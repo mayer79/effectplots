@@ -5,7 +5,7 @@
 #' - average predicted,
 #' - partial dependence, and
 #' - counts/weights
-#' over a (binned) feature v, possibly weigthed by a vector `w`.
+#' over a (binned) feature v, possibly weighted.
 #'
 #'
 #'
@@ -30,18 +30,16 @@
 #' fit <- ranger(Sepal.Length ~ ., data = iris)
 #' pf <- function(m, x) predict(m, x)$predictions
 #'
-#' x <- marginal.default(
+#' M <- marginal.default(
 #'   fit,
-#'   v = 'Sepal.Width',
-#'   X = iris,
+#'   x_name = "Species",
+#'   data = iris,
 #'   y = "Sepal.Length",
-#'   pred_fun = pf,
-#'   breaks = 5,
-#'   max_bins_discrete = 2
+#'   pred_fun = pf
 #' )
-#' x
-#' x |> plot(backend = "plotly")
-#' x |> plot(exposure = 1)
+#' M
+#' M |> plot(backend = "plotly")
+#' M |> plot()
 marginal <- function(object, ...) {
   UseMethod("marginal")
 }
@@ -50,124 +48,74 @@ marginal <- function(object, ...) {
 #' @export
 marginal.default <- function(
     object,
-    v,
-    X,
-    y = NULL,                 #  NULL to switch off
+    x_name,
+    data,
+    y = NULL,
     pred = NULL,
     pred_fun = stats::predict,
     w = NULL,
-    breaks = "FD",
+    breaks = "Sturges",
     right = TRUE,
-    max_bins_discrete = 28,
-    pd_n = 1000L,             #  0 to switch off
+    discrete = NULL,
+    pd_n = 500L,
     ...
 ) {
   stopifnot(
-    is.data.frame(X) || is.matrix(X),
+    is.data.frame(data) || is.matrix(data),
     is.function(pred_fun),
-    nrow(X) >= 2L,
-    v %in% colnames(X)
+    x_name %in% colnames(data)
   )
 
   # Prepare pred (can't stay NULL)
   if (is.null(pred)) {
-    pred <- prepare_pred2(pred_fun(object, X, ...))
+    pred <- prep_vector(pred_fun(object, data, ...))
   } else {
-    pred <- prepare_pred2(pred)
-    if (length(pred) != nrow(X)) {
-      stop("'pred' should be a vector of length nrow(X), or NULL.")
+    pred <- prep_vector(pred)
+    if (length(pred) != nrow(data)) {
+      stop("'pred' should be a vector of length nrow(data), or NULL.")
     }
   }
 
   # Prepare y (can stay NULL)
   if (!is.null(y)) {
-    y <- prepare_yw(y, X)
+    y <- prep_vector(name_or_vector(y, data))
   }
 
   # Prepare w (can stay NULL)
   if (!is.null(w)) {
-    w <- prepare_w(w, X = X)[["w"]]
+    w <- prep_vector(name_or_vector(w, data))
     if (any(w < 0) || anyNA(w)) {
       stop("'w' can't have negative or missing values")
     }
   }
 
-  # prepare v
-  if (length(v) != 1L || !(v %in% colnames(X))) {
-    stop("'v' must be a column name in 'X'.")
-  }
-  vv <- if (is.matrix(X)) X[, v] else X[[v]]
-
-  grid <- unique(vv)
-
-  if (is.numeric(vv) && length(grid) > max_bins_discrete) {
-    H <- graphics::hist(
-      vv,
-      breaks = breaks,
-      include.lowest = TRUE,
-      right = right,
-      plot = FALSE
-    )
-    grid <- H$mids      # Sorted, i.e. same order as gwColMeans()
-    vv <- grid[
-      findInterval(
-        vv, H$breaks, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
-      )
-    ]
-    bar_width <- diff(H$breaks)
-    is_discrete <- FALSE
-  } else {
-    grid <- sort(grid)    # Same order as gwColMeans(). TODO: Check factors
-    if (anyNA(x)) {
-      grid <- c(grid, NA)
-    }
-    bar_width <- 0.7
-    is_discrete <- TRUE
-  }
-
-  # Get statistics and attach info
-  out <- gwColMeans(cbind(pred = pred, y = y), g = vv, w = w)
-  out <- cbind.data.frame(grid, out$w, bar_width, out$M)
-  colnames(out) <- c("v", "exposure", "bar_width", "pred", if (!is.null(y)) "obs")
-  rownames(out) <- NULL
-
-  # Partial dependence
-  if (pd_n >= 1L) {
-    if (nrow(X) > pd_n) {
-      ix <- sample(nrow(X), pd_n)
-      X <- X[ix, , drop = FALSE]
-      if (!is.null(w)) {
-        w <- w[ix]
-      }
-    }
-    out$pd <- wrowmean_vector(
-      ice_raw(
-        object = object,
-        v = v,
-        X = X,
-        grid = grid,
-        pred_fun = pred_fun,
-        pred_only = TRUE,
-        ...
-      ),
-      ngroups = length(grid),
-      w = w
-    )
-  }
-
-  if (is_discrete && is.numeric(grid)) {
-    out[[v]] <- factor(out[[v]])
-  }
-
-  # Combine everything
-  structure(
-    list(data = out, v = v, is_discrete = is_discrete),
-    class = "marginal"
+  out <- calculate_stats(
+    x = if (is.matrix(data)) data[, x_name] else data[[x_name]],
+    pred = pred,
+    y = y,
+    w = w,
+    breaks = breaks,
+    right = right,
+    discrete = discrete
   )
+
+  if (pd_n >= 1L) {
+    out$data$pd <- partial_dep(
+      object = object,
+      v = x_name,
+      X = data,
+      grid = out$data$eval_at,
+      pred_fun = pred_fun,
+      pd_n = pd_n,
+      w = w,
+      ...
+    )
+  }
+
+  out$x_name <- x_name
+  class(out) <- "marginal"
+  out
 }
-
-
-
 
 #' @describeIn marginal Method for "ranger" models.
 #' @export
@@ -212,8 +160,12 @@ print.marginal <- function(x, ...) {
 #' @importFrom ggplot2 .data
 #' @param x An object of class "marginal".
 #' @param line_colors Named vector of line colors. By default, a color blind
-#'   palette from {ggthemes} is used. Can be used to remove certain lines in the plot.
-#' @param fill Fill color of bars. Default is "lightgrey".
+#'   palette from {ggthemes} is used, equalling to
+#'   `c(obs = "#E69F00", pred = "#009E73", pd = "#56B4E9")`.
+#'   To change globally, set `options(marginalplot.line_colors = "named color vector")`.
+#'   Can be used to remove certain lines in the plot.
+#' @param fill Fill color of bars. The default equals "lightgrey".
+#'   To change globally, set `options(marginalplot.fill = "new color")`.
 #' @param rotate_x Should x axis labels be rotated by 45 degrees (only ggplot2)?
 #' @param show_exposure Should exposure bars be shown (on hidden right y axis)?
 #'   For `backend = "ggplot"`, a value between 0 and 1 scales the bar heights so they
@@ -221,22 +173,23 @@ print.marginal <- function(x, ...) {
 #' @param drop_below Drop values with lower exposure. The default 0 keeps all.
 #' @param na.rm Should values for missing v be plotted (on the very right)?
 #'   Default is `TRUE`.
-#' @param backend Plot backend, one of "ggplot2" or "plotly". TODO: Make global option.
+#' @param backend Plotting backend, one of "ggplot2" (default) or "plotly".
+#'   To change globally, set `options(marginalplot.backend = "plotly")`.
 #' @param ... Currently not used.
 #' @export
 #' @returns An object of class "ggplot" or "plotly"/"htmlwidget".
 plot.marginal <- function(
     x,
-    line_colors = c(obs = "#E69F00", pred = "#009E73", pd = "#56B4E9"),
-    fill = "lightgrey",
+    line_colors = getOption("marginalplot.line_colors"),
+    fill = getOption("marginalplot.fill"),
     rotate_x = FALSE,
     show_exposure = TRUE,
     drop_below = 0,
     na.rm = FALSE,
-    backend = c("ggplot2", "plotly"),
+    backend = getOption("marginalplot.plot_backend"),
     ...
 ) {
-  backend <- match.arg(backend)
+  stopifnot(backend %in% c("ggplot2", "plotly"))
   vars_to_show <- Reduce(
     intersect, list(c("obs", "pred", "pd"), colnames(x$data), names(line_colors))
   )
@@ -245,7 +198,7 @@ plot.marginal <- function(
     x$data <- x$data[x$data$exposure >= drop_below, ]
   }
   if (isTRUE(na.rm)) {
-    x$data <- x$data[!is.na(x$data$v), ]
+    x$data <- x$data[!is.na(x$data$bar_center), ]
   }
 
   if (backend == "plotly") {
@@ -269,24 +222,30 @@ plot.marginal <- function(
   )
 }
 
-plot_marginal_plotly <- function(x, vars_to_show, line_colors, fill, show_exposure, ...) {
-  fig <- plot_ly(x = x$data$v)
+plot_marginal_plotly <- function(
+    x, vars_to_show, line_colors, fill, show_exposure, ...
+) {
+  fig <- plot_ly()
 
   if (show_exposure) {
     fig <- add_bars(
       fig,
-      y = x$data$exposure,
+      x = ~bar_center,
+      y = ~exposure,
       yaxis = "y2",
       color = I(fill),
       name = "exposure",
       showlegend = FALSE,
-      width = x$data$bar_width
+      width = ~bar_width,
+      marker = list(line = list(color = fill, width = 1)),  # to avoid tiny white gaps
+      data = x$data
     )
   }
 
   for (z in vars_to_show) {
     fig <- add_trace(
       fig,
+      x = ~eval_at,
       y = x$data[[z]],
       mode = "lines+markers",
       type = "scatter",
@@ -295,14 +254,13 @@ plot_marginal_plotly <- function(x, vars_to_show, line_colors, fill, show_exposu
     )
   }
 
-  fig <- layout(
+  layout(
     fig,
     yaxis2 = list(side = "right", showgrid = FALSE, showticklabels = FALSE),
     yaxis = list(title = "Response", overlaying = "y2"),
-    xaxis = list(title = x$v),
+    xaxis = list(title = x$x_name),
     legend = list(orientation = "v", x = 1.05, xanchor = "left")
   )
-  fig
 }
 
 plot_marginal_ggplot <- function(
@@ -315,7 +273,6 @@ plot_marginal_ggplot <- function(
     ...
 ) {
   df <- poor_man_stack(x$data, vars_to_show)
-  df$varying_ <- factor(df$varying_, levels = vars_to_show)
 
   if (show_exposure > 0) {
     mult <- show_exposure * diff(range(df$value_, na.rm = TRUE)) / max(x$data$exposure)
@@ -324,7 +281,7 @@ plot_marginal_ggplot <- function(
     bars <- ggplot2::geom_tile(
       x$data,
       mapping = ggplot2::aes(
-        x = v,
+        x = bar_center,
         y = exposure / 2 * mult + add,
         height = exposure * mult,
         width = bar_width
@@ -340,7 +297,7 @@ plot_marginal_ggplot <- function(
     bars <- NULL
   }
 
-  p <- ggplot2::ggplot(df, aes(x = v, y = value_)) +
+  p <- ggplot2::ggplot(df, aes(x = eval_at, y = value_)) +
     bars +
     ggplot2::geom_point(ggplot2::aes(color = varying_), size = 2) +
     ggplot2::geom_line(
@@ -349,7 +306,7 @@ plot_marginal_ggplot <- function(
     ggplot2::scale_color_manual(values = line_colors) +
     ggplot2::theme_bw() +
     ggplot2::theme(legend.title = ggplot2::element_blank(), legend.position = "right") +
-    ggplot2::labs(x = x$v, y = "Prediction scale")
+    ggplot2::labs(x = x$x_name, y = "Prediction scale")
 
   if (rotate_x) {
     p <- p + rotate_x_labs()
@@ -357,17 +314,3 @@ plot_marginal_ggplot <- function(
   p
 }
 
-
-
-
-fit <- ranger(price~ carat + color + cut + clarity, data = diamonds)
-
-profvis::profvis(x <- marginal.default(
-  fit,
-  v = "color",
-  X = diamonds,
-  y = "price",
-  pred_fun = pf,
-  breaks = c(0.2, 0.4, 0.6, 0.8, 1, 1.5, 2, 3, 6),
-  max_bins_discrete = 2
-))
