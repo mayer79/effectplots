@@ -9,9 +9,31 @@
 #'
 #'
 #'
-#' @inheritParams hstats
-#' @param v One or more column names over which you want to calculate the partial
-#'   dependence.
+#' @param object Fitted model.
+#' @param x_name Column name of the stratification variable shown on the x axis.
+#' @param data Matrix-like.
+#' @param y Numeric vector of the response. Can also be a column name in `data`.
+#'   Omitted if `NULL` (default).
+#' @param pred Numeric vector with predictions. If `NULL` (and `pref_fun` is not
+#'   `NULL`), it is calculated as `pred_fun(object, data, ...)`. Used to save time
+#'   if the function is to be called multiple times. Can be omitted only if both
+#'   `pred` and `pred_fun` are `NULL`, which also excludes the possibility to crunch
+#'   partial dependence.
+#' @param pred_fun Prediction function, by default `stats::predict`. The function takes
+#'   three arguments: `object`, `data`, and `...`.
+#' @param w Optional vector with case weights. Can also be a column name in `data`.
+#' @param breaks An integer, a vector, a string or a function specifying the bins,
+#'   see [graphics::hist()]. The default is "Sturges". Calculations are done by
+#'   [graphics::hist()].
+#' @param right Should bins created via [graphics::hist()] be right-closed?
+#'   The default is `TRUE`.
+#' @param discrete Set to `TRUE` to force a numeric x to be treated as discrete, i.e.,
+#'   not to use binning.
+#' @param pd_n Size of the dataset used for calculation of partial dependence.
+#'   The default is 500. Set to 0 (or pass `pred_fun = NULL`) to omit calculation
+#'   of partial dependence.
+#' @param ... Further arguments passed to `pred_fun()`, e.g., `type = "response"` in
+#'   a `glm()` model.
 #' @returns
 #'   An object of class "marginal" containing these elements:
 #'   - `data`: data.frame containing the partial dependencies.
@@ -24,7 +46,6 @@
 #'     Annals of Statistics 29, no. 5 (2001): 1189-1232.
 #' @export
 #' @examples
-#' library(plotly)
 #' library(ranger)
 #'
 #' fit <- ranger(Sepal.Length ~ ., data = iris)
@@ -62,18 +83,18 @@ marginal.default <- function(
 ) {
   stopifnot(
     is.data.frame(data) || is.matrix(data),
-    is.function(pred_fun),
+    is.null(pred_fun) || is.function(pred_fun),
     x_name %in% colnames(data)
   )
 
-  # Prepare pred (can't stay NULL)
-  if (is.null(pred)) {
+  # Prepare pred
+  if (is.null(pred) && !is.null(pred_fun)) {
     pred <- prep_vector(pred_fun(object, data, ...))
-  } else {
-    pred <- prep_vector(pred)
+  } else if (!is.null(pred)) {
     if (length(pred) != nrow(data)) {
       stop("'pred' should be a vector of length nrow(data), or NULL.")
     }
+    pred <- prep_vector(pred)
   }
 
   # Prepare y (can stay NULL)
@@ -89,8 +110,15 @@ marginal.default <- function(
     }
   }
 
+  # calculate_stats() does not work if both pred and y are NULL
+  if (is.null(pred) && is.null(y)) {
+    stop("Either 'pred' or 'y' must be available.")
+  }
+
+  x <- if (is.matrix(data)) data[, x_name] else data[[x_name]]
+
   out <- calculate_stats(
-    x = if (is.matrix(data)) data[, x_name] else data[[x_name]],
+    x = x,
     pred = pred,
     y = y,
     w = w,
@@ -99,7 +127,7 @@ marginal.default <- function(
     discrete = discrete
   )
 
-  if (pd_n >= 1L) {
+  if (pd_n >= 1L && !is.null(pred_fun)) {
     out$data$pd <- partial_dep(
       object = object,
       v = x_name,
@@ -119,16 +147,39 @@ marginal.default <- function(
 
 #' @describeIn marginal Method for "ranger" models.
 #' @export
-marginal.ranger <- function() {
-  print("Todo")
-  # marginal.default()
-}
+# marginal.ranger <- function() {
+#   print("Todo")
+#   # marginal.default()
+# }
 
 #' @describeIn marginal Method for DALEX "explainer".
 #' @export
 marginal.explainer <- function() {
   print("Todo")
   # marginal.default()
+}
+
+#' @export
+#' @examples
+#' M <- bivariate("Species", data = iris, y = "Sepal.Length")
+#' M
+#' M |> plot(backend = "plotly")
+#' M |> plot()
+bivariate <- function(
+    x_name, data, y, w = NULL, breaks = "Sturges", right = TRUE, discrete = NULL
+) {
+  marginal.default(
+    object = NULL,
+    x_name = x_name,
+    data = data,
+    y = y,
+    pred = NULL,
+    pred_fun = NULL,
+    w = w,
+    breaks = breaks,
+    right = right,
+    discrete = discrete,
+  )
 }
 
 #' Prints "marginal" Object
@@ -186,7 +237,7 @@ plot.marginal <- function(
     show_exposure = TRUE,
     drop_below = 0,
     na.rm = FALSE,
-    backend = getOption("marginalplot.plot_backend"),
+    backend = getOption("marginalplot.backend"),
     ...
 ) {
   stopifnot(backend %in% c("ggplot2", "plotly"))
@@ -198,7 +249,7 @@ plot.marginal <- function(
     x$data <- x$data[x$data$exposure >= drop_below, ]
   }
   if (isTRUE(na.rm)) {
-    x$data <- x$data[!is.na(x$data$bar_center), ]
+    x$data <- x$data[!is.na(x$data$bar_at), ]
   }
 
   if (backend == "plotly") {
@@ -225,12 +276,12 @@ plot.marginal <- function(
 plot_marginal_plotly <- function(
     x, vars_to_show, line_colors, fill, show_exposure, ...
 ) {
-  fig <- plot_ly()
+  fig <- plotly::plot_ly()
 
   if (show_exposure) {
-    fig <- add_bars(
+    fig <- plotly::add_bars(
       fig,
-      x = ~bar_center,
+      x = ~bar_at,
       y = ~exposure,
       yaxis = "y2",
       color = I(fill),
@@ -243,7 +294,7 @@ plot_marginal_plotly <- function(
   }
 
   for (z in vars_to_show) {
-    fig <- add_trace(
+    fig <- plotly::add_trace(
       fig,
       x = ~eval_at,
       y = x$data[[z]],
@@ -254,7 +305,7 @@ plot_marginal_plotly <- function(
     )
   }
 
-  layout(
+  plotly::layout(
     fig,
     yaxis2 = list(side = "right", showgrid = FALSE, showticklabels = FALSE),
     yaxis = list(title = "Response", overlaying = "y2"),
@@ -281,7 +332,7 @@ plot_marginal_ggplot <- function(
     bars <- ggplot2::geom_tile(
       x$data,
       mapping = ggplot2::aes(
-        x = bar_center,
+        x = bar_at,
         y = exposure / 2 * mult + add,
         height = exposure * mult,
         width = bar_width

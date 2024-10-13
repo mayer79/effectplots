@@ -29,7 +29,6 @@ gwColMeans <- function(x, g, w = NULL) {
   list(M = rowsum(x, group = g) / denom, w = denom)
 }
 
-
 # Adapted from {hstats}
 partial_dep <- function(
     object, v, X, grid, pred_fun = stats::predict, pd_n = 500, w = NULL, ...
@@ -103,7 +102,7 @@ calculate_stats <- function(
       g <- factor(g)  # To ensure nice plot scales
     }
     S <- gwColMeans(cbind(pred = pred, obs = y), g = x, w = w)
-    out <- data.frame(bar_center = g, bar_width = 0.7, exposure = S$w, eval_at = g, S$M)
+    out <- data.frame(bar_at = g, bar_width = 0.7, exposure = S$w, eval_at = g, S$M)
     rownames(out) <- NULL
     discrete <- TRUE
   } else {
@@ -119,12 +118,12 @@ calculate_stats <- function(
     )
     S <- gwColMeans(cbind(eval_at = x, pred = pred, obs = y), g = ix, w = w)
     S <- cbind(exposure = S$w, S$M)
-    out <- data.frame(bar_center = g, bar_width = diff(H$breaks))
+    out <- data.frame(bar_at = g, bar_width = diff(H$breaks))
     out[rownames(S), colnames(S)] <- S
     s <- is.na(out$exposure)
     if (any(s)) {
       out[s, "exposure"] <- 0
-      out[s, "eval_at"] <- out[s, "bar_center"]
+      out[s, "eval_at"] <- out[s, "bar_at"]
     }
     discrete <- FALSE
   }
