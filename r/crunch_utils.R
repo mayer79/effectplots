@@ -12,21 +12,52 @@ rep_rows <- function(x, i) {
   out
 }
 
+
+#' Stack some Columns (from hstats)
+#'
+#' Internal function used in the plot method for "pd" objects. The function brings
+#' wide columns `to_stack` (the prediction dimensions) into long form.
+#'
+#' @noRd
+#' @keywords internal
+#'
+#' @param data A data.frame.
+#' @param to_stack Column names in `data` to bring from wide to long form.
+#' @returns
+#'   A data.frame with variables not in `to_stack`, a column "varying_" with
+#'   the column name from `to_stack`, and finally a column "value_" with stacked values.
+poor_man_stack <- function(data, to_stack) {
+  if (!is.data.frame(data)) {
+    stop("'data' must be a data.frame.")
+  }
+  keep <- setdiff(colnames(data), to_stack)
+  out <- lapply(
+    to_stack,
+    FUN = function(z) cbind.data.frame(data[keep], varying_ = z, value_ = data[, z])
+  )
+  out <- do.call(rbind, out)
+  transform(out, varying_ = factor(varying_, levels = to_stack))
+}
+
 # Adapted from hstats:::wrowmean_vector()
 wrowmean <- function(x, ngroups = 1L, w = NULL) {
   dim(x) <- c(length(x) %/% ngroups, ngroups)
   if (is.null(w)) colMeans(x) else colSums(x * w) / sum(w)
 }
 
-# Adapted from hstats:::gwColMeans()
-gwColMeans <- function(x, g, w = NULL) {
+grouped_mean <- function(x, g, w = NULL) {
   if (is.null(w)) {
-    w <- rep.int(1, NROW(x))
-  } else {
+    w <- rep.int(1, length(g))
+  } else if (!is.null(x)) {
     x <- x * w
   }
-  denom <- as.numeric(rowsum(w, group = g))
-  list(M = rowsum(x, group = g) / denom, w = denom)
+  exposure <- rowsum(w, group = g)
+  colnames(exposure) <- "exposure"
+  if (is.null(x)) {
+    return(exposure)
+  }
+  S <- rowsum(x, group = g)
+  cbind(S / as.numeric(exposure), exposure)
 }
 
 # Adapted from {hstats}
@@ -88,21 +119,15 @@ calculate_stats <- function(
     w = NULL,
     breaks = "Sturges",
     right = TRUE,
-    discrete = NULL
+    discrete_m = NULL
 ) {
-  if (is.null(pred) && is.null(y)) {
-    stop("Either pred or y must be present")
-  }
   g <- unique(x)
 
   # DISCRETE
-  if (!is.numeric(x) || isTRUE(discrete) || length(g) <= 2L) {
+  if (!is.numeric(x) || length(g) <= discrete_m) {
     g <- sort(g, na.last = TRUE)  # Same order as gwCOlMeans() resp. rowsum(sorted)
-    if (is.numeric(g)) {
-      g <- factor(g)  # To ensure nice plot scales
-    }
-    S <- gwColMeans(cbind(pred = pred, obs = y), g = x, w = w)
-    out <- data.frame(bar_at = g, bar_width = 0.7, exposure = S$w, eval_at = g, S$M)
+    S <- grouped_mean(cbind(pred = pred, obs = y), g = x, w = w)
+    out <- data.frame(bar_at = g, bar_width = 0.7, eval_at = g, S)
     rownames(out) <- NULL
     discrete <- TRUE
   } else {
@@ -116,8 +141,7 @@ calculate_stats <- function(
     ix <- findInterval(
       x, vec = H$breaks, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
     )
-    S <- gwColMeans(cbind(eval_at = x, pred = pred, obs = y), g = ix, w = w)
-    S <- cbind(exposure = S$w, S$M)
+    S <- grouped_mean(cbind(eval_at = x, pred = pred, obs = y), g = ix, w = w)
     out <- data.frame(bar_at = g, bar_width = diff(H$breaks))
     out[rownames(S), colnames(S)] <- S
     s <- is.na(out$exposure)
