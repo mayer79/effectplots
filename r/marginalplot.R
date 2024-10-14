@@ -26,6 +26,11 @@
 #'   The default is `TRUE`.
 #' @param discrete_m Numeric variable with up to this number of unique values
 #'   should not be binned. The default is 2. Set to `Inf` to avoid any binning.
+#' @param winsorize_x Probabilities used to calculate lower and upper quantiles for
+#'   Winsorization of `x`. The default is `c(0.01, 0.99)`. Set to `0:1` for no
+#'   Winsorization.
+#' @param winsorize_nmax If `x` is larger than this, Winsorization quantiles are
+#'   derived from a sample of this size.
 #' @param calc_pred Should predictions `pred` be calculated? Default is `TRUE`.
 #' @param pd_n Size of the dataset used for calculation of partial dependence.
 #'   The default is 500. Set to 0 (or pass `pred_fun = NULL`) to omit calculation
@@ -77,6 +82,8 @@ marginal.default <- function(
     breaks = "Sturges",
     right = TRUE,
     discrete_m = 2L,
+    winsorize_x = c(0.01, 0.99),
+    winsorize_nmax = 1e5,
     calc_pred = TRUE,
     pd_n = 500L,
     ...
@@ -84,7 +91,9 @@ marginal.default <- function(
   stopifnot(
     is.data.frame(data) || is.matrix(data),
     is.function(pred_fun),
-    x_name %in% colnames(data)
+    x_name %in% colnames(data),
+    length(winsorize_x) == 2L,
+    winsorize_x[1L] <= winsorize_x[2L]
   )
 
   # Prepare pred
@@ -126,6 +135,8 @@ marginal.default <- function(
       breaks = breaks,
       right = right,
       discrete_m = discrete_m,
+      winsorize_x = winsorize_x,
+      winsorize_nmax = winsorize_nmax,
       calc_pred = calc_pred,
       pd_n = pd_n,
       ...
@@ -135,7 +146,11 @@ marginal.default <- function(
     return(out)
   }
 
+  # Prepare x
   x <- if (is.matrix(data)) data[, x_name] else data[[x_name]]
+  if (is.numeric(x) && (winsorize_x[1L] > 0 || winsorize_x[2L] < 1)) {
+    x <- winsorize(x, probs = winsorize_x, nmax = winsorize_nmax)
+  }
 
   out <- calculate_stats(
     x = x,

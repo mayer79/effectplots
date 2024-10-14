@@ -1,3 +1,19 @@
+winsorize <- function(x, probs = 0:1, nmax = 1e5) {
+  if (!is.numeric(x) || (probs[1L] == 0 && probs[2L] == 1)) {
+    return(x)
+  }
+  xs <- if (length(x) > nmax) sample(x, nmax) else x
+  # If one of the probs is 0 or 1, the following line is inefficient
+  q <- stats::quantile(xs, probs = probs, na.rm = TRUE, names = FALSE, type = 1L)
+  if (probs[1L] > 0) {
+    x[x < q[1L]] <- q[1L]
+  }
+  if (probs[2L] < 1) {
+    x[x > q[2L]] <- q[2L]
+  }
+  return(x)
+}
+
 # Copied from hstats:::rep_rows
 rep_rows <- function(x, i) {
   if (!(all(class(x) == "data.frame"))) {

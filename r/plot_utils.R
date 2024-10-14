@@ -121,6 +121,7 @@ plot_marginal_plotly <- function(
       x = ~eval_at,
       y = x$data[[z]],
       data = x$data,
+      yaxis = "y",
       mode = "lines+markers",
       type = "scatter",
       name = z,
@@ -137,7 +138,7 @@ plot_marginal_plotly <- function(
   }
   plotly::layout(
     fig,
-    yaxis = list(title = "Response", overlaying = "y2"),
+    yaxis = list(side = "left", title = "Response", overlaying = "y2"),
     yaxis2 = list(side = "right", showgrid = FALSE, showticklabels = FALSE),
     xaxis = list(title = x$x_name),
     legend = list(orientation = "v", x = 1.05, xanchor = "left")
@@ -243,6 +244,9 @@ plot.multimarginal <- function(
   )
   if (backend == "ggplot2") {
     patchwork::wrap_plots(plot_list)
+  } else {
+    #subplot(plot_list, titleY = TRUE, titleX = TRUE)
+    combineWidgets(list = plot_list, ncol = 1)
   }
 }
 
