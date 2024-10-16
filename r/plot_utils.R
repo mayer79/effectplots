@@ -32,7 +32,6 @@ plot.marginal <- function(
     fill = getOption("marginalplot.fill"),
     cat_rotate_x = FALSE,
     show_exposure = TRUE,
-    show_legend = NULL,
     ylim = NULL,
     backend = getOption("marginalplot.backend"),
     ...
@@ -41,10 +40,6 @@ plot.marginal <- function(
   vars_to_show <- Reduce(
     intersect, list(c("obs", "pred", "pd"), colnames(x$data), names(line_colors))
   )
-
-  if (is.null(show_legend)) {
-    show_legend <- length(vars_to_show) > 1L
-  }
 
   if (backend == "plotly") {
     p <- plot_marginal_plotly(
@@ -66,7 +61,6 @@ plot.marginal <- function(
     fill = fill,
     cat_rotate_x = cat_rotate_x,
     show_exposure = show_exposure,
-    show_legend = show_legend,
     ylim = ylim,
     ...
   )
@@ -133,7 +127,6 @@ plot_marginal_ggplot <- function(
     fill,
     cat_rotate_x,
     show_exposure,
-    show_legend = NULL,
     ylim = NULL,
     ...
 ) {
@@ -159,10 +152,6 @@ plot_marginal_ggplot <- function(
       show.legend = FALSE,
       fill = fill
     )
-    # ggplot2::scale_y_continuous(
-    # sec.axis = ggplot2::sec_axis(
-    #   transform = ~ (. - ylim[1L]) / mult, name = ggplot2::element_blank()
-    # ))
   } else {
     bars <- NULL
   }
@@ -170,16 +159,21 @@ plot_marginal_ggplot <- function(
   p <- ggplot2::ggplot(df, ggplot2::aes(x = eval_at, y = value_)) +
     bars +
     ggplot2::geom_point(
-      ggplot2::aes(color = varying_), size = 2, show.legend = show_legend
+      ggplot2::aes(color = varying_),
+      size = 2,
+      show.legend = length(vars_to_show) > 1L
     ) +
     ggplot2::geom_line(
       ggplot2::aes(color = varying_, group = varying_),
       linewidth = 0.8,
-      show.legend = show_legend
+      show.legend = length(vars_to_show) > 1L
     ) +
     ggplot2::scale_color_manual(values = line_colors) +
     ggplot2::theme_bw() +
-    ggplot2::theme(legend.title = ggplot2::element_blank(), legend.position = "right") +
+    ggplot2::theme(
+      legend.title = ggplot2::element_blank(),
+      legend.position = "right"
+    ) +
     ggplot2::labs(x = x$x_name, y = "Prediction scale")
 
   if (!is.null(ylim)) {
@@ -222,7 +216,7 @@ plot.multimarginal <- function(
   plot_list <- mapply(
     plot.marginal,
     x,
-    show_legend = row_i == 1L & col_i == ncol,
+    # show_legend = row_i == 1L & col_i == ncol,
     MoreArgs = list(
       line_colors = line_colors,
       fill = fill,
@@ -239,11 +233,11 @@ plot.multimarginal <- function(
       p <- plot_list[[i]]
       p <- p + ggplot2::ggtitle(names(x)[i])
       if (col_i[i] != 1L) {
-        p <- p + ggplot2::ylab(element_blank())
+        p <- p + ggplot2::ylab(ggplot2::element_blank())
       }
       plot_list[[i]] <- p
     }
-    patchwork::wrap_plots(plot_list, ncol = ncol)
+    patchwork::wrap_plots(plot_list, ncol = ncol, guides = "collect", ...)
   } else {
     subplot(
       plot_list,
@@ -251,7 +245,8 @@ plot.multimarginal <- function(
       titleY = TRUE,
       nrows = ceiling(length(x) / ncol),
       margin = 0.05,
-      shareY = if (share_y) "all" else FALSE
+      shareY = if (share_y) "all" else FALSE,
+      ...
     )
   }
 }

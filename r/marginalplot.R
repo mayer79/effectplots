@@ -7,8 +7,6 @@
 #' - counts/weights
 #' over a (binned) feature v, possibly weighted.
 #'
-#'
-#'
 #' @param object Fitted model.
 #' @param x_name Column name of the stratification variable shown on the x axis.
 #' @param data Matrix-like.
