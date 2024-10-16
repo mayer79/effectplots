@@ -22,15 +22,18 @@
 #' @param w Optional vector with case weights. Can also be a column name in `data`.
 #' @param breaks An integer, a vector, a string or a function specifying the bins
 #'   of `x`, and passed to [graphics::hist()]. The default is "Sturges".
+#'   *Not* vectorized over `x_name`.
 #' @param right Should bins created via [graphics::hist()] be right-closed?
-#'   The default is `TRUE`.
+#'   The default is `TRUE`. Vectorized over `x_name`.
 #' @param discrete_m Numeric variable with up to this number of unique values
 #'   should not be binned. The default is 2. Set to `Inf` to avoid any binning.
-#' @param winsorize_x Probabilities used to calculate lower and upper quantiles for
-#'   Winsorization of `x`. The default is `c(0.01, 0.99)`. Set to `0:1` for no
-#'   Winsorization.
-#' @param winsorize_nmax If `x` is larger than this, Winsorization quantiles are
-#'   derived from a sample of this size.
+#'   Vectorized over `x_name`.
+#' @param wins_low Small values of `x` are capped at the `wins_low` quantile.
+#'   Set to 0 to avoid Winsorizing. Note that at most 100k observations are sampled
+#'   to calculate the quantile. Vectorized over `x_name`.
+#' @param wins_low High values of `x` are capped at the `wins_high` quantile.
+#'   Set to 1 to avoid Winsorizing. Note that at most 100k observations are sampled
+#'   to calculate the quantile. Vectorized over `x_name`.
 #' @param calc_pred Should predictions `pred` be calculated? Default is `TRUE`.
 #' @param pd_n Size of the dataset used for calculation of partial dependence.
 #'   The default is 500. Set to 0 (or pass `pred_fun = NULL`) to omit calculation
@@ -54,15 +57,8 @@
 #' fit <- ranger(Sepal.Length ~ ., data = iris)
 #' pf <- function(m, x) predict(m, x)$predictions
 #'
-#' M <- marginal.default(
-#'   fit,
-#'   x_name = c("Sepal.Width", "Species"),
-#'   data = iris,
-#'   y = "Sepal.Length",
-#'   pred_fun = pf,
-#'   breaks = seq(2, 4.5, by = 0.5)
-#' )
-#' M
+#' M <- marginal.default(fit, x_name = c("Sepal.Width", "Petal.Width", "Petal.Length", "Species"), data = iris, y = "Sepal.Length", pred_fun = pf)
+#' M$Petal.Width
 #' M |> plot()
 #' M |> plot(backend = "plotly")
 marginal <- function(object, ...) {
@@ -82,8 +78,8 @@ marginal.default <- function(
     breaks = "Sturges",
     right = TRUE,
     discrete_m = 2L,
-    winsorize_x = c(0.01, 0.99),
-    winsorize_nmax = 1e5,
+    wins_low = 0.01,
+    wins_high = 0.99,
     calc_pred = TRUE,
     pd_n = 500L,
     ...
@@ -92,8 +88,7 @@ marginal.default <- function(
     is.data.frame(data) || is.matrix(data),
     is.function(pred_fun),
     x_name %in% colnames(data),
-    length(winsorize_x) == 2L,
-    winsorize_x[1L] <= winsorize_x[2L]
+    wins_low <= wins_high
   )
 
   # Prepare pred
@@ -123,23 +118,26 @@ marginal.default <- function(
 
   # Deal with multiple x_name
   if (length(x_name) > 1L) {
-    out <- lapply(
+    out <- mapply(
       x_name,
       FUN = marginal,
-      object = object,
-      data = data,
-      y = y,
-      pred = pred,
-      pred_fun = pred_fun,
-      w = w,
-      breaks = breaks,
       right = right,
       discrete_m = discrete_m,
-      winsorize_x = winsorize_x,
-      winsorize_nmax = winsorize_nmax,
-      calc_pred = calc_pred,
-      pd_n = pd_n,
-      ...
+      wins_low = wins_low,
+      wins_high = wins_high,
+      MoreArgs = list(
+        object = object,
+        data = data,
+        y = y,
+        pred = pred,
+        pred_fun = pred_fun,
+        w = w,
+        breaks = breaks,
+        calc_pred = calc_pred,
+        pd_n = pd_n,
+        ...
+      ),
+      SIMPLIFY = FALSE
     )
     names(out) <- x_name
     class(out) <- "multimarginal"
@@ -148,8 +146,8 @@ marginal.default <- function(
 
   # Prepare x
   x <- if (is.matrix(data)) data[, x_name] else data[[x_name]]
-  if (is.numeric(x) && (winsorize_x[1L] > 0 || winsorize_x[2L] < 1)) {
-    x <- winsorize(x, probs = winsorize_x, nmax = winsorize_nmax)
+  if (is.numeric(x) && (wins_low > 0 || wins_high < 1)) {
+    x <- winsorize(x, probs = c(wins_low, wins_high), nmax = 1e5)
   }
 
   out <- calculate_stats(
@@ -175,7 +173,7 @@ marginal.default <- function(
     )
   }
 
-  if (out$discrete) {
+  if (out$discrete && !is.factor(out$data$bar_at)) {
     # To ensure nice plot scales
     out$data$bar_at <- out$data$eval_at <- factor(out$data$bar_at)
   }
@@ -201,17 +199,17 @@ marginal.explainer <- function() {
 #' @inheritParams marginal
 #' @export
 #' @examples
-#' M <- bivariate(x_name = "Species", data = iris, y = "Sepal.Length")
+#' M <- average_observed(x_name = "Species", data = iris, y = "Sepal.Length")
 #' M
 #' M |> plot()
 #' M |> plot(backend = "plotly")
 #'
 #' xvars <- c("Sepal.Width", "Species")
-#' M <- bivariate(xvars, data = iris, y = "Sepal.Length")
+#' M <- average_observed(xvars, data = iris, y = "Sepal.Length")
 #' M
 #' M$Species
 #' plot(M)
-bivariate <- function(
+average_observed <- function(
     x_name, data, y, w = NULL, breaks = "Sturges", right = TRUE, discrete_m = 2L
 ) {
   marginal.default(
@@ -280,5 +278,54 @@ print.multimarginal <- function(x, ...) {
   invisible(x)
 }
 
+postprocess <- function(object, ...) {
+  UseMethod("postprocess")
+}
 
+postprocess.default <- function(object, ...) {
+  stop("Undefined")
+}
 
+postprocess.marginal <- function(
+    object,
+    disc_drop_below_n = 0,
+    disc_drop_below_prop = 0,
+    disc_explicit_na = TRUE,
+    drop_na = FALSE
+  ) {
+  X <- object$data
+
+  if (object$discrete) {
+    if (disc_drop_below_n > 0) {
+      X <- X[X$exposure >= drop_below_n, ]
+    }
+    if (disc_drop_below_prop > 0) {
+      X <- X[X$exposure / sum(X$exposure)>= drop_below_prop, ]
+    }
+
+    if (disc_explicit_na) {
+      s <- is.na(X$bar_at)
+      if (any(s)) {
+        lvl <- levels(X$bar_at)
+        if ("NA" %in% lvl) {
+          stop("'bar_at' contains level 'NA'. This is incompatible with missing handling.")
+        }
+        levels(X$bar_at) <- levels(X$eval_at) <- c(lvl, "NA")
+        X[s, c("bar_at", "eval_at")] <- "NA"
+      }
+    }
+    X <- droplevels(X)
+  } else {
+    if (isTRUE(drop_na)) {
+      X <- X[!is.na(X$bar_at), ]
+    }
+  }
+
+  object$data <- X
+  return(object)
+}
+
+postprocess.multimarginal <- function(object, ...) {
+  out <- lapply(object, postprocess)
+  class(out) <- "multimarginal"
+}
