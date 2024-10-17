@@ -54,7 +54,7 @@
 #'
 #' fit <- ranger(Sepal.Length ~ ., data = iris)
 #' xvars <- c("Sepal.Width", "Petal.Width", "Petal.Length", "Species")
-#' M <- marginal.default(fit, x_name = xvars, data = iris, y = "Sepal.Length")
+#' M <- marginal(fit, x_name = xvars, data = iris, y = "Sepal.Length")
 #' M$Petal.Width
 #' M |> plot()
 #' M |> plot(backend = "plotly")
@@ -181,16 +181,83 @@ marginal.default <- function(
 
 #' @describeIn marginal Method for "ranger" models.
 #' @export
-marginal.ranger <- function() {
-  print("Todo")
-  # marginal.default()
+marginal.ranger <- function(
+    object,
+    x_name,
+    data,
+    y = NULL,
+    pred = NULL,
+    pred_fun = NULL,
+    w = NULL,
+    breaks = "Sturges",
+    right = TRUE,
+    discrete_m = 2L,
+    winsorize_low = 0.01,
+    winsorize_high = 0.99,
+    calc_pred = TRUE,
+    pd_n = 500L,
+    ...
+) {
+  if (is.null(pred_fun)) {
+    pred_fun <- function(model, newdata, ...) {
+      stats::predict(model, newdata, ...)$predictions
+    }
+  }
+  marginal.default(
+    object,
+    x_name = x_name,
+    data = data,
+    y = y,
+    pred = pred,
+    pred_fun = pred_fun,
+    w = w,
+    breaks = breaks,
+    right = right,
+    discrete_m = discrete_m,
+    winsorize_low = winsorize_low,
+    winsorize_high = winsorize_high,
+    calc_pred = calc_pred,
+    pd_n = pd_n,
+    ...
+  )
 }
 
 #' @describeIn marginal Method for DALEX "explainer".
 #' @export
-marginal.explainer <- function() {
-  print("Todo")
-  # marginal.default()
+marginal.explainer <- function(
+  object,
+  x_name,
+  data = object[["data"]],
+  y = NULL,
+  pred = NULL,
+  pred_fun = object[["predict_function"]],
+  w = object[["weights"]],
+  breaks = "Sturges",
+  right = TRUE,
+  discrete_m = 2L,
+  winsorize_low = 0.01,
+  winsorize_high = 0.99,
+  calc_pred = TRUE,
+  pd_n = 500L,
+  ...
+) {
+  marginal.default(
+    object,
+    x_name = x_name,
+    data = data,
+    y = y,
+    pred = pred,
+    pred_fun = pred_fun,
+    w = w,
+    breaks = breaks,
+    right = right,
+    discrete_m = discrete_m,
+    winsorize_low = winsorize_low,
+    winsorize_high = winsorize_high,
+    calc_pred = calc_pred,
+    pd_n = pd_n,
+    ...
+  )
 }
 
 #' @export

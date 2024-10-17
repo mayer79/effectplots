@@ -27,9 +27,41 @@ marginal(object, ...)
   ...
 )
 
-\method{marginal}{ranger}()
+\method{marginal}{ranger}(
+  object,
+  x_name,
+  data,
+  y = NULL,
+  pred = NULL,
+  pred_fun = NULL,
+  w = NULL,
+  breaks = "Sturges",
+  right = TRUE,
+  discrete_m = 2L,
+  winsorize_low = 0.01,
+  winsorize_high = 0.99,
+  calc_pred = TRUE,
+  pd_n = 500L,
+  ...
+)
 
-\method{marginal}{explainer}()
+\method{marginal}{explainer}(
+  object,
+  x_name,
+  data = object[["data"]],
+  y = NULL,
+  pred = NULL,
+  pred_fun = object[["predict_function"]],
+  w = object[["weights"]],
+  breaks = "Sturges",
+  right = TRUE,
+  discrete_m = 2L,
+  winsorize_low = 0.01,
+  winsorize_high = 0.99,
+  calc_pred = TRUE,
+  pd_n = 500L,
+  ...
+)
 }
 \arguments{
 \item{object}{Fitted model.}

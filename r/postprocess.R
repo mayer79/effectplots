@@ -52,4 +52,5 @@ postprocess.marginal <- function(
 postprocess.multimarginal <- function(object, ...) {
   out <- lapply(object, postprocess)
   class(out) <- "multimarginal"
+  out
 }
