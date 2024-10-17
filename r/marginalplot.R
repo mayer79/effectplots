@@ -53,9 +53,8 @@
 #' library(ranger)
 #'
 #' fit <- ranger(Sepal.Length ~ ., data = iris)
-#' pf <- function(m, x) predict(m, x)$predictions
-#'
-#' M <- marginal.default(fit, x_name = c("Sepal.Width", "Petal.Width", "Petal.Length", "Species"), data = iris, y = "Sepal.Length", pred_fun = pf)
+#' xvars <- c("Sepal.Width", "Petal.Width", "Petal.Length", "Species")
+#' M <- marginal.default(fit, x_name = xvars, data = iris, y = "Sepal.Length")
 #' M$Petal.Width
 #' M |> plot()
 #' M |> plot(backend = "plotly")
@@ -76,8 +75,8 @@ marginal.default <- function(
     breaks = "Sturges",
     right = TRUE,
     discrete_m = 2L,
-    wins_low = 0.01,
-    wins_high = 0.99,
+    winsorize_low = 0.01,
+    winsorize_high = 0.99,
     calc_pred = TRUE,
     pd_n = 500L,
     ...
@@ -86,7 +85,7 @@ marginal.default <- function(
     is.data.frame(data) || is.matrix(data),
     is.function(pred_fun),
     x_name %in% colnames(data),
-    wins_low <= wins_high
+    winsorize_low <= winsorize_high
   )
 
   # Prepare pred
@@ -121,8 +120,8 @@ marginal.default <- function(
       FUN = marginal,
       right = right,
       discrete_m = discrete_m,
-      wins_low = wins_low,
-      wins_high = wins_high,
+      winsorize_low = winsorize_low,
+      winsorize_high = winsorize_high,
       MoreArgs = list(
         object = object,
         data = data,
@@ -144,8 +143,8 @@ marginal.default <- function(
 
   # Prepare x
   x <- if (is.matrix(data)) data[, x_name] else data[[x_name]]
-  if (is.numeric(x) && (wins_low > 0 || wins_high < 1)) {
-    x <- winsorize(x, probs = c(wins_low, wins_high), nmax = 1e5)
+  if (is.numeric(x) && (winsorize_low > 0 || winsorize_high < 1)) {
+    x <- winsorize(x, probs = c(winsorize_low, winsorize_high), nmax = 1e5)
   }
 
   out <- calculate_stats(
@@ -182,10 +181,10 @@ marginal.default <- function(
 
 #' @describeIn marginal Method for "ranger" models.
 #' @export
-# marginal.ranger <- function() {
-#   print("Todo")
-#   # marginal.default()
-# }
+marginal.ranger <- function() {
+  print("Todo")
+  # marginal.default()
+}
 
 #' @describeIn marginal Method for DALEX "explainer".
 #' @export
@@ -194,136 +193,22 @@ marginal.explainer <- function() {
   # marginal.default()
 }
 
-#' @inheritParams marginal
-#' @export
-#' @examples
-#' M <- average_observed(x_name = "Species", data = iris, y = "Sepal.Length")
-#' M
-#' M |> plot()
-#' M |> plot(backend = "plotly")
-#'
-#' xvars <- c("Sepal.Width", "Species")
-#' M <- average_observed(xvars, data = iris, y = "Sepal.Length")
-#' M
-#' M$Species
-#' plot(M)
-average_observed <- function(
-    x_name, data, y, w = NULL, breaks = "Sturges", right = TRUE, discrete_m = 2L
-) {
-  marginal.default(
-    object = NULL,
-    x_name = x_name,
-    data = data,
-    y = y,
-    w = w,
-    breaks = breaks,
-    right = right,
-    discrete_m = discrete_m,
-    calc_pred = FALSE,
-    pd_n = 0L
-  )
-}
-
-#' @inheritParams marginal
-#' @export
-#' @examples
-#' M <- partial_dependence(fit, x_name = "Species", data = iris, pred_fun = pf)
-#' M
-#' M |> plot()
-#' M |> plot(backend = "plotly")
-#'
-#' xvars <- c("Species", "Sepal.Width")
-#' M <- partial_dependence(fit, x_name = xvars, data = iris, pred_fun = pf)
-#' M
-#' M$Species
-#' plot(M)
-partial_dependence <- function(
-    object,
-    x_name,
-    data,
-    pred_fun = stats::predict,
-    w = NULL,
-    breaks = "Sturges",
-    right = TRUE,
-    discrete_m = 2L,
-    pd_n = 500L
-) {
-  marginal.default(
-    object = object,
-    x_name = x_name,
-    data = data,
-    y = NULL,
-    pred_fun = pred_fun,
-    w = w,
-    breaks = breaks,
-    right = right,
-    discrete_m = discrete_m,
-    calc_pred = FALSE,
-    pd_n = pd_n
-  )
-}
-
 #' @export
 print.marginal <- function(x, ...) {
-  cat("marginal object: \n", sep = "")
+  cat("'marginal' object: \n", sep = "")
   print(x$data)
   invisible(x)
 }
 
 #' @export
 print.multimarginal <- function(x, ...) {
-  cat("multimarginal object of length", length(x), "\n")
+  cat(
+    "The first element of this 'multimarginal' object of length ",
+    length(x),
+    ": \n",
+    sep = ""
+  )
+  print(x[[1L]]$data)
   invisible(x)
 }
 
-postprocess <- function(object, ...) {
-  UseMethod("postprocess")
-}
-
-postprocess.default <- function(object, ...) {
-  stop("Undefined")
-}
-
-postprocess.marginal <- function(
-    object,
-    disc_drop_below_n = 0,
-    disc_drop_below_prop = 0,
-    disc_explicit_na = TRUE,
-    drop_na = FALSE
-  ) {
-  X <- object$data
-
-  if (object$discrete) {
-    if (disc_drop_below_n > 0) {
-      X <- X[X$exposure >= drop_below_n, ]
-    }
-    if (disc_drop_below_prop > 0) {
-      X <- X[X$exposure / sum(X$exposure)>= drop_below_prop, ]
-    }
-
-    if (disc_explicit_na) {
-      s <- is.na(X$bar_at)
-      if (any(s)) {
-        lvl <- levels(X$bar_at)
-        if ("NA" %in% lvl) {
-          stop("'bar_at' contains level 'NA'. This is incompatible with missing handling.")
-        }
-        levels(X$bar_at) <- levels(X$eval_at) <- c(lvl, "NA")
-        X[s, c("bar_at", "eval_at")] <- "NA"
-      }
-    }
-    X <- droplevels(X)
-  } else {
-    if (isTRUE(drop_na)) {
-      X <- X[!is.na(X$bar_at), ]
-    }
-  }
-
-  object$data <- X
-  return(object)
-}
-
-postprocess.multimarginal <- function(object, ...) {
-  out <- lapply(object, postprocess)
-  class(out) <- "multimarginal"
-}

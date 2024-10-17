@@ -1,0 +1,27 @@
+Package: marginalplot
+Title: Marginal Plots
+Version: 0.0.1
+Authors@R: 
+    person("Michael", "Mayer", , "mayermichael79@gmail.com", role = c("aut", "cre"))
+Description: Average observed, average predicted, partial dependence, and
+    total exposure per feature value provide a rich description of a model
+    and its effects. Numeric variables are binned.  'DALEX' explainers,
+    meta learners ('mlr3', 'tidymodels', 'caret') and most other models
+    providing numeric predictions work out-of-the-box.
+License: GPL (>= 2)
+Depends: 
+    R (>= 4.1.0)
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.2
+Imports: 
+    ggplot2,
+    patchwork,
+    plotly,
+    stats,
+    utils
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
+URL: https://github.com/mayer79/marginalplot
+BugReports: https://github.com/mayer79/marginalplot/issues

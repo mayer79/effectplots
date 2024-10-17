@@ -15,6 +15,7 @@ You can install the development version of {marginalplot} from [GitHub](https://
 pak::pak("mayer79/marginalplot")
 ```
 
+## Example
 
 This is a basic example which shows you how to solve a common problem:
 
