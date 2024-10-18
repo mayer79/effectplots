@@ -144,8 +144,7 @@ fit <- lm(Sepal.Length ~ ., data = iris)
 xvars <- c("Sepal.Width", "Petal.Width", "Petal.Length", "Species")
 M <- marginal(fit, x_name = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 M$Petal.Width
-M |> plot(rotate_x = 45)
-# Interactive via plot(backend = "plotly")
+M |> plot(rotate_x = 45)  # , backend = "plotly"
 }
 \references{
 Friedman, Jerome H. \emph{"Greedy Function Approximation: A Gradient Boosting Machine."}

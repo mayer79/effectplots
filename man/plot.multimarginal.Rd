@@ -6,12 +6,12 @@
 \usage{
 \method{plot}{multimarginal}(
   x,
-  line_colors = getOption("marginalplot.line_colors"),
-  fill = getOption("marginalplot.fill"),
   ncols = 2L,
   share_y = FALSE,
   ylim = NULL,
-  show_exposure = TRUE,
+  scale_exposure = 1,
+  line_colors = getOption("marginalplot.line_colors"),
+  fill = getOption("marginalplot.fill"),
   wrap_x = 10,
   rotate_x = 0,
   backend = getOption("marginalplot.backend"),
@@ -21,8 +21,18 @@
 \arguments{
 \item{x}{An object of class "marginal".}
 
+\item{ncols}{Number of columns in the plot layout.}
+
+\item{share_y}{Should y axis be shared across all subplots?
+No effect if \code{ylim} is passed.}
+
+\item{ylim}{Manual y axis range.}
+
+\item{scale_exposure}{Scale of the exposure bars, by default 1. Set to 0 for no bars.
+Currently, values between 0 and 1 are possible only with backend "ggplot2".}
+
 \item{line_colors}{Named vector of line colors. By default, a color blind
-palette from "ggthemes" is used, equalling to
+palette from "ggthemes" is used, equaling to
 \code{c(obs = "#E69F00", pred = "#009E73", pd = "#56B4E9")}.
 To change globally, set \code{options(marginalplot.line_colors = "named color vector")}.
 Can be used to remove certain lines in the plot.}
@@ -30,27 +40,20 @@ Can be used to remove certain lines in the plot.}
 \item{fill}{Fill color of bars. The default equals "lightgrey".
 To change globally, set \code{options(marginalplot.fill = "new color")}.}
 
-\item{ncols}{Number of columns in the plot layout.}
-
-\item{share_y}{Should y axis be shared across all subplots? This has no effect
-if \code{ylim} is provided.}
-
-\item{ylim}{Manual limits of the y axis range.}
-
-\item{show_exposure}{Should exposure bars be shown (on hidden right y axis)?
-For \code{backend = "ggplot"}, a value between 0 and 1 scales the bar heights so they
-would cover only part of the y range.}
-
 \item{wrap_x}{Should categorical x axis labels be wrapped after
-this number of characters? The default is 10. Only "with ggplot2" backend.}
+this number of characters? The default is 10. Only for "ggplot2" backend.}
 
 \item{rotate_x}{Should categorical x axis labels be rotated by this
-number of degrees? Only "with ggplot2" backend. The default is 0 (no rotation).}
+number of degrees? Only for "ggplot2" backend. The default is 0 (no rotation).}
 
-\item{backend}{Plotting backend, one of "ggplot2" (default) or "plotly".
+\item{backend}{Plotting backend, either "ggplot2" (default) or "plotly".
 To change globally, set \code{options(marginalplot.backend = "plotly")}.}
 
-\item{...}{Internally used.}
+\item{...}{Currently not used.}
+}
+\value{
+Object of class "ggplot" (single plot) or "patchwork" (multiple plots),
+or "plotly"/"htmlwidget" (with plotly backend).
 }
 \description{
 Plots "multimarginal" Object

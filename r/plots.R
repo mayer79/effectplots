@@ -4,37 +4,35 @@
 #' "ggthemes". When "plotly" is installed, you can switch to the interactive interface
 #' by setting `backend = "plotly"`.
 #'
-#' Single lines can be switched off
-#' by passing a shorter `line_colors` vector.
+#' Single lines can be switched off by passing a shorter `line_colors` vector.
 #'
 #' @importFrom ggplot2 .data
 #' @param x An object of class "marginal".
+#' @param ylim Manual y axis range.
+#' @param scale_exposure Scale of the exposure bars, by default 1. Set to 0 for no bars.
+#'   Currently, values between 0 and 1 are possible only with backend "ggplot2".
 #' @param line_colors Named vector of line colors. By default, a color blind
-#'   palette from "ggthemes" is used, equalling to
+#'   palette from "ggthemes" is used, equaling to
 #'   `c(obs = "#E69F00", pred = "#009E73", pd = "#56B4E9")`.
 #'   To change globally, set `options(marginalplot.line_colors = "named color vector")`.
 #'   Can be used to remove certain lines in the plot.
 #' @param fill Fill color of bars. The default equals "lightgrey".
 #'   To change globally, set `options(marginalplot.fill = "new color")`.
-#' @param ylim Manual limits of the y axis range.
-#' @param show_exposure Should exposure bars be shown (on hidden right y axis)?
-#'   For `backend = "ggplot"`, a value between 0 and 1 scales the bar heights so they
-#'   would cover only part of the y range.
 #' @param wrap_x Should categorical x axis labels be wrapped after
-#'   this number of characters? The default is 10. Only "with ggplot2" backend.
+#'   this number of characters? The default is 10. Only for "ggplot2" backend.
 #' @param rotate_x Should categorical x axis labels be rotated by this
-#'   number of degrees? Only "with ggplot2" backend. The default is 0 (no rotation).
-#' @param backend Plotting backend, one of "ggplot2" (default) or "plotly".
+#'   number of degrees? Only for "ggplot2" backend. The default is 0 (no rotation).
+#' @param backend Plotting backend, either "ggplot2" (default) or "plotly".
 #'   To change globally, set `options(marginalplot.backend = "plotly")`.
-#' @param ... Internally used.
+#' @param ... Currently not used.
 #' @export
 #' @returns An object of class "ggplot" or "plotly"/"htmlwidget".
 plot.marginal <- function(
     x,
+    ylim = NULL,
+    scale_exposure = 1,
     line_colors = getOption("marginalplot.line_colors"),
     fill = getOption("marginalplot.fill"),
-    ylim = NULL,
-    show_exposure = TRUE,
     wrap_x = 10,
     rotate_x = 0,
     backend = getOption("marginalplot.backend"),
@@ -49,10 +47,10 @@ plot.marginal <- function(
     p <- plot_marginal_plotly(
       x,
       vars_to_show = vars_to_show,
+      ylim = ylim,
+      scale_exposure = scale_exposure,
       line_colors = line_colors,
       fill = fill,
-      show_exposure = show_exposure,
-      ylim = ylim,
       ...
     )
     return(p)
@@ -60,10 +58,10 @@ plot.marginal <- function(
   plot_marginal_ggplot(
     x,
     vars_to_show = vars_to_show,
+    ylim = ylim,
+    scale_exposure = scale_exposure,
     line_colors = line_colors,
     fill = fill,
-    show_exposure = show_exposure,
-    ylim = ylim,
     wrap_x = wrap_x,
     rotate_x = rotate_x,
     ...
@@ -73,19 +71,19 @@ plot.marginal <- function(
 plot_marginal_plotly <- function(
     x,
     vars_to_show,
+    ylim = NULL,
+    scale_exposure = 1,
     line_colors,
     fill,
     title = NULL,
     show_ylab = TRUE,
     show_legend = TRUE,
-    ylim = NULL,
-    show_exposure,
     overlay = "y2",
     ...
 ) {
   fig <- plotly::plot_ly()
 
-  if (show_exposure) {
+  if (scale_exposure > 0) {
     fig <- plotly::add_bars(
       fig,
       x = ~bar_at,
@@ -145,14 +143,14 @@ plot_marginal_plotly <- function(
 plot_marginal_ggplot <- function(
     x,
     vars_to_show,
+    ylim = NULL,
+    scale_exposure = 1,
     line_colors,
     fill,
+    wrap_x = 10,
+    rotate_x = 0,
     title = NULL,
     show_ylab = TRUE,
-    ylim = NULL,
-    show_exposure = TRUE,
-    rotate_x = 0,
-    wrap_x = 10,
     ...
 ) {
   df <- poor_man_stack(x$data, vars_to_show)
@@ -162,11 +160,11 @@ plot_marginal_ggplot <- function(
     r <- range(df$value_, na.rm = TRUE)
     r <- r + c(-0.03, -0.03) * diff(r)
   } else {
-    r <- ylim + c(0.05, -0.05) * diff(ylim)  # ~invert typical 5% expansion
+    r <- ylim + c(0.05, -0.05) * diff(ylim)  # ~remove 5% expansion
   }
 
-  if (show_exposure > 0) {
-    mult <- show_exposure * diff(r) / max(x$data$exposure)
+  if (scale_exposure > 0) {
+    mult <- scale_exposure * diff(r) / max(x$data$exposure)
     bars <- ggplot2::geom_tile(
       x$data,
       mapping = ggplot2::aes(
@@ -225,30 +223,32 @@ plot_marginal_ggplot <- function(
 #'
 #' @inheritParams plot.marginal
 #' @param ncols Number of columns in the plot layout.
-#' @param share_y Should y axis be shared across all subplots? This has no effect
-#'   if `ylim` is provided.
+#' @param share_y Should y axis be shared across all subplots?
+#'   No effect if `ylim` is passed.
+#' @returns Object of class "ggplot" (single plot) or "patchwork" (multiple plots),
+#'   or "plotly"/"htmlwidget" (with plotly backend).
 #' @export
 plot.multimarginal <- function(
     x,
-    line_colors = getOption("marginalplot.line_colors"),
-    fill = getOption("marginalplot.fill"),
     ncols = 2L,
     share_y = FALSE,
     ylim = NULL,
-    show_exposure = TRUE,
+    scale_exposure = 1,
+    line_colors = getOption("marginalplot.line_colors"),
+    fill = getOption("marginalplot.fill"),
     wrap_x = 10,
     rotate_x = 0,
     backend = getOption("marginalplot.backend"),
     ...
 ) {
-
   stopifnot(backend %in% c("ggplot2", "plotly"))
+
   vars_to_show <- Reduce(
     intersect, list(c("obs", "pred", "pd"), colnames(x[[1L]]$data), names(line_colors))
   )
 
   ncols <- min(ncols, length(x))
-  col_i <- ((seq_len(length(x)) - 1) %% ncols) + 1L
+  col_i <- (seq_along(x) - 1L) %% ncols + 1L
   row_i <- ceiling(seq_along(x) / ncols)
 
   if (share_y && is.null(ylim)) {
@@ -258,37 +258,37 @@ plot.multimarginal <- function(
 
   if (backend == "ggplot2") {
     plot_list <- mapply(
-      plot.marginal,
+      plot_marginal_ggplot,
       x,
       title = names(x),
       show_ylab = col_i == 1L,
       show_legend = row_i == 1L & col_i == ncols,
       MoreArgs = list(
+        vars_to_show = vars_to_show,
+        ylim = ylim,
+        scale_exposure = scale_exposure,
         line_colors = line_colors,
         fill = fill,
-        ylim = ylim,
-        show_exposure = show_exposure,
         wrap_x = wrap_x,
-        rotate_x = rotate_x,
-        backend = backend
+        rotate_x = rotate_x
       ),
       SIMPLIFY = FALSE
     )
     patchwork::wrap_plots(plot_list, ncols = ncols, guides = "collect", ...)
-  } else {  # plotly
+  } else {
     plot_list <- mapply(
-      plot.marginal,
+      plot_marginal_plotly,
       x,
       title = names(x),
       show_ylab = col_i == 1L,
       show_legend = row_i == 1L & col_i == ncols,
       overlay = paste0("y", 2 * seq_along(x)),
       MoreArgs = list(
-        line_colors = line_colors,
-        fill = fill,
+        vars_to_show = vars_to_show,
         ylim = ylim,
-        show_exposure = show_exposure,
-        backend = backend
+        scale_exposure = scale_exposure,
+        line_colors = line_colors,
+        fill = fill
       ),
       SIMPLIFY = FALSE
     )
