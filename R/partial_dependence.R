@@ -13,8 +13,10 @@
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)
 #' M <- partial_dependence(fit, x_name = "Species", data = iris)
-#' M
 #' M |> plot()
+#'
+#' M2 <- partial_dependence(fit, x_name = colnames(iris)[-1], data = iris)
+#' plot(M2, share_y = TRUE)
 partial_dependence <- function(object, ...) {
   UseMethod("partial_dependence")
 }

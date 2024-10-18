@@ -49,10 +49,13 @@
 #' @export
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)
-#' xvars <- c("Sepal.Width", "Petal.Width", "Petal.Length", "Species")
-#' M <- marginal(fit, x_name = xvars, data = iris, y = "Sepal.Length", breaks = 5)
+#' M <- marginal(
+#'   fit, x_name = colnames(iris)[-1], data = iris, y = "Sepal.Length", breaks = 5
+#' )
 #' M$Petal.Width
-#' M |> plot(rotate_x = 45)  # , backend = "plotly"
+#'
+#' # Use plot option 'backend = "plotly"' for interactive plots
+#' M |> plot()
 marginal <- function(object, ...) {
   UseMethod("marginal")
 }

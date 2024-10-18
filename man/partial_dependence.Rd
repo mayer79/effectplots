@@ -117,8 +117,10 @@ a dataset \code{data}. This function is a convenience wrapper over \code{\link[=
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)
 M <- partial_dependence(fit, x_name = "Species", data = iris)
-M
 M |> plot()
+
+M2 <- partial_dependence(fit, x_name = colnames(iris)[-1], data = iris)
+plot(M2, share_y = TRUE)
 }
 \references{
 Friedman, Jerome H. \emph{"Greedy Function Approximation: A Gradient Boosting Machine."}

@@ -63,17 +63,9 @@ via \code{x_names}. \code{y} can either be a numeric vector or a column name in 
 This function is a convenience wrapper over \code{\link[=marginal]{marginal()}}.
 }
 \examples{
-fit <- lm(Sepal.Length ~ ., data = iris)
-M <- average_observed(
-  x_name = "Sepal.Width", y = "Sepal.Length", data = iris, breaks = 5
-)
+M <- average_observed(x_name = "Species", y = "Sepal.Length", data = iris)
 M
 M |> plot()
-
-xvars <- c("Sepal.Width", "Species")
-M <- average_observed(xvars, data = iris, y = "Sepal.Length")
-M$Species
-plot(M, rotate_x = 45)
 }
 \seealso{
 \code{\link[=marginal]{marginal()}}

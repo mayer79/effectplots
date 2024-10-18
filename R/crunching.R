@@ -67,12 +67,12 @@ grouped_mean <- function(x, g, w = NULL) {
   } else if (!is.null(x)) {
     x <- x * w
   }
-  exposure <- rowsum(w, group = g)
+  suppressWarnings(exposure <- rowsum(w, group = g))  # silence warning about missings
   colnames(exposure) <- "exposure"
   if (is.null(x)) {
     return(exposure)
   }
-  S <- rowsum(x, group = g)
+  suppressWarnings(S <- rowsum(x, group = g))         # silence warning about missings
   cbind(S / as.numeric(exposure), exposure)
 }
 

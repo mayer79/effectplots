@@ -10,17 +10,9 @@
 #' @seealso [marginal()]
 #' @export
 #' @examples
-#' fit <- lm(Sepal.Length ~ ., data = iris)
-#' M <- average_observed(
-#'   x_name = "Sepal.Width", y = "Sepal.Length", data = iris, breaks = 5
-#' )
+#' M <- average_observed(x_name = "Species", y = "Sepal.Length", data = iris)
 #' M
 #' M |> plot()
-#'
-#' xvars <- c("Sepal.Width", "Species")
-#' M <- average_observed(xvars, data = iris, y = "Sepal.Length")
-#' M$Species
-#' plot(M, rotate_x = 45)
 average_observed <- function(
     x_name,
     data,
