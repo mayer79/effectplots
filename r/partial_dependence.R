@@ -4,11 +4,10 @@
 #' a dataset `data`. This function is a convenience wrapper over [marginal()].
 #'
 #' @inheritParams marginal
+#' @inherit marginal return
 #' @export
 #' @examples
-#' library(ranger)
-#'
-#' fit <- ranger(Sepal.Length ~ ., data = iris)
+#' fit <- lm(Sepal.Length ~ ., data = iris)
 #' M <- partial_dependence(fit, x_name = "Species", data = iris)
 #' M
 #' M |> plot()

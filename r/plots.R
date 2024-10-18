@@ -1,7 +1,7 @@
 #' Plots "marginal" Object
 #'
 #' Plots all information calculated from [marginal()] using a color blind palette from
-#' {ggthemes}. When {plotly} is installed, you can switch to the interactive interface
+#' "ggthemes". When "plotly" is installed, you can switch to the interactive interface
 #' by setting `backend = "plotly"`.
 #'
 #' Single lines can be switched off
@@ -10,7 +10,7 @@
 #' @importFrom ggplot2 .data
 #' @param x An object of class "marginal".
 #' @param line_colors Named vector of line colors. By default, a color blind
-#'   palette from {ggthemes} is used, equalling to
+#'   palette from "ggthemes" is used, equalling to
 #'   `c(obs = "#E69F00", pred = "#009E73", pd = "#56B4E9")`.
 #'   To change globally, set `options(marginalplot.line_colors = "named color vector")`.
 #'   Can be used to remove certain lines in the plot.
@@ -210,7 +210,7 @@ plot_marginal_ggplot <- function(
   if (!is.null(ylim)) {
     p <- p + ggplot2::ylim(ylim)
   }
-  if (x$discrete) {
+  if (!x$num) {
     if (wrap_x > 0 && is.finite(wrap_x)) {
       p <- p + ggplot2::scale_x_discrete(labels = ggplot2::label_wrap_gen(wrap_x))
     }
@@ -224,6 +224,7 @@ plot_marginal_ggplot <- function(
 #' Plots "multimarginal" Object
 #'
 #' @inheritParams plot.marginal
+#' @param ncols Number of columns in the plot layout.
 #' @param share_y Should y axis be shared across all subplots? This has no effect
 #'   if `ylim` is provided.
 #' @export
@@ -231,7 +232,7 @@ plot.multimarginal <- function(
     x,
     line_colors = getOption("marginalplot.line_colors"),
     fill = getOption("marginalplot.fill"),
-    ncol = 2L,
+    ncols = 2L,
     share_y = FALSE,
     ylim = NULL,
     show_exposure = TRUE,
@@ -246,9 +247,9 @@ plot.multimarginal <- function(
     intersect, list(c("obs", "pred", "pd"), colnames(x[[1L]]$data), names(line_colors))
   )
 
-  ncol <- min(ncol, length(x))
-  col_i <- ((seq_len(length(x)) - 1) %% ncol) + 1L
-  row_i <- ceiling(seq_along(x) / ncol)
+  ncols <- min(ncols, length(x))
+  col_i <- ((seq_len(length(x)) - 1) %% ncols) + 1L
+  row_i <- ceiling(seq_along(x) / ncols)
 
   if (share_y && is.null(ylim)) {
     r <- range(sapply(x, function(z) range(z$data[vars_to_show], na.rm = TRUE)))
@@ -261,7 +262,7 @@ plot.multimarginal <- function(
       x,
       title = names(x),
       show_ylab = col_i == 1L,
-      show_legend = row_i == 1L & col_i == ncol,
+      show_legend = row_i == 1L & col_i == ncols,
       MoreArgs = list(
         line_colors = line_colors,
         fill = fill,
@@ -273,14 +274,14 @@ plot.multimarginal <- function(
       ),
       SIMPLIFY = FALSE
     )
-    patchwork::wrap_plots(plot_list, ncol = ncol, guides = "collect", ...)
+    patchwork::wrap_plots(plot_list, ncols = ncols, guides = "collect", ...)
   } else {  # plotly
     plot_list <- mapply(
       plot.marginal,
       x,
       title = names(x),
       show_ylab = col_i == 1L,
-      show_legend = row_i == 1L & col_i == ncol,
+      show_legend = row_i == 1L & col_i == ncols,
       overlay = paste0("y", 2 * seq_along(x)),
       MoreArgs = list(
         line_colors = line_colors,
@@ -295,7 +296,7 @@ plot.multimarginal <- function(
       plot_list,
       titleX = TRUE,
       titleY = TRUE,
-      nrows = ceiling(length(x) / ncol),
+      nrows = ceiling(length(x) / ncols),
       margin = c(0.03, 0.05, 0.125, 0.05),
       ...
     )

@@ -32,7 +32,6 @@ use_package("ggplot2", "Imports")
 use_package("patchwork", "Imports")
 use_package("plotly", "Imports")
 use_package("stats", "Imports")
-use_package("utils", "Imports")
 
 use_gpl_license(2)
 
@@ -70,7 +69,7 @@ use_github_links() # use this if this project is on github
 library(devtools)
 
 document()
-test()
+# test()
 check(manual = TRUE, cran = TRUE)
 build()
 # build(binary = TRUE)

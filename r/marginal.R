@@ -1,63 +1,61 @@
 #' Marginal Statistics
 #'
-#' Calculates
+#' This is the main function of the package. It calculates
 #' - average observed,
 #' - average predicted,
 #' - partial dependence, and
 #' - counts/weights
-#' over a (binned) feature v, possibly weighted.
+#' over a (possibly binned) feature v, optionally weighted with weights `w`.
 #'
 #' @param object Fitted model.
-#' @param x_name Column name of the stratification variable shown on the x axis.
+#' @param x_name Column name of the variable shown on the x axis.
 #' @param data Matrix-like.
 #' @param y Numeric vector with observed values of the response.
 #'   Can also be a column name in `data`. Omitted if `NULL` (default).
 #' @param pred Numeric vector with predictions. If `NULL`, it is calculated as
-#'   `pred_fun(object, data, ...)`. Used to save time if the function is to be
+#'   `pred_fun(object, data, ...)`. Used to save time if `marginal()` is to be
 #'   called multiple times.
 #' @param pred_fun Prediction function, by default `stats::predict`.
 #'   The function takes three arguments (names irrelevant): `object`, `data`, and `...`.
 #' @param w Optional vector with case weights. Can also be a column name in `data`.
 #' @param breaks An integer, a vector, a string or a function specifying the bins
 #'   of `x`, and passed to [graphics::hist()]. The default is "Sturges".
-#'   *Not* vectorized over `x_name`.
+#'   *Not* vectorized over `x_name`. Only relevant for numeric x.
 #' @param right Should bins created via [graphics::hist()] be right-closed?
-#'   The default is `TRUE`. Vectorized over `x_name`.
-#' @param discrete_m Numeric variable with up to this number of unique values
-#'   should not be binned. The default is 2. Set to `Inf` to avoid any binning.
-#'   Vectorized over `x_name`.
-#' @param wins_low Small values of `x` are capped at the `wins_low` quantile.
+#'   The default is `TRUE`. Vectorized over `x_name`. Only relevant for numeric x.
+#' @param discrete_m Numeric x with up to this number of unique values
+#'   should be treated as factors. The default is 2. Vectorized over `x_name`.
+#' @param winsorize_low Small values of numeric x are capped at this quantile.
 #'   Set to 0 to avoid Winsorizing. Note that at most 100k observations are sampled
-#'   to calculate the quantile. Vectorized over `x_name`.
-#' @param wins_low High values of `x` are capped at the `wins_high` quantile.
+#'   to calculate the quantile (depends on your random seed). Vectorized over `x_name`.
+#' @param winsorize_high High values of numeric x are capped at this quantile.
 #'   Set to 1 to avoid Winsorizing. Note that at most 100k observations are sampled
-#'   to calculate the quantile. Vectorized over `x_name`.
-#' @param calc_pred Should predictions `pred` be calculated? Default is `TRUE`.
-#' @param pd_n Size of the dataset used for calculation of partial dependence.
+#'   to calculate the quantile (depends on your random seed). Vectorized over `x_name`.
+#' @param calc_pred Should predictions be calculated? Default is `TRUE`. Only relevant
+#'   if `pred = NULL`.
+#' @param pd_n Size of the data used for calculation of partial dependence.
 #'   The default is 500. Set to 0 (or pass `pred_fun = NULL`) to omit calculation
-#'   of partial dependence.
+#'   of partial dependence. This depends on your random seed.
 #' @param ... Further arguments passed to `pred_fun()`, e.g., `type = "response"` in
-#'   a `glm()` model.
+#'   a `glm()` or (typically) `prob = TRUE` in binary probabilistic models.
 #' @returns
-#'   An object of class "marginal" containing these elements:
-#'   - `data`: data.frame containing the partial dependencies.
-#'   - `v`: Same as input `v`.
-#'   - `K`: Number of columns of prediction matrix.
-#'   - `pred_names`: Column names of prediction matrix.
-#'   - `by_name`: Column name of grouping variable (or `NULL`).
+#'   If `x_name` has length 1, an object of class "marginal" containing these elements:
+#'   - `data`: data.frame containing statistics and plot positions of values and bars.
+#'   - `num`: Indicator whether x is numeric.
+#'   - `x_name`: Same as input `x_name`.
+#'   If `x_name` has length > 1, an object of class "multimarginal", which is a named
+#'   list of "marginal" objects.
 #' @references
 #'   Friedman, Jerome H. *"Greedy Function Approximation: A Gradient Boosting Machine."*
 #'     Annals of Statistics 29, no. 5 (2001): 1189-1232.
 #' @export
 #' @examples
-#' library(ranger)
-#'
-#' fit <- ranger(Sepal.Length ~ ., data = iris)
+#' fit <- lm(Sepal.Length ~ ., data = iris)
 #' xvars <- c("Sepal.Width", "Petal.Width", "Petal.Length", "Species")
-#' M <- marginal(fit, x_name = xvars, data = iris, y = "Sepal.Length")
+#' M <- marginal(fit, x_name = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 #' M$Petal.Width
-#' M |> plot()
-#' M |> plot(backend = "plotly")
+#' M |> plot(rotate_x = 45)
+#' # Interactive via plot(backend = "plotly")
 marginal <- function(object, ...) {
   UseMethod("marginal")
 }
@@ -170,7 +168,7 @@ marginal.default <- function(
     )
   }
 
-  if (out$discrete && !is.factor(out$data$bar_at)) {
+  if (!out$num && !is.factor(out$data$bar_at)) {
     # To ensure nice plot scales
     out$data$bar_at <- out$data$eval_at <- factor(out$data$bar_at)
   }

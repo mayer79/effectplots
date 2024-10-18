@@ -104,13 +104,12 @@ partial_dep <- function(
 }
 
 prep_vector <- function(x) {
-  if (NCOL(x) > 1L) {
-    stop("Only univariate predictions are handled.")
-  }
+  p <- NCOL(x)
   if (is.data.frame(x)) {
-    x <- x[[1L]]
-  }
-  if (!is.vector(x)) {
+    x <- x[[p]]
+  } else if (p > 1L) {
+    x <- x[, p]
+  } else if (!is.vector(x)) {
     x <- as.vector(x)
   }
   if (!is.numeric(x) && !is.logical(x)) {
@@ -145,7 +144,7 @@ calculate_stats <- function(
     S <- grouped_mean(cbind(pred = pred, obs = y), g = x, w = w)
     out <- data.frame(bar_at = g, bar_width = 0.7, eval_at = g, S)
     rownames(out) <- NULL
-    discrete <- TRUE
+    num <- FALSE
   } else {
     # "CONTINUOUS"
     H <- graphics::hist(x, breaks = breaks, right = right, plot = FALSE)
@@ -165,9 +164,9 @@ calculate_stats <- function(
       out[s, "exposure"] <- 0
       out[s, "eval_at"] <- out[s, "bar_at"]
     }
-    discrete <- FALSE
+    num <- TRUE
   }
 
-  return(list(data = out, discrete = discrete))
+  return(list(data = out, num = num))
 }
 

@@ -5,10 +5,14 @@
 #' This function is a convenience wrapper over [marginal()].
 #'
 #' @inheritParams marginal
+#' @inherit marginal return
 #' @param ... Currently unused.
 #' @export
 #' @examples
-#' M <- average_observed(x_name = "Species", data = iris, y = "Sepal.Length")
+#' fit <- lm(Sepal.Length ~ ., data = iris)
+#' M <- average_observed(
+#'   x_name = "Sepal.Width", y = "Sepal.Length", data = iris, breaks = 5
+#' )
 #' M
 #' M |> plot()
 #'

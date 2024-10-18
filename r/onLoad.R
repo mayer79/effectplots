@@ -13,4 +13,6 @@
 }
 
 # Fix undefined global variable note
-# utils::globalVariables(c("varying_", "value_"))
+utils::globalVariables(
+  c("bar_at", "exposure", "bar_width", "eval_at", "varying_", "value_")
+)
