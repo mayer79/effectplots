@@ -58,6 +58,7 @@
 <span>  <span class="va">x</span>,</span>
 <span>  ncols <span class="op">=</span> <span class="fl">2L</span>,</span>
 <span>  share_y <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  sort <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  scale_exposure <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  line_colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"marginalplot.line_colors"</span><span class="op">)</span>,</span>
@@ -84,6 +85,13 @@
 <dt id="arg-share-y">share_y<a class="anchor" aria-label="anchor" href="#arg-share-y"></a></dt>
 <dd><p>Should y axis be shared across all subplots?
 No effect if <code>ylim</code> is passed.</p></dd>
+
+
+<dt id="arg-sort">sort<a class="anchor" aria-label="anchor" href="#arg-sort"></a></dt>
+<dd><p>Should plots be sorted in decreasing order of main effect importance
+measured by the exposure weighted variance of partial dependence? Only if
+partial dependence values have been calculated (i.e., not available for
+<code><a href="average_observed.html">average_observed()</a></code>).</p></dd>
 
 
 <dt id="arg-ylim">ylim<a class="anchor" aria-label="anchor" href="#arg-ylim"></a></dt>
@@ -131,6 +139,10 @@ To change globally, set <code>options(marginalplot.backend = "plotly")</code>.</
     <h2>Value</h2>
     <p>Object of class "ggplot" (single plot) or "patchwork" (multiple plots),
 or "plotly"/"htmlwidget" (with plotly backend).</p>
+    </div>
+    <div id="see-also">
+    <h2>See also</h2>
+    <div class="dont-index"><p><code><a href="marginal.html">marginal()</a></code>, <code><a href="average_observed.html">average_observed()</a></code>, <code><a href="partial_dependence.html">partial_dependence()</a></code></p></div>
     </div>
 
   </div>
