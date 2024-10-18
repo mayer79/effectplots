@@ -1,0 +1,15 @@
+<urlset xmlns = 'http://www.sitemaps.org/schemas/sitemap/0.9'>
+<url><loc>/404.html</loc></url>
+<url><loc>/LICENSE.html</loc></url>
+<url><loc>/authors.html</loc></url>
+<url><loc>/index.html</loc></url>
+<url><loc>/news/index.html</loc></url>
+<url><loc>/reference/average_observed.html</loc></url>
+<url><loc>/reference/index.html</loc></url>
+<url><loc>/reference/marginal.html</loc></url>
+<url><loc>/reference/partial_dependence.html</loc></url>
+<url><loc>/reference/plot.marginal.html</loc></url>
+<url><loc>/reference/plot.multimarginal.html</loc></url>
+<url><loc>/reference/postprocess.html</loc></url>
+</urlset>
+
