@@ -22,9 +22,9 @@ use_description(
     feature and (possibly binned) feature value.
     Visualization can be done via 'ggplot2' or 'plotly'.
     Optimized for speed and convenience, the package supports models with numeric
-    predictions, including regression and binary classification. It is compatible
-    with many models out-of-the-box, such as those wrapped with 'DALEX' explainers,
-    and can be extended with custom prediction functions.",
+    predictions, including regression and probabilistic binary classification.
+    It is compatible with many models out-of-the-box, also those wrapped with
+    'DALEX' explainers or 'Tidymodels'.",
     `Authors@R` = "person('Michael', 'Mayer', email = 'mayermichael79@gmail.com', role = c('aut', 'cre'))",
     Depends = "R (>= 4.1.0)",
     LazyData = NULL

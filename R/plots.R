@@ -121,9 +121,10 @@ plot_marginal_plotly <- function(
     ann <- list(
       text = title,
       x = 0.05,
-      y = 1.07,
-      font = list(size = 17),
+      y = 1.02,
+      font = list(size = 16),
       xanchor = "left",
+      yanchor = "bottom",
       xref = "paper",
       yref = "paper",
       showarrow = FALSE
@@ -133,7 +134,10 @@ plot_marginal_plotly <- function(
   plotly::layout(
     fig,
     yaxis = list(
-      side = "left", title = if (show_ylab) "Response" else "", overlaying = overlay
+      side = "left",
+      title = if (show_ylab) "Response" else "",
+      overlaying = overlay,
+      zeroline = FALSE
     ),
     yaxis2 = list(side = "right", showgrid = FALSE, showticklabels = FALSE),
     xaxis = list(title = x$x_name),
@@ -287,7 +291,7 @@ plot.multimarginal <- function(
       ),
       SIMPLIFY = FALSE
     )
-    patchwork::wrap_plots(plot_list, ncols = ncols, guides = "collect", ...)
+    patchwork::wrap_plots(plot_list, ncol = ncols, guides = "collect", ...)
   } else {
     plot_list <- mapply(
       plot_marginal_plotly,

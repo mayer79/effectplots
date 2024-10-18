@@ -9,10 +9,9 @@ Description: Provides tools to create high-quality plots for model
     dependence, and exposure for each feature and (possibly binned)
     feature value.  Visualization can be done via 'ggplot2' or 'plotly'.
     Optimized for speed and convenience, the package supports models with
-    numeric predictions, including regression and binary classification.
-    It is compatible with many models out-of-the-box, such as those
-    wrapped with 'DALEX' explainers, and can be extended with custom
-    prediction functions.
+    numeric predictions, including regression and probabilistic binary
+    classification. It is compatible with many models out-of-the-box, 
+    alsos those wrapped with 'DALEX' explainers or 'Tidymodels'.
 License: GPL (>= 2)
 Depends: 
     R (>= 4.1.0)
