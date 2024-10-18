@@ -146,7 +146,6 @@ M <- marginal(fit, x_name = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 M$Petal.Width
 M |> plot(rotate_x = 45)  # , backend = "plotly"
 }
-\references{
-Friedman, Jerome H. \emph{"Greedy Function Approximation: A Gradient Boosting Machine."}
-Annals of Statistics 29, no. 5 (2001): 1189-1232.
+\seealso{
+\code{\link[=average_observed]{average_observed()}}, \code{\link[=partial_dependence]{partial_dependence()}}
 }

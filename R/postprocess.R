@@ -7,7 +7,7 @@
 #' @param cat_drop_below_n Drop categories with exposure below this value.
 #' @param cat_drop_below_prop Drop categories with relative exposure below this value.
 #' @param cat_explicit_na Should `NA` levels in categoricals be converted to strings?
-#' @param drop_na Should `NA` levels be dropped?
+#' @param na.rm Should `NA` levels be dropped?
 #' @param ... Currently unused.
 #' @export
 postprocess <- function(object, ...) {
@@ -27,7 +27,7 @@ postprocess.marginal <- function(
     cat_drop_below_n = 0,
     cat_drop_below_prop = 0,
     cat_explicit_na = TRUE,
-    drop_na = FALSE,
+    na.rm = FALSE,
     ...
 ) {
   X <- object$data
@@ -53,7 +53,7 @@ postprocess.marginal <- function(
     }
     X <- droplevels(X)
   } else {
-    if (isTRUE(drop_na)) {
+    if (isTRUE(na.rm)) {
       X <- X[!is.na(X$bar_at), ]
     }
   }

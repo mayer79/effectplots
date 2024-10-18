@@ -8,6 +8,7 @@
   x,
   ncols = 2L,
   share_y = FALSE,
+  sort = FALSE,
   ylim = NULL,
   scale_exposure = 1,
   line_colors = getOption("marginalplot.line_colors"),
@@ -25,6 +26,11 @@
 
 \item{share_y}{Should y axis be shared across all subplots?
 No effect if \code{ylim} is passed.}
+
+\item{sort}{Should plots be sorted in decreasing order of main effect importance
+measured by the exposure weighted variance of partial dependence? Only if
+partial dependence values have been calculated (i.e., not available for
+\code{\link[=average_observed]{average_observed()}}).}
 
 \item{ylim}{Manual y axis range.}
 
@@ -57,4 +63,7 @@ or "plotly"/"htmlwidget" (with plotly backend).
 }
 \description{
 Plots "multimarginal" Object
+}
+\seealso{
+\code{\link[=marginal]{marginal()}}, \code{\link[=average_observed]{average_observed()}}, \code{\link[=partial_dependence]{partial_dependence()}}
 }

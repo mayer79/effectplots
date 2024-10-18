@@ -120,3 +120,10 @@ M <- partial_dependence(fit, x_name = "Species", data = iris)
 M
 M |> plot()
 }
+\references{
+Friedman, Jerome H. \emph{"Greedy Function Approximation: A Gradient Boosting Machine."}
+Annals of Statistics 29, no. 5 (2001): 1189-1232.
+}
+\seealso{
+\code{\link[=marginal]{marginal()}}
+}

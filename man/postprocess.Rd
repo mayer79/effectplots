@@ -16,7 +16,7 @@ postprocess(object, ...)
   cat_drop_below_n = 0,
   cat_drop_below_prop = 0,
   cat_explicit_na = TRUE,
-  drop_na = FALSE,
+  na.rm = FALSE,
   ...
 )
 
@@ -33,7 +33,7 @@ postprocess(object, ...)
 
 \item{cat_explicit_na}{Should \code{NA} levels in categoricals be converted to strings?}
 
-\item{drop_na}{Should \code{NA} levels be dropped?}
+\item{na.rm}{Should \code{NA} levels be dropped?}
 }
 \description{
 This function offers different ways to improve the output of \code{\link[=marginal]{marginal()}},

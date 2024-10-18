@@ -25,6 +25,7 @@
 #' @param backend Plotting backend, either "ggplot2" (default) or "plotly".
 #'   To change globally, set `options(marginalplot.backend = "plotly")`.
 #' @param ... Currently not used.
+#' @seealso [marginal()], [average_observed()], [partial_dependence()]
 #' @export
 #' @returns An object of class "ggplot" or "plotly"/"htmlwidget".
 plot.marginal <- function(
@@ -225,13 +226,19 @@ plot_marginal_ggplot <- function(
 #' @param ncols Number of columns in the plot layout.
 #' @param share_y Should y axis be shared across all subplots?
 #'   No effect if `ylim` is passed.
+#' @param sort Should plots be sorted in decreasing order of main effect importance
+#'   measured by the exposure weighted variance of partial dependence? Only if
+#'   partial dependence values have been calculated (i.e., not available for
+#'   [average_observed()]).
 #' @returns Object of class "ggplot" (single plot) or "patchwork" (multiple plots),
 #'   or "plotly"/"htmlwidget" (with plotly backend).
+#' @seealso [marginal()], [average_observed()], [partial_dependence()]
 #' @export
 plot.multimarginal <- function(
     x,
     ncols = 2L,
     share_y = FALSE,
+    sort = FALSE,
     ylim = NULL,
     scale_exposure = 1,
     line_colors = getOption("marginalplot.line_colors"),
@@ -246,6 +253,12 @@ plot.multimarginal <- function(
   vars_to_show <- Reduce(
     intersect, list(c("obs", "pred", "pd"), colnames(x[[1L]]$data), names(line_colors))
   )
+  if (isTRUE(sort)) {
+    sorter <- vars_to_show[length(vars_to_show)]
+    message("Sorting via exposure weighted variance of '", sorter, "'")
+    imp <- vapply(x, FUN = .one_imp, v = sorter, FUN.VALUE = numeric(1))
+    x <- x[order(imp, decreasing = TRUE, na.last = TRUE)]
+  }
 
   ncols <- min(ncols, length(x))
   col_i <- (seq_along(x) - 1L) %% ncols + 1L
@@ -303,3 +316,10 @@ plot.multimarginal <- function(
   }
 }
 
+# Helper function
+.one_imp <- function(x, v) {
+  ok <- is.finite(x$data[[v]])
+  stats::cov.wt(
+    x$data[ok, v, drop = FALSE], x$data[["exposure"]][ok], method = "ML"
+  )$cov[1L, 1L]
+}

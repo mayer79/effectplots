@@ -45,9 +45,7 @@
 #'   - `x_name`: Same as input `x_name`.
 #'   If `x_name` has length > 1, an object of class "multimarginal", which is a named
 #'   list of "marginal" objects.
-#' @references
-#'   Friedman, Jerome H. *"Greedy Function Approximation: A Gradient Boosting Machine."*
-#'     Annals of Statistics 29, no. 5 (2001): 1189-1232.
+#' @seealso [average_observed()], [partial_dependence()]
 #' @export
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)

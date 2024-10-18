@@ -5,6 +5,10 @@
 #'
 #' @inheritParams marginal
 #' @inherit marginal return
+#' @references
+#'   Friedman, Jerome H. *"Greedy Function Approximation: A Gradient Boosting Machine."*
+#'     Annals of Statistics 29, no. 5 (2001): 1189-1232.
+#' @seealso [marginal()]
 #' @export
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)

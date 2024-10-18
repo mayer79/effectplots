@@ -75,3 +75,6 @@ M <- average_observed(xvars, data = iris, y = "Sepal.Length")
 M$Species
 plot(M, rotate_x = 45)
 }
+\seealso{
+\code{\link[=marginal]{marginal()}}
+}

@@ -16,11 +16,15 @@ use_description(
   fields = list(
     Title = "Marginal Plots",
     Version = "0.0.1",
-    Description = "Average observed, average predicted, partial dependence, and
-    total exposure per feature value provide a rich description of a model and its
-    effects. Numeric variables are binned.
-    'DALEX' explainers, meta learners ('mlr3', 'tidymodels', 'caret') and most
-    other models providing numeric predictions work out-of-the-box.",
+    Description = "Provides tools to create high-quality plots for model analysis.
+    The main function 'marginal()' calculates average observed values of the model
+    response, average predicted values, partial dependence, and exposure for each
+    feature and (possibly binned) feature value.
+    Visualization can be done via 'ggplot2' or 'plotly'.
+    Optimized for speed and convenience, the package supports models with numeric
+    predictions, including regression and binary classification. It is compatible
+    with many models out-of-the-box, such as those wrapped with 'DALEX' explainers,
+    and can be extended with custom prediction functions.",
     `Authors@R` = "person('Michael', 'Mayer', email = 'mayermichael79@gmail.com', role = c('aut', 'cre'))",
     Depends = "R (>= 4.1.0)",
     LazyData = NULL

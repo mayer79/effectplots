@@ -7,6 +7,7 @@
 #' @inheritParams marginal
 #' @inherit marginal return
 #' @param ... Currently unused.
+#' @seealso [marginal()]
 #' @export
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)

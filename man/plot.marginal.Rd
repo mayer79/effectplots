@@ -55,3 +55,6 @@ by setting \code{backend = "plotly"}.
 \details{
 Single lines can be switched off by passing a shorter \code{line_colors} vector.
 }
+\seealso{
+\code{\link[=marginal]{marginal()}}, \code{\link[=average_observed]{average_observed()}}, \code{\link[=partial_dependence]{partial_dependence()}}
+}
