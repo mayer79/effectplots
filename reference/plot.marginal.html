@@ -60,10 +60,10 @@ by setting <code>backend = "plotly"</code>.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'marginal'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
+<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  scale_exposure <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  line_colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"marginalplot.line_colors"</span><span class="op">)</span>,</span>
 <span>  fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"marginalplot.fill"</span><span class="op">)</span>,</span>
-<span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  show_exposure <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  wrap_x <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  rotate_x <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  backend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"marginalplot.backend"</span><span class="op">)</span>,</span>
@@ -79,9 +79,18 @@ by setting <code>backend = "plotly"</code>.</p>
 <dd><p>An object of class "marginal".</p></dd>
 
 
+<dt id="arg-ylim">ylim<a class="anchor" aria-label="anchor" href="#arg-ylim"></a></dt>
+<dd><p>Manual y axis range.</p></dd>
+
+
+<dt id="arg-scale-exposure">scale_exposure<a class="anchor" aria-label="anchor" href="#arg-scale-exposure"></a></dt>
+<dd><p>Scale of the exposure bars, by default 1. Set to 0 for no bars.
+Currently, values between 0 and 1 are possible only with backend "ggplot2".</p></dd>
+
+
 <dt id="arg-line-colors">line_colors<a class="anchor" aria-label="anchor" href="#arg-line-colors"></a></dt>
 <dd><p>Named vector of line colors. By default, a color blind
-palette from "ggthemes" is used, equalling to
+palette from "ggthemes" is used, equaling to
 <code>c(obs = "#E69F00", pred = "#009E73", pd = "#56B4E9")</code>.
 To change globally, set <code>options(marginalplot.line_colors = "named color vector")</code>.
 Can be used to remove certain lines in the plot.</p></dd>
@@ -92,33 +101,23 @@ Can be used to remove certain lines in the plot.</p></dd>
 To change globally, set <code>options(marginalplot.fill = "new color")</code>.</p></dd>
 
 
-<dt id="arg-ylim">ylim<a class="anchor" aria-label="anchor" href="#arg-ylim"></a></dt>
-<dd><p>Manual limits of the y axis range.</p></dd>
-
-
-<dt id="arg-show-exposure">show_exposure<a class="anchor" aria-label="anchor" href="#arg-show-exposure"></a></dt>
-<dd><p>Should exposure bars be shown (on hidden right y axis)?
-For <code>backend = "ggplot"</code>, a value between 0 and 1 scales the bar heights so they
-would cover only part of the y range.</p></dd>
-
-
 <dt id="arg-wrap-x">wrap_x<a class="anchor" aria-label="anchor" href="#arg-wrap-x"></a></dt>
 <dd><p>Should categorical x axis labels be wrapped after
-this number of characters? The default is 10. Only "with ggplot2" backend.</p></dd>
+this number of characters? The default is 10. Only for "ggplot2" backend.</p></dd>
 
 
 <dt id="arg-rotate-x">rotate_x<a class="anchor" aria-label="anchor" href="#arg-rotate-x"></a></dt>
 <dd><p>Should categorical x axis labels be rotated by this
-number of degrees? Only "with ggplot2" backend. The default is 0 (no rotation).</p></dd>
+number of degrees? Only for "ggplot2" backend. The default is 0 (no rotation).</p></dd>
 
 
 <dt id="arg-backend">backend<a class="anchor" aria-label="anchor" href="#arg-backend"></a></dt>
-<dd><p>Plotting backend, one of "ggplot2" (default) or "plotly".
+<dd><p>Plotting backend, either "ggplot2" (default) or "plotly".
 To change globally, set <code>options(marginalplot.backend = "plotly")</code>.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Internally used.</p></dd>
+<dd><p>Currently not used.</p></dd>
 
 </dl></div>
     <div id="value">
@@ -127,8 +126,7 @@ To change globally, set <code>options(marginalplot.backend = "plotly")</code>.</
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>Single lines can be switched off
-by passing a shorter <code>line_colors</code> vector.</p>
+    <p>Single lines can be switched off by passing a shorter <code>line_colors</code> vector.</p>
     </div>
 
   </div>
