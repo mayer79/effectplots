@@ -1,7 +1,7 @@
 #' Average Observed
 #'
 #' Calculates average observed `y` values over one or multiple x variables specified
-#' via `x_names`. `y` can either be a numeric vector or a column name in `data`.
+#' via `v`. `y` can either be a numeric vector or a column name in `data`.
 #' This function is a convenience wrapper over [marginal()].
 #'
 #' @inheritParams marginal
@@ -10,11 +10,11 @@
 #' @seealso [marginal()]
 #' @export
 #' @examples
-#' M <- average_observed(x_name = "Species", y = "Sepal.Length", data = iris)
+#' M <- average_observed(v = "Species", y = "Sepal.Length", data = iris)
 #' M
 #' M |> plot()
 average_observed <- function(
-    x_name,
+    v,
     data,
     y,
     w = NULL,
@@ -27,7 +27,7 @@ average_observed <- function(
 ) {
   marginal.default(
     object = NULL,
-    x_name = x_name,
+    v = v,
     data = data,
     y = y,
     w = w,

@@ -1,6 +1,6 @@
 #' Partial Dependence
 #'
-#' Calculates partial dependence of one or more variables (`x_name`) in
+#' Calculates partial dependence of one or more variables (`v`) in
 #' a dataset `data`. This function is a convenience wrapper over [marginal()].
 #'
 #' @inheritParams marginal
@@ -12,10 +12,10 @@
 #' @export
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)
-#' M <- partial_dependence(fit, x_name = "Species", data = iris)
+#' M <- partial_dependence(fit, v = "Species", data = iris)
 #' M |> plot()
 #'
-#' M2 <- partial_dependence(fit, x_name = colnames(iris)[-1], data = iris)
+#' M2 <- partial_dependence(fit, v = colnames(iris)[-1], data = iris)
 #' plot(M2, share_y = TRUE)
 partial_dependence <- function(object, ...) {
   UseMethod("partial_dependence")
@@ -25,7 +25,7 @@ partial_dependence <- function(object, ...) {
 #' @export
 partial_dependence.default <- function(
     object,
-    x_name,
+    v,
     data,
     pred_fun = stats::predict,
     w = NULL,
@@ -39,7 +39,7 @@ partial_dependence.default <- function(
 ) {
   marginal.default(
     object = object,
-    x_name = x_name,
+    v = v,
     data = data,
     y = NULL,
     pred_fun = pred_fun,
@@ -59,7 +59,7 @@ partial_dependence.default <- function(
 #' @export
 partial_dependence.ranger <- function(
     object,
-    x_name,
+    v,
     data,
     pred_fun = NULL,
     w = NULL,
@@ -78,7 +78,7 @@ partial_dependence.ranger <- function(
   }
   partial_dependence.default(
     object = object,
-    x_name = x_name,
+    v = v,
     data = data,
     pred_fun = pred_fun,
     w = w,
@@ -96,7 +96,7 @@ partial_dependence.ranger <- function(
 #' @export
 partial_dependence.explainer <- function(
     object,
-    x_name,
+    v,
     data = object[["data"]],
     pred_fun = object[["predict_function"]],
     w = object[["weights"]],
@@ -110,7 +110,7 @@ partial_dependence.explainer <- function(
 ) {
   partial_dependence.default(
     object = object[["model"]],
-    x_name = x_name,
+    v = v,
     data = data,
     pred_fun = pred_fun,
     w = w,

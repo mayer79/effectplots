@@ -140,7 +140,7 @@ plot_marginal_plotly <- function(
       zeroline = FALSE
     ),
     yaxis2 = list(side = "right", showgrid = FALSE, showticklabels = FALSE),
-    xaxis = list(title = x$x_name),
+    xaxis = list(title = x$v),
     legend = list(orientation = "v", x = 1.05, xanchor = "left")
   )
 }
@@ -204,7 +204,7 @@ plot_marginal_ggplot <- function(
       legend.position = "right"
     ) +
     ggplot2::labs(
-      x = x$x_name, y = if (show_ylab) "Response" else ggplot2::element_blank()
+      x = x$v, y = if (show_ylab) "Response" else ggplot2::element_blank()
     )
 
   if (!is.null(title)) {

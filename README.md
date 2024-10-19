@@ -4,7 +4,7 @@
 
 [![R-CMD-check](https://github.com/mayer79/marginalplot/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mayer79/marginalplot/actions/workflows/R-CMD-check.yaml)
 [![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
-
+[![Codecov test coverage](https://codecov.io/gh/mayer79/marginalplot/graph/badge.svg)](https://app.codecov.io/gh/mayer79/marginalplot)
 <!-- badges: end -->
 
 **{marginalplot}** provides high-quality plots for modeling.
@@ -51,7 +51,7 @@ set.seed(1)
 fit <- ranger(Sepal.Length ~ ., data = iris)
 xvars <- c("Sepal.Width", "Petal.Width", "Petal.Length", "Species")
 
-marginal(fit, x_name = xvars, data = iris, y = "Sepal.Length") |> 
+marginal(fit, v = xvars, data = iris, y = "Sepal.Length") |> 
   postprocess(na.rm = TRUE) |> 
   plot()
 ```
@@ -71,9 +71,9 @@ library(ranger)
 set.seed(1)
 
 fit <- ranger(Sepal.Length ~ ., data = iris)
-xvars <- c("Sepal.Width", "Petal.Width", "Petal.Length", "Species")
+xvars <- colnames(iris)[-1]
 
-partial_dependence(fit, x_name = xvars, data = iris, breaks = 17) |> 
+partial_dependence(fit, v = xvars, data = iris, breaks = 17) |> 
   plot(sort = TRUE, share_y = TRUE, scale_exposure = 0.2)
 ```
 
@@ -93,9 +93,8 @@ Note: Sorting is done by decreasing variance of average observed values (exposur
 ``` r
 library(marginalplot)
 
-xvars <- c("Sepal.Width", "Petal.Width", "Petal.Length", "Species")
-
-average_observed(x_name = xvars, data = iris, y = "Sepal.Length") |> 
+xvars <- colnames(iris)[-1]
+average_observed(xvars, data = iris, y = "Sepal.Length") |> 
   plot(sort = TRUE, share_y = TRUE, rotate_x = 45)
 ```
 

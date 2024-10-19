@@ -28,7 +28,6 @@ rep_rows <- function(x, i) {
   out
 }
 
-
 #' Stack some Columns (from hstats)
 #'
 #' Internal function used in the plot method for "pd" objects. The function brings

@@ -8,7 +8,7 @@
 #' over a (possibly binned) feature v, optionally weighted with weights `w`.
 #'
 #' @param object Fitted model.
-#' @param x_name Column name of the variable shown on the x axis.
+#' @param v Names of the variables shown on the x axis.
 #' @param data Matrix-like.
 #' @param y Numeric vector with observed values of the response.
 #'   Can also be a column name in `data`. Omitted if `NULL` (default).
@@ -20,17 +20,17 @@
 #' @param w Optional vector with case weights. Can also be a column name in `data`.
 #' @param breaks An integer, a vector, a string or a function specifying the bins
 #'   of `x`, and passed to [graphics::hist()]. The default is "Sturges".
-#'   *Not* vectorized over `x_name`. Only relevant for numeric x.
+#'   *Not* vectorized over `v`. Only relevant for numeric x.
 #' @param right Should bins created via [graphics::hist()] be right-closed?
-#'   The default is `TRUE`. Vectorized over `x_name`. Only relevant for numeric x.
+#'   The default is `TRUE`. Vectorized over `v`. Only relevant for numeric x.
 #' @param discrete_m Numeric x with up to this number of unique values
-#'   should be treated as factors. The default is 2. Vectorized over `x_name`.
+#'   should be treated as factors. The default is 2. Vectorized over `v`.
 #' @param winsorize_low Small values of numeric x are capped at this quantile.
 #'   Set to 0 to avoid Winsorizing. Note that at most 100k observations are sampled
-#'   to calculate the quantile (depends on your random seed). Vectorized over `x_name`.
+#'   to calculate the quantile (depends on your random seed). Vectorized over `v`.
 #' @param winsorize_high High values of numeric x are capped at this quantile.
 #'   Set to 1 to avoid Winsorizing. Note that at most 100k observations are sampled
-#'   to calculate the quantile (depends on your random seed). Vectorized over `x_name`.
+#'   to calculate the quantile (depends on your random seed). Vectorized over `v`.
 #' @param calc_pred Should predictions be calculated? Default is `TRUE`. Only relevant
 #'   if `pred = NULL`.
 #' @param pd_n Size of the data used for calculation of partial dependence.
@@ -39,18 +39,18 @@
 #' @param ... Further arguments passed to `pred_fun()`, e.g., `type = "response"` in
 #'   a `glm()` or (typically) `prob = TRUE` in binary probabilistic models.
 #' @returns
-#'   If `x_name` has length 1, an object of class "marginal" containing these elements:
+#'   If `v` has length 1, an object of class "marginal" containing these elements:
 #'   - `data`: data.frame containing statistics and plot positions of values and bars.
 #'   - `num`: Indicator whether x is numeric.
-#'   - `x_name`: Same as input `x_name`.
-#'   If `x_name` has length > 1, an object of class "multimarginal", which is a named
+#'   - `v`: Same as input `v`.
+#'   If `v` has length > 1, an object of class "multimarginal", which is a named
 #'   list of "marginal" objects.
 #' @seealso [average_observed()], [partial_dependence()]
 #' @export
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)
 #' M <- marginal(
-#'   fit, x_name = colnames(iris)[-1], data = iris, y = "Sepal.Length", breaks = 5
+#'   fit, v = colnames(iris)[-1], data = iris, y = "Sepal.Length", breaks = 5
 #' )
 #' M$Petal.Width
 #'
@@ -64,7 +64,7 @@ marginal <- function(object, ...) {
 #' @export
 marginal.default <- function(
     object,
-    x_name,
+    v,
     data,
     y = NULL,
     pred = NULL,
@@ -82,7 +82,7 @@ marginal.default <- function(
   stopifnot(
     is.data.frame(data) || is.matrix(data),
     is.function(pred_fun),
-    x_name %in% colnames(data),
+    v %in% colnames(data),
     winsorize_low <= winsorize_high
   )
 
@@ -111,10 +111,10 @@ marginal.default <- function(
     }
   }
 
-  # Deal with multiple x_name
-  if (length(x_name) > 1L) {
+  # Deal with multiple v
+  if (length(v) > 1L) {
     out <- mapply(
-      x_name,
+      v,
       FUN = marginal,
       right = right,
       discrete_m = discrete_m,
@@ -134,13 +134,13 @@ marginal.default <- function(
       ),
       SIMPLIFY = FALSE
     )
-    names(out) <- x_name
+    names(out) <- v
     class(out) <- "multimarginal"
     return(out)
   }
 
   # Prepare x
-  x <- if (is.matrix(data)) data[, x_name] else data[[x_name]]
+  x <- if (is.matrix(data)) data[, v] else data[[v]]
   if (is.numeric(x) && (winsorize_low > 0 || winsorize_high < 1)) {
     x <- winsorize(x, probs = c(winsorize_low, winsorize_high), nmax = 1e5)
   }
@@ -158,7 +158,7 @@ marginal.default <- function(
   if (pd_n >= 1L) {
     out$data$pd <- partial_dep(
       object = object,
-      v = x_name,
+      v = v,
       X = data,
       grid = out$data$eval_at,
       pred_fun = pred_fun,
@@ -172,7 +172,7 @@ marginal.default <- function(
     # To ensure nice plot scales
     out$data$bar_at <- out$data$eval_at <- factor(out$data$bar_at)
   }
-  out$x_name <- x_name
+  out$v <- v
   class(out) <- "marginal"
   out
 }
@@ -181,7 +181,7 @@ marginal.default <- function(
 #' @export
 marginal.ranger <- function(
     object,
-    x_name,
+    v,
     data,
     y = NULL,
     pred = NULL,
@@ -203,7 +203,7 @@ marginal.ranger <- function(
   }
   marginal.default(
     object,
-    x_name = x_name,
+    v = v,
     data = data,
     y = y,
     pred = pred,
@@ -224,7 +224,7 @@ marginal.ranger <- function(
 #' @export
 marginal.explainer <- function(
   object,
-  x_name,
+  v,
   data = object[["data"]],
   y = NULL,
   pred = NULL,
@@ -241,7 +241,7 @@ marginal.explainer <- function(
 ) {
   marginal.default(
     object,
-    x_name = x_name,
+    v = v,
     data = data,
     y = y,
     pred = pred,

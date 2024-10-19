@@ -11,7 +11,7 @@ partial_dependence(object, ...)
 
 \method{partial_dependence}{default}(
   object,
-  x_name,
+  v,
   data,
   pred_fun = stats::predict,
   w = NULL,
@@ -26,7 +26,7 @@ partial_dependence(object, ...)
 
 \method{partial_dependence}{ranger}(
   object,
-  x_name,
+  v,
   data,
   pred_fun = NULL,
   w = NULL,
@@ -41,7 +41,7 @@ partial_dependence(object, ...)
 
 \method{partial_dependence}{explainer}(
   object,
-  x_name,
+  v,
   data = object[["data"]],
   pred_fun = object[["predict_function"]],
   w = object[["weights"]],
@@ -60,7 +60,7 @@ partial_dependence(object, ...)
 \item{...}{Further arguments passed to \code{pred_fun()}, e.g., \code{type = "response"} in
 a \code{glm()} or (typically) \code{prob = TRUE} in binary probabilistic models.}
 
-\item{x_name}{Column name of the variable shown on the x axis.}
+\item{v}{Names of the variables shown on the x axis.}
 
 \item{data}{Matrix-like.}
 
@@ -71,38 +71,38 @@ The function takes three arguments (names irrelevant): \code{object}, \code{data
 
 \item{breaks}{An integer, a vector, a string or a function specifying the bins
 of \code{x}, and passed to \code{\link[graphics:hist]{graphics::hist()}}. The default is "Sturges".
-\emph{Not} vectorized over \code{x_name}. Only relevant for numeric x.}
+\emph{Not} vectorized over \code{v}. Only relevant for numeric x.}
 
 \item{right}{Should bins created via \code{\link[graphics:hist]{graphics::hist()}} be right-closed?
-The default is \code{TRUE}. Vectorized over \code{x_name}. Only relevant for numeric x.}
+The default is \code{TRUE}. Vectorized over \code{v}. Only relevant for numeric x.}
 
 \item{discrete_m}{Numeric x with up to this number of unique values
-should be treated as factors. The default is 2. Vectorized over \code{x_name}.}
+should be treated as factors. The default is 2. Vectorized over \code{v}.}
 
 \item{winsorize_low}{Small values of numeric x are capped at this quantile.
 Set to 0 to avoid Winsorizing. Note that at most 100k observations are sampled
-to calculate the quantile (depends on your random seed). Vectorized over \code{x_name}.}
+to calculate the quantile (depends on your random seed). Vectorized over \code{v}.}
 
 \item{winsorize_high}{High values of numeric x are capped at this quantile.
 Set to 1 to avoid Winsorizing. Note that at most 100k observations are sampled
-to calculate the quantile (depends on your random seed). Vectorized over \code{x_name}.}
+to calculate the quantile (depends on your random seed). Vectorized over \code{v}.}
 
 \item{pd_n}{Size of the data used for calculation of partial dependence.
 The default is 500. Set to 0 (or pass \code{pred_fun = NULL}) to omit calculation
 of partial dependence. This depends on your random seed.}
 }
 \value{
-If \code{x_name} has length 1, an object of class "marginal" containing these elements:
+If \code{v} has length 1, an object of class "marginal" containing these elements:
 \itemize{
 \item \code{data}: data.frame containing statistics and plot positions of values and bars.
 \item \code{num}: Indicator whether x is numeric.
-\item \code{x_name}: Same as input \code{x_name}.
-If \code{x_name} has length > 1, an object of class "multimarginal", which is a named
+\item \code{v}: Same as input \code{v}.
+If \code{v} has length > 1, an object of class "multimarginal", which is a named
 list of "marginal" objects.
 }
 }
 \description{
-Calculates partial dependence of one or more variables (\code{x_name}) in
+Calculates partial dependence of one or more variables (\code{v}) in
 a dataset \code{data}. This function is a convenience wrapper over \code{\link[=marginal]{marginal()}}.
 }
 \section{Methods (by class)}{
@@ -116,10 +116,10 @@ a dataset \code{data}. This function is a convenience wrapper over \code{\link[=
 }}
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)
-M <- partial_dependence(fit, x_name = "Species", data = iris)
+M <- partial_dependence(fit, v = "Species", data = iris)
 M |> plot()
 
-M2 <- partial_dependence(fit, x_name = colnames(iris)[-1], data = iris)
+M2 <- partial_dependence(fit, v = colnames(iris)[-1], data = iris)
 plot(M2, share_y = TRUE)
 }
 \references{

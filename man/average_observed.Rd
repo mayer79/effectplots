@@ -5,7 +5,7 @@
 \title{Average Observed}
 \usage{
 average_observed(
-  x_name,
+  v,
   data,
   y,
   w = NULL,
@@ -18,7 +18,7 @@ average_observed(
 )
 }
 \arguments{
-\item{x_name}{Column name of the variable shown on the x axis.}
+\item{v}{Names of the variables shown on the x axis.}
 
 \item{data}{Matrix-like.}
 
@@ -29,41 +29,41 @@ Can also be a column name in \code{data}. Omitted if \code{NULL} (default).}
 
 \item{breaks}{An integer, a vector, a string or a function specifying the bins
 of \code{x}, and passed to \code{\link[graphics:hist]{graphics::hist()}}. The default is "Sturges".
-\emph{Not} vectorized over \code{x_name}. Only relevant for numeric x.}
+\emph{Not} vectorized over \code{v}. Only relevant for numeric x.}
 
 \item{right}{Should bins created via \code{\link[graphics:hist]{graphics::hist()}} be right-closed?
-The default is \code{TRUE}. Vectorized over \code{x_name}. Only relevant for numeric x.}
+The default is \code{TRUE}. Vectorized over \code{v}. Only relevant for numeric x.}
 
 \item{discrete_m}{Numeric x with up to this number of unique values
-should be treated as factors. The default is 2. Vectorized over \code{x_name}.}
+should be treated as factors. The default is 2. Vectorized over \code{v}.}
 
 \item{winsorize_low}{Small values of numeric x are capped at this quantile.
 Set to 0 to avoid Winsorizing. Note that at most 100k observations are sampled
-to calculate the quantile (depends on your random seed). Vectorized over \code{x_name}.}
+to calculate the quantile (depends on your random seed). Vectorized over \code{v}.}
 
 \item{winsorize_high}{High values of numeric x are capped at this quantile.
 Set to 1 to avoid Winsorizing. Note that at most 100k observations are sampled
-to calculate the quantile (depends on your random seed). Vectorized over \code{x_name}.}
+to calculate the quantile (depends on your random seed). Vectorized over \code{v}.}
 
 \item{...}{Currently unused.}
 }
 \value{
-If \code{x_name} has length 1, an object of class "marginal" containing these elements:
+If \code{v} has length 1, an object of class "marginal" containing these elements:
 \itemize{
 \item \code{data}: data.frame containing statistics and plot positions of values and bars.
 \item \code{num}: Indicator whether x is numeric.
-\item \code{x_name}: Same as input \code{x_name}.
-If \code{x_name} has length > 1, an object of class "multimarginal", which is a named
+\item \code{v}: Same as input \code{v}.
+If \code{v} has length > 1, an object of class "multimarginal", which is a named
 list of "marginal" objects.
 }
 }
 \description{
 Calculates average observed \code{y} values over one or multiple x variables specified
-via \code{x_names}. \code{y} can either be a numeric vector or a column name in \code{data}.
+via \code{v}. \code{y} can either be a numeric vector or a column name in \code{data}.
 This function is a convenience wrapper over \code{\link[=marginal]{marginal()}}.
 }
 \examples{
-M <- average_observed(x_name = "Species", y = "Sepal.Length", data = iris)
+M <- average_observed(v = "Species", y = "Sepal.Length", data = iris)
 M
 M |> plot()
 }
