@@ -52,7 +52,6 @@ fit <- ranger(Sepal.Length ~ ., data = iris)
 xvars <- c("Sepal.Width", "Petal.Width", "Petal.Length", "Species")
 
 marginal(fit, v = xvars, data = iris, y = "Sepal.Length") |> 
-  postprocess(na.rm = TRUE) |> 
   plot()
 ```
 

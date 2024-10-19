@@ -18,8 +18,8 @@ partial_dependence(object, ...)
   breaks = "Sturges",
   right = TRUE,
   discrete_m = 2L,
-  winsorize_low = 0.01,
-  winsorize_high = 0.99,
+  wprob_low = 0.01,
+  wprob_high = 0.99,
   pd_n = 500L,
   ...
 )
@@ -33,8 +33,8 @@ partial_dependence(object, ...)
   breaks = "Sturges",
   right = TRUE,
   discrete_m = 2L,
-  winsorize_low = 0.01,
-  winsorize_high = 0.99,
+  wprob_low = 0.01,
+  wprob_high = 0.99,
   pd_n = 500L,
   ...
 )
@@ -48,8 +48,8 @@ partial_dependence(object, ...)
   breaks = "Sturges",
   right = TRUE,
   discrete_m = 2L,
-  winsorize_low = 0.01,
-  winsorize_high = 0.99,
+  wprob_low = 0.01,
+  wprob_high = 0.99,
   pd_n = 500L,
   ...
 )
@@ -60,7 +60,7 @@ partial_dependence(object, ...)
 \item{...}{Further arguments passed to \code{pred_fun()}, e.g., \code{type = "response"} in
 a \code{glm()} or (typically) \code{prob = TRUE} in binary probabilistic models.}
 
-\item{v}{Names of the variables shown on the x axis.}
+\item{v}{Vector of variable names to be used on the x axis.}
 
 \item{data}{Matrix-like.}
 
@@ -79,11 +79,11 @@ The default is \code{TRUE}. Vectorized over \code{v}. Only relevant for numeric 
 \item{discrete_m}{Numeric x with up to this number of unique values
 should be treated as factors. The default is 2. Vectorized over \code{v}.}
 
-\item{winsorize_low}{Small values of numeric x are capped at this quantile.
+\item{wprob_low}{Small values of numeric x are capped at this quantile.
 Set to 0 to avoid Winsorizing. Note that at most 100k observations are sampled
 to calculate the quantile (depends on your random seed). Vectorized over \code{v}.}
 
-\item{winsorize_high}{High values of numeric x are capped at this quantile.
+\item{wprob_high}{High values of numeric x are capped at this quantile.
 Set to 1 to avoid Winsorizing. Note that at most 100k observations are sampled
 to calculate the quantile (depends on your random seed). Vectorized over \code{v}.}
 

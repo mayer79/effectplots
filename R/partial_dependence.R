@@ -32,8 +32,8 @@ partial_dependence.default <- function(
     breaks = "Sturges",
     right = TRUE,
     discrete_m = 2L,
-    winsorize_low = 0.01,
-    winsorize_high = 0.99,
+    wprob_low = 0.01,
+    wprob_high = 0.99,
     pd_n = 500L,
     ...
 ) {
@@ -47,8 +47,8 @@ partial_dependence.default <- function(
     breaks = breaks,
     right = right,
     discrete_m = discrete_m,
-    winsorize_low = winsorize_low,
-    winsorize_high = winsorize_high,
+    wprob_low = wprob_low,
+    wprob_high = wprob_high,
     calc_pred = FALSE,
     pd_n = pd_n,
     ...
@@ -66,8 +66,8 @@ partial_dependence.ranger <- function(
     breaks = "Sturges",
     right = TRUE,
     discrete_m = 2L,
-    winsorize_low = 0.01,
-    winsorize_high = 0.99,
+    wprob_low = 0.01,
+    wprob_high = 0.99,
     pd_n = 500L,
     ...
 ) {
@@ -85,8 +85,8 @@ partial_dependence.ranger <- function(
     breaks = breaks,
     right = right,
     discrete_m = discrete_m,
-    winsorize_low = winsorize_low,
-    winsorize_high = winsorize_high,
+    wprob_low = wprob_low,
+    wprob_high = wprob_high,
     pd_n = pd_n,
     ...
   )
@@ -103,8 +103,8 @@ partial_dependence.explainer <- function(
     breaks = "Sturges",
     right = TRUE,
     discrete_m = 2L,
-    winsorize_low = 0.01,
-    winsorize_high = 0.99,
+    wprob_low = 0.01,
+    wprob_high = 0.99,
     pd_n = 500L,
     ...
 ) {
@@ -117,8 +117,8 @@ partial_dependence.explainer <- function(
     breaks = breaks,
     right = right,
     discrete_m = discrete_m,
-    winsorize_low = winsorize_low,
-    winsorize_high = winsorize_high,
+    wprob_low = wprob_low,
+    wprob_high = wprob_high,
     pd_n = pd_n,
     ...
   )

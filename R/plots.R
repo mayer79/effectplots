@@ -4,13 +4,21 @@
 #' "ggthemes". When "plotly" is installed, you can switch to the interactive interface
 #' by setting `backend = "plotly"`.
 #'
-#' Single lines can be switched off by passing a shorter `line_colors` vector.
+#' Single curves can be switched off by passing a shorter `line_colors` vector.
 #'
 #' @importFrom ggplot2 .data
 #' @param x An object of class "marginal".
+#' @param ncols Number of columns in the plot layout.
+#'   Only if `length(x) > 1` (multiple plots).
+#' @param share_y Should y axis be shared across all subplots?
+#'   No effect if `ylim` is passed. Only if `length(x) > 1` (multiple plots).
+#' @param sort Should plots be sorted in decreasing order of importance? Importance is
+#'   measured by the exposure weighted variance of the most relevant available statistic
+#'   (pd > pred > obs). Only if `length(x) > 1` (multiple plots).
 #' @param ylim Manual y axis range.
-#' @param scale_exposure Scale of the exposure bars, by default 1. Set to 0 for no bars.
-#'   Currently, values between 0 and 1 are possible only with backend "ggplot2".
+#' @param scale_exposure Scaling of the exposure bars (between 0 and 1).
+#'   The default is 1. Set to 0 for no bars. With "plotly", values between 0 and 1 ar
+#'   currently not possible.
 #' @param line_colors Named vector of line colors. By default, a color blind
 #'   palette from "ggthemes" is used, equaling to
 #'   `c(obs = "#E69F00", pred = "#009E73", pd = "#56B4E9")`.
@@ -18,18 +26,25 @@
 #'   Can be used to remove certain lines in the plot.
 #' @param fill Fill color of bars. The default equals "lightgrey".
 #'   To change globally, set `options(marginalplot.fill = "new color")`.
-#' @param wrap_x Should categorical x axis labels be wrapped after
-#'   this number of characters? The default is 10. Only for "ggplot2" backend.
-#' @param rotate_x Should categorical x axis labels be rotated by this
-#'   number of degrees? Only for "ggplot2" backend. The default is 0 (no rotation).
-#' @param backend Plotting backend, either "ggplot2" (default) or "plotly".
+#' @param wrap_x Should categorical x axis labels be wrapped after this length?
+#'   The default is 10. Set to 0 for no wrapping. Vectorized over `x`.
+#'   Only for "ggplot2" backend.
+#' @param rotate_x Should categorical x axis labels be rotated by this angle?
+#'   The default is 0 (no rotation). Vectorized over `x`.
+#'   Only for "ggplot2" backend.
+#' @param backend Plot backend, either "ggplot2" (default) or "plotly".
 #'   To change globally, set `options(marginalplot.backend = "plotly")`.
-#' @param ... Currently not used.
+#' @param ... Currently unused.
+#' @returns
+#'   If `length(x) == 1` (single plot), an object of class  "ggplot" or "plotly".
+#'   Otherwise, an object of class "patchwork" or a "plotly" subplot.
 #' @seealso [marginal()], [average_observed()], [partial_dependence()]
 #' @export
-#' @returns An object of class "ggplot" or "plotly"/"htmlwidget".
 plot.marginal <- function(
     x,
+    ncols = 2L,
+    share_y = FALSE,
+    sort = FALSE,
     ylim = NULL,
     scale_exposure = 1,
     line_colors = getOption("marginalplot.line_colors"),
@@ -40,43 +55,114 @@ plot.marginal <- function(
     ...
 ) {
   stopifnot(backend %in% c("ggplot2", "plotly"))
+
   vars_to_show <- Reduce(
-    intersect, list(c("obs", "pred", "pd"), colnames(x$data), names(line_colors))
+    intersect, list(c("obs", "pred", "pd"), colnames(x[[1L]]), names(line_colors))
   )
 
-  if (backend == "plotly") {
-    p <- plot_marginal_plotly(
-      x,
+  if (length(x) == 1L) {
+    if (backend == "plotly") {
+      p <- plot_marginal_plotly(
+        x[[1L]],
+        v = names(x),
+        vars_to_show = vars_to_show,
+        ylim = ylim,
+        scale_exposure = scale_exposure,
+        line_colors = line_colors,
+        fill = fill,
+        ...
+      )
+    }
+    p <- plot_marginal_ggplot(
+      x[[1L]],
+      v = names(x),
       vars_to_show = vars_to_show,
       ylim = ylim,
       scale_exposure = scale_exposure,
       line_colors = line_colors,
       fill = fill,
+      wrap_x = wrap_x,
+      rotate_x = rotate_x,
       ...
     )
     return(p)
   }
-  plot_marginal_ggplot(
-    x,
-    vars_to_show = vars_to_show,
-    ylim = ylim,
-    scale_exposure = scale_exposure,
-    line_colors = line_colors,
-    fill = fill,
-    wrap_x = wrap_x,
-    rotate_x = rotate_x,
-    ...
-  )
+
+  # Now the multi-plot case
+  if (isTRUE(sort)) {
+    sorter <- vars_to_show[length(vars_to_show)]
+    message("Sorting via exposure weighted variance of '", sorter, "'")
+    imp <- vapply(x, FUN = .one_imp, v = sorter, FUN.VALUE = numeric(1))
+    x <- x[order(imp, decreasing = TRUE, na.last = TRUE)]
+  }
+
+  ncols <- min(ncols, length(x))
+  col_i <- (seq_along(x) - 1L) %% ncols + 1L
+  row_i <- ceiling(seq_along(x) / ncols)
+
+  if (share_y && is.null(ylim)) {
+    r <- range(sapply(x, function(z) range(z[vars_to_show], na.rm = TRUE)))
+    ylim <- r + c(-0.05, 0.05) * diff(r)
+  }
+
+  if (backend == "ggplot2") {
+    plot_list <- mapply(
+      plot_marginal_ggplot,
+      x,
+      v = names(x),
+      show_ylab = col_i == 1L,
+      show_legend = row_i == 1L & col_i == ncols,
+      wrap_x = wrap_x,
+      rotate_x = rotate_x,
+      MoreArgs = list(
+        vars_to_show = vars_to_show,
+        show_title = TRUE,
+        ylim = ylim,
+        scale_exposure = scale_exposure,
+        line_colors = line_colors,
+        fill = fill
+      ),
+      SIMPLIFY = FALSE
+    )
+    patchwork::wrap_plots(plot_list, ncol = ncols, guides = "collect", ...)
+  } else {
+    plot_list <- mapply(
+      plot_marginal_plotly,
+      x,
+      v = names(x),
+      show_ylab = col_i == 1L,
+      show_legend = row_i == 1L & col_i == ncols,
+      overlay = paste0("y", 2 * seq_along(x)),
+      MoreArgs = list(
+        vars_to_show = vars_to_show,
+        show_title = TRUE,
+        ylim = ylim,
+        scale_exposure = scale_exposure,
+        line_colors = line_colors,
+        fill = fill
+      ),
+      SIMPLIFY = FALSE
+    )
+    plotly::subplot(
+      plot_list,
+      titleX = TRUE,
+      titleY = TRUE,
+      nrows = ceiling(length(x) / ncols),
+      margin = c(0.03, 0.05, 0.125, 0.05),
+      ...
+    )
+  }
 }
 
 plot_marginal_plotly <- function(
     x,
+    v,
     vars_to_show,
     ylim = NULL,
     scale_exposure = 1,
     line_colors,
     fill,
-    title = NULL,
+    show_title = FALSE,
     show_ylab = TRUE,
     show_legend = TRUE,
     overlay = "y2",
@@ -90,7 +176,7 @@ plot_marginal_plotly <- function(
       x = ~bar_at,
       y = ~exposure,
       width = ~bar_width,
-      data = x$data,
+      data = x,
       yaxis = "y2",
       color = I(fill),
       name = "exposure",
@@ -103,8 +189,8 @@ plot_marginal_plotly <- function(
     fig <- plotly::add_trace(
       fig,
       x = ~eval_at,
-      y = x$data[[z]],
-      data = x$data,
+      y = x[[z]],
+      data = x,
       yaxis = "y",
       mode = "lines+markers",
       type = "scatter",
@@ -117,9 +203,9 @@ plot_marginal_plotly <- function(
   if (!is.null(ylim)) {
     fig <- plotly::layout(fig, yaxis = list(range = ylim))
   }
-  if (!is.null(title)) {
+  if (show_title) {
     ann <- list(
-      text = title,
+      text = v,
       x = 0.05,
       y = 1.02,
       font = list(size = 16),
@@ -140,13 +226,14 @@ plot_marginal_plotly <- function(
       zeroline = FALSE
     ),
     yaxis2 = list(side = "right", showgrid = FALSE, showticklabels = FALSE),
-    xaxis = list(title = x$v),
+    xaxis = list(title = v),
     legend = list(orientation = "v", x = 1.05, xanchor = "left")
   )
 }
 
 plot_marginal_ggplot <- function(
     x,
+    v,
     vars_to_show,
     ylim = NULL,
     scale_exposure = 1,
@@ -154,11 +241,11 @@ plot_marginal_ggplot <- function(
     fill,
     wrap_x = 10,
     rotate_x = 0,
-    title = NULL,
+    show_title = FALSE,
     show_ylab = TRUE,
     ...
 ) {
-  df <- poor_man_stack(x$data, vars_to_show)
+  df <- poor_man_stack(x, vars_to_show)
 
   # Calculate transformation of exposure bars on the right y axis
   if (is.null(ylim)) {
@@ -169,9 +256,9 @@ plot_marginal_ggplot <- function(
   }
 
   if (scale_exposure > 0) {
-    mult <- scale_exposure * diff(r) / max(x$data$exposure)
+    mult <- scale_exposure * diff(r) / max(x$exposure)
     bars <- ggplot2::geom_tile(
-      x$data,
+      x,
       mapping = ggplot2::aes(
         x = bar_at,
         y = exposure / 2 * mult + r[1L],
@@ -204,16 +291,16 @@ plot_marginal_ggplot <- function(
       legend.position = "right"
     ) +
     ggplot2::labs(
-      x = x$v, y = if (show_ylab) "Response" else ggplot2::element_blank()
+      x = v, y = if (show_ylab) "Response" else ggplot2::element_blank()
     )
 
-  if (!is.null(title)) {
-    p <- p + ggplot2::ggtitle(title)
+  if (show_title) {
+    p <- p + ggplot2::ggtitle(v)
   }
   if (!is.null(ylim)) {
     p <- p + ggplot2::ylim(ylim)
   }
-  if (!x$num) {
+  if (!is.numeric(x$eval_at)) {
     if (wrap_x > 0 && is.finite(wrap_x)) {
       p <- p + ggplot2::scale_x_discrete(labels = ggplot2::label_wrap_gen(wrap_x))
     }
@@ -224,106 +311,8 @@ plot_marginal_ggplot <- function(
   p
 }
 
-#' Plots "multimarginal" Object
-#'
-#' @inheritParams plot.marginal
-#' @param ncols Number of columns in the plot layout.
-#' @param share_y Should y axis be shared across all subplots?
-#'   No effect if `ylim` is passed.
-#' @param sort Should plots be sorted in decreasing order of main effect importance
-#'   measured by the exposure weighted variance of partial dependence? Only if
-#'   partial dependence values have been calculated (i.e., not available for
-#'   [average_observed()]).
-#' @returns Object of class "ggplot" (single plot) or "patchwork" (multiple plots),
-#'   or "plotly"/"htmlwidget" (with plotly backend).
-#' @seealso [marginal()], [average_observed()], [partial_dependence()]
-#' @export
-plot.multimarginal <- function(
-    x,
-    ncols = 2L,
-    share_y = FALSE,
-    sort = FALSE,
-    ylim = NULL,
-    scale_exposure = 1,
-    line_colors = getOption("marginalplot.line_colors"),
-    fill = getOption("marginalplot.fill"),
-    wrap_x = 10,
-    rotate_x = 0,
-    backend = getOption("marginalplot.backend"),
-    ...
-) {
-  stopifnot(backend %in% c("ggplot2", "plotly"))
-
-  vars_to_show <- Reduce(
-    intersect, list(c("obs", "pred", "pd"), colnames(x[[1L]]$data), names(line_colors))
-  )
-  if (isTRUE(sort)) {
-    sorter <- vars_to_show[length(vars_to_show)]
-    message("Sorting via exposure weighted variance of '", sorter, "'")
-    imp <- vapply(x, FUN = .one_imp, v = sorter, FUN.VALUE = numeric(1))
-    x <- x[order(imp, decreasing = TRUE, na.last = TRUE)]
-  }
-
-  ncols <- min(ncols, length(x))
-  col_i <- (seq_along(x) - 1L) %% ncols + 1L
-  row_i <- ceiling(seq_along(x) / ncols)
-
-  if (share_y && is.null(ylim)) {
-    r <- range(sapply(x, function(z) range(z$data[vars_to_show], na.rm = TRUE)))
-    ylim <- r + c(-0.05, 0.05) * diff(r)
-  }
-
-  if (backend == "ggplot2") {
-    plot_list <- mapply(
-      plot_marginal_ggplot,
-      x,
-      title = names(x),
-      show_ylab = col_i == 1L,
-      show_legend = row_i == 1L & col_i == ncols,
-      MoreArgs = list(
-        vars_to_show = vars_to_show,
-        ylim = ylim,
-        scale_exposure = scale_exposure,
-        line_colors = line_colors,
-        fill = fill,
-        wrap_x = wrap_x,
-        rotate_x = rotate_x
-      ),
-      SIMPLIFY = FALSE
-    )
-    patchwork::wrap_plots(plot_list, ncol = ncols, guides = "collect", ...)
-  } else {
-    plot_list <- mapply(
-      plot_marginal_plotly,
-      x,
-      title = names(x),
-      show_ylab = col_i == 1L,
-      show_legend = row_i == 1L & col_i == ncols,
-      overlay = paste0("y", 2 * seq_along(x)),
-      MoreArgs = list(
-        vars_to_show = vars_to_show,
-        ylim = ylim,
-        scale_exposure = scale_exposure,
-        line_colors = line_colors,
-        fill = fill
-      ),
-      SIMPLIFY = FALSE
-    )
-    plotly::subplot(
-      plot_list,
-      titleX = TRUE,
-      titleY = TRUE,
-      nrows = ceiling(length(x) / ncols),
-      margin = c(0.03, 0.05, 0.125, 0.05),
-      ...
-    )
-  }
-}
-
 # Helper function
 .one_imp <- function(x, v) {
-  ok <- is.finite(x$data[[v]])
-  stats::cov.wt(
-    x$data[ok, v, drop = FALSE], x$data[["exposure"]][ok], method = "ML"
-  )$cov[1L, 1L]
+  ok <- is.finite(x[[v]])
+  stats::cov.wt(x[ok, v, drop = FALSE], x[["exposure"]][ok], method = "ML")$cov[1L, 1L]
 }

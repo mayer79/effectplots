@@ -8,7 +8,7 @@
 #' over a (possibly binned) feature v, optionally weighted with weights `w`.
 #'
 #' @param object Fitted model.
-#' @param v Names of the variables shown on the x axis.
+#' @param v Vector of variable names to be used on the x axis.
 #' @param data Matrix-like.
 #' @param y Numeric vector with observed values of the response.
 #'   Can also be a column name in `data`. Omitted if `NULL` (default).
@@ -25,10 +25,10 @@
 #'   The default is `TRUE`. Vectorized over `v`. Only relevant for numeric x.
 #' @param discrete_m Numeric x with up to this number of unique values
 #'   should be treated as factors. The default is 2. Vectorized over `v`.
-#' @param winsorize_low Small values of numeric x are capped at this quantile.
+#' @param wprob_low Small values of numeric x are capped at this quantile.
 #'   Set to 0 to avoid Winsorizing. Note that at most 100k observations are sampled
 #'   to calculate the quantile (depends on your random seed). Vectorized over `v`.
-#' @param winsorize_high High values of numeric x are capped at this quantile.
+#' @param wprob_high High values of numeric x are capped at this quantile.
 #'   Set to 1 to avoid Winsorizing. Note that at most 100k observations are sampled
 #'   to calculate the quantile (depends on your random seed). Vectorized over `v`.
 #' @param calc_pred Should predictions be calculated? Default is `TRUE`. Only relevant
@@ -49,12 +49,9 @@
 #' @export
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)
-#' M <- marginal(
-#'   fit, v = colnames(iris)[-1], data = iris, y = "Sepal.Length", breaks = 5
-#' )
-#' M$Petal.Width
-#'
-#' # Use plot option 'backend = "plotly"' for interactive plots
+#' xvars <- colnames(iris)[-1]
+#' M <- marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
+#' M
 #' M |> plot()
 marginal <- function(object, ...) {
   UseMethod("marginal")
@@ -73,8 +70,8 @@ marginal.default <- function(
     breaks = "Sturges",
     right = TRUE,
     discrete_m = 2L,
-    winsorize_low = 0.01,
-    winsorize_high = 0.99,
+    wprob_low = 0.01,
+    wprob_high = 0.99,
     calc_pred = TRUE,
     pd_n = 500L,
     ...
@@ -83,7 +80,7 @@ marginal.default <- function(
     is.data.frame(data) || is.matrix(data),
     is.function(pred_fun),
     v %in% colnames(data),
-    winsorize_low <= winsorize_high
+    wprob_low <= wprob_high
   )
 
   # Prepare pred
@@ -111,70 +108,46 @@ marginal.default <- function(
     }
   }
 
-  # Deal with multiple v
-  if (length(v) > 1L) {
-    out <- mapply(
-      v,
-      FUN = marginal,
-      right = right,
-      discrete_m = discrete_m,
-      winsorize_low = winsorize_low,
-      winsorize_high = winsorize_high,
-      MoreArgs = list(
-        object = object,
-        data = data,
-        y = y,
-        pred = pred,
-        pred_fun = pred_fun,
-        w = w,
-        breaks = breaks,
-        calc_pred = calc_pred,
-        pd_n = pd_n,
-        ...
-      ),
-      SIMPLIFY = FALSE
-    )
-    names(out) <- v
-    class(out) <- "multimarginal"
-    return(out)
+  # Prepare pd_X and pd_w
+  if (pd_n > 0L) {
+    if (nrow(data) > pd_n) {
+      ix <- sample(nrow(data), pd_n)
+      pd_X <- data[ix, , drop = FALSE]
+      if (!is.null(w)) {
+        pd_w <- w[ix]
+      }
+    } else {
+      pd_X <- data
+      pd_w <- w
+    }
+  } else {
+    pd_X <- NULL
+    pd_w <- NULL
   }
 
-  # Prepare x
-  x <- if (is.matrix(data)) data[, v] else data[[v]]
-  if (is.numeric(x) && (winsorize_low > 0 || winsorize_high < 1)) {
-    x <- winsorize(x, probs = c(winsorize_low, winsorize_high), nmax = 1e5)
-  }
-
-  out <- calculate_stats(
-    x = x,
-    pred = pred,
-    y = y,
-    w = w,
-    breaks = breaks,
+  out <- mapply(
+    FUN = calculate_stats,
+    v,
     right = right,
-    discrete_m = discrete_m
-  )
-
-  if (pd_n >= 1L) {
-    out$data$pd <- partial_dep(
-      object = object,
-      v = v,
-      X = data,
-      grid = out$data$eval_at,
-      pred_fun = pred_fun,
-      pd_n = pd_n,
+    discrete_m = discrete_m,
+    wprob_low = wprob_low,
+    wprob_high = wprob_high,
+    MoreArgs = list(
+      pred = pred,
+      y = y,
       w = w,
+      data = data,
+      breaks = breaks,
+      object = object,
+      pred_fun = pred_fun,
+      pd_X = pd_X,
+      pd_w = pd_w,
       ...
-    )
-  }
-
-  if (!out$num && !is.factor(out$data$bar_at)) {
-    # To ensure nice plot scales
-    out$data$bar_at <- out$data$eval_at <- factor(out$data$bar_at)
-  }
-  out$v <- v
+    ),
+    SIMPLIFY = FALSE
+  )
   class(out) <- "marginal"
-  out
+  return(out)
 }
 
 #' @describeIn marginal Method for "ranger" models.
@@ -190,8 +163,8 @@ marginal.ranger <- function(
     breaks = "Sturges",
     right = TRUE,
     discrete_m = 2L,
-    winsorize_low = 0.01,
-    winsorize_high = 0.99,
+    wprob_low = 0.01,
+    wprob_high = 0.99,
     calc_pred = TRUE,
     pd_n = 500L,
     ...
@@ -212,8 +185,8 @@ marginal.ranger <- function(
     breaks = breaks,
     right = right,
     discrete_m = discrete_m,
-    winsorize_low = winsorize_low,
-    winsorize_high = winsorize_high,
+    wprob_low = wprob_low,
+    wprob_high = wprob_high,
     calc_pred = calc_pred,
     pd_n = pd_n,
     ...
@@ -233,8 +206,8 @@ marginal.explainer <- function(
   breaks = "Sturges",
   right = TRUE,
   discrete_m = 2L,
-  winsorize_low = 0.01,
-  winsorize_high = 0.99,
+  wprob_low = 0.01,
+  wprob_high = 0.99,
   calc_pred = TRUE,
   pd_n = 500L,
   ...
@@ -250,8 +223,8 @@ marginal.explainer <- function(
     breaks = breaks,
     right = right,
     discrete_m = discrete_m,
-    winsorize_low = winsorize_low,
-    winsorize_high = winsorize_high,
+    wprob_low = wprob_low,
+    wprob_high = wprob_high,
     calc_pred = calc_pred,
     pd_n = pd_n,
     ...
@@ -260,20 +233,90 @@ marginal.explainer <- function(
 
 #' @export
 print.marginal <- function(x, ...) {
-  cat("'marginal' object: \n", sep = "")
-  print(x$data)
+  cat(
+    "'marginal' object of length ",
+    length(x),
+    if (length(x) > 1) paste0(", starting with '", names(x)[1L], "'") else "",
+    ": \n\n",
+    sep = ""
+  )
+  print(x[[1L]])
   invisible(x)
 }
 
 #' @export
-print.multimarginal <- function(x, ...) {
-  cat(
-    "The first element of this 'multimarginal' object of length ",
-    length(x),
-    ": \n",
-    sep = ""
-  )
-  print(x[[1L]]$data)
-  invisible(x)
+`[.marginal` <- function(x, ...) {
+  structure(NextMethod(), class = "marginal")
 }
 
+calculate_stats <- function(
+    v,
+    pred,
+    y,
+    w,
+    data,
+    breaks,
+    right,
+    discrete_m,
+    wprob_low,
+    wprob_high,
+    object,
+    pred_fun,
+    pd_X,
+    pd_w,
+    ...
+) {
+
+  # Prepare x
+  x <- if (is.matrix(data)) data[, v] else data[[v]]
+  if (is.numeric(x) && (wprob_low > 0 || wprob_high < 1)) {
+    x <- winsorize(x, probs = c(wprob_low, wprob_high), nmax = 1e5)
+  }
+
+  g <- unique(x)
+
+  # DISCRETE
+  if (!is.numeric(x) || length(g) <= discrete_m) {
+    g <- sort(g, na.last = TRUE)  # Same order as grouped_mean()
+    S <- grouped_mean(cbind(pred = pred, obs = y), g = x, w = w)
+    if (!is.factor(g)) {
+      g <- factor(g)
+    }
+    out <- data.frame(bar_at = g, bar_width = 0.7, eval_at = g, S)
+    rownames(out) <- NULL
+  } else {
+    # "CONTINUOUS"
+    H <- graphics::hist(x, breaks = breaks, right = right, plot = FALSE)
+    g <- H$mids
+    if (anyNA(x)) {
+      g <- c(g, NA)
+    }
+    # Integer encoding
+    ix <- findInterval(
+      x, vec = H$breaks, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
+    )
+    S <- grouped_mean(cbind(eval_at = x, pred = pred, obs = y), g = ix, w = w)
+    out <- data.frame(bar_at = g, bar_width = diff(H$breaks))
+    out[rownames(S), colnames(S)] <- S
+    s <- is.na(out$exposure)
+    if (any(s)) {
+      out[s, "exposure"] <- 0
+      out[s, "eval_at"] <- out[s, "bar_at"]
+    }
+  }
+
+  # Add partial dependence
+  if (!is.null(pd_X)) {
+    out$pd <- partial_dep(
+      object = object,
+      v = v,
+      X = pd_X,
+      grid = out$eval_at,
+      pred_fun = pred_fun,
+      w = pd_w,
+      ...
+    )
+  }
+
+  return(out)
+}

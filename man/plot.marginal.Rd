@@ -6,6 +6,9 @@
 \usage{
 \method{plot}{marginal}(
   x,
+  ncols = 2L,
+  share_y = FALSE,
+  sort = FALSE,
   ylim = NULL,
   scale_exposure = 1,
   line_colors = getOption("marginalplot.line_colors"),
@@ -19,10 +22,21 @@
 \arguments{
 \item{x}{An object of class "marginal".}
 
+\item{ncols}{Number of columns in the plot layout.
+Only if \code{length(x) > 1} (multiple plots).}
+
+\item{share_y}{Should y axis be shared across all subplots?
+No effect if \code{ylim} is passed. Only if \code{length(x) > 1} (multiple plots).}
+
+\item{sort}{Should plots be sorted in decreasing order of importance? Importance is
+measured by the exposure weighted variance of the most relevant available statistic
+(pd > pred > obs). Only if \code{length(x) > 1} (multiple plots).}
+
 \item{ylim}{Manual y axis range.}
 
-\item{scale_exposure}{Scale of the exposure bars, by default 1. Set to 0 for no bars.
-Currently, values between 0 and 1 are possible only with backend "ggplot2".}
+\item{scale_exposure}{Scaling of the exposure bars (between 0 and 1).
+The default is 1. Set to 0 for no bars. With "plotly", values between 0 and 1 ar
+currently not possible.}
 
 \item{line_colors}{Named vector of line colors. By default, a color blind
 palette from "ggthemes" is used, equaling to
@@ -33,19 +47,22 @@ Can be used to remove certain lines in the plot.}
 \item{fill}{Fill color of bars. The default equals "lightgrey".
 To change globally, set \code{options(marginalplot.fill = "new color")}.}
 
-\item{wrap_x}{Should categorical x axis labels be wrapped after
-this number of characters? The default is 10. Only for "ggplot2" backend.}
+\item{wrap_x}{Should categorical x axis labels be wrapped after this length?
+The default is 10. Set to 0 for no wrapping. Vectorized over \code{x}.
+Only for "ggplot2" backend.}
 
-\item{rotate_x}{Should categorical x axis labels be rotated by this
-number of degrees? Only for "ggplot2" backend. The default is 0 (no rotation).}
+\item{rotate_x}{Should categorical x axis labels be rotated by this angle?
+The default is 0 (no rotation). Vectorized over \code{x}.
+Only for "ggplot2" backend.}
 
-\item{backend}{Plotting backend, either "ggplot2" (default) or "plotly".
+\item{backend}{Plot backend, either "ggplot2" (default) or "plotly".
 To change globally, set \code{options(marginalplot.backend = "plotly")}.}
 
-\item{...}{Currently not used.}
+\item{...}{Currently unused.}
 }
 \value{
-An object of class "ggplot" or "plotly"/"htmlwidget".
+If \code{length(x) == 1} (single plot), an object of class  "ggplot" or "plotly".
+Otherwise, an object of class "patchwork" or a "plotly" subplot.
 }
 \description{
 Plots all information calculated from \code{\link[=marginal]{marginal()}} using a color blind palette from
@@ -53,7 +70,7 @@ Plots all information calculated from \code{\link[=marginal]{marginal()}} using 
 by setting \code{backend = "plotly"}.
 }
 \details{
-Single lines can be switched off by passing a shorter \code{line_colors} vector.
+Single curves can be switched off by passing a shorter \code{line_colors} vector.
 }
 \seealso{
 \code{\link[=marginal]{marginal()}}, \code{\link[=average_observed]{average_observed()}}, \code{\link[=partial_dependence]{partial_dependence()}}
