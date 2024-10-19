@@ -82,7 +82,7 @@
 <p>The workflow is as follows:</p>
 <ol style="list-style-type: decimal">
 <li>Crunch values via <code><a href="reference/marginal.html">marginal()</a></code> or the convenience wrappers <code><a href="reference/average_observed.html">average_observed()</a></code> and <code><a href="reference/partial_dependence.html">partial_dependence()</a></code>.</li>
-<li>Post-process the results with <code><a href="reference/postprocess.html">postprocess()</a></code>, e.g., to collapse rare levels of a categorical feature.</li>
+<li>Post-process the results with <code>postprocess()</code>, e.g., to collapse rare levels of a categorical feature.</li>
 <li>Plot the results with <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>.</li>
 </ol>
 <p><strong>Notes</strong></p>
@@ -115,7 +115,6 @@
 <span><span class="va">xvars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Sepal.Width"</span>, <span class="st">"Petal.Width"</span>, <span class="st">"Petal.Length"</span>, <span class="st">"Species"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="reference/marginal.html">marginal</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">iris</span>, y <span class="op">=</span> <span class="st">"Sepal.Length"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="reference/postprocess.html">postprocess</a></span><span class="op">(</span>na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/marginal1.svg"></p>
 </div>

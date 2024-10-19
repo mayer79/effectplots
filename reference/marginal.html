@@ -78,8 +78,8 @@ over a (possibly binned) feature v, optionally weighted with weights <code>w</co
 <span>  breaks <span class="op">=</span> <span class="st">"Sturges"</span>,</span>
 <span>  right <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  discrete_m <span class="op">=</span> <span class="fl">2L</span>,</span>
-<span>  winsorize_low <span class="op">=</span> <span class="fl">0.01</span>,</span>
-<span>  winsorize_high <span class="op">=</span> <span class="fl">0.99</span>,</span>
+<span>  wprob_low <span class="op">=</span> <span class="fl">0.01</span>,</span>
+<span>  wprob_high <span class="op">=</span> <span class="fl">0.99</span>,</span>
 <span>  calc_pred <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  pd_n <span class="op">=</span> <span class="fl">500L</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -97,8 +97,8 @@ over a (possibly binned) feature v, optionally weighted with weights <code>w</co
 <span>  breaks <span class="op">=</span> <span class="st">"Sturges"</span>,</span>
 <span>  right <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  discrete_m <span class="op">=</span> <span class="fl">2L</span>,</span>
-<span>  winsorize_low <span class="op">=</span> <span class="fl">0.01</span>,</span>
-<span>  winsorize_high <span class="op">=</span> <span class="fl">0.99</span>,</span>
+<span>  wprob_low <span class="op">=</span> <span class="fl">0.01</span>,</span>
+<span>  wprob_high <span class="op">=</span> <span class="fl">0.99</span>,</span>
 <span>  calc_pred <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  pd_n <span class="op">=</span> <span class="fl">500L</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -116,8 +116,8 @@ over a (possibly binned) feature v, optionally weighted with weights <code>w</co
 <span>  breaks <span class="op">=</span> <span class="st">"Sturges"</span>,</span>
 <span>  right <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  discrete_m <span class="op">=</span> <span class="fl">2L</span>,</span>
-<span>  winsorize_low <span class="op">=</span> <span class="fl">0.01</span>,</span>
-<span>  winsorize_high <span class="op">=</span> <span class="fl">0.99</span>,</span>
+<span>  wprob_low <span class="op">=</span> <span class="fl">0.01</span>,</span>
+<span>  wprob_high <span class="op">=</span> <span class="fl">0.99</span>,</span>
 <span>  calc_pred <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  pd_n <span class="op">=</span> <span class="fl">500L</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -138,7 +138,7 @@ a <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</
 
 
 <dt id="arg-v">v<a class="anchor" aria-label="anchor" href="#arg-v"></a></dt>
-<dd><p>Names of the variables shown on the x axis.</p></dd>
+<dd><p>Vector of variable names to be used on the x axis.</p></dd>
 
 
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
@@ -181,13 +181,13 @@ The default is <code>TRUE</code>. Vectorized over <code>v</code>. Only relevant 
 should be treated as factors. The default is 2. Vectorized over <code>v</code>.</p></dd>
 
 
-<dt id="arg-winsorize-low">winsorize_low<a class="anchor" aria-label="anchor" href="#arg-winsorize-low"></a></dt>
+<dt id="arg-wprob-low">wprob_low<a class="anchor" aria-label="anchor" href="#arg-wprob-low"></a></dt>
 <dd><p>Small values of numeric x are capped at this quantile.
 Set to 0 to avoid Winsorizing. Note that at most 100k observations are sampled
 to calculate the quantile (depends on your random seed). Vectorized over <code>v</code>.</p></dd>
 
 
-<dt id="arg-winsorize-high">winsorize_high<a class="anchor" aria-label="anchor" href="#arg-winsorize-high"></a></dt>
+<dt id="arg-wprob-high">wprob_high<a class="anchor" aria-label="anchor" href="#arg-wprob-high"></a></dt>
 <dd><p>High values of numeric x are capped at this quantile.
 Set to 1 to avoid Winsorizing. Note that at most 100k observations are sampled
 to calculate the quantile (depends on your random seed). Vectorized over <code>v</code>.</p></dd>
@@ -227,19 +227,17 @@ list of "marginal" objects.</p></li>
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">Sepal.Length</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">M</span> <span class="op">&lt;-</span> <span class="fu">marginal</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="va">fit</span>, v <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">iris</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span>, data <span class="op">=</span> <span class="va">iris</span>, y <span class="op">=</span> <span class="st">"Sepal.Length"</span>, breaks <span class="op">=</span> <span class="fl">5</span></span></span>
-<span class="r-in"><span><span class="op">)</span></span></span>
-<span class="r-in"><span><span class="va">M</span><span class="op">$</span><span class="va">Petal.Width</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 'marginal' object: </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   bar_at bar_width   eval_at     pred      obs exposure       pd</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1   0.25       0.5 0.2387755 5.005213 5.006122       49 6.146058</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   0.75       0.5 0.9500000 5.283371 5.362500        8 5.921912</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3   1.25       0.5 1.3512195 6.001920 6.009756       41 5.795466</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4   1.75       0.5 1.8241379 6.462207 6.396552       29 5.646423</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5   2.25       0.5 2.2739130 6.760647 6.800000       23 5.504674</span>
-<span class="r-in"><span></span></span>
-<span class="r-in"><span><span class="co"># Use plot option 'backend = "plotly"' for interactive plots</span></span></span>
+<span class="r-in"><span><span class="va">xvars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">iris</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span></span></span>
+<span class="r-in"><span><span class="va">M</span> <span class="op">&lt;-</span> <span class="fu">marginal</span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">iris</span>, y <span class="op">=</span> <span class="st">"Sepal.Length"</span>, breaks <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="va">M</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 'marginal' object of length 4, starting with 'Sepal.Width': </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   bar_at bar_width  eval_at     pred      obs exposure       pd</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   2.25       0.5 2.378947 5.532860 5.605263       19 5.506929</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   2.75       0.5 2.867188 6.111200 6.081250       64 5.749042</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3   3.25       0.5 3.277083 5.706627 5.702083       48 5.952305</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4   3.75       0.5 3.756250 5.631317 5.668750       16 6.189918</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5   4.25       0.5 4.166667 5.413218 5.466667        3 6.393439</span>
 <span class="r-in"><span><span class="va">M</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="marginal-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>

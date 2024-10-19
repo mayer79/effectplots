@@ -60,6 +60,9 @@ by setting <code>backend = "plotly"</code>.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'marginal'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
+<span>  ncols <span class="op">=</span> <span class="fl">2L</span>,</span>
+<span>  share_y <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  sort <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  scale_exposure <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  line_colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"marginalplot.line_colors"</span><span class="op">)</span>,</span>
@@ -79,13 +82,30 @@ by setting <code>backend = "plotly"</code>.</p>
 <dd><p>An object of class "marginal".</p></dd>
 
 
+<dt id="arg-ncols">ncols<a class="anchor" aria-label="anchor" href="#arg-ncols"></a></dt>
+<dd><p>Number of columns in the plot layout.
+Only if <code>length(x) &gt; 1</code> (multiple plots).</p></dd>
+
+
+<dt id="arg-share-y">share_y<a class="anchor" aria-label="anchor" href="#arg-share-y"></a></dt>
+<dd><p>Should y axis be shared across all subplots?
+No effect if <code>ylim</code> is passed. Only if <code>length(x) &gt; 1</code> (multiple plots).</p></dd>
+
+
+<dt id="arg-sort">sort<a class="anchor" aria-label="anchor" href="#arg-sort"></a></dt>
+<dd><p>Should plots be sorted in decreasing order of importance? Importance is
+measured by the exposure weighted variance of the most relevant available statistic
+(pd &gt; pred &gt; obs). Only if <code>length(x) &gt; 1</code> (multiple plots).</p></dd>
+
+
 <dt id="arg-ylim">ylim<a class="anchor" aria-label="anchor" href="#arg-ylim"></a></dt>
 <dd><p>Manual y axis range.</p></dd>
 
 
 <dt id="arg-scale-exposure">scale_exposure<a class="anchor" aria-label="anchor" href="#arg-scale-exposure"></a></dt>
-<dd><p>Scale of the exposure bars, by default 1. Set to 0 for no bars.
-Currently, values between 0 and 1 are possible only with backend "ggplot2".</p></dd>
+<dd><p>Scaling of the exposure bars (between 0 and 1).
+The default is 1. Set to 0 for no bars. With "plotly", values between 0 and 1 ar
+currently not possible.</p></dd>
 
 
 <dt id="arg-line-colors">line_colors<a class="anchor" aria-label="anchor" href="#arg-line-colors"></a></dt>
@@ -102,31 +122,34 @@ To change globally, set <code>options(marginalplot.fill = "new color")</code>.</
 
 
 <dt id="arg-wrap-x">wrap_x<a class="anchor" aria-label="anchor" href="#arg-wrap-x"></a></dt>
-<dd><p>Should categorical x axis labels be wrapped after
-this number of characters? The default is 10. Only for "ggplot2" backend.</p></dd>
+<dd><p>Should categorical x axis labels be wrapped after this length?
+The default is 10. Set to 0 for no wrapping. Vectorized over <code>x</code>.
+Only for "ggplot2" backend.</p></dd>
 
 
 <dt id="arg-rotate-x">rotate_x<a class="anchor" aria-label="anchor" href="#arg-rotate-x"></a></dt>
-<dd><p>Should categorical x axis labels be rotated by this
-number of degrees? Only for "ggplot2" backend. The default is 0 (no rotation).</p></dd>
+<dd><p>Should categorical x axis labels be rotated by this angle?
+The default is 0 (no rotation). Vectorized over <code>x</code>.
+Only for "ggplot2" backend.</p></dd>
 
 
 <dt id="arg-backend">backend<a class="anchor" aria-label="anchor" href="#arg-backend"></a></dt>
-<dd><p>Plotting backend, either "ggplot2" (default) or "plotly".
+<dd><p>Plot backend, either "ggplot2" (default) or "plotly".
 To change globally, set <code>options(marginalplot.backend = "plotly")</code>.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
-<dd><p>Currently not used.</p></dd>
+<dd><p>Currently unused.</p></dd>
 
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An object of class "ggplot" or "plotly"/"htmlwidget".</p>
+    <p>If <code>length(x) == 1</code> (single plot), an object of class  "ggplot" or "plotly".
+Otherwise, an object of class "patchwork" or a "plotly" subplot.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>Single lines can be switched off by passing a shorter <code>line_colors</code> vector.</p>
+    <p>Single curves can be switched off by passing a shorter <code>line_colors</code> vector.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
