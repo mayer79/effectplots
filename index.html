@@ -71,7 +71,6 @@
 </h1></div>
 <!-- badges: start -->
 
-<!-- badges: end -->
 <p><strong>{marginalplot}</strong> provides high-quality plots for modeling.</p>
 <p>Per feature and feature value, the main function <code><a href="reference/marginal.html">marginal()</a></code> calculates</p>
 <ul>
@@ -115,7 +114,7 @@
 <span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">ranger</span><span class="op">(</span><span class="va">Sepal.Length</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span>
 <span><span class="va">xvars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Sepal.Width"</span>, <span class="st">"Petal.Width"</span>, <span class="st">"Petal.Length"</span>, <span class="st">"Species"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="reference/marginal.html">marginal</a></span><span class="op">(</span><span class="va">fit</span>, x_name <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">iris</span>, y <span class="op">=</span> <span class="st">"Sepal.Length"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span><span class="fu"><a href="reference/marginal.html">marginal</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">iris</span>, y <span class="op">=</span> <span class="st">"Sepal.Length"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="reference/postprocess.html">postprocess</a></span><span class="op">(</span>na.rm <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/marginal1.svg"></p>
@@ -134,9 +133,9 @@
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">ranger</span><span class="op">(</span><span class="va">Sepal.Length</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span>
-<span><span class="va">xvars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Sepal.Width"</span>, <span class="st">"Petal.Width"</span>, <span class="st">"Petal.Length"</span>, <span class="st">"Species"</span><span class="op">)</span></span>
+<span><span class="va">xvars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">iris</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
 <span></span>
-<span><span class="fu"><a href="reference/partial_dependence.html">partial_dependence</a></span><span class="op">(</span><span class="va">fit</span>, x_name <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">iris</span>, breaks <span class="op">=</span> <span class="fl">17</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span><span class="fu"><a href="reference/partial_dependence.html">partial_dependence</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">iris</span>, breaks <span class="op">=</span> <span class="fl">17</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span>sort <span class="op">=</span> <span class="cn">TRUE</span>, share_y <span class="op">=</span> <span class="cn">TRUE</span>, scale_exposure <span class="op">=</span> <span class="fl">0.2</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/pd.svg"></p>
 </div>
@@ -153,9 +152,8 @@
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mayer79/marginalplot" class="external-link">marginalplot</a></span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">xvars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Sepal.Width"</span>, <span class="st">"Petal.Width"</span>, <span class="st">"Petal.Length"</span>, <span class="st">"Species"</span><span class="op">)</span></span>
-<span></span>
-<span><span class="fu"><a href="reference/average_observed.html">average_observed</a></span><span class="op">(</span>x_name <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">iris</span>, y <span class="op">=</span> <span class="st">"Sepal.Length"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span><span class="va">xvars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">iris</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
+<span><span class="fu"><a href="reference/average_observed.html">average_observed</a></span><span class="op">(</span><span class="va">xvars</span>, data <span class="op">=</span> <span class="va">iris</span>, y <span class="op">=</span> <span class="st">"Sepal.Length"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span>sort <span class="op">=</span> <span class="cn">TRUE</span>, share_y <span class="op">=</span> <span class="cn">TRUE</span>, rotate_x <span class="op">=</span> <span class="fl">45</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/avg_obs.svg"></p>
 </div>
@@ -200,6 +198,7 @@
 <ul class="list-unstyled">
 <li><a href="https://github.com/mayer79/marginalplot/actions/workflows/R-CMD-check.yaml" class="external-link"><img src="https://github.com/mayer79/marginalplot/actions/workflows/R-CMD-check.yaml/badge.svg" alt="R-CMD-check"></a></li>
 <li><a href="https://www.tidyverse.org/lifecycle/#experimental" class="external-link"><img src="https://img.shields.io/badge/lifecycle-experimental-orange.svg" alt="Lifecycle: maturing"></a></li>
+<li><a href="https://app.codecov.io/gh/mayer79/marginalplot" class="external-link"><img src="https://codecov.io/gh/mayer79/marginalplot/graph/badge.svg" alt="Codecov test coverage"></a></li>
 </ul>
 </div>
 

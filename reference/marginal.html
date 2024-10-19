@@ -69,7 +69,7 @@ over a (possibly binned) feature v, optionally weighted with weights <code>w</co
 <span><span class="co"># Default S3 method</span></span>
 <span><span class="fu">marginal</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
-<span>  <span class="va">x_name</span>,</span>
+<span>  <span class="va">v</span>,</span>
 <span>  <span class="va">data</span>,</span>
 <span>  y <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  pred <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -88,7 +88,7 @@ over a (possibly binned) feature v, optionally weighted with weights <code>w</co
 <span><span class="co"># S3 method for class 'ranger'</span></span>
 <span><span class="fu">marginal</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
-<span>  <span class="va">x_name</span>,</span>
+<span>  <span class="va">v</span>,</span>
 <span>  <span class="va">data</span>,</span>
 <span>  y <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  pred <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -107,7 +107,7 @@ over a (possibly binned) feature v, optionally weighted with weights <code>w</co
 <span><span class="co"># S3 method for class 'explainer'</span></span>
 <span><span class="fu">marginal</span><span class="op">(</span></span>
 <span>  <span class="va">object</span>,</span>
-<span>  <span class="va">x_name</span>,</span>
+<span>  <span class="va">v</span>,</span>
 <span>  data <span class="op">=</span> <span class="va">object</span><span class="op">[[</span><span class="st">"data"</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>  y <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  pred <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -137,8 +137,8 @@ over a (possibly binned) feature v, optionally weighted with weights <code>w</co
 a <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</a></code> or (typically) <code>prob = TRUE</code> in binary probabilistic models.</p></dd>
 
 
-<dt id="arg-x-name">x_name<a class="anchor" aria-label="anchor" href="#arg-x-name"></a></dt>
-<dd><p>Column name of the variable shown on the x axis.</p></dd>
+<dt id="arg-v">v<a class="anchor" aria-label="anchor" href="#arg-v"></a></dt>
+<dd><p>Names of the variables shown on the x axis.</p></dd>
 
 
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
@@ -168,29 +168,29 @@ The function takes three arguments (names irrelevant): <code>object</code>, <cod
 <dt id="arg-breaks">breaks<a class="anchor" aria-label="anchor" href="#arg-breaks"></a></dt>
 <dd><p>An integer, a vector, a string or a function specifying the bins
 of <code>x</code>, and passed to <code><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">graphics::hist()</a></code>. The default is "Sturges".
-<em>Not</em> vectorized over <code>x_name</code>. Only relevant for numeric x.</p></dd>
+<em>Not</em> vectorized over <code>v</code>. Only relevant for numeric x.</p></dd>
 
 
 <dt id="arg-right">right<a class="anchor" aria-label="anchor" href="#arg-right"></a></dt>
 <dd><p>Should bins created via <code><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">graphics::hist()</a></code> be right-closed?
-The default is <code>TRUE</code>. Vectorized over <code>x_name</code>. Only relevant for numeric x.</p></dd>
+The default is <code>TRUE</code>. Vectorized over <code>v</code>. Only relevant for numeric x.</p></dd>
 
 
 <dt id="arg-discrete-m">discrete_m<a class="anchor" aria-label="anchor" href="#arg-discrete-m"></a></dt>
 <dd><p>Numeric x with up to this number of unique values
-should be treated as factors. The default is 2. Vectorized over <code>x_name</code>.</p></dd>
+should be treated as factors. The default is 2. Vectorized over <code>v</code>.</p></dd>
 
 
 <dt id="arg-winsorize-low">winsorize_low<a class="anchor" aria-label="anchor" href="#arg-winsorize-low"></a></dt>
 <dd><p>Small values of numeric x are capped at this quantile.
 Set to 0 to avoid Winsorizing. Note that at most 100k observations are sampled
-to calculate the quantile (depends on your random seed). Vectorized over <code>x_name</code>.</p></dd>
+to calculate the quantile (depends on your random seed). Vectorized over <code>v</code>.</p></dd>
 
 
 <dt id="arg-winsorize-high">winsorize_high<a class="anchor" aria-label="anchor" href="#arg-winsorize-high"></a></dt>
 <dd><p>High values of numeric x are capped at this quantile.
 Set to 1 to avoid Winsorizing. Note that at most 100k observations are sampled
-to calculate the quantile (depends on your random seed). Vectorized over <code>x_name</code>.</p></dd>
+to calculate the quantile (depends on your random seed). Vectorized over <code>v</code>.</p></dd>
 
 
 <dt id="arg-calc-pred">calc_pred<a class="anchor" aria-label="anchor" href="#arg-calc-pred"></a></dt>
@@ -206,10 +206,10 @@ of partial dependence. This depends on your random seed.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>If <code>x_name</code> has length 1, an object of class "marginal" containing these elements:</p><ul><li><p><code>data</code>: data.frame containing statistics and plot positions of values and bars.</p></li>
+    <p>If <code>v</code> has length 1, an object of class "marginal" containing these elements:</p><ul><li><p><code>data</code>: data.frame containing statistics and plot positions of values and bars.</p></li>
 <li><p><code>num</code>: Indicator whether x is numeric.</p></li>
-<li><p><code>x_name</code>: Same as input <code>x_name</code>.
-If <code>x_name</code> has length &gt; 1, an object of class "multimarginal", which is a named
+<li><p><code>v</code>: Same as input <code>v</code>.
+If <code>v</code> has length &gt; 1, an object of class "multimarginal", which is a named
 list of "marginal" objects.</p></li>
 </ul></div>
     <div id="methods-by-class-">
@@ -228,7 +228,7 @@ list of "marginal" objects.</p></li>
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">Sepal.Length</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">M</span> <span class="op">&lt;-</span> <span class="fu">marginal</span><span class="op">(</span></span></span>
-<span class="r-in"><span>  <span class="va">fit</span>, x_name <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">iris</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span>, data <span class="op">=</span> <span class="va">iris</span>, y <span class="op">=</span> <span class="st">"Sepal.Length"</span>, breaks <span class="op">=</span> <span class="fl">5</span></span></span>
+<span class="r-in"><span>  <span class="va">fit</span>, v <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">iris</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span>, data <span class="op">=</span> <span class="va">iris</span>, y <span class="op">=</span> <span class="st">"Sepal.Length"</span>, breaks <span class="op">=</span> <span class="fl">5</span></span></span>
 <span class="r-in"><span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">M</span><span class="op">$</span><span class="va">Petal.Width</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 'marginal' object: </span>
