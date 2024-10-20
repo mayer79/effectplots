@@ -69,9 +69,9 @@ marginal(object, ...)
 \item{...}{Further arguments passed to \code{pred_fun()}, e.g., \code{type = "response"} in
 a \code{glm()} or (typically) \code{prob = TRUE} in binary probabilistic models.}
 
-\item{v}{Vector of variable names to be used on the x axis.}
+\item{v}{Vector of variable names to calculate statistics.}
 
-\item{data}{Matrix-like.}
+\item{data}{Matrix or data.frame.}
 
 \item{y}{Numeric vector with observed values of the response.
 Can also be a column name in \code{data}. Omitted if \code{NULL} (default).}
@@ -86,39 +86,34 @@ The function takes three arguments (names irrelevant): \code{object}, \code{data
 \item{w}{Optional vector with case weights. Can also be a column name in \code{data}.}
 
 \item{breaks}{An integer, a vector, a string or a function specifying the bins
-of \code{x}, and passed to \code{\link[graphics:hist]{graphics::hist()}}. The default is "Sturges".
-\emph{Not} vectorized over \code{v}. Only relevant for numeric x.}
+of the numeric X variables, and passed to \code{\link[graphics:hist]{graphics::hist()}}.
+The default is "Sturges". \emph{Not} vectorized over \code{v}.}
 
 \item{right}{Should bins created via \code{\link[graphics:hist]{graphics::hist()}} be right-closed?
-The default is \code{TRUE}. Vectorized over \code{v}. Only relevant for numeric x.}
+The default is \code{TRUE}. Vectorized over \code{v}. Only relevant for numeric X.}
 
-\item{discrete_m}{Numeric x with up to this number of unique values
-should be treated as factors. The default is 2. Vectorized over \code{v}.}
+\item{discrete_m}{Numeric X variables with up to this number of unique values
+should not be binned. The default is 2. Vectorized over \code{v}.}
 
-\item{wprob_low}{Small values of numeric x are capped at this quantile.
+\item{wprob_low}{Small values of numeric X variables are capped at this quantile.
 Set to 0 to avoid Winsorizing. Note that at most 100k observations are sampled
-to calculate the quantile (depends on your random seed). Vectorized over \code{v}.}
+to calculate the quantiles (uses random seed). Vectorized over \code{v}.}
 
-\item{wprob_high}{High values of numeric x are capped at this quantile.
+\item{wprob_high}{High values of numeric X variables are capped at this quantile.
 Set to 1 to avoid Winsorizing. Note that at most 100k observations are sampled
-to calculate the quantile (depends on your random seed). Vectorized over \code{v}.}
+to calculate the quantile (uses random seed). Vectorized over \code{v}.}
 
 \item{calc_pred}{Should predictions be calculated? Default is \code{TRUE}. Only relevant
 if \code{pred = NULL}.}
 
-\item{pd_n}{Size of the data used for calculation of partial dependence.
-The default is 500. Set to 0 (or pass \code{pred_fun = NULL}) to omit calculation
-of partial dependence. This depends on your random seed.}
+\item{pd_n}{Size of the data used for calculating partial dependence.
+The default is 500. For larger \code{data} (and \code{w}), \code{pd_n} rows are randomly sampled
+(uses random seed). Each variable specified by \code{v} uses the same subsample.
+Set to 0 to omit.}
 }
 \value{
-If \code{v} has length 1, an object of class "marginal" containing these elements:
-\itemize{
-\item \code{data}: data.frame containing statistics and plot positions of values and bars.
-\item \code{num}: Indicator whether x is numeric.
-\item \code{v}: Same as input \code{v}.
-If \code{v} has length > 1, an object of class "multimarginal", which is a named
-list of "marginal" objects.
-}
+A list (of class "marginal") with a data.frame of statistics per feature. Use
+single bracket subsetting to select part of the output.
 }
 \description{
 This is the main function of the package. It calculates
@@ -127,7 +122,7 @@ This is the main function of the package. It calculates
 \item average predicted,
 \item partial dependence, and
 \item counts/weights
-over a (possibly binned) feature v, optionally weighted with weights \code{w}.
+over (possibly binned) features X specified by their column names \code{v}.
 }
 }
 \section{Methods (by class)}{

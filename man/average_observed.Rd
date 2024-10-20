@@ -18,9 +18,9 @@ average_observed(
 )
 }
 \arguments{
-\item{v}{Vector of variable names to be used on the x axis.}
+\item{v}{Vector of variable names to calculate statistics.}
 
-\item{data}{Matrix-like.}
+\item{data}{Matrix or data.frame.}
 
 \item{y}{Numeric vector with observed values of the response.
 Can also be a column name in \code{data}. Omitted if \code{NULL} (default).}
@@ -28,34 +28,28 @@ Can also be a column name in \code{data}. Omitted if \code{NULL} (default).}
 \item{w}{Optional vector with case weights. Can also be a column name in \code{data}.}
 
 \item{breaks}{An integer, a vector, a string or a function specifying the bins
-of \code{x}, and passed to \code{\link[graphics:hist]{graphics::hist()}}. The default is "Sturges".
-\emph{Not} vectorized over \code{v}. Only relevant for numeric x.}
+of the numeric X variables, and passed to \code{\link[graphics:hist]{graphics::hist()}}.
+The default is "Sturges". \emph{Not} vectorized over \code{v}.}
 
 \item{right}{Should bins created via \code{\link[graphics:hist]{graphics::hist()}} be right-closed?
-The default is \code{TRUE}. Vectorized over \code{v}. Only relevant for numeric x.}
+The default is \code{TRUE}. Vectorized over \code{v}. Only relevant for numeric X.}
 
-\item{discrete_m}{Numeric x with up to this number of unique values
-should be treated as factors. The default is 2. Vectorized over \code{v}.}
+\item{discrete_m}{Numeric X variables with up to this number of unique values
+should not be binned. The default is 2. Vectorized over \code{v}.}
 
-\item{wprob_low}{Small values of numeric x are capped at this quantile.
+\item{wprob_low}{Small values of numeric X variables are capped at this quantile.
 Set to 0 to avoid Winsorizing. Note that at most 100k observations are sampled
-to calculate the quantile (depends on your random seed). Vectorized over \code{v}.}
+to calculate the quantiles (uses random seed). Vectorized over \code{v}.}
 
-\item{wprob_high}{High values of numeric x are capped at this quantile.
+\item{wprob_high}{High values of numeric X variables are capped at this quantile.
 Set to 1 to avoid Winsorizing. Note that at most 100k observations are sampled
-to calculate the quantile (depends on your random seed). Vectorized over \code{v}.}
+to calculate the quantile (uses random seed). Vectorized over \code{v}.}
 
 \item{...}{Currently unused.}
 }
 \value{
-If \code{v} has length 1, an object of class "marginal" containing these elements:
-\itemize{
-\item \code{data}: data.frame containing statistics and plot positions of values and bars.
-\item \code{num}: Indicator whether x is numeric.
-\item \code{v}: Same as input \code{v}.
-If \code{v} has length > 1, an object of class "multimarginal", which is a named
-list of "marginal" objects.
-}
+A list (of class "marginal") with a data.frame of statistics per feature. Use
+single bracket subsetting to select part of the output.
 }
 \description{
 Calculates average observed \code{y} values over one or multiple x variables specified

@@ -5,11 +5,11 @@
 #' - average predicted,
 #' - partial dependence, and
 #' - counts/weights
-#' over a (possibly binned) feature v, optionally weighted with weights `w`.
+#' over (possibly binned) features X specified by their column names `v`.
 #'
 #' @param object Fitted model.
-#' @param v Vector of variable names to be used on the x axis.
-#' @param data Matrix-like.
+#' @param v Vector of variable names to calculate statistics.
+#' @param data Matrix or data.frame.
 #' @param y Numeric vector with observed values of the response.
 #'   Can also be a column name in `data`. Omitted if `NULL` (default).
 #' @param pred Numeric vector with predictions. If `NULL`, it is calculated as
@@ -19,32 +19,29 @@
 #'   The function takes three arguments (names irrelevant): `object`, `data`, and `...`.
 #' @param w Optional vector with case weights. Can also be a column name in `data`.
 #' @param breaks An integer, a vector, a string or a function specifying the bins
-#'   of `x`, and passed to [graphics::hist()]. The default is "Sturges".
-#'   *Not* vectorized over `v`. Only relevant for numeric x.
+#'   of the numeric X variables, and passed to [graphics::hist()].
+#'   The default is "Sturges". *Not* vectorized over `v`.
 #' @param right Should bins created via [graphics::hist()] be right-closed?
-#'   The default is `TRUE`. Vectorized over `v`. Only relevant for numeric x.
-#' @param discrete_m Numeric x with up to this number of unique values
-#'   should be treated as factors. The default is 2. Vectorized over `v`.
-#' @param wprob_low Small values of numeric x are capped at this quantile.
+#'   The default is `TRUE`. Vectorized over `v`. Only relevant for numeric X.
+#' @param discrete_m Numeric X variables with up to this number of unique values
+#'   should not be binned. The default is 2. Vectorized over `v`.
+#' @param wprob_low Small values of numeric X variables are capped at this quantile.
 #'   Set to 0 to avoid Winsorizing. Note that at most 100k observations are sampled
-#'   to calculate the quantile (depends on your random seed). Vectorized over `v`.
-#' @param wprob_high High values of numeric x are capped at this quantile.
+#'   to calculate the quantiles (uses random seed). Vectorized over `v`.
+#' @param wprob_high High values of numeric X variables are capped at this quantile.
 #'   Set to 1 to avoid Winsorizing. Note that at most 100k observations are sampled
-#'   to calculate the quantile (depends on your random seed). Vectorized over `v`.
+#'   to calculate the quantile (uses random seed). Vectorized over `v`.
 #' @param calc_pred Should predictions be calculated? Default is `TRUE`. Only relevant
 #'   if `pred = NULL`.
-#' @param pd_n Size of the data used for calculation of partial dependence.
-#'   The default is 500. Set to 0 (or pass `pred_fun = NULL`) to omit calculation
-#'   of partial dependence. This depends on your random seed.
+#' @param pd_n Size of the data used for calculating partial dependence.
+#'   The default is 500. For larger `data` (and `w`), `pd_n` rows are randomly sampled
+#'   (uses random seed). Each variable specified by `v` uses the same subsample.
+#'   Set to 0 to omit.
 #' @param ... Further arguments passed to `pred_fun()`, e.g., `type = "response"` in
 #'   a `glm()` or (typically) `prob = TRUE` in binary probabilistic models.
 #' @returns
-#'   If `v` has length 1, an object of class "marginal" containing these elements:
-#'   - `data`: data.frame containing statistics and plot positions of values and bars.
-#'   - `num`: Indicator whether x is numeric.
-#'   - `v`: Same as input `v`.
-#'   If `v` has length > 1, an object of class "multimarginal", which is a named
-#'   list of "marginal" objects.
+#'   A list (of class "marginal") with a data.frame of statistics per feature. Use
+#'   single bracket subsetting to select part of the output.
 #' @seealso [average_observed()], [partial_dependence()]
 #' @export
 #' @examples

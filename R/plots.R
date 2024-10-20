@@ -1,22 +1,22 @@
 #' Plots "marginal" Object
 #'
-#' Plots all information calculated from [marginal()] using a color blind palette from
-#' "ggthemes". When "plotly" is installed, you can switch to the interactive interface
-#' by setting `backend = "plotly"`.
+#' Plots all statistics using a color blind palette from "ggthemes".
+#' You can switch to the interactive interface by setting `backend = "plotly"`.
 #'
-#' Single curves can be switched off by passing a shorter `line_colors` vector.
+#' Note: Curves can be selected for plotting by passing a shorter `line_colors` vector.
 #'
 #' @importFrom ggplot2 .data
 #' @param x An object of class "marginal".
 #' @param ncols Number of columns in the plot layout.
-#'   Only if `length(x) > 1` (multiple plots).
+#'   Only if `length(x) > 1` (multiple plots). With "plotly" subplots, only nrow can
+#'   be set. Therefore, the calculation is approximately possible only.
 #' @param share_y Should y axis be shared across all subplots?
 #'   No effect if `ylim` is passed. Only if `length(x) > 1` (multiple plots).
 #' @param sort Should plots be sorted in decreasing order of importance? Importance is
 #'   measured by the exposure weighted variance of the most relevant available statistic
 #'   (pd > pred > obs). Only if `length(x) > 1` (multiple plots).
 #' @param ylim Manual y axis range.
-#' @param scale_exposure Scaling of the exposure bars (between 0 and 1).
+#' @param scale_exposure Vertical scaling of the exposure bars (between 0 and 1).
 #'   The default is 1. Set to 0 for no bars. With "plotly", values between 0 and 1 ar
 #'   currently not possible.
 #' @param line_colors Named vector of line colors. By default, a color blind
@@ -26,12 +26,11 @@
 #'   Can be used to remove certain lines in the plot.
 #' @param fill Fill color of bars. The default equals "lightgrey".
 #'   To change globally, set `options(marginalplot.fill = "new color")`.
-#' @param wrap_x Should categorical x axis labels be wrapped after this length?
+#' @param wrap_x Should categorical xaxis labels be wrapped after this length?
 #'   The default is 10. Set to 0 for no wrapping. Vectorized over `x`.
 #'   Only for "ggplot2" backend.
-#' @param rotate_x Should categorical x axis labels be rotated by this angle?
-#'   The default is 0 (no rotation). Vectorized over `x`.
-#'   Only for "ggplot2" backend.
+#' @param rotate_x Should categorical xaxis labels be rotated by this angle?
+#'   The default is 0 (no rotation). Vectorized over `x`. Only for "ggplot2" backend.
 #' @param backend Plot backend, either "ggplot2" (default) or "plotly".
 #'   To change globally, set `options(marginalplot.backend = "plotly")`.
 #' @param ... Currently unused.
