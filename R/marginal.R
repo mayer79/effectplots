@@ -110,16 +110,13 @@ marginal.default <- function(
     if (nrow(data) > pd_n) {
       ix <- sample(nrow(data), pd_n)
       pd_X <- data[ix, , drop = FALSE]
-      if (!is.null(w)) {
-        pd_w <- w[ix]
-      }
+      pd_w <- if (!is.null(w)) w[ix]
     } else {
       pd_X <- data
       pd_w <- w
     }
   } else {
-    pd_X <- NULL
-    pd_w <- NULL
+    pd_X <- pd_w <- NULL
   }
 
   out <- mapply(
