@@ -19,6 +19,10 @@
 #' @param scale_exposure Vertical scaling of the exposure bars (between 0 and 1).
 #'   The default is 1. Set to 0 for no bars. With "plotly", values between 0 and 1 ar
 #'   currently not possible.
+#' @param cat_lines Show lines for non-numeric features. Default is `TRUE`.
+#'   Vectorized over `x`.
+#' @param num_points Show points for numeric features. Default is `FALSE`.
+#'   Vectorized over `x`.
 #' @param line_colors Named vector of line colors. By default, a color blind
 #'   palette from "ggthemes" is used, equaling to
 #'   `c(obs = "#E69F00", pred = "#009E73", pd = "#56B4E9")`.
@@ -46,6 +50,8 @@ plot.marginal <- function(
     sort = FALSE,
     ylim = NULL,
     scale_exposure = 1,
+    cat_lines = TRUE,
+    num_points = FALSE,
     line_colors = getOption("marginalplot.line_colors"),
     fill = getOption("marginalplot.fill"),
     wrap_x = 10,
@@ -60,30 +66,35 @@ plot.marginal <- function(
   )
 
   if (length(x) == 1L) {
-    if (backend == "plotly") {
+    if (backend == "ggplot2") {
+      p <- plot_marginal_ggplot(
+        x[[1L]],
+        v = names(x),
+        vars_to_show = vars_to_show,
+        ylim = ylim,
+        scale_exposure = scale_exposure,
+        cat_lines = cat_lines,
+        num_points = num_points,
+        line_colors = line_colors,
+        fill = fill,
+        wrap_x = wrap_x,
+        rotate_x = rotate_x,
+        ...
+      )
+    } else {
       p <- plot_marginal_plotly(
         x[[1L]],
         v = names(x),
         vars_to_show = vars_to_show,
         ylim = ylim,
         scale_exposure = scale_exposure,
+        cat_lines = cat_lines,
+        num_points = num_points,
         line_colors = line_colors,
         fill = fill,
         ...
       )
     }
-    p <- plot_marginal_ggplot(
-      x[[1L]],
-      v = names(x),
-      vars_to_show = vars_to_show,
-      ylim = ylim,
-      scale_exposure = scale_exposure,
-      line_colors = line_colors,
-      fill = fill,
-      wrap_x = wrap_x,
-      rotate_x = rotate_x,
-      ...
-    )
     return(p)
   }
 
@@ -101,7 +112,7 @@ plot.marginal <- function(
 
   if (share_y && is.null(ylim)) {
     r <- range(sapply(x, function(z) range(z[vars_to_show], na.rm = TRUE)))
-    ylim <- r + c(-0.05, 0.05) * diff(r)
+    ylim <- grDevices::extendrange(r)
   }
 
   if (backend == "ggplot2") {
@@ -111,6 +122,8 @@ plot.marginal <- function(
       v = names(x),
       show_ylab = col_i == 1L,
       show_legend = row_i == 1L & col_i == ncols,
+      cat_lines = cat_lines,
+      num_points = num_points,
       wrap_x = wrap_x,
       rotate_x = rotate_x,
       MoreArgs = list(
@@ -132,6 +145,8 @@ plot.marginal <- function(
       show_ylab = col_i == 1L,
       show_legend = row_i == 1L & col_i == ncols,
       overlay = paste0("y", 2 * seq_along(x)),
+      cat_lines = cat_lines,
+      num_points = num_points,
       MoreArgs = list(
         vars_to_show = vars_to_show,
         show_title = TRUE,
@@ -147,18 +162,111 @@ plot.marginal <- function(
       titleX = TRUE,
       titleY = TRUE,
       nrows = ceiling(length(x) / ncols),
-      margin = c(0.03, 0.05, 0.125, 0.05),
+      margin = c(0.03, 0.05, 0.125, 0.03),
       ...
     )
   }
+}
+
+plot_marginal_ggplot <- function(
+    x,
+    v,
+    vars_to_show,
+    ylim,
+    scale_exposure,
+    num_points,
+    cat_lines,
+    line_colors,
+    fill,
+    wrap_x,
+    rotate_x,
+    show_title = FALSE,
+    show_ylab = TRUE,
+    ...
+) {
+  num <- is.numeric(x$eval_at)
+  show_legend <- length(vars_to_show) > 1L
+
+  df <- poor_man_stack(x, vars_to_show)
+
+  # Calculate transformation of exposure bars on the right y axis
+  if (is.null(ylim)) {
+    r <- grDevices::extendrange(df$value_, f = 0.03)
+  } else {
+    r <- grDevices::extendrange(ylim, f = -0.05)  # ~remove 5% expansion
+  }
+
+  p <- ggplot2::ggplot(df, ggplot2::aes(x = eval_at, y = value_))
+
+  # Add optional exposure bars on secondary y axis
+  if (scale_exposure > 0) {
+    mult <- scale_exposure * diff(r) / max(x$exposure)
+
+    p <- p + ggplot2::geom_tile(
+      x,
+      mapping = ggplot2::aes(
+        x = bar_at,
+        y = exposure / 2 * mult + r[1L],
+        height = exposure * mult,
+        width = bar_width
+      ),
+      show.legend = FALSE,
+      fill = fill
+    )
+  }
+
+  # Add optional points
+  if (!num || isTRUE(num_points)) {
+    p <- p + ggplot2::geom_point(
+      ggplot2::aes(color = varying_), size = 2, show.legend = show_legend
+    )
+  }
+
+  # Add optional lines
+  if (num || isTRUE(cat_lines)) {
+    p <- p + ggplot2::geom_line(
+      ggplot2::aes(color = varying_, group = varying_),
+      linewidth = 0.8,
+      show.legend = show_legend
+    )
+  }
+
+  # Styling
+  p <- p + ggplot2::scale_color_manual(values = line_colors) +
+    ggplot2::theme_bw() +
+    ggplot2::theme(
+      legend.title = ggplot2::element_blank(),
+      legend.position = "right"
+    ) +
+    ggplot2::labs(
+      x = v, y = if (show_ylab) "Response" else ggplot2::element_blank()
+    )
+
+  if (show_title) {
+    p <- p + ggplot2::ggtitle(v)
+  }
+  if (!is.null(ylim)) {
+    p <- p + ggplot2::ylim(ylim)
+  }
+  if (!num) {
+    if (wrap_x > 0 && is.finite(wrap_x)) {
+      p <- p + ggplot2::scale_x_discrete(labels = ggplot2::label_wrap_gen(wrap_x))
+    }
+    if (rotate_x != 0) {
+      p <- p + ggplot2::guides(x = ggplot2::guide_axis(angle = rotate_x))
+    }
+  }
+  p
 }
 
 plot_marginal_plotly <- function(
     x,
     v,
     vars_to_show,
-    ylim = NULL,
-    scale_exposure = 1,
+    ylim,
+    scale_exposure,
+    cat_lines,
+    num_points,
     line_colors,
     fill,
     show_title = FALSE,
@@ -167,6 +275,16 @@ plot_marginal_plotly <- function(
     overlay = "y2",
     ...
 ) {
+  num <- is.numeric(x$eval_at)
+
+  if (num && isFALSE(num_points)) {
+    scatter_mode <- "lines"
+  } else if (!num && isFALSE(cat_lines)) {
+    scatter_mode <- "markers"
+  } else {
+    scatter_mode <-  "lines+markers"
+  }
+
   fig <- plotly::plot_ly()
 
   if (scale_exposure > 0) {
@@ -191,7 +309,7 @@ plot_marginal_plotly <- function(
       y = x[[z]],
       data = x,
       yaxis = "y",
-      mode = "lines+markers",
+      mode = scatter_mode,
       type = "scatter",
       name = z,
       showlegend = show_legend,
@@ -228,86 +346,6 @@ plot_marginal_plotly <- function(
     xaxis = list(title = v),
     legend = list(orientation = "v", x = 1.05, xanchor = "left")
   )
-}
-
-plot_marginal_ggplot <- function(
-    x,
-    v,
-    vars_to_show,
-    ylim = NULL,
-    scale_exposure = 1,
-    line_colors,
-    fill,
-    wrap_x = 10,
-    rotate_x = 0,
-    show_title = FALSE,
-    show_ylab = TRUE,
-    ...
-) {
-  df <- poor_man_stack(x, vars_to_show)
-
-  # Calculate transformation of exposure bars on the right y axis
-  if (is.null(ylim)) {
-    r <- range(df$value_, na.rm = TRUE)
-    r <- r + c(-0.03, -0.03) * diff(r)
-  } else {
-    r <- ylim + c(0.05, -0.05) * diff(ylim)  # ~remove 5% expansion
-  }
-
-  if (scale_exposure > 0) {
-    mult <- scale_exposure * diff(r) / max(x$exposure)
-    bars <- ggplot2::geom_tile(
-      x,
-      mapping = ggplot2::aes(
-        x = bar_at,
-        y = exposure / 2 * mult + r[1L],
-        height = exposure * mult,
-        width = bar_width
-      ),
-      show.legend = FALSE,
-      fill = fill
-    )
-  } else {
-    bars <- NULL
-  }
-
-  p <- ggplot2::ggplot(df, ggplot2::aes(x = eval_at, y = value_)) +
-    bars +
-    ggplot2::geom_point(
-      ggplot2::aes(color = varying_),
-      size = 2,
-      show.legend = length(vars_to_show) > 1L
-    ) +
-    ggplot2::geom_line(
-      ggplot2::aes(color = varying_, group = varying_),
-      linewidth = 0.8,
-      show.legend = length(vars_to_show) > 1L
-    ) +
-    ggplot2::scale_color_manual(values = line_colors) +
-    ggplot2::theme_bw() +
-    ggplot2::theme(
-      legend.title = ggplot2::element_blank(),
-      legend.position = "right"
-    ) +
-    ggplot2::labs(
-      x = v, y = if (show_ylab) "Response" else ggplot2::element_blank()
-    )
-
-  if (show_title) {
-    p <- p + ggplot2::ggtitle(v)
-  }
-  if (!is.null(ylim)) {
-    p <- p + ggplot2::ylim(ylim)
-  }
-  if (!is.numeric(x$eval_at)) {
-    if (wrap_x > 0 && is.finite(wrap_x)) {
-      p <- p + ggplot2::scale_x_discrete(labels = ggplot2::label_wrap_gen(wrap_x))
-    }
-    if (rotate_x != 0) {
-      p <- p + ggplot2::guides(x = ggplot2::guide_axis(angle = rotate_x))
-    }
-  }
-  p
 }
 
 # Helper function

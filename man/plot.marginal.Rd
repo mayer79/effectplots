@@ -11,6 +11,8 @@
   sort = FALSE,
   ylim = NULL,
   scale_exposure = 1,
+  cat_lines = TRUE,
+  num_points = FALSE,
   line_colors = getOption("marginalplot.line_colors"),
   fill = getOption("marginalplot.fill"),
   wrap_x = 10,
@@ -38,6 +40,12 @@ measured by the exposure weighted variance of the most relevant available statis
 \item{scale_exposure}{Vertical scaling of the exposure bars (between 0 and 1).
 The default is 1. Set to 0 for no bars. With "plotly", values between 0 and 1 ar
 currently not possible.}
+
+\item{cat_lines}{Show lines for non-numeric features. Default is \code{TRUE}.
+Vectorized over \code{x}.}
+
+\item{num_points}{Show points for numeric features. Default is \code{FALSE}.
+Vectorized over \code{x}.}
 
 \item{line_colors}{Named vector of line colors. By default, a color blind
 palette from "ggthemes" is used, equaling to
