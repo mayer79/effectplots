@@ -63,6 +63,8 @@ You can switch to the interactive interface by setting <code>backend = "plotly"<
 <span>  sort <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  scale_exposure <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  cat_lines <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  num_points <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  line_colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"marginalplot.line_colors"</span><span class="op">)</span>,</span>
 <span>  fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"marginalplot.fill"</span><span class="op">)</span>,</span>
 <span>  wrap_x <span class="op">=</span> <span class="fl">10</span>,</span>
@@ -105,6 +107,16 @@ measured by the exposure weighted variance of the most relevant available statis
 <dd><p>Vertical scaling of the exposure bars (between 0 and 1).
 The default is 1. Set to 0 for no bars. With "plotly", values between 0 and 1 ar
 currently not possible.</p></dd>
+
+
+<dt id="arg-cat-lines">cat_lines<a class="anchor" aria-label="anchor" href="#arg-cat-lines"></a></dt>
+<dd><p>Show lines for non-numeric features. Default is <code>TRUE</code>.
+Vectorized over <code>x</code>.</p></dd>
+
+
+<dt id="arg-num-points">num_points<a class="anchor" aria-label="anchor" href="#arg-num-points"></a></dt>
+<dd><p>Show points for numeric features. Default is <code>FALSE</code>.
+Vectorized over <code>x</code>.</p></dd>
 
 
 <dt id="arg-line-colors">line_colors<a class="anchor" aria-label="anchor" href="#arg-line-colors"></a></dt>
