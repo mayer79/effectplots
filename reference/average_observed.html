@@ -76,11 +76,11 @@ This function is a convenience wrapper over <code><a href="marginal.html">margin
 
 
 <dl><dt id="arg-v">v<a class="anchor" aria-label="anchor" href="#arg-v"></a></dt>
-<dd><p>Vector of variable names to be used on the x axis.</p></dd>
+<dd><p>Vector of variable names to calculate statistics.</p></dd>
 
 
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
-<dd><p>Matrix-like.</p></dd>
+<dd><p>Matrix or data.frame.</p></dd>
 
 
 <dt id="arg-y">y<a class="anchor" aria-label="anchor" href="#arg-y"></a></dt>
@@ -94,30 +94,30 @@ Can also be a column name in <code>data</code>. Omitted if <code>NULL</code> (de
 
 <dt id="arg-breaks">breaks<a class="anchor" aria-label="anchor" href="#arg-breaks"></a></dt>
 <dd><p>An integer, a vector, a string or a function specifying the bins
-of <code>x</code>, and passed to <code><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">graphics::hist()</a></code>. The default is "Sturges".
-<em>Not</em> vectorized over <code>v</code>. Only relevant for numeric x.</p></dd>
+of the numeric X variables, and passed to <code><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">graphics::hist()</a></code>.
+The default is "Sturges". <em>Not</em> vectorized over <code>v</code>.</p></dd>
 
 
 <dt id="arg-right">right<a class="anchor" aria-label="anchor" href="#arg-right"></a></dt>
 <dd><p>Should bins created via <code><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">graphics::hist()</a></code> be right-closed?
-The default is <code>TRUE</code>. Vectorized over <code>v</code>. Only relevant for numeric x.</p></dd>
+The default is <code>TRUE</code>. Vectorized over <code>v</code>. Only relevant for numeric X.</p></dd>
 
 
 <dt id="arg-discrete-m">discrete_m<a class="anchor" aria-label="anchor" href="#arg-discrete-m"></a></dt>
-<dd><p>Numeric x with up to this number of unique values
-should be treated as factors. The default is 2. Vectorized over <code>v</code>.</p></dd>
+<dd><p>Numeric X variables with up to this number of unique values
+should not be binned. The default is 2. Vectorized over <code>v</code>.</p></dd>
 
 
 <dt id="arg-wprob-low">wprob_low<a class="anchor" aria-label="anchor" href="#arg-wprob-low"></a></dt>
-<dd><p>Small values of numeric x are capped at this quantile.
+<dd><p>Small values of numeric X variables are capped at this quantile.
 Set to 0 to avoid Winsorizing. Note that at most 100k observations are sampled
-to calculate the quantile (depends on your random seed). Vectorized over <code>v</code>.</p></dd>
+to calculate the quantiles (uses random seed). Vectorized over <code>v</code>.</p></dd>
 
 
 <dt id="arg-wprob-high">wprob_high<a class="anchor" aria-label="anchor" href="#arg-wprob-high"></a></dt>
-<dd><p>High values of numeric x are capped at this quantile.
+<dd><p>High values of numeric X variables are capped at this quantile.
 Set to 1 to avoid Winsorizing. Note that at most 100k observations are sampled
-to calculate the quantile (depends on your random seed). Vectorized over <code>v</code>.</p></dd>
+to calculate the quantile (uses random seed). Vectorized over <code>v</code>.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
@@ -126,12 +126,9 @@ to calculate the quantile (depends on your random seed). Vectorized over <code>v
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>If <code>v</code> has length 1, an object of class "marginal" containing these elements:</p><ul><li><p><code>data</code>: data.frame containing statistics and plot positions of values and bars.</p></li>
-<li><p><code>num</code>: Indicator whether x is numeric.</p></li>
-<li><p><code>v</code>: Same as input <code>v</code>.
-If <code>v</code> has length &gt; 1, an object of class "multimarginal", which is a named
-list of "marginal" objects.</p></li>
-</ul></div>
+    <p>A list (of class "marginal") with a data.frame of statistics per feature. Use
+single bracket subsetting to select part of the output.</p>
+    </div>
     <div id="see-also">
     <h2>See also</h2>
     <div class="dont-index"><p><code><a href="marginal.html">marginal()</a></code></p></div>
