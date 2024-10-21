@@ -7,7 +7,7 @@ hist2 <- function(x, breaks = "Sturges") {
       sturges = grDevices::nclass.Sturges(x),
       `freedman-diaconis` = ,
       fd = grDevices::nclass.FD(x),
-      scott = nclass.scott(x),
+      scott = grDevices::nclass.scott(x),
       stop("unknown 'breaks' algo")
     )
   }

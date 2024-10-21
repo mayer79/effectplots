@@ -3,8 +3,7 @@ wins_prob <- function(x, probs = 0:1, nmax = 1e5) {
     return(x)
   }
   xs <- if (length(x) > nmax) sample(x, nmax) else x
-  # If one of the probs is 0 or 1, the following line is inefficient
-  q <- stats::quantile(xs, probs = probs, na.rm = TRUE, names = FALSE, type = 1L)
+  q <- stats::quantile(xs, probs = probs, na.rm = TRUE, names = FALSE)
   winsorize(x, low = q[1L], high = q[2L])
 }
 
