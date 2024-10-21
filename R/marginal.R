@@ -7,6 +7,12 @@
 #' - counts/weights
 #' over (possibly binned) features X specified by their column names `v`.
 #'
+#' For numeric variables with more than `discrete_m = 2` disjoint values,
+#' the same binning options (specified by `breaks`) are available as in
+#' [graphics::hist()]. Before calculating bins, the smallest 1% and the
+#' largest 99% of values are winsorized (capped) at the corresponding observed
+#' (approximate) quantiles.
+#'
 #' @param object Fitted model.
 #' @param v Vector of variable names to calculate statistics.
 #' @param data Matrix or data.frame.
@@ -264,7 +270,7 @@ calculate_stats <- function(
   # Prepare x
   x <- if (is.matrix(data)) data[, v] else data[[v]]
   if (is.numeric(x) && (wprob_low > 0 || wprob_high < 1)) {
-    x <- winsorize(x, probs = c(wprob_low, wprob_high), nmax = 1e5)
+    x <- win_prob(x, probs = c(wprob_low, wprob_high), nmax = 1e5)
   }
 
   g <- unique(x)
@@ -280,7 +286,8 @@ calculate_stats <- function(
     rownames(out) <- NULL
   } else {
     # "CONTINUOUS"
-    H <- graphics::hist(x, breaks = breaks, right = right, plot = FALSE)
+    # H <- graphics::hist.default(x, breaks = breaks, right = right, plot = FALSE)
+    H <- hist2(x, breaks = breaks)
     g <- H$mids
     if (anyNA(x)) {
       g <- c(g, NA)

@@ -1,17 +1,20 @@
-winsorize <- function(x, probs = 0:1, nmax = 1e5) {
+wins_prob <- function(x, probs = 0:1, nmax = 1e5) {
   if (!is.numeric(x) || (probs[1L] == 0 && probs[2L] == 1)) {
     return(x)
   }
   xs <- if (length(x) > nmax) sample(x, nmax) else x
   # If one of the probs is 0 or 1, the following line is inefficient
   q <- stats::quantile(xs, probs = probs, na.rm = TRUE, names = FALSE, type = 1L)
-  if (probs[1L] > 0) {
-    x[x < q[1L]] <- q[1L]
+  winsorize(x, low = q[1L], high = q[2L])
+}
+
+# pmin() and pmax() are surprisingly fast for large vectors
+# and need less memory than subsetting
+winsorize <- function(x, low = -Inf, high = Inf) {
+  if (low != -Inf) {
+    x <- pmax(x, low)
   }
-  if (probs[2L] < 1) {
-    x[x > q[2L]] <- q[2L]
-  }
-  return(x)
+  if (high != Inf) pmin(x, high) else x
 }
 
 #' Stack some Columns (from hstats)

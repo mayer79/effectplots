@@ -1,9 +1,9 @@
 test_that("winsorize() works", {
   x <- 1:10
   expect_equal(winsorize(x), x)
-  expect_equal(winsorize(x, probs = c(0.2, 1)), pmax(2, x))
-  expect_equal(winsorize(x, probs = c(0, 0.8)), pmin(8, x))  # not symmetric
-  expect_equal(winsorize(x, probs = c(0.3, 0.7)), pmax(3, pmin(7, x)))
+  expect_equal(winsorize(x, low = 2), pmax(2, x))
+  expect_equal(winsorize(x, high = 8), pmin(8, x))  # not symmetric
+  expect_equal(winsorize(x, low = 3, high = 7), pmax(3, pmin(7, x)))
 })
 
 test_that("rep_rows() gives the same as usual subsetting (except rownames)", {
