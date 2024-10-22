@@ -25,8 +25,9 @@
 #'   The function takes three arguments (names irrelevant): `object`, `data`, and `...`.
 #' @param w Optional vector with case weights. Can also be a column name in `data`.
 #' @param breaks An integer, a vector, a string or a function specifying the bins
-#'   of the numeric X variables, and passed to [graphics::hist()].
-#'   The default is "Sturges". *Not* vectorized over `v`.
+#'   of the numeric X variables as in [graphics::hist()]. The default is "Sturges".
+#'   To allow the value of `breaks` to vary across variables, it can either be a list
+#'   of the same length as `v`, or a *named* list for certain variables.
 #' @param right Should bins created via [graphics::hist()] be right-closed?
 #'   The default is `TRUE`. Vectorized over `v`. Only relevant for numeric X.
 #' @param discrete_m Numeric X variables with up to this number of unique values
@@ -125,9 +126,23 @@ marginal.default <- function(
     pd_X <- pd_w <- NULL
   }
 
+  # Prepare breaks
+  nv <- length(v)
+  if (is.list(breaks)) {
+    if (length(breaks) < nv) {
+      br <- replicate(nv, "Sturges", simplify = FALSE)
+      names(br) <- v
+      br[names(breaks)] <- breaks
+      breaks <- br
+    }
+  } else {
+    breaks <- replicate(nv, breaks, simplify = FALSE)
+  }
+
   out <- mapply(
     FUN = calculate_stats,
     v,
+    breaks = breaks,
     right = right,
     discrete_m = discrete_m,
     wprob_low = wprob_low,
@@ -137,7 +152,6 @@ marginal.default <- function(
       y = y,
       w = w,
       data = data,
-      breaks = breaks,
       object = object,
       pred_fun = pred_fun,
       pd_X = pd_X,
