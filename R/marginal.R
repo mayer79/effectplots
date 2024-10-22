@@ -24,10 +24,10 @@
 #' @param pred_fun Prediction function, by default `stats::predict`.
 #'   The function takes three arguments (names irrelevant): `object`, `data`, and `...`.
 #' @param w Optional vector with case weights. Can also be a column name in `data`.
-#' @param breaks An integer, a vector, a string or a function specifying the bins
+#' @param breaks An integer, vector, string or function specifying the bins
 #'   of the numeric X variables as in [graphics::hist()]. The default is "Sturges".
-#'   To allow the value of `breaks` to vary across variables, it can either be a list
-#'   of the same length as `v`, or a *named* list for certain variables.
+#'   To allow varying values of `breaks` across variables, it can be a list of the
+#'   same length as `v`, or a *named* list with `breaks` for certain variables.
 #' @param right Should bins created via [graphics::hist()] be right-closed?
 #'   The default is `TRUE`. Vectorized over `v`. Only relevant for numeric X.
 #' @param discrete_m Numeric X variables with up to this number of unique values

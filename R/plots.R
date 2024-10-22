@@ -64,6 +64,7 @@ plot.marginal <- function(
   vars_to_show <- Reduce(
     intersect, list(c("obs", "pred", "pd"), colnames(x[[1L]]), names(line_colors))
   )
+  show_legend <- (length(vars_to_show) > 1L)
 
   if (length(x) == 1L) {
     if (backend == "ggplot2") {
@@ -79,6 +80,7 @@ plot.marginal <- function(
         fill = fill,
         wrap_x = wrap_x,
         rotate_x = rotate_x,
+        show_legend = show_legend,
         ...
       )
     } else {
@@ -92,6 +94,7 @@ plot.marginal <- function(
         num_points = num_points,
         line_colors = line_colors,
         fill = fill,
+        show_legend = show_legend,
         ...
       )
     }
@@ -109,6 +112,7 @@ plot.marginal <- function(
   ncols <- min(ncols, length(x))
   col_i <- (seq_along(x) - 1L) %% ncols + 1L
   row_i <- ceiling(seq_along(x) / ncols)
+  show_legend <- show_legend & row_i == 1L & col_i == ncols
 
   if (share_y && is.null(ylim)) {
     r <- range(sapply(x, function(z) range(z[vars_to_show], na.rm = TRUE)))
@@ -121,7 +125,7 @@ plot.marginal <- function(
       x,
       v = names(x),
       show_ylab = col_i == 1L,
-      show_legend = row_i == 1L & col_i == ncols,
+      show_legend = show_legend,
       cat_lines = cat_lines,
       num_points = num_points,
       wrap_x = wrap_x,
@@ -136,14 +140,14 @@ plot.marginal <- function(
       ),
       SIMPLIFY = FALSE
     )
-    patchwork::wrap_plots(plot_list, ncol = ncols, guides = "collect", ...)
+    patchwork::wrap_plots(plot_list, ncol = ncols, ...)
   } else {
     plot_list <- mapply(
       plot_marginal_plotly,
       x,
       v = names(x),
       show_ylab = col_i == 1L,
-      show_legend = row_i == 1L & col_i == ncols,
+      show_legend = show_legend,
       overlay = paste0("y", 2 * seq_along(x)),
       cat_lines = cat_lines,
       num_points = num_points,
@@ -181,12 +185,11 @@ plot_marginal_ggplot <- function(
     wrap_x,
     rotate_x,
     show_title = FALSE,
+    show_legend = TRUE,
     show_ylab = TRUE,
     ...
 ) {
   num <- is.numeric(x$eval_at)
-  show_legend <- length(vars_to_show) > 1L
-
   df <- poor_man_stack(x, vars_to_show)
 
   # Calculate transformation of exposure bars on the right y axis
@@ -211,7 +214,8 @@ plot_marginal_ggplot <- function(
         width = bar_width
       ),
       show.legend = FALSE,
-      fill = fill
+      fill = fill,
+      color = fill
     )
   }
 

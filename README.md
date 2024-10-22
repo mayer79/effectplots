@@ -51,8 +51,8 @@ set.seed(1)
 fit <- ranger(Sepal.Length ~ ., data = iris)
 xvars <- c("Sepal.Width", "Petal.Width", "Petal.Length", "Species")
 
-marginal(fit, v = xvars, data = iris, y = "Sepal.Length") |> 
-  plot()
+marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = "Scott") |> 
+  plot(num_points = TRUE)
 ```
 
 ![](man/figures/marginal1.svg)
@@ -61,7 +61,7 @@ marginal(fit, v = xvars, data = iris, y = "Sepal.Length") |>
 
 ### Partial dependence only
 
-The function `partial_dependence()` produces high-quality plots to study main effects. To visually see how important each feature is (regarding main effect strength), we switch on the option `share_y` and sort the plots by decreasing variance of the partial dependence function (exposure weighted).
+The function `partial_dependence()` produces high-quality plots to study main effects. To visually see how important each feature is (regarding main effect strength), we activate the option `share_y` and sort the plots by decreasing variance of the partial dependence function (exposure weighted).
 
 ``` r
 library(marginalplot)
@@ -93,7 +93,7 @@ Note: Sorting is done by decreasing variance of average observed values (exposur
 library(marginalplot)
 
 xvars <- colnames(iris)[-1]
-average_observed(xvars, data = iris, y = "Sepal.Length") |> 
+average_observed(xvars, data = iris, y = "Sepal.Length", breaks = 5) |> 
   plot(sort = TRUE, share_y = TRUE, rotate_x = 45)
 ```
 

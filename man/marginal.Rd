@@ -85,9 +85,10 @@ The function takes three arguments (names irrelevant): \code{object}, \code{data
 
 \item{w}{Optional vector with case weights. Can also be a column name in \code{data}.}
 
-\item{breaks}{An integer, a vector, a string or a function specifying the bins
-of the numeric X variables, and passed to \code{\link[graphics:hist]{graphics::hist()}}.
-The default is "Sturges". \emph{Not} vectorized over \code{v}.}
+\item{breaks}{An integer, vector, string or function specifying the bins
+of the numeric X variables as in \code{\link[graphics:hist]{graphics::hist()}}. The default is "Sturges".
+To allow varying values of \code{breaks} across variables, it can be a list of the
+same length as \code{v}, or a \emph{named} list with \code{breaks} for certain variables.}
 
 \item{right}{Should bins created via \code{\link[graphics:hist]{graphics::hist()}} be right-closed?
 The default is \code{TRUE}. Vectorized over \code{v}. Only relevant for numeric X.}
@@ -124,6 +125,13 @@ This is the main function of the package. It calculates
 \item counts/weights
 over (possibly binned) features X specified by their column names \code{v}.
 }
+}
+\details{
+For numeric variables with more than \code{discrete_m = 2} disjoint values,
+the same binning options (specified by \code{breaks}) are available as in
+\code{\link[graphics:hist]{graphics::hist()}}. Before calculating bins, the smallest 1\% and the
+largest 99\% of values are winsorized (capped) at the corresponding observed
+(approximate) quantiles.
 }
 \section{Methods (by class)}{
 \itemize{
