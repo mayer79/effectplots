@@ -166,9 +166,10 @@ The function takes three arguments (names irrelevant): <code>object</code>, <cod
 
 
 <dt id="arg-breaks">breaks<a class="anchor" aria-label="anchor" href="#arg-breaks"></a></dt>
-<dd><p>An integer, a vector, a string or a function specifying the bins
-of the numeric X variables, and passed to <code><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">graphics::hist()</a></code>.
-The default is "Sturges". <em>Not</em> vectorized over <code>v</code>.</p></dd>
+<dd><p>An integer, vector, string or function specifying the bins
+of the numeric X variables as in <code><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">graphics::hist()</a></code>. The default is "Sturges".
+To allow varying values of <code>breaks</code> across variables, it can be a list of the
+same length as <code>v</code>, or a <em>named</em> list with <code>breaks</code> for certain variables.</p></dd>
 
 
 <dt id="arg-right">right<a class="anchor" aria-label="anchor" href="#arg-right"></a></dt>
@@ -209,6 +210,14 @@ Set to 0 to omit.</p></dd>
     <h2>Value</h2>
     <p>A list (of class "marginal") with a data.frame of statistics per feature. Use
 single bracket subsetting to select part of the output.</p>
+    </div>
+    <div id="details">
+    <h2>Details</h2>
+    <p>For numeric variables with more than <code>discrete_m = 2</code> disjoint values,
+the same binning options (specified by <code>breaks</code>) are available as in
+<code><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">graphics::hist()</a></code>. Before calculating bins, the smallest 1% and the
+largest 99% of values are winsorized (capped) at the corresponding observed
+(approximate) quantiles.</p>
     </div>
     <div id="methods-by-class-">
     <h2>Methods (by class)</h2>
