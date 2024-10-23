@@ -291,8 +291,8 @@ calculate_stats <- function(
 
   # DISCRETE
   if (!is.numeric(x) || length(g) <= discrete_m) {
-    g <- sort(g, na.last = TRUE)  # Same order as grouped_mean()
     S <- grouped_mean(cbind(pred = pred, obs = y), g = x, w = w)
+    g <- sort(g, na.last = TRUE)  # Same order as grouped_mean()
     if (!is.factor(g)) {
       g <- factor(g)
     }
