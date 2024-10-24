@@ -6,8 +6,9 @@
 \usage{
 postprocess(
   object,
-  choose_stats = c("obs", "pred", "pd"),
+  drop_stats = NULL,
   eval_at_center = FALSE,
+  collapse_m = Inf,
   drop_below_n = 0,
   drop_below_prop = 0,
   explicit_na = TRUE,
@@ -17,7 +18,8 @@ postprocess(
 \arguments{
 \item{object}{Object of class "marginal".}
 
-\item{choose_stats}{Statistics to select, by default \code{c("obs", "pred", "pd")}.}
+\item{drop_stats}{Statistics to drop, by default \code{NULL}.
+Subset of "pred", "obs", "pd". Not vectorized over \code{object} elements.}
 
 \item{eval_at_center}{If \code{FALSE} (default), the points are aligned with (weighted)
 average X values per bin. If \code{TRUE}, the points are aligned with bar centers.
@@ -35,15 +37,15 @@ Only for categorical X variables.}
 \item{na.rm}{Should \code{NA} levels in X be dropped?}
 }
 \description{
-This function offers different ways to improve the output of \code{\link[=marginal]{marginal()}},
-\code{\link[=partial_dependence]{partial_dependence()}}, \code{\link[=average_observed]{average_observed()}}. Except for \code{choose_stats},
+This function helps to improve the output of \code{\link[=marginal]{marginal()}},
+\code{\link[=partial_dependence]{partial_dependence()}}, \code{\link[=average_observed]{average_observed()}}. Except for \code{drop_stats},
 all arguments are vectorized, i.e., you can select different values per X variable.
 }
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)
 xvars <- colnames(iris)[-1]
 marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5) |>
-  postprocess(choose_stats = "pd", eval_at_center = TRUE) |>
+  postprocess(keep_stats = "pd", eval_at_center = TRUE) |>
   plot(num_points = TRUE)
 }
 \seealso{
