@@ -183,15 +183,15 @@ should not be binned. The default is 2. Vectorized over <code>v</code>.</p></dd>
 
 
 <dt id="arg-wprob-low">wprob_low<a class="anchor" aria-label="anchor" href="#arg-wprob-low"></a></dt>
-<dd><p>Small values of numeric X variables are capped at this quantile.
-Set to 0 to avoid Winsorizing. Note that at most 100k observations are sampled
-to calculate the quantiles (uses random seed). Vectorized over <code>v</code>.</p></dd>
+<dd><p>The smallest values of a numeric X are capped at the corresponding
+quantile. Set to 0 to avoid Winsorizing. Note that at most 100k observations
+are sampled to calculate the quantile (uses random seed). Vectorized over <code>v</code>.</p></dd>
 
 
 <dt id="arg-wprob-high">wprob_high<a class="anchor" aria-label="anchor" href="#arg-wprob-high"></a></dt>
-<dd><p>High values of numeric X variables are capped at this quantile.
-Set to 1 to avoid Winsorizing. Note that at most 100k observations are sampled
-to calculate the quantile (uses random seed). Vectorized over <code>v</code>.</p></dd>
+<dd><p>The largest values of a numeric X are capped at the corresponding
+quantile. Set to 1 to avoid Winsorizing. Note that at most 100k observations
+are sampled to calculate the quantile (uses random seed). Vectorized over <code>v</code>.</p></dd>
 
 
 <dt id="arg-calc-pred">calc_pred<a class="anchor" aria-label="anchor" href="#arg-calc-pred"></a></dt>
@@ -215,9 +215,8 @@ single bracket subsetting to select part of the output.</p>
     <h2>Details</h2>
     <p>For numeric variables with more than <code>discrete_m = 2</code> disjoint values,
 the same binning options (specified by <code>breaks</code>) are available as in
-<code><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">graphics::hist()</a></code>. Before calculating bins, the smallest 1% and the
-largest 99% of values are winsorized (capped) at the corresponding observed
-(approximate) quantiles.</p>
+<code><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">graphics::hist()</a></code>. Before calculating bins, the smallest and largest 1% of the
+values are winsorized (capped) at the corresponding observed (approximate) quantiles.</p>
     </div>
     <div id="methods-by-class-">
     <h2>Methods (by class)</h2>
