@@ -282,8 +282,8 @@ calculate_stats <- function(
 
   # Prepare x
   x <- if (is.matrix(data)) data[, v] else data[[v]]
-  if (is.numeric(x) && (wprob_low > 0 || wprob_high > 0)) {
-    x <- wins_prob(x, probs = c(wprob_low, 1 - wprob_high), nmax = 1e5)
+  if (is.numeric(x) && (wprob_low > 0 || wprob_high < 1)) {
+    x <- wins_prob(x, probs = c(wprob_low, wprob_high), nmax = 1e5)
   }
 
   g <- unique(x)

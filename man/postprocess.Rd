@@ -49,7 +49,7 @@ all arguments are vectorized, i.e., you can select different values per X variab
 fit <- lm(Sepal.Length ~ ., data = iris)
 xvars <- colnames(iris)[-1]
 marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5) |>
-  postprocess(keep_stats = "pd", eval_at_center = TRUE) |>
+  postprocess(drop_stats = "obs", eval_at_center = TRUE) |>
   plot(num_points = TRUE)
 }
 \seealso{
