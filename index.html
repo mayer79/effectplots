@@ -88,11 +88,11 @@
 <p><strong>Notes</strong></p>
 <ul>
 <li>You can switch between {ggplot2}/{patchwork} plots and interactive {plotly} plots.</li>
-<li>The implementation is optimized for speed and convenience.</li>
+<li>The implementation is optimized for large data.</li>
 <li>Most models (including DALEX explainers and meta-learners such as Tidymodels) work out-of-the box. If not, a tailored prediction function can be specified.</li>
-<li>For multioutput models, the last output is picked.</li>
+<li>For multi-output models, the last output is picked.</li>
 <li>Case weights are supported via the argument <code>w</code>.</li>
-<li>Binning of numeric X is done by the same options as <code>stats::hist()</code>. Additionally, very small and large values are winsorized (clipped) by default.</li>
+<li>Binning of numeric features is done by the same options as <code>stats::hist()</code>. Additionally, very small and large values are winsorized (clipped) by default.</li>
 </ul>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -105,56 +105,72 @@
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
+<p>We use a synthetic dataset with 1 Mio rows containing information on Motor TPL insurance policies and claims. The aim is to model claim frequency as a function of features like “driver_age” and “car_power”.</p>
+<p>Before modeling, we want to study how the average response is associated with feature values.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mayer79/marginalplot" class="external-link">marginalplot</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://imbs-hl.github.io/ranger/" class="external-link">ranger</a></span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/openml/openml-r" class="external-link">OpenML</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/Microsoft/LightGBM" class="external-link">lightgbm</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mayer79/marginalplot" class="external-link">marginalplot</a></span><span class="op">)</span></span>
 <span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span></span>
-<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">ranger</span><span class="op">(</span><span class="va">Sepal.Length</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span>
-<span><span class="va">xvars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"Sepal.Width"</span>, <span class="st">"Petal.Width"</span>, <span class="st">"Petal.Length"</span>, <span class="st">"Species"</span><span class="op">)</span></span>
+<span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">getOMLDataSet</span><span class="op">(</span>data.id <span class="op">=</span> <span class="fl">45106L</span><span class="op">)</span><span class="op">$</span><span class="va">data</span></span>
 <span></span>
-<span><span class="fu"><a href="reference/marginal.html">marginal</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">iris</span>, y <span class="op">=</span> <span class="st">"Sepal.Length"</span>, breaks <span class="op">=</span> <span class="st">"Scott"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/marginal1.svg"></p>
-</div>
-<div class="section level2">
-<h2 id="more-examples">More examples<a class="anchor" aria-label="anchor" href="#more-examples"></a>
-</h2>
-<div class="section level3">
-<h3 id="partial-dependence-only">Partial dependence only<a class="anchor" aria-label="anchor" href="#partial-dependence-only"></a>
-</h3>
-<p>The function <code><a href="reference/partial_dependence.html">partial_dependence()</a></code> produces high-quality plots to study main effects. To visually see how important each feature is (regarding main effect strength), we activate the option <code>share_y</code> and sort the plots by decreasing variance of the partial dependence function (exposure weighted).</p>
-<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mayer79/marginalplot" class="external-link">marginalplot</a></span><span class="op">)</span></span>
-<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="http://imbs-hl.github.io/ranger/" class="external-link">ranger</a></span><span class="op">)</span></span>
+<span><span class="va">y</span> <span class="op">&lt;-</span> <span class="st">"claim_nb"</span></span>
+<span><span class="va">xvars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"year"</span>, <span class="st">"town"</span>, <span class="st">"driver_age"</span>, <span class="st">"car_weight"</span>, <span class="st">"car_power"</span>, <span class="st">"car_age"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">ranger</span><span class="op">(</span><span class="va">Sepal.Length</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span>
-<span><span class="va">xvars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">iris</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
-<span></span>
-<span><span class="fu"><a href="reference/partial_dependence.html">partial_dependence</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">iris</span>, breaks <span class="op">=</span> <span class="fl">17</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span>sort <span class="op">=</span> <span class="cn">TRUE</span>, share_y <span class="op">=</span> <span class="cn">TRUE</span>, scale_exposure <span class="op">=</span> <span class="fl">0.5</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/pd.svg"></p>
-</div>
-<div class="section level3">
-<h3 id="before-modeling">Before modeling<a class="anchor" aria-label="anchor" href="#before-modeling"></a>
-</h3>
-<p>Before modeling, you might be interested in</p>
-<ul>
-<li>univariate distributions of potential features, and</li>
-<li>how the average response is associated with their values.</li>
-</ul>
-<p>These infos are provided via <code><a href="reference/average_observed.html">average_observed()</a></code>.</p>
-<p>Note: Sorting is done by decreasing variance of average observed values (exposure weighted).</p>
-<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mayer79/marginalplot" class="external-link">marginalplot</a></span><span class="op">)</span></span>
-<span></span>
-<span><span class="va">xvars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">iris</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span></span>
-<span><span class="fu"><a href="reference/average_observed.html">average_observed</a></span><span class="op">(</span><span class="va">xvars</span>, data <span class="op">=</span> <span class="va">iris</span>, y <span class="op">=</span> <span class="st">"Sepal.Length"</span>, breaks <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span>sort <span class="op">=</span> <span class="cn">TRUE</span>, share_y <span class="op">=</span> <span class="cn">TRUE</span>, rotate_x <span class="op">=</span> <span class="fl">45</span><span class="op">)</span></span></code></pre></div>
+<span><span class="co"># 0.6 seconds on laptop</span></span>
+<span><span class="fu"><a href="reference/average_observed.html">average_observed</a></span><span class="op">(</span><span class="va">xvars</span>, data <span class="op">=</span> <span class="va">df</span>, y <span class="op">=</span> <span class="va">y</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span>sort <span class="op">=</span> <span class="cn">TRUE</span>, share_y <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/avg_obs.svg"></p>
+<p>The plots have been automatically sorted by decreasing (exposure-weighted) variance of the average observed values. Using a shared y axis helps to compare the strength of the association.</p>
+<div class="section level3">
+<h3 id="fit-model">Fit model<a class="anchor" aria-label="anchor" href="#fit-model"></a>
+</h3>
+<p>Now, after having studied the data, we are ready to fit a boosted trees model. Note that hyper-parameters have been tuned outside this notebook via cross-validation over the training data.</p>
+<div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># Data splits</span></span>
+<span><span class="va">ix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span>, <span class="fl">0.8</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span><span class="op">)</span></span>
+<span><span class="va">train</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">[</span><span class="va">ix</span>, <span class="op">]</span></span>
+<span><span class="va">test</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">[</span><span class="op">-</span><span class="va">ix</span>, <span class="op">]</span></span>
+<span><span class="va">X_train</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.matrix.html" class="external-link">data.matrix</a></span><span class="op">(</span><span class="va">train</span><span class="op">[</span><span class="va">xvars</span><span class="op">]</span><span class="op">)</span></span>
+<span><span class="va">X_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.matrix.html" class="external-link">data.matrix</a></span><span class="op">(</span><span class="va">test</span><span class="op">[</span><span class="va">xvars</span><span class="op">]</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Training, using slightly opimized parameters found via cross-validation</span></span>
+<span><span class="va">params</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/list.html" class="external-link">list</a></span><span class="op">(</span></span>
+<span>  learning_rate <span class="op">=</span> <span class="fl">0.05</span>,</span>
+<span>  objective <span class="op">=</span> <span class="st">"poisson"</span>,</span>
+<span>  num_leaves <span class="op">=</span> <span class="fl">7</span>,</span>
+<span>  min_data_in_leaf <span class="op">=</span> <span class="fl">50</span>,</span>
+<span>  min_sum_hessian_in_leaf <span class="op">=</span> <span class="fl">0.001</span>,</span>
+<span>  colsample_bynode <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>  bagging_fraction <span class="op">=</span> <span class="fl">0.8</span>,</span>
+<span>  lambda_l1 <span class="op">=</span> <span class="fl">3</span>,</span>
+<span>  lambda_l2 <span class="op">=</span> <span class="fl">5</span>,</span>
+<span>  num_threads <span class="op">=</span> <span class="fl">7</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">lgb.train</span><span class="op">(</span></span>
+<span>  params <span class="op">=</span> <span class="va">params</span>,</span>
+<span>  data <span class="op">=</span> <span class="fu">lgb.Dataset</span><span class="op">(</span><span class="va">X_train</span>, label <span class="op">=</span> <span class="va">train</span><span class="op">[[</span><span class="va">y</span><span class="op">]</span><span class="op">]</span><span class="op">)</span>,</span>
+<span>  nrounds <span class="op">=</span> <span class="fl">300</span></span>
+<span><span class="op">)</span></span></code></pre></div>
+</div>
+<div class="section level3">
+<h3 id="inspect-model">Inspect model<a class="anchor" aria-label="anchor" href="#inspect-model"></a>
+</h3>
+<p>After modeling, we use the test (or validation) data to crunch average observed, average predicted, and partial dependence per feature values/bins to gain insights about the model. Calculation is lightning fast.</p>
+<div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="co"># 1 second on laptop</span></span>
+<span><span class="fu"><a href="reference/marginal.html">marginal</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">X_test</span>, y <span class="op">=</span> <span class="va">test</span><span class="op">[[</span><span class="va">y</span><span class="op">]</span><span class="op">]</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span>sort <span class="op">=</span> <span class="cn">TRUE</span>, share_y <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/marginal1.svg"></p>
+<p><strong>Comments</strong></p>
+<ol style="list-style-type: decimal">
+<li>Comparing average predicted with average observed values gives a hint about bias. In this case, the bias on the test data seems to be small. Studying the same plot on the training data would help to assess in-sample bias.</li>
+<li>Comparing the shape of the partial dependence curve with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors “driver_age” and “car_power”, the two lines are very similar. This means the marginal effect is really coming from the feature in question (and not of some other, correlated, feature).</li>
+<li>Sorting is done by decreasing exposure weighted variance of the partial dependence values.</li>
+</ol>
 </div>
 </div>
 </div>
