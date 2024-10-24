@@ -60,7 +60,6 @@ You can switch to plotly by setting <code>backend = "plotly"</code>.</p>
 <span>  <span class="va">x</span>,</span>
 <span>  ncols <span class="op">=</span> <span class="fl">2L</span>,</span>
 <span>  share_y <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  sort <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  scale_exposure <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  cat_lines <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -91,12 +90,6 @@ differ slightly.</p></dd>
 <dt id="arg-share-y">share_y<a class="anchor" aria-label="anchor" href="#arg-share-y"></a></dt>
 <dd><p>Should y axis be shared across all subplots?
 No effect if <code>ylim</code> is passed. Only if <code>length(x) &gt; 1</code> (multiple plots).</p></dd>
-
-
-<dt id="arg-sort">sort<a class="anchor" aria-label="anchor" href="#arg-sort"></a></dt>
-<dd><p>Should plots be sorted in decreasing order of importance? Importance is
-measured by the exposure weighted variance of the most relevant available statistic
-(pd &gt; pred &gt; obs). Only if <code>length(x) &gt; 1</code> (multiple plots).</p></dd>
 
 
 <dt id="arg-ylim">ylim<a class="anchor" aria-label="anchor" href="#arg-ylim"></a></dt>
