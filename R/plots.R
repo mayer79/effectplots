@@ -10,9 +10,6 @@
 #'   differ slightly.
 #' @param share_y Should y axis be shared across all subplots?
 #'   No effect if `ylim` is passed. Only if `length(x) > 1` (multiple plots).
-#' @param sort Should plots be sorted in decreasing order of importance? Importance is
-#'   measured by the exposure weighted variance of the most relevant available statistic
-#'   (pd > pred > obs). Only if `length(x) > 1` (multiple plots).
 #' @param ylim Manual y axis range.
 #' @param scale_exposure Vertical scaling of the exposure bars (between 0 and 1).
 #'   The default is 1. Set to 0 for no bars. With "plotly", values between 0 and 1 are
@@ -43,7 +40,6 @@ plot.marginal <- function(
     x,
     ncols = 2L,
     share_y = FALSE,
-    sort = FALSE,
     ylim = NULL,
     scale_exposure = 1,
     cat_lines = TRUE,
@@ -62,7 +58,6 @@ plot.marginal <- function(
     backend %in% c("ggplot2", "plotly"),
     length(colors) >= length(vars_to_show)
   )
-
 
   if (length(x) == 1L) {
     if (backend == "ggplot2") {
@@ -97,14 +92,6 @@ plot.marginal <- function(
       )
     }
     return(p)
-  }
-
-  # Now the multi-plot case
-  if (isTRUE(sort)) {
-    sorter <- vars_to_show[length(vars_to_show)]
-    message("Sorting via exposure weighted variance of '", sorter, "'")
-    imp <- vapply(x, FUN = .one_imp, v = sorter, FUN.VALUE = numeric(1))
-    x <- x[order(imp, decreasing = TRUE, na.last = TRUE)]
   }
 
   ncols <- min(ncols, length(x))
@@ -349,10 +336,4 @@ plot_marginal_plotly <- function(
     xaxis = list(title = v),
     legend = list(orientation = "v", x = 1.05, xanchor = "left")
   )
-}
-
-# Helper function
-.one_imp <- function(x, v) {
-  ok <- is.finite(x[[v]])
-  stats::cov.wt(x[ok, v, drop = FALSE], x[["exposure"]][ok], method = "ML")$cov[1L, 1L]
 }

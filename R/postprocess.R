@@ -1,10 +1,15 @@
 #' Postprocess Marginal Object
 #'
 #' This function helps to improve the output of [marginal()],
-#' [partial_dependence()], [average_observed()]. Except for `drop_stats`,
-#' all arguments are vectorized, i.e., you can select different values per X variable.
+#' [partial_dependence()], [average_observed()]. Except for `sort` and `drop_stats`,
+#' all arguments are vectorized, i.e., you can pass a list of the same length as
+#' `object`.
 #'
 #' @param object Object of class "marginal".
+#' @param sort Should `object` be sorted in decreasing order of feature importance?
+#'   Importance is measured by the exposure weighted variance of the most
+#'   relevant available statistic (pd > pred > obs). The default is `FALSE`.
+#'   This step is applied after all other postprocessings.
 #' @param drop_stats Statistics to drop, by default `NULL`.
 #'   Subset of "pred", "obs", "pd". Not vectorized over `object` elements.
 #' @param eval_at_center If `FALSE` (default), the points are aligned with (weighted)
@@ -26,10 +31,11 @@
 #' fit <- lm(Sepal.Length ~ ., data = iris)
 #' xvars <- colnames(iris)[-1]
 #' marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5) |>
-#'   postprocess(drop_stats = "obs", eval_at_center = TRUE) |>
+#'   postprocess(sort = TRUE, eval_at_center = TRUE) |>
 #'   plot(num_points = TRUE)
 postprocess <- function(
   object,
+  sort = FALSE,
   drop_stats = NULL,
   eval_at_center = FALSE,
   collapse_m = Inf,
@@ -52,6 +58,12 @@ postprocess <- function(
     MoreArgs = list(drop_stats = drop_stats),
     SIMPLIFY = FALSE
   )
+
+  if (isTRUE(sort)) {
+    imp <- main_effect_importance(out)
+    out <- out[order(imp, decreasing = TRUE, na.last = TRUE)]
+  }
+
   class(out) <- "marginal"
   out
 }
@@ -125,4 +137,35 @@ postprocess_one <- function(
   }
 
   droplevels(x)
+}
+
+#' Main Effect Importance
+#'
+#' Extracts the exposure weighted variances of the most relevant statistic
+#' (pd > pred > obs) from a "marginal" object. This serves as a simple "main effect"
+#' importance measure.
+#'
+#' @param x Marginal object.
+#' @param statistic The statistic used to calculate the variance for.
+#' One of 'pd', 'pred', or 'obs'.
+#' @seealso [postprocess()]
+#' @export
+#' @examples
+#' fit <- lm(Sepal.Length ~ ., data = iris)
+#' xvars <- colnames(iris)[-1]
+#' M <- marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
+#' main_effect_importance(M)
+main_effect_importance <- function(x, statistic = NULL) {
+  if (is.null(statistic)) {
+    vars <- intersect(c("pd", "pred", "obs"), colnames(x[[1L]]))
+    statistic <- vars[1L]
+    message("Importance via exposure weighted variance of '", statistic, "'")
+  }
+  vapply(x, FUN = .one_imp, v = statistic, FUN.VALUE = numeric(1))
+}
+
+# Helper function
+.one_imp <- function(x, v) {
+  ok <- is.finite(x[[v]])
+  stats::cov.wt(x[ok, v, drop = FALSE], x[["exposure"]][ok], method = "ML")$cov[1L, 1L]
 }

@@ -61,7 +61,8 @@ xvars <- c("year", "town", "driver_age", "car_weight", "car_power", "car_age")
 
 # 0.6 seconds on laptop
 average_observed(xvars, data = df, y = y) |>
-  plot(sort = TRUE, share_y = TRUE)
+  postprocess(sort = TRUE) |> 
+  plot(share_y = TRUE)
 ```
 
 ![](man/figures/avg_obs.svg)
@@ -108,10 +109,11 @@ After modeling, we use the test (or validation) data to crunch average observed,
 ```r
 # 1 second on laptop
 marginal(fit, v = xvars, data = X_test, y = test[[y]]) |>
-  plot(sort = TRUE, share_y = TRUE)
+  postprocess(sort = TRUE) |> 
+  plot(share_y = TRUE)
 ```
 
-![](man/figures/marginal1.svg)
+![](man/figures/marginal.svg)
 
 **Comments**
 

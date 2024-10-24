@@ -6,6 +6,7 @@
 \usage{
 postprocess(
   object,
+  sort = FALSE,
   drop_stats = NULL,
   eval_at_center = FALSE,
   collapse_m = Inf,
@@ -17,6 +18,11 @@ postprocess(
 }
 \arguments{
 \item{object}{Object of class "marginal".}
+
+\item{sort}{Should \code{object} be sorted in decreasing order of feature importance?
+Importance is measured by the exposure weighted variance of the most
+relevant available statistic (pd > pred > obs). The default is \code{FALSE}.
+This step is applied after all other postprocessings.}
 
 \item{drop_stats}{Statistics to drop, by default \code{NULL}.
 Subset of "pred", "obs", "pd". Not vectorized over \code{object} elements.}
@@ -42,14 +48,15 @@ Only for categorical X variables.}
 }
 \description{
 This function helps to improve the output of \code{\link[=marginal]{marginal()}},
-\code{\link[=partial_dependence]{partial_dependence()}}, \code{\link[=average_observed]{average_observed()}}. Except for \code{drop_stats},
-all arguments are vectorized, i.e., you can select different values per X variable.
+\code{\link[=partial_dependence]{partial_dependence()}}, \code{\link[=average_observed]{average_observed()}}. Except for \code{sort} and \code{drop_stats},
+all arguments are vectorized, i.e., you can pass a list of the same length as
+\code{object}.
 }
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)
 xvars <- colnames(iris)[-1]
 marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5) |>
-  postprocess(drop_stats = "obs", eval_at_center = TRUE) |>
+  postprocess(sort = TRUE, eval_at_center = TRUE) |>
   plot(num_points = TRUE)
 }
 \seealso{

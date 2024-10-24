@@ -8,7 +8,6 @@
   x,
   ncols = 2L,
   share_y = FALSE,
-  sort = FALSE,
   ylim = NULL,
   scale_exposure = 1,
   cat_lines = TRUE,
@@ -30,10 +29,6 @@ differ slightly.}
 
 \item{share_y}{Should y axis be shared across all subplots?
 No effect if \code{ylim} is passed. Only if \code{length(x) > 1} (multiple plots).}
-
-\item{sort}{Should plots be sorted in decreasing order of importance? Importance is
-measured by the exposure weighted variance of the most relevant available statistic
-(pd > pred > obs). Only if \code{length(x) > 1} (multiple plots).}
 
 \item{ylim}{Manual y axis range.}
 
