@@ -52,7 +52,7 @@ fit <- ranger(Sepal.Length ~ ., data = iris)
 xvars <- c("Sepal.Width", "Petal.Width", "Petal.Length", "Species")
 
 marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = "Scott") |> 
-  plot(num_points = TRUE)
+  plot()
 ```
 
 ![](man/figures/marginal1.svg)
@@ -73,7 +73,7 @@ fit <- ranger(Sepal.Length ~ ., data = iris)
 xvars <- colnames(iris)[-1]
 
 partial_dependence(fit, v = xvars, data = iris, breaks = 17) |> 
-  plot(sort = TRUE, share_y = TRUE, scale_exposure = 0.2)
+  plot(sort = TRUE, share_y = TRUE, scale_exposure = 0.5)
 ```
 
 ![](man/figures/pd.svg)

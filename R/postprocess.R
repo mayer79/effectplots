@@ -1,10 +1,11 @@
 #' Postprocess Output
 #'
 #' This function offers different ways to improve the output of [marginal()],
-#' [partial_dependence()], [average_observed()]. All arguments are vectorized, i.e.,
-#' you can select different values per X variable.
+#' [partial_dependence()], [average_observed()]. Except for `choose_stats`,
+#' all arguments are vectorized, i.e., you can select different values per X variable.
 #'
 #' @param object Object of class "marginal".
+#' @param choose_stats Statistics to select, by default `c("obs", "pred", "pd")`.
 #' @param eval_at_center If `FALSE` (default), the points are aligned with (weighted)
 #'   average X values per bin. If `TRUE`, the points are aligned with bar centers.
 #'   Since categoricals are always evaluated at bar centers, this only affects numerics.
@@ -21,10 +22,11 @@
 #' fit <- lm(Sepal.Length ~ ., data = iris)
 #' xvars <- colnames(iris)[-1]
 #' marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5) |>
-#'   postprocess(eval_at_center = TRUE) |>
-#'   plot()
+#'   postprocess(choose_stats = "pd", eval_at_center = TRUE) |>
+#'   plot(num_points = TRUE)
 postprocess <- function(
   object,
+  choose_stats = c("obs", "pred", "pd"),
   eval_at_center = FALSE,
   drop_below_n = 0,
   drop_below_prop = 0,
@@ -41,15 +43,16 @@ postprocess <- function(
     drop_below_prop = drop_below_prop,
     explicit_na = explicit_na,
     na.rm = na.rm,
+    MoreArgs = list(choose_stats = choose_stats),
     SIMPLIFY = FALSE
   )
   class(out) <- "marginal"
   out
 }
 
-
 postprocess_one <- function(
   x,
+  choose_stats,
   eval_at_center,
   drop_below_n,
   drop_below_prop,
@@ -58,6 +61,11 @@ postprocess_one <- function(
   ...
 ) {
   num <- is.numeric(x$eval_at)
+
+  if (length(choose_stats) < 3L) {
+    vars <- setdiff(colnames(x), setdiff(c("obs", "pred", "pd"), choose_stats))
+    x <- x[vars]
+  }
 
   if (num) {
     if (isTRUE(eval_at_center)) {

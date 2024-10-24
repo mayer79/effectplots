@@ -3,7 +3,7 @@
   op.marginalplot <- list(
     marginalplot.backend = "ggplot2",
     marginalplot.fill = "lightgrey",
-    marginalplot.line_colors = c(obs = "#E69F00", pred = "#009E73", pd = "#56B4E9")
+    marginalplot.colors = c("#CC79A7", "#009E73", "#56B4E9")
   )
   toset <- !(names(op.marginalplot) %in% names(op))
   if (any(toset)) {

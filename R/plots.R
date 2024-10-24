@@ -3,8 +3,6 @@
 #' Plots all statistics using a color blind palette from "ggthemes".
 #' You can switch to the interactive interface by setting `backend = "plotly"`.
 #'
-#' Note: Curves can be selected for plotting by passing a shorter `line_colors` vector.
-#'
 #' @importFrom ggplot2 .data
 #' @param x An object of class "marginal".
 #' @param ncols Number of columns in the plot layout.
@@ -23,13 +21,11 @@
 #'   Vectorized over `x`.
 #' @param num_points Show points for numeric features. Default is `FALSE`.
 #'   Vectorized over `x`.
-#' @param line_colors Named vector of line colors. By default, a color blind
-#'   palette from "ggthemes" is used, equaling to
-#'   `c(obs = "#E69F00", pred = "#009E73", pd = "#56B4E9")`.
-#'   To change globally, set `options(marginalplot.line_colors = "named color vector")`.
-#'   Can be used to remove certain lines in the plot.
+#' @param colors Line colors. By default, a color blind friendly
+#'   palette from "ggthemes", namely `c("#CC79A7", "#009E73", "#56B4E9")`.
+#'   To change globally, set `options(marginalplot.colors = new colors)`.
 #' @param fill Fill color of bars. The default equals "lightgrey".
-#'   To change globally, set `options(marginalplot.fill = "new color")`.
+#'   To change globally, set `options(marginalplot.fill = new color)`.
 #' @param wrap_x Should categorical xaxis labels be wrapped after this length?
 #'   The default is 10. Set to 0 for no wrapping. Vectorized over `x`.
 #'   Only for "ggplot2" backend.
@@ -52,19 +48,21 @@ plot.marginal <- function(
     scale_exposure = 1,
     cat_lines = TRUE,
     num_points = FALSE,
-    line_colors = getOption("marginalplot.line_colors"),
+    colors = getOption("marginalplot.colors"),
     fill = getOption("marginalplot.fill"),
     wrap_x = 10,
     rotate_x = 0,
     backend = getOption("marginalplot.backend"),
     ...
 ) {
-  stopifnot(backend %in% c("ggplot2", "plotly"))
-
-  vars_to_show <- Reduce(
-    intersect, list(c("obs", "pred", "pd"), colnames(x[[1L]]), names(line_colors))
-  )
+  vars_to_show <- intersect(c("obs", "pred", "pd"), colnames(x[[1L]]))
   show_legend <- (length(vars_to_show) > 1L)
+
+  stopifnot(
+    backend %in% c("ggplot2", "plotly"),
+    length(colors) >= length(vars_to_show)
+  )
+
 
   if (length(x) == 1L) {
     if (backend == "ggplot2") {
@@ -76,7 +74,7 @@ plot.marginal <- function(
         scale_exposure = scale_exposure,
         cat_lines = cat_lines,
         num_points = num_points,
-        line_colors = line_colors,
+        colors = colors,
         fill = fill,
         wrap_x = wrap_x,
         rotate_x = rotate_x,
@@ -92,7 +90,7 @@ plot.marginal <- function(
         scale_exposure = scale_exposure,
         cat_lines = cat_lines,
         num_points = num_points,
-        line_colors = line_colors,
+        colors = colors,
         fill = fill,
         show_legend = show_legend,
         ...
@@ -135,7 +133,7 @@ plot.marginal <- function(
         show_title = TRUE,
         ylim = ylim,
         scale_exposure = scale_exposure,
-        line_colors = line_colors,
+        colors = colors,
         fill = fill
       ),
       SIMPLIFY = FALSE
@@ -156,7 +154,7 @@ plot.marginal <- function(
         show_title = TRUE,
         ylim = ylim,
         scale_exposure = scale_exposure,
-        line_colors = line_colors,
+        colors = colors,
         fill = fill
       ),
       SIMPLIFY = FALSE
@@ -180,7 +178,7 @@ plot_marginal_ggplot <- function(
     scale_exposure,
     num_points,
     cat_lines,
-    line_colors,
+    colors,
     fill,
     wrap_x,
     rotate_x,
@@ -236,7 +234,7 @@ plot_marginal_ggplot <- function(
   }
 
   # Styling
-  p <- p + ggplot2::scale_color_manual(values = line_colors) +
+  p <- p + ggplot2::scale_color_manual(values = colors) +
     ggplot2::theme_bw() +
     ggplot2::theme(
       legend.title = ggplot2::element_blank(),
@@ -271,7 +269,7 @@ plot_marginal_plotly <- function(
     scale_exposure,
     cat_lines,
     num_points,
-    line_colors,
+    colors,
     fill,
     show_title = FALSE,
     show_ylab = TRUE,
@@ -306,7 +304,8 @@ plot_marginal_plotly <- function(
     )
   }
 
-  for (z in vars_to_show) {
+  for (i in seq_along(vars_to_show)) {
+    z <- vars_to_show[i]
     fig <- plotly::add_trace(
       fig,
       x = ~eval_at,
@@ -317,7 +316,7 @@ plot_marginal_plotly <- function(
       type = "scatter",
       name = z,
       showlegend = show_legend,
-      color = I(line_colors[z])
+      color = I(colors[i])
     )
   }
 

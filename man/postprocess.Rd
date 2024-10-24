@@ -6,6 +6,7 @@
 \usage{
 postprocess(
   object,
+  choose_stats = c("obs", "pred", "pd"),
   eval_at_center = FALSE,
   drop_below_n = 0,
   drop_below_prop = 0,
@@ -15,6 +16,8 @@ postprocess(
 }
 \arguments{
 \item{object}{Object of class "marginal".}
+
+\item{choose_stats}{Statistics to select, by default \code{c("obs", "pred", "pd")}.}
 
 \item{eval_at_center}{If \code{FALSE} (default), the points are aligned with (weighted)
 average X values per bin. If \code{TRUE}, the points are aligned with bar centers.
@@ -33,15 +36,15 @@ Only for categorical X variables.}
 }
 \description{
 This function offers different ways to improve the output of \code{\link[=marginal]{marginal()}},
-\code{\link[=partial_dependence]{partial_dependence()}}, \code{\link[=average_observed]{average_observed()}}. All arguments are vectorized, i.e.,
-you can select different values per X variable.
+\code{\link[=partial_dependence]{partial_dependence()}}, \code{\link[=average_observed]{average_observed()}}. Except for \code{choose_stats},
+all arguments are vectorized, i.e., you can select different values per X variable.
 }
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)
 xvars <- colnames(iris)[-1]
 marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5) |>
-  postprocess(eval_at_center = TRUE) |>
-  plot()
+  postprocess(choose_stats = "pd", eval_at_center = TRUE) |>
+  plot(num_points = TRUE)
 }
 \seealso{
 \code{\link[=marginal]{marginal()}}, \code{\link[=average_observed]{average_observed()}}, \code{\link[=partial_dependence]{partial_dependence()}}

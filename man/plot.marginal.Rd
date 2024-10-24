@@ -13,7 +13,7 @@
   scale_exposure = 1,
   cat_lines = TRUE,
   num_points = FALSE,
-  line_colors = getOption("marginalplot.line_colors"),
+  colors = getOption("marginalplot.colors"),
   fill = getOption("marginalplot.fill"),
   wrap_x = 10,
   rotate_x = 0,
@@ -47,14 +47,12 @@ Vectorized over \code{x}.}
 \item{num_points}{Show points for numeric features. Default is \code{FALSE}.
 Vectorized over \code{x}.}
 
-\item{line_colors}{Named vector of line colors. By default, a color blind
-palette from "ggthemes" is used, equaling to
-\code{c(obs = "#E69F00", pred = "#009E73", pd = "#56B4E9")}.
-To change globally, set \code{options(marginalplot.line_colors = "named color vector")}.
-Can be used to remove certain lines in the plot.}
+\item{colors}{Line colors. By default, a color blind friendly
+palette from "ggthemes", namely \code{c("#CC79A7", "#009E73", "#56B4E9")}.
+To change globally, set \verb{options(marginalplot.colors = new colors)}.}
 
 \item{fill}{Fill color of bars. The default equals "lightgrey".
-To change globally, set \code{options(marginalplot.fill = "new color")}.}
+To change globally, set \verb{options(marginalplot.fill = new color)}.}
 
 \item{wrap_x}{Should categorical xaxis labels be wrapped after this length?
 The default is 10. Set to 0 for no wrapping. Vectorized over \code{x}.
@@ -75,9 +73,6 @@ Otherwise, an object of class "patchwork" or a "plotly" subplot.
 \description{
 Plots all statistics using a color blind palette from "ggthemes".
 You can switch to the interactive interface by setting \code{backend = "plotly"}.
-}
-\details{
-Note: Curves can be selected for plotting by passing a shorter \code{line_colors} vector.
 }
 \seealso{
 \code{\link[=marginal]{marginal()}}, \code{\link[=average_observed]{average_observed()}}, \code{\link[=partial_dependence]{partial_dependence()}}
