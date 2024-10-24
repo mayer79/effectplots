@@ -1,8 +1,8 @@
 #' Average Observed
 #'
-#' Calculates average observed `y` values over one or multiple x variables specified
-#' via `v`. `y` can either be a numeric vector or a column name in `data`.
-#' This function is a convenience wrapper over [marginal()].
+#' Calculates average observed `y` values over one or multiple X variables `v`.
+#' The `y` argument can either be a numeric vector or a column name in `data`.
+#' This function is a convenience wrapper around [marginal()].
 #'
 #' @inheritParams marginal
 #' @inherit marginal return

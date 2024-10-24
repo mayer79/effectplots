@@ -2,7 +2,7 @@
 % Please edit documentation in R/postprocess.R
 \name{postprocess}
 \alias{postprocess}
-\title{Postprocess Output}
+\title{Postprocess Marginal Object}
 \usage{
 postprocess(
   object,
@@ -24,6 +24,10 @@ Subset of "pred", "obs", "pd". Not vectorized over \code{object} elements.}
 \item{eval_at_center}{If \code{FALSE} (default), the points are aligned with (weighted)
 average X values per bin. If \code{TRUE}, the points are aligned with bar centers.
 Since categoricals are always evaluated at bar centers, this only affects numerics.}
+
+\item{collapse_m}{If a categorical X has more than \code{collapse_m} levels,
+low exposure levels are collapsed into a new level "Other".
+By default \code{Inf} (no collapsing).}
 
 \item{drop_below_n}{Drop categories with exposure below this value.
 Only for categorical X variables.}

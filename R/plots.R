@@ -1,13 +1,13 @@
-#' Plots "marginal" Object
+#' Plots Marginal Object
 #'
-#' Plots all statistics using a color blind palette from "ggthemes".
-#' You can switch to the interactive interface by setting `backend = "plotly"`.
+#' Plots marginal statistics using a color blind palette from "ggthemes".
+#' You can switch to plotly by setting `backend = "plotly"`.
 #'
 #' @importFrom ggplot2 .data
 #' @param x An object of class "marginal".
 #' @param ncols Number of columns in the plot layout.
-#'   Only if `length(x) > 1` (multiple plots). With "plotly" subplots, only nrow can
-#'   be set. Therefore, the calculation is approximately possible only.
+#'   Only if `length(x) > 1` (multiple plots). With "plotly" subplots, the result may
+#'   differ slightly.
 #' @param share_y Should y axis be shared across all subplots?
 #'   No effect if `ylim` is passed. Only if `length(x) > 1` (multiple plots).
 #' @param sort Should plots be sorted in decreasing order of importance? Importance is
@@ -15,7 +15,7 @@
 #'   (pd > pred > obs). Only if `length(x) > 1` (multiple plots).
 #' @param ylim Manual y axis range.
 #' @param scale_exposure Vertical scaling of the exposure bars (between 0 and 1).
-#'   The default is 1. Set to 0 for no bars. With "plotly", values between 0 and 1 ar
+#'   The default is 1. Set to 0 for no bars. With "plotly", values between 0 and 1 are
 #'   currently not possible.
 #' @param cat_lines Show lines for non-numeric features. Default is `TRUE`.
 #'   Vectorized over `x`.
@@ -36,7 +36,7 @@
 #' @param ... Currently unused.
 #' @returns
 #'   If `length(x) == 1` (single plot), an object of class  "ggplot" or "plotly".
-#'   Otherwise, an object of class "patchwork" or a "plotly" subplot.
+#'   Otherwise, an object of class "patchwork", or a "plotly" subplot.
 #' @seealso [marginal()], [average_observed()], [partial_dependence()]
 #' @export
 plot.marginal <- function(

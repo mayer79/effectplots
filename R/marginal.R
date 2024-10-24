@@ -9,9 +9,8 @@
 #'
 #' For numeric variables with more than `discrete_m = 2` disjoint values,
 #' the same binning options (specified by `breaks`) are available as in
-#' [graphics::hist()]. Before calculating bins, the smallest 1% and the
-#' largest 99% of values are winsorized (capped) at the corresponding observed
-#' (approximate) quantiles.
+#' [graphics::hist()]. Before calculating bins, the smallest and largest 1% of the
+#' values are winsorized (capped) at the corresponding observed (approximate) quantiles.
 #'
 #' @param object Fitted model.
 #' @param v Vector of variable names to calculate statistics.
@@ -32,12 +31,12 @@
 #'   The default is `TRUE`. Vectorized over `v`. Only relevant for numeric X.
 #' @param discrete_m Numeric X variables with up to this number of unique values
 #'   should not be binned. The default is 2. Vectorized over `v`.
-#' @param wprob_low Small values of numeric X variables are capped at this quantile.
-#'   Set to 0 to avoid Winsorizing. Note that at most 100k observations are sampled
-#'   to calculate the quantiles (uses random seed). Vectorized over `v`.
-#' @param wprob_high High values of numeric X variables are capped at this quantile.
-#'   Set to 1 to avoid Winsorizing. Note that at most 100k observations are sampled
-#'   to calculate the quantile (uses random seed). Vectorized over `v`.
+#' @param wprob_low The smallest values of a numeric X are capped at the corresponding
+#'   quantile. Set to 0 to avoid Winsorizing. Note that at most 100k observations
+#'   are sampled to calculate the quantile (uses random seed). Vectorized over `v`.
+#' @param wprob_high The largest values of a numeric X are capped at the corresponding
+#'   quantile. Set to 1 to avoid Winsorizing. Note that at most 100k observations
+#'   are sampled to calculate the quantile (uses random seed). Vectorized over `v`.
 #' @param calc_pred Should predictions be calculated? Default is `TRUE`. Only relevant
 #'   if `pred = NULL`.
 #' @param pd_n Size of the data used for calculating partial dependence.
@@ -283,8 +282,8 @@ calculate_stats <- function(
 
   # Prepare x
   x <- if (is.matrix(data)) data[, v] else data[[v]]
-  if (is.numeric(x) && (wprob_low > 0 || wprob_high < 1)) {
-    x <- wins_prob(x, probs = c(wprob_low, wprob_high), nmax = 1e5)
+  if (is.numeric(x) && (wprob_low > 0 || wprob_high > 0)) {
+    x <- wins_prob(x, probs = c(wprob_low, 1 - wprob_high), nmax = 1e5)
   }
 
   g <- unique(x)

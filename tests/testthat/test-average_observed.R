@@ -6,8 +6,8 @@ test_that("average_observed() is consistent with marginal()", {
     v = v,
     data = iris,
     y = iris$Sepal.Length,
-    winsorize_low = 0.1,
-    winsorize_high = 0.9,
+    wprob_low = 0.1,
+    wprob_high = 0.9,
     w = 1:150
   )
   marg <- marginal(
@@ -15,8 +15,8 @@ test_that("average_observed() is consistent with marginal()", {
     v = v,
     data = iris,
     y = iris$Sepal.Length,
-    winsorize_low = 0.1,
-    winsorize_high = 0.9,
+    wprob_low = 0.1,
+    wprob_high = 0.9,
     calc_pred = FALSE,
     pd_n = 0,
     w = 1:150

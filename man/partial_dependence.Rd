@@ -80,13 +80,13 @@ The default is \code{TRUE}. Vectorized over \code{v}. Only relevant for numeric 
 \item{discrete_m}{Numeric X variables with up to this number of unique values
 should not be binned. The default is 2. Vectorized over \code{v}.}
 
-\item{wprob_low}{Small values of numeric X variables are capped at this quantile.
-Set to 0 to avoid Winsorizing. Note that at most 100k observations are sampled
-to calculate the quantiles (uses random seed). Vectorized over \code{v}.}
+\item{wprob_low}{The smallest values of a numeric X are capped at the corresponding
+quantile. Set to 0 to avoid Winsorizing. Note that at most 100k observations
+are sampled to calculate the quantile (uses random seed). Vectorized over \code{v}.}
 
-\item{wprob_high}{High values of numeric X variables are capped at this quantile.
-Set to 1 to avoid Winsorizing. Note that at most 100k observations are sampled
-to calculate the quantile (uses random seed). Vectorized over \code{v}.}
+\item{wprob_high}{The largest values of a numeric X are capped at the corresponding
+quantile. Set to 1 to avoid Winsorizing. Note that at most 100k observations
+are sampled to calculate the quantile (uses random seed). Vectorized over \code{v}.}
 
 \item{pd_n}{Size of the data used for calculating partial dependence.
 The default is 500. For larger \code{data} (and \code{w}), \code{pd_n} rows are randomly sampled
@@ -98,8 +98,8 @@ A list (of class "marginal") with a data.frame of statistics per feature. Use
 single bracket subsetting to select part of the output.
 }
 \description{
-Calculates partial dependence of one or more variables (\code{v}) in
-a dataset \code{data}. This function is a convenience wrapper over \code{\link[=marginal]{marginal()}}.
+Calculates partial dependence of one or more X variables (\code{v}) in \code{data}.
+This function is a convenience wrapper around \code{\link[=marginal]{marginal()}}.
 }
 \section{Methods (by class)}{
 \itemize{

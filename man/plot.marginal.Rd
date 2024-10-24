@@ -2,7 +2,7 @@
 % Please edit documentation in R/plots.R
 \name{plot.marginal}
 \alias{plot.marginal}
-\title{Plots "marginal" Object}
+\title{Plots Marginal Object}
 \usage{
 \method{plot}{marginal}(
   x,
@@ -25,8 +25,8 @@
 \item{x}{An object of class "marginal".}
 
 \item{ncols}{Number of columns in the plot layout.
-Only if \code{length(x) > 1} (multiple plots). With "plotly" subplots, only nrow can
-be set. Therefore, the calculation is approximately possible only.}
+Only if \code{length(x) > 1} (multiple plots). With "plotly" subplots, the result may
+differ slightly.}
 
 \item{share_y}{Should y axis be shared across all subplots?
 No effect if \code{ylim} is passed. Only if \code{length(x) > 1} (multiple plots).}
@@ -38,7 +38,7 @@ measured by the exposure weighted variance of the most relevant available statis
 \item{ylim}{Manual y axis range.}
 
 \item{scale_exposure}{Vertical scaling of the exposure bars (between 0 and 1).
-The default is 1. Set to 0 for no bars. With "plotly", values between 0 and 1 ar
+The default is 1. Set to 0 for no bars. With "plotly", values between 0 and 1 are
 currently not possible.}
 
 \item{cat_lines}{Show lines for non-numeric features. Default is \code{TRUE}.
@@ -68,11 +68,11 @@ To change globally, set \code{options(marginalplot.backend = "plotly")}.}
 }
 \value{
 If \code{length(x) == 1} (single plot), an object of class  "ggplot" or "plotly".
-Otherwise, an object of class "patchwork" or a "plotly" subplot.
+Otherwise, an object of class "patchwork", or a "plotly" subplot.
 }
 \description{
-Plots all statistics using a color blind palette from "ggthemes".
-You can switch to the interactive interface by setting \code{backend = "plotly"}.
+Plots marginal statistics using a color blind palette from "ggthemes".
+You can switch to plotly by setting \code{backend = "plotly"}.
 }
 \seealso{
 \code{\link[=marginal]{marginal()}}, \code{\link[=average_observed]{average_observed()}}, \code{\link[=partial_dependence]{partial_dependence()}}

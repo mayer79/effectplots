@@ -96,13 +96,13 @@ The default is \code{TRUE}. Vectorized over \code{v}. Only relevant for numeric 
 \item{discrete_m}{Numeric X variables with up to this number of unique values
 should not be binned. The default is 2. Vectorized over \code{v}.}
 
-\item{wprob_low}{Small values of numeric X variables are capped at this quantile.
-Set to 0 to avoid Winsorizing. Note that at most 100k observations are sampled
-to calculate the quantiles (uses random seed). Vectorized over \code{v}.}
+\item{wprob_low}{The smallest values of a numeric X are capped at the corresponding
+quantile. Set to 0 to avoid Winsorizing. Note that at most 100k observations
+are sampled to calculate the quantile (uses random seed). Vectorized over \code{v}.}
 
-\item{wprob_high}{High values of numeric X variables are capped at this quantile.
-Set to 1 to avoid Winsorizing. Note that at most 100k observations are sampled
-to calculate the quantile (uses random seed). Vectorized over \code{v}.}
+\item{wprob_high}{The largest values of a numeric X are capped at the corresponding
+quantile. Set to 1 to avoid Winsorizing. Note that at most 100k observations
+are sampled to calculate the quantile (uses random seed). Vectorized over \code{v}.}
 
 \item{calc_pred}{Should predictions be calculated? Default is \code{TRUE}. Only relevant
 if \code{pred = NULL}.}
@@ -129,9 +129,8 @@ over (possibly binned) features X specified by their column names \code{v}.
 \details{
 For numeric variables with more than \code{discrete_m = 2} disjoint values,
 the same binning options (specified by \code{breaks}) are available as in
-\code{\link[graphics:hist]{graphics::hist()}}. Before calculating bins, the smallest 1\% and the
-largest 99\% of values are winsorized (capped) at the corresponding observed
-(approximate) quantiles.
+\code{\link[graphics:hist]{graphics::hist()}}. Before calculating bins, the smallest and largest 1\% of the
+values are winsorized (capped) at the corresponding observed (approximate) quantiles.
 }
 \section{Methods (by class)}{
 \itemize{

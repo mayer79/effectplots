@@ -1,7 +1,7 @@
 #' Partial Dependence
 #'
-#' Calculates partial dependence of one or more variables (`v`) in
-#' a dataset `data`. This function is a convenience wrapper over [marginal()].
+#' Calculates partial dependence of one or more X variables (`v`) in `data`.
+#' This function is a convenience wrapper around [marginal()].
 #'
 #' @inheritParams marginal
 #' @inherit marginal return

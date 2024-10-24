@@ -1,4 +1,4 @@
-#' Postprocess Output
+#' Postprocess Marginal Object
 #'
 #' This function helps to improve the output of [marginal()],
 #' [partial_dependence()], [average_observed()]. Except for `drop_stats`,
@@ -10,6 +10,9 @@
 #' @param eval_at_center If `FALSE` (default), the points are aligned with (weighted)
 #'   average X values per bin. If `TRUE`, the points are aligned with bar centers.
 #'   Since categoricals are always evaluated at bar centers, this only affects numerics.
+#' @param collapse_m If a categorical X has more than `collapse_m` levels,
+#'   low exposure levels are collapsed into a new level "Other".
+#'    By default `Inf` (no collapsing).
 #' @param drop_below_n Drop categories with exposure below this value.
 #'   Only for categorical X variables.
 #' @param drop_below_prop Drop categories with relative exposure below this value.
