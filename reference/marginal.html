@@ -217,6 +217,8 @@ single bracket subsetting to select part of the output.</p>
 the same binning options (specified by <code>breaks</code>) are available as in
 <code><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">graphics::hist()</a></code>. Before calculating bins, the smallest and largest 1% of the
 values are winsorized (capped) at the corresponding observed (approximate) quantiles.</p>
+<p>Note that partial dependence of numeric features is evaluated at (possibly weighted)
+bin means, i.e., not at the bin center.</p>
     </div>
     <div id="methods-by-class-">
     <h2>Methods (by class)</h2>
@@ -238,15 +240,13 @@ values are winsorized (capped) at the corresponding observed (approximate) quant
 <span class="r-in"><span><span class="va">M</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 'marginal' object of length 4, starting with 'Sepal.Width': </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   bar_at bar_width  eval_at     pred      obs exposure       pd</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1   2.25       0.5 2.378947 5.532860 5.605263       19 5.506929</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2   2.75       0.5 2.867188 6.111200 6.081250       64 5.749042</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3   3.25       0.5 3.277083 5.706627 5.702083       48 5.952305</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4   3.75       0.5 3.756250 5.631317 5.668750       16 6.189918</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5   4.25       0.5 4.134000 5.413218 5.466667        3 6.377240</span>
-<span class="r-in"><span><span class="va">M</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="postprocess.html">postprocess</a></span><span class="op">(</span>sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   bar_at bar_width  eval_at exposure     pred      obs       pd</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1   2.25       0.5 2.378947       19 5.532860 5.605263 5.506929</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2   2.75       0.5 2.867188       64 6.111200 6.081250 5.749042</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3   3.25       0.5 3.277083       48 5.706627 5.702083 5.952305</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4   3.75       0.5 3.756250       16 5.631317 5.668750 6.189918</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5   4.25       0.5 4.134000        3 5.413218 5.466667 6.377240</span>
+<span class="r-in"><span><span class="va">M</span> <span class="op">|&gt;</span> <span class="fu"><a href="postprocess.html">postprocess</a></span><span class="op">(</span>sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Importance via exposure weighted variance of 'pd'</span>
 <span class="r-plt img"><img src="marginal-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
