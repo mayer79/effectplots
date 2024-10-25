@@ -51,18 +51,18 @@ test_that("grouped_mean() works", {
 
   r <- grouped_mean(x, g = g)
   rownames(r) <- NULL
-  expect_equal(r, cbind(a = c(4.5, 1.5), b = c(2.5, 5.5), exposure = c(4, 2)))
+  expect_equal(r, cbind(exposure = c(4, 2), a = c(4.5, 1.5), b = c(2.5, 5.5)))
 
   # Grouped and weighted
   rw1 <- grouped_mean(x, g = g, w = w1)
   rownames(rw1) <- NULL
-  expect_equal(r[, 1:2], rw1[, 1:2])
+  expect_equal(r[, 2:3], rw1[, 2:3])
 
   rw2 <- grouped_mean(x, g = g, w = w2)
   rownames(rw2) <- c("g1", "g2")
   g1 <- colSums(x[g == 1, ] * w2[g == 1]) / sum(w2[g == 1])
   g2 <- colSums(x[g == 2, ] * w2[g == 2]) / sum(w2[g == 2])
-  expect_equal(rw2, cbind(rbind(g1, g2), exposure = c(18, 3)))
+  expect_equal(rw2, cbind(exposure = c(18, 3), rbind(g1, g2)))
 })
 
 test_that("poor_man_stack() works (test could be improved)", {

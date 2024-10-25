@@ -12,6 +12,9 @@
 #' [graphics::hist()]. Before calculating bins, the smallest and largest 1% of the
 #' values are winsorized (capped) at the corresponding observed (approximate) quantiles.
 #'
+#' Note that partial dependence of numeric features is evaluated at (possibly weighted)
+#' bin means, i.e., not at the bin center.
+#'
 #' @param object Fitted model.
 #' @param v Vector of variable names to calculate statistics.
 #' @param data Matrix or data.frame.
@@ -310,13 +313,8 @@ calculate_stats <- function(
       x, vec = H$breaks, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
     )
     S <- grouped_mean(cbind(eval_at = x, pred = pred, obs = y), g = ix, w = w)
-    out <- data.frame(bar_at = g, bar_width = diff(H$breaks))
+    out <- data.frame(bar_at = g, bar_width = diff(H$breaks), eval_at = g, exposure = 0)
     out[rownames(S), colnames(S)] <- S
-    s <- is.na(out$exposure)
-    if (any(s)) {
-      out[s, "exposure"] <- 0
-      out[s, "eval_at"] <- out[s, "bar_at"]
-    }
   }
 
   # Add partial dependence

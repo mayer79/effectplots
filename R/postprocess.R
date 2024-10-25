@@ -3,25 +3,23 @@
 #' This function helps to improve the output of [marginal()],
 #' [partial_dependence()], [average_observed()]. Except for `sort` and `drop_stats`,
 #' all arguments are vectorized, i.e., you can pass a list of the same length as
-#' `object`.
+#' `x`.
 #'
-#' @param object Object of class "marginal".
-#' @param sort Should `object` be sorted in decreasing order of feature importance?
+#' @param x Object of class "marginal".
+#' @param sort Should `x` be sorted in decreasing order of feature importance?
 #'   Importance is measured by the exposure weighted variance of the most
 #'   relevant available statistic (pd > pred > obs). The default is `FALSE`.
-#'   This step is applied after all other postprocessings.
+#'   Importance is calculated after the other postprocessing steps.
 #' @param drop_stats Statistics to drop, by default `NULL`.
-#'   Subset of "pred", "obs", "pd". Not vectorized over `object` elements.
+#'   Subset of "pred", "obs", "pd". Not vectorized over `x` elements.
 #' @param eval_at_center If `FALSE` (default), the points are aligned with (weighted)
 #'   average X values per bin. If `TRUE`, the points are aligned with bar centers.
 #'   Since categoricals are always evaluated at bar centers, this only affects numerics.
+#'   Note that partial dependence of numeric X is always evaluated at bar means, not
+#'   centers.
 #' @param collapse_m If a categorical X has more than `collapse_m` levels,
 #'   low exposure levels are collapsed into a new level "Other".
-#'    By default `Inf` (no collapsing).
-#' @param drop_below_n Drop categories with exposure below this value.
-#'   Only for categorical X variables.
-#' @param drop_below_prop Drop categories with relative exposure below this value.
-#'   Only for categorical X variables.
+#'   By default `Inf` (no collapsing).
 #' @param explicit_na Should `NA` levels be converted to strings?
 #'   Only for categorical X variables.
 #' @param na.rm Should `NA` levels in X be dropped?
@@ -34,25 +32,21 @@
 #'   postprocess(sort = TRUE, eval_at_center = TRUE) |>
 #'   plot(num_points = TRUE)
 postprocess <- function(
-  object,
+  x,
   sort = FALSE,
   drop_stats = NULL,
   eval_at_center = FALSE,
   collapse_m = Inf,
-  drop_below_n = 0,
-  drop_below_prop = 0,
   explicit_na = TRUE,
   na.rm = FALSE
 ) {
-  stopifnot(inherits(object, "marginal"))
+  stopifnot(inherits(x, "marginal"))
 
   out <- mapply(
     postprocess_one,
-    x = object,
+    x = x,
     eval_at_center = eval_at_center,
     collapse_m = collapse_m,
-    drop_below_n = drop_below_n,
-    drop_below_prop = drop_below_prop,
     explicit_na = explicit_na,
     na.rm = na.rm,
     MoreArgs = list(drop_stats = drop_stats),
@@ -73,8 +67,6 @@ postprocess_one <- function(
   drop_stats,
   collapse_m,
   eval_at_center,
-  drop_below_n,
-  drop_below_prop,
   explicit_na,
   na.rm,
   ...
@@ -111,13 +103,7 @@ postprocess_one <- function(
       S <- x_agg[intersect(colnames(x), all_stats)]
       gS <- grouped_mean(S, g = rep.int(1, nrow(S)), w = x_agg$exposure)
       x_new <- data.frame(bar_at = "Other", bar_width = 0.7, eval_at = "Other", gS)
-      x <- rbind(x_keep, x_new)  # Column order dof x_new oes not matter
-    }
-    if (drop_below_n > 0) {
-      x <- subset(x, exposure >= drop_below_n)
-    }
-    if (drop_below_prop > 0) {
-      x <- subset(x, exposure / sum(exposure) >= drop_below_prop)
+      x <- rbind(x_keep, x_new)  # Column order dof x_new does not matter
     }
     if (isTRUE(explicit_na)) {
       s <- is.na(x$bar_at)

@@ -54,7 +54,7 @@ grouped_mean <- function(x, g, w = NULL) {
     return(exposure)
   }
   suppressWarnings(S <- rowsum(x, group = g))         # silence warning about missings
-  cbind(S / as.numeric(exposure), exposure)
+  cbind(exposure, S / as.numeric(exposure))
 }
 
 wrowmean <- function(x, ngroups = 1L, w = NULL) {

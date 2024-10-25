@@ -14,7 +14,14 @@ One of 'pd', 'pred', or 'obs'.}
 }
 \description{
 Extracts the exposure weighted variances of the most relevant statistic
-(pd > pred > obs) from a "marginal" object.
+(pd > pred > obs) from a "marginal" object. This serves as a simple "main effect"
+importance measure.
+}
+\examples{
+fit <- lm(Sepal.Length ~ ., data = iris)
+xvars <- colnames(iris)[-1]
+M <- marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
+main_effect_importance(M)
 }
 \seealso{
 \code{\link[=postprocess]{postprocess()}}

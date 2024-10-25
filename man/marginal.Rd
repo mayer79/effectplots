@@ -131,6 +131,9 @@ For numeric variables with more than \code{discrete_m = 2} disjoint values,
 the same binning options (specified by \code{breaks}) are available as in
 \code{\link[graphics:hist]{graphics::hist()}}. Before calculating bins, the smallest and largest 1\% of the
 values are winsorized (capped) at the corresponding observed (approximate) quantiles.
+
+Note that partial dependence of numeric features is evaluated at (possibly weighted)
+bin means, i.e., not at the bin center.
 }
 \section{Methods (by class)}{
 \itemize{
@@ -146,9 +149,7 @@ fit <- lm(Sepal.Length ~ ., data = iris)
 xvars <- colnames(iris)[-1]
 M <- marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 M
-M |>
-  postprocess(sort = TRUE) |>
-  plot()
+M |> postprocess(sort = TRUE) |> plot()
 }
 \seealso{
 \code{\link[=average_observed]{average_observed()}}, \code{\link[=partial_dependence]{partial_dependence()}}

@@ -9,3 +9,4 @@
 ^\.Rproj\.user$
 ^cran-comments\.md$
 ^bench\.R$
+^claims\.parquet$

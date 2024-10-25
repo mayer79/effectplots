@@ -5,41 +5,35 @@
 \title{Postprocess Marginal Object}
 \usage{
 postprocess(
-  object,
+  x,
   sort = FALSE,
   drop_stats = NULL,
   eval_at_center = FALSE,
   collapse_m = Inf,
-  drop_below_n = 0,
-  drop_below_prop = 0,
   explicit_na = TRUE,
   na.rm = FALSE
 )
 }
 \arguments{
-\item{object}{Object of class "marginal".}
+\item{x}{Object of class "marginal".}
 
-\item{sort}{Should \code{object} be sorted in decreasing order of feature importance?
+\item{sort}{Should \code{x} be sorted in decreasing order of feature importance?
 Importance is measured by the exposure weighted variance of the most
 relevant available statistic (pd > pred > obs). The default is \code{FALSE}.
-This step is applied after all other postprocessings.}
+Importance is calculated after the other postprocessing steps.}
 
 \item{drop_stats}{Statistics to drop, by default \code{NULL}.
-Subset of "pred", "obs", "pd". Not vectorized over \code{object} elements.}
+Subset of "pred", "obs", "pd". Not vectorized over \code{x} elements.}
 
 \item{eval_at_center}{If \code{FALSE} (default), the points are aligned with (weighted)
 average X values per bin. If \code{TRUE}, the points are aligned with bar centers.
-Since categoricals are always evaluated at bar centers, this only affects numerics.}
+Since categoricals are always evaluated at bar centers, this only affects numerics.
+Note that partial dependence of numeric X is always evaluated at bar means, not
+centers.}
 
 \item{collapse_m}{If a categorical X has more than \code{collapse_m} levels,
 low exposure levels are collapsed into a new level "Other".
 By default \code{Inf} (no collapsing).}
-
-\item{drop_below_n}{Drop categories with exposure below this value.
-Only for categorical X variables.}
-
-\item{drop_below_prop}{Drop categories with relative exposure below this value.
-Only for categorical X variables.}
 
 \item{explicit_na}{Should \code{NA} levels be converted to strings?
 Only for categorical X variables.}
@@ -50,7 +44,7 @@ Only for categorical X variables.}
 This function helps to improve the output of \code{\link[=marginal]{marginal()}},
 \code{\link[=partial_dependence]{partial_dependence()}}, \code{\link[=average_observed]{average_observed()}}. Except for \code{sort} and \code{drop_stats},
 all arguments are vectorized, i.e., you can pass a list of the same length as
-\code{object}.
+\code{x}.
 }
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)
