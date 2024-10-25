@@ -289,46 +289,49 @@ calculate_stats <- function(
     x <- wins_prob(x, probs = c(wprob_low, wprob_high), nmax = 1e5)
   }
 
-  g <- unique(x)
+  g <- unique(x)  # Could be avoided for factors - but would need to keep track of NA
 
   # DISCRETE
   if (!is.numeric(x) || length(g) <= discrete_m) {
+    num <- FALSE
+    # Ordered by sort(g) (+ NA). For factors, this equals levels(g) (+ NA)
     S <- grouped_mean(cbind(pred = pred, obs = y), g = x, w = w)
-    g <- sort(g, na.last = TRUE)  # Same order as grouped_mean()
-    if (!is.factor(g)) {
-      g <- factor(g)
-    }
+    g <- sort(g, na.last = TRUE)
     out <- data.frame(bar_at = g, bar_width = 0.7, eval_at = g, S)
     rownames(out) <- NULL
-  } else {
-    # "CONTINUOUS"
-    # H <- graphics::hist.default(x, breaks = breaks, right = right, plot = FALSE)
+  } else {  # "CONTINUOUS"
+    num <- TRUE
     H <- hist2(x, breaks = breaks)
     g <- H$mids
     if (anyNA(x)) {
       g <- c(g, NA)
     }
+    out <- data.frame(bar_at = g, bar_width = diff(H$breaks), eval_at = g, exposure = 0)
+
     # Integer encoding
     ix <- findInterval(
       x, vec = H$breaks, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
     )
     S <- grouped_mean(cbind(eval_at = x, pred = pred, obs = y), g = ix, w = w)
-    out <- data.frame(bar_at = g, bar_width = diff(H$breaks), eval_at = g, exposure = 0)
     out[rownames(S), colnames(S)] <- S
   }
 
   # Add partial dependence
   if (!is.null(pd_X)) {
-    out$pd <- partial_dep(
+    out[["pd"]] <- partial_dep(
       object = object,
       v = v,
       X = pd_X,
-      grid = out$eval_at,
+      grid = out[["eval_at"]],
       pred_fun = pred_fun,
       w = pd_w,
       ...
     )
   }
 
+  # Convert non-numeric levels *after* calculation of partial dependence!
+  if (!num && !is.factor(out[["eval_at"]])) {
+    out[["bar_at"]] <- out[["eval_at"]] <- factor(out[["eval_at"]])
+  }
   return(out)
 }
