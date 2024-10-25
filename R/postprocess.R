@@ -2,8 +2,8 @@
 #'
 #' This function helps to improve the output of [marginal()],
 #' [partial_dependence()], [average_observed()]. Except for `sort` and `drop_stats`,
-#' all arguments are vectorized, i.e., you can pass a list of the same length as
-#' `x`.
+#' all arguments are vectorized, i.e., you can pass a vector or list of the same
+#'  length as `x`.
 #'
 #' @param x Object of class "marginal".
 #' @param sort Should `x` be sorted in decreasing order of feature importance?
@@ -11,17 +11,19 @@
 #'   relevant available statistic (pd > pred > obs). The default is `FALSE`.
 #'   Importance is calculated after the other postprocessing steps.
 #' @param drop_stats Statistics to drop, by default `NULL`.
-#'   Subset of "pred", "obs", "pd". Not vectorized over `x` elements.
+#'   Subset of "pred", "obs", "pd". Not vectorized over `x`.
 #' @param eval_at_center If `FALSE` (default), the points are aligned with (weighted)
 #'   average X values per bin. If `TRUE`, the points are aligned with bar centers.
 #'   Since categoricals are always evaluated at bar centers, this only affects numerics.
 #'   Note that partial dependence of numeric X is always evaluated at bar means, not
-#'   centers.
+#'   centers. Vectorized over `x`.
 #' @param collapse_m If a categorical X has more than `collapse_m` levels,
 #'   low exposure levels are collapsed into a new level "Other".
-#'   By default `Inf` (no collapsing).
+#'   By default `Inf` (no collapsing). Vectorized over `x`.
+#' @param drop_below_n Drop bins with exposure below this value. Applied after the
+#'   effect of `collapse_m`. Vectorized over `x`.
 #' @param explicit_na Should `NA` levels be converted to strings?
-#'   Only for categorical X variables.
+#'   Only for categorical X variables. Vectorized over `x`.
 #' @param na.rm Should `NA` levels in X be dropped?
 #' @seealso [marginal()], [average_observed()], [partial_dependence()]
 #' @export
@@ -37,16 +39,21 @@ postprocess <- function(
   drop_stats = NULL,
   eval_at_center = FALSE,
   collapse_m = Inf,
+  drop_below_n = 0,
   explicit_na = TRUE,
   na.rm = FALSE
 ) {
-  stopifnot(inherits(x, "marginal"))
+  stopifnot(
+    inherits(x, "marginal"),
+    collapse_m >= 2L
+  )
 
   out <- mapply(
     postprocess_one,
     x = x,
     eval_at_center = eval_at_center,
     collapse_m = collapse_m,
+    drop_below_n = drop_below_n,
     explicit_na = explicit_na,
     na.rm = na.rm,
     MoreArgs = list(drop_stats = drop_stats),
@@ -67,9 +74,9 @@ postprocess_one <- function(
   drop_stats,
   collapse_m,
   eval_at_center,
+  drop_below_n,
   explicit_na,
-  na.rm,
-  ...
+  na.rm
 ) {
   num <- is.numeric(x$eval_at)
   all_stats <- c("pred", "obs", "pd")
@@ -116,6 +123,10 @@ postprocess_one <- function(
         x[s, c("bar_at", "eval_at")] <- "NA"
       }
     }
+  }
+
+  if (drop_below_n > 0) {
+    x <- subset(x, exposure >= drop_below_n)
   }
 
   if (isTRUE(na.rm)) {

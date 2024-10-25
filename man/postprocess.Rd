@@ -10,6 +10,7 @@ postprocess(
   drop_stats = NULL,
   eval_at_center = FALSE,
   collapse_m = Inf,
+  drop_below_n = 0,
   explicit_na = TRUE,
   na.rm = FALSE
 )
@@ -23,28 +24,31 @@ relevant available statistic (pd > pred > obs). The default is \code{FALSE}.
 Importance is calculated after the other postprocessing steps.}
 
 \item{drop_stats}{Statistics to drop, by default \code{NULL}.
-Subset of "pred", "obs", "pd". Not vectorized over \code{x} elements.}
+Subset of "pred", "obs", "pd". Not vectorized over \code{x}.}
 
 \item{eval_at_center}{If \code{FALSE} (default), the points are aligned with (weighted)
 average X values per bin. If \code{TRUE}, the points are aligned with bar centers.
 Since categoricals are always evaluated at bar centers, this only affects numerics.
 Note that partial dependence of numeric X is always evaluated at bar means, not
-centers.}
+centers. Vectorized over \code{x}.}
 
 \item{collapse_m}{If a categorical X has more than \code{collapse_m} levels,
 low exposure levels are collapsed into a new level "Other".
-By default \code{Inf} (no collapsing).}
+By default \code{Inf} (no collapsing). Vectorized over \code{x}.}
+
+\item{drop_below_n}{Drop bins with exposure below this value. Applied after the
+effect of \code{collapse_m}. Vectorized over \code{x}.}
 
 \item{explicit_na}{Should \code{NA} levels be converted to strings?
-Only for categorical X variables.}
+Only for categorical X variables. Vectorized over \code{x}.}
 
 \item{na.rm}{Should \code{NA} levels in X be dropped?}
 }
 \description{
 This function helps to improve the output of \code{\link[=marginal]{marginal()}},
 \code{\link[=partial_dependence]{partial_dependence()}}, \code{\link[=average_observed]{average_observed()}}. Except for \code{sort} and \code{drop_stats},
-all arguments are vectorized, i.e., you can pass a list of the same length as
-\code{x}.
+all arguments are vectorized, i.e., you can pass a vector or list of the same
+length as \code{x}.
 }
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)
