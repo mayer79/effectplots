@@ -19,7 +19,7 @@ Per feature and feature value, the main function `marginal()` calculates
 The workflow is as follows:
 
 1. Crunch values via `marginal()` or the convenience wrappers `average_observed()` and `partial_dependence()`.
-2. Post-process the results with `postprocess()`, e.g., to collapse rare levels of a categorical feature.
+2. Post-process the results with `postprocess()`, e.g., to collapse rare levels of categorical features.
 3. Plot the results with `plot()`.
 
 **Notes**
@@ -29,7 +29,7 @@ The workflow is as follows:
 - Most models (including DALEX explainers and meta-learners such as Tidymodels) work out-of-the box. If not, a tailored prediction function can be specified.
 - For multi-output models, the last output is picked.
 - Case weights are supported via the argument `w`.
-- Binning of numeric features is done by the same options as `stats::hist()`. Additionally, very small and large values are winsorized (clipped) by default.
+- Binning of numeric features is done by the same options as `stats::hist()`. Additionally, the smallest and largest 1% values are winsorized (clipped) by default.
 
 ## Installation
 
@@ -42,7 +42,7 @@ pak::pak("mayer79/marginalplot")
 
 ## Usage
 
-We use a synthetic dataset with 1 Mio rows containing information on Motor TPL insurance policies and claims.
+We use synthetic data with 1 Mio rows containing information on Motor TPL insurance policies and claims.
 The aim is to model claim frequency as a function of features like "driver_age" and "car_power".
 
 Before modeling, we want to study how the average response is associated with feature values.
@@ -66,11 +66,11 @@ average_observed(xvars, data = df, y = "claim_nb") |>
 
 ![](man/figures/avg_obs.svg)
 
-The plots have been automatically sorted by decreasing (exposure-weighted) variance of the average observed values. Using a shared y axis helps to compare the strength of the association.
+The plots have been automatically sorted by decreasing (exposure-weighted) variance of the average observed values. A shared y axis helps to compare the strength of the association across features.
 
 ### Fit model
 
-Now, after having studied the data, we are ready to fit a boosted trees model. Note that hyper-parameters have been tuned outside this notebook via cross-validation over the training data.
+Next, let's fit a boosted trees model.
 
 ```r
 # Data splits
@@ -117,5 +117,5 @@ marginal(fit, v = xvars, data = X_test, y = test$claim_nb) |>
 **Comments**
 
 1. Comparing average predicted with average observed values gives a hint about bias. In this case, the bias on the test data seems to be small. Studying the same plot on the training data would help to assess in-sample bias.
-2. Comparing the shape of the partial dependence curve with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors "driver_age" and "car_power", the two lines are very similar. This means the marginal effect is really coming from the feature in question (and not of some other, correlated, feature).
+2. Comparing the shape of the partial dependence curve with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors "driver_age" and "car_power", the two lines are very similar. This means the marginal effects are mainly due to the feature on the x-axis (and not of some other, correlated, feature).
 3. Sorting is done by decreasing exposure weighted variance of the partial dependence values.
