@@ -56,11 +56,10 @@ set.seed(1)
 
 df <- getOMLDataSet(data.id = 45106L)$data
 
-y <- "claim_nb"
 xvars <- c("year", "town", "driver_age", "car_weight", "car_power", "car_age")
 
 # 0.5 seconds on laptop
-average_observed(xvars, data = df, y = y) |>
+average_observed(xvars, data = df, y = "claim_nb") |>
   postprocess(sort = TRUE) |> 
   plot(share_y = TRUE)
 ```
@@ -97,7 +96,7 @@ params <- list(
 
 fit <- lgb.train(
   params = params,
-  data = lgb.Dataset(X_train, label = train[[y]]),
+  data = lgb.Dataset(X_train, label = train$claim_nb),
   nrounds = 300
 )
 ```
@@ -108,7 +107,7 @@ After modeling, we use the test (or validation) data to crunch average observed,
 
 ```r
 # 0.3 second on laptop
-marginal(fit, v = xvars, data = X_test, y = test[[y]]) |>
+marginal(fit, v = xvars, data = X_test, y = test$claim_nb) |>
   postprocess(sort = TRUE) |> 
   plot(share_y = TRUE)
 ```
