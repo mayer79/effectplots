@@ -75,7 +75,7 @@ use_github_links() # use this if this project is on github
 library(devtools)
 
 document()
-# test()
+test()
 check(manual = TRUE, cran = TRUE)
 build()
 # build(binary = TRUE)

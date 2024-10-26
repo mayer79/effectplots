@@ -11,8 +11,8 @@
 
 Per feature and feature value, the main function `marginal()` calculates
 
-- average observed values of the model response,
-- average predicted values,
+- average observed response (and std),
+- average predicted values (and std),
 - partial dependence, and
 - the exposure.
 
@@ -106,7 +106,7 @@ fit <- lgb.train(
 After modeling, we use the test (or validation) data to crunch average observed, average predicted, and partial dependence per feature values/bins to gain insights about the model. Calculations are lightning fast.
 
 ```r
-# 0.3 second on laptop
+# 0.8 second on laptop
 marginal(fit, v = xvars, data = X_test, y = test$claim_nb) |>
   postprocess(sort = TRUE) |> 
   plot(share_y = TRUE)

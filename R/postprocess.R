@@ -103,10 +103,18 @@ postprocess_one <- function(
       levels(x_keep$bar_at) <- levels(x_keep$eval_at) <- c(lvl, "Other")
 
       # Collapse other rows
-      S <- x_agg[intersect(colnames(x), all_stats)]
-      gS <- grouped_mean(S, g = rep.int(1, nrow(S)), w = x_agg$exposure)
-      x_new <- data.frame(bar_at = "Other", bar_width = 0.7, eval_at = "Other", gS)
-      x <- rbind(x_keep, x_new)  # Column order dof x_new does not matter
+      M <- x_agg[intersect(colnames(x), all_stats)]
+      S <- x_agg[intersect(colnames(x), c("obs_sd", "pred_sd"))]
+      w <- x_agg$exposure
+      x_new <- data.frame(
+        bar_at = "Other",
+        bar_width = 0.7,
+        eval_at = "Other",
+        exposure = sum(w),
+        collapse::fmean(M, w = w, drop = FALSE),
+        sqrt(collapse::fsum(S^2 * (w - 1), drop = FALSE) / (sum(w) - 1))  # OK?
+      )
+      x <- rbind(x_keep, x_new)  # Column order of x_new does not matter
     }
   }
 
