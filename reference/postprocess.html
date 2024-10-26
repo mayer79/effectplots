@@ -66,7 +66,6 @@ length as <code>x</code>.</p>
 <span>  eval_at_center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  collapse_m <span class="op">=</span> <span class="cn">Inf</span>,</span>
 <span>  drop_below_n <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  explicit_na <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -94,9 +93,9 @@ Subset of "pred", "obs", "pd". Not vectorized over <code>x</code>.</p></dd>
 <dt id="arg-eval-at-center">eval_at_center<a class="anchor" aria-label="anchor" href="#arg-eval-at-center"></a></dt>
 <dd><p>If <code>FALSE</code> (default), the points are aligned with (weighted)
 average X values per bin. If <code>TRUE</code>, the points are aligned with bar centers.
-Since categoricals are always evaluated at bar centers, this only affects numerics.
-Note that partial dependence of numeric X is always evaluated at bar means, not
-centers. Vectorized over <code>x</code>.</p></dd>
+Since categorical X are always evaluated at bar centers, this only affects
+numeric X. Note that partial dependence of numeric X is always evaluated at
+bar means, not centers. Vectorized over <code>x</code>.</p></dd>
 
 
 <dt id="arg-collapse-m">collapse_m<a class="anchor" aria-label="anchor" href="#arg-collapse-m"></a></dt>
@@ -108,11 +107,6 @@ By default <code>Inf</code> (no collapsing). Vectorized over <code>x</code>.</p>
 <dt id="arg-drop-below-n">drop_below_n<a class="anchor" aria-label="anchor" href="#arg-drop-below-n"></a></dt>
 <dd><p>Drop bins with exposure below this value. Applied after the
 effect of <code>collapse_m</code>. Vectorized over <code>x</code>.</p></dd>
-
-
-<dt id="arg-explicit-na">explicit_na<a class="anchor" aria-label="anchor" href="#arg-explicit-na"></a></dt>
-<dd><p>Should <code>NA</code> levels be converted to strings?
-Only for categorical X variables. Vectorized over <code>x</code>.</p></dd>
 
 
 <dt id="arg-na-rm">na.rm<a class="anchor" aria-label="anchor" href="#arg-na-rm"></a></dt>
