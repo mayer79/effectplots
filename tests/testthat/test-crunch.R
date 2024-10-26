@@ -80,19 +80,18 @@ test_that("poor_man_stack() works (test could be improved)", {
   expect_error(poor_man_stack(cbind(a = 1:3, b = 2:4), to_stack = "b"))
 })
 
-test_that("Test that grouped_mean() uses sort(unique) + NA as order", {
-  f <- c("b", "c", "c", NA, "a", "b")
+test_that("Test that grouped_stats() uses sort(funique) + NA as order", {
+  f1 <- c("b", "c", "c", NA, "a", "b")
   ff <- list(
-    fact = factor(f, levels = c("c", "b", "a")),
+    fact = factor(f1, levels = c("c", "b", "a")),
     float = c(3, 3, 1, 2, NA, 2),
     int = c(3L, 3L, 1L, 2L, NA, 2L),
     logi = c(TRUE, FALSE, FALSE, FALSE, NA, TRUE),
-    char = f
+    char = f1
   )
   for (f in ff) {
-    out <- rownames(grouped_mean(cbind(1:6), g = f))
-    expect_equal(out, as.character(sort(unique(f), na.last = TRUE)))
+    out <- rownames(grouped_stats(cbind(1:6), g = f))
+    expect_equal(out, as.character(sort(collapse::funique(f), na.last = TRUE)))
   }
 })
-
 

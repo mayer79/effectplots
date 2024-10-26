@@ -32,6 +32,7 @@ use_description(
   roxygen = TRUE
 )
 
+use_package("collapse", "Imports")
 use_package("ggplot2", "Imports")
 use_package("grDevices", "Imports")
 use_package("patchwork", "Imports")

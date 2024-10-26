@@ -6,6 +6,7 @@
 #' - partial dependence, and
 #' - counts/weights
 #' over (possibly binned) features X specified by their column names `v`.
+#' Besides averages, it calculates standard deviations of observed and predicted values.
 #'
 #' For numeric variables with more than `discrete_m = 2` disjoint values,
 #' the same binning options (specified by `breaks`) are available as in
@@ -289,16 +290,21 @@ calculate_stats <- function(
     x <- wins_prob(x, probs = c(wprob_low, wprob_high), nmax = 1e5)
   }
 
-  g <- unique(x)  # Could be avoided for factors - but would need to keep track of NA
+  # {collapse} seems to distinguish positive and negative double zeros
+  # https://github.com/SebKrantz/collapse/issues/648
+  # Adding 0 to a double turns negative 0 to positive ones (ISO/IEC 60559)
+  if (is.double(x)) {
+    x <- x + 0.0
+  }
+  g <- funique(x)
 
   # DISCRETE
   if (!is.numeric(x) || length(g) <= discrete_m) {
     num <- FALSE
     # Ordered by sort(g) (+ NA). For factors, this equals levels(g) (+ NA)
-    M <- grouped_mean(cbind(pred = pred, obs = y), g = x, w = w)
-    # S <- grouped_sd(cbind(pred = pred, obs = y), g = x, M = M, w = w)
+    S <- grouped_stats(cbind(pred = pred, obs = y), g = x, w = w)
     g <- sort(g, na.last = TRUE)
-    out <- data.frame(bar_at = g, bar_width = 0.7, eval_at = g, M)
+    out <- data.frame(bar_at = g, bar_width = 0.7, eval_at = g, S)
     rownames(out) <- NULL
   } else {
     # "CONTINUOUS" case. Tricky because there can be empty bins.
@@ -310,7 +316,7 @@ calculate_stats <- function(
     if (anyNA(x)) {
       g <- c(g, NA)
       gix <- c(gix, NA)
-      bar_width <- c(bar_width, NA)
+      bar_width <- c(bar_width, NA)  #  Can't be plotted anyway
     }
     out <- data.frame(bar_at = g, bar_width = bar_width, eval_at = g, exposure = 0)
 
@@ -318,8 +324,10 @@ calculate_stats <- function(
     ix <- findInterval(
       x, vec = H$breaks, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
     )
-    M <- grouped_mean(cbind(eval_at = x, pred = pred, obs = y), g = ix, w = w)
-    # M <- cbind(M, grouped_sd(cbind(pred = pred, obs = y), g = ix, M = M, w = w))
+    M <- cbind(
+      eval_at = collapse::fmean.default(x, g = ix, w = w),
+      grouped_stats(cbind(pred = pred, obs = y), g = ix, w = w)
+    )
     reindex <- match(as.integer(rownames(M)), gix)
     out[reindex, colnames(M)] <- M  # Fill gaps
   }
