@@ -62,7 +62,9 @@ grouped_sd <- function(x, g, M, w = NULL) {
   if (NCOL(x) == 0L) {
     return(NULL)
   }
-  z <- (x - M[match(g, rownames(M)), colnames(x)])^2
+  MM <- M[match(g, rownames(M)), colnames(x)]  # slow for large data
+  # MM <- M[g]
+  z <- (x - MM)^2
   colnames(z) <- paste0(colnames(z), "_sd")
   if (!is.null(w)) {
     z <- z * w
