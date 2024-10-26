@@ -6,8 +6,6 @@
 #' - partial dependence, and
 #' - counts/weights
 #' over (possibly binned) features X specified by their column names `v`.
-#' Furthermore, standard deviations (without -1 in the denominator) are calculated
-#' for observed and predicted values.
 #'
 #' For numeric variables with more than `discrete_m = 2` disjoint values,
 #' the same binning options (specified by `breaks`) are available as in
