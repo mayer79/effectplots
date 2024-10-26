@@ -32,6 +32,7 @@ use_description(
   roxygen = TRUE
 )
 
+use_package("collapse", "Imports")
 use_package("ggplot2", "Imports")
 use_package("grDevices", "Imports")
 use_package("patchwork", "Imports")
@@ -74,7 +75,7 @@ use_github_links() # use this if this project is on github
 library(devtools)
 
 document()
-# test()
+test()
 check(manual = TRUE, cran = TRUE)
 build()
 # build(binary = TRUE)

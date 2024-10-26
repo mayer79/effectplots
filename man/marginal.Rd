@@ -124,6 +124,7 @@ This is the main function of the package. It calculates
 \item partial dependence, and
 \item counts/weights
 over (possibly binned) features X specified by their column names \code{v}.
+Besides averages, it calculates standard deviations of observed and predicted values.
 }
 }
 \details{

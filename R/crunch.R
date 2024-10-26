@@ -42,35 +42,47 @@ poor_man_stack <- function(data, to_stack) {
   transform(out, varying_ = factor(varying_, levels = to_stack))
 }
 
-grouped_mean <- function(x, g, w = NULL) {
-  if (is.null(w)) {
-    w <- rep.int(1, length(g))
-  } else if (!is.null(x)) {
-    x <- x * w
-  }
-  suppressWarnings(exposure <- rowsum(w, group = g))  # silence warning about missings
-  colnames(exposure) <- "exposure"
+grouped_stats <- function(x, g, w = NULL) {
+  W <- collapse::fsum.default(rep.int(1, times = length(g)), g = g, w = w)
   if (is.null(x)) {
-    return(exposure)
+    return(cbind(exposure = W))
   }
-  suppressWarnings(S <- rowsum(x, group = g))         # silence warning about missings
-  cbind(exposure, S / as.numeric(exposure))
+  M <- collapse::fmean.matrix(x, g = g, w = w, use.g.names = FALSE)
+  S <- collapse::fsd.matrix(x, g = g, w = w, use.g.names = FALSE)
+  colnames(S) <- paste0(colnames(S), "_sd")
+  cbind(exposure = W, M, S)
 }
 
-# ML estimate of sd. M is the result of grouped_mean(). Currently unused as too slow
-grouped_sd <- function(x, g, M, w = NULL) {
-  if (NCOL(x) == 0L) {
-    return(NULL)
-  }
-  MM <- M[match(g, rownames(M)), colnames(x)]  # slow for large data
-  # MM <- M[g]
-  z <- (x - MM)^2
-  colnames(z) <- paste0(colnames(z), "_sd")
-  if (!is.null(w)) {
-    z <- z * w
-  }
-  sqrt(rowsum(z, group = g) / M[, "exposure"])
-}
+# Grouped stats without {collapse}
+# grouped_mean <- function(x, g, w = NULL) {
+#   if (is.null(w)) {
+#     w <- rep.int(1, length(g))
+#   } else if (!is.null(x)) {
+#     x <- x * w
+#   }
+#   suppressWarnings(exposure <- rowsum(w, group = g))  # silence warning about missings
+#   colnames(exposure) <- "exposure"
+#   if (is.null(x)) {
+#     return(exposure)
+#   }
+#   suppressWarnings(S <- rowsum(x, group = g))         # silence warning about missings
+#   cbind(exposure, S / as.numeric(exposure))
+# }
+#
+# # ML estimate of sd. M is the result of grouped_mean(). Currently unused as too slow
+# grouped_sd <- function(x, g, M, w = NULL) {
+#   if (NCOL(x) == 0L) {
+#     return(NULL)
+#   }
+#   MM <- M[match(g, rownames(M)), colnames(x)]  # slow for large data
+#   # MM <- M[g]
+#   z <- (x - MM)^2
+#   colnames(z) <- paste0(colnames(z), "_sd")
+#   if (!is.null(w)) {
+#     z <- z * w
+#   }
+#   sqrt(rowsum(z, group = g) / M[, "exposure"])
+# }
 
 wrowmean <- function(x, ngroups = 1L, w = NULL) {
   dim(x) <- c(length(x) %/% ngroups, ngroups)
