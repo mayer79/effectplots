@@ -57,6 +57,19 @@ grouped_mean <- function(x, g, w = NULL) {
   cbind(exposure, S / as.numeric(exposure))
 }
 
+# ML estimate of sd. M is the result of grouped_mean(). Currently unused as too slow
+grouped_sd <- function(x, g, M, w = NULL) {
+  if (NCOL(x) == 0L) {
+    return(NULL)
+  }
+  z <- (x - M[match(g, rownames(M)), colnames(x)])^2
+  colnames(z) <- paste0(colnames(z), "_sd")
+  if (!is.null(w)) {
+    z <- z * w
+  }
+  sqrt(rowsum(z, group = g) / M[, "exposure"])
+}
+
 wrowmean <- function(x, ngroups = 1L, w = NULL) {
   dim(x) <- c(length(x) %/% ngroups, ngroups)
   if (is.null(w)) colMeans(x) else colSums(x * w) / sum(w)

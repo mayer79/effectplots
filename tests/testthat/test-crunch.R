@@ -80,7 +80,7 @@ test_that("poor_man_stack() works (test could be improved)", {
   expect_error(poor_man_stack(cbind(a = 1:3, b = 2:4), to_stack = "b"))
 })
 
-test_that("Test that rowsum() uses sort(unique) + NA as order", {
+test_that("Test that grouped_mean() uses sort(unique) + NA as order", {
   f <- c("b", "c", "c", NA, "a", "b")
   ff <- list(
     fact = factor(f, levels = c("c", "b", "a")),
@@ -90,7 +90,7 @@ test_that("Test that rowsum() uses sort(unique) + NA as order", {
     char = f
   )
   for (f in ff) {
-    suppressWarnings(out <- rownames(rowsum(cbind(1:6), g = f)))
+    out <- rownames(grouped_mean(cbind(1:6), g = f))
     expect_equal(out, as.character(sort(unique(f), na.last = TRUE)))
   }
 })

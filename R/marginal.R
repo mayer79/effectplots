@@ -6,6 +6,8 @@
 #' - partial dependence, and
 #' - counts/weights
 #' over (possibly binned) features X specified by their column names `v`.
+#' Furthermore, standard deviations (without -1 in the denominator) are calculated
+#' for observed and predicted values.
 #'
 #' For numeric variables with more than `discrete_m = 2` disjoint values,
 #' the same binning options (specified by `breaks`) are available as in
@@ -295,25 +297,33 @@ calculate_stats <- function(
   if (!is.numeric(x) || length(g) <= discrete_m) {
     num <- FALSE
     # Ordered by sort(g) (+ NA). For factors, this equals levels(g) (+ NA)
-    S <- grouped_mean(cbind(pred = pred, obs = y), g = x, w = w)
+    M <- grouped_mean(cbind(pred = pred, obs = y), g = x, w = w)
+    # S <- grouped_sd(cbind(pred = pred, obs = y), g = x, M = M, w = w)
     g <- sort(g, na.last = TRUE)
-    out <- data.frame(bar_at = g, bar_width = 0.7, eval_at = g, S)
+    out <- data.frame(bar_at = g, bar_width = 0.7, eval_at = g, M)
     rownames(out) <- NULL
-  } else {  # "CONTINUOUS"
+  } else {
+    # "CONTINUOUS" case. Tricky because there can be empty bins.
     num <- TRUE
     H <- hist2(x, breaks = breaks)
     g <- H$mids
+    gix <- seq_along(g)
+    bar_width <- diff(H$breaks)
     if (anyNA(x)) {
       g <- c(g, NA)
+      gix <- c(gix, NA)
+      bar_width <- c(bar_width, NA)
     }
-    out <- data.frame(bar_at = g, bar_width = diff(H$breaks), eval_at = g, exposure = 0)
+    out <- data.frame(bar_at = g, bar_width = bar_width, eval_at = g, exposure = 0)
 
     # Integer encoding
     ix <- findInterval(
       x, vec = H$breaks, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
     )
-    S <- grouped_mean(cbind(eval_at = x, pred = pred, obs = y), g = ix, w = w)
-    out[rownames(S), colnames(S)] <- S
+    M <- grouped_mean(cbind(eval_at = x, pred = pred, obs = y), g = ix, w = w)
+    # M <- cbind(M, grouped_sd(cbind(pred = pred, obs = y), g = ix, M = M, w = w))
+    reindex <- match(as.integer(rownames(M)), gix)
+    out[reindex, colnames(M)] <- M  # Fill gaps
   }
 
   # Add partial dependence
