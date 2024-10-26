@@ -82,7 +82,7 @@
 <p>The workflow is as follows:</p>
 <ol style="list-style-type: decimal">
 <li>Crunch values via <code><a href="reference/marginal.html">marginal()</a></code> or the convenience wrappers <code><a href="reference/average_observed.html">average_observed()</a></code> and <code><a href="reference/partial_dependence.html">partial_dependence()</a></code>.</li>
-<li>Post-process the results with <code><a href="reference/postprocess.html">postprocess()</a></code>, e.g., to collapse rare levels of a categorical feature.</li>
+<li>Post-process the results with <code><a href="reference/postprocess.html">postprocess()</a></code>, e.g., to collapse rare levels of categorical features.</li>
 <li>Plot the results with <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>.</li>
 </ol>
 <p><strong>Notes</strong></p>
@@ -92,7 +92,7 @@
 <li>Most models (including DALEX explainers and meta-learners such as Tidymodels) work out-of-the box. If not, a tailored prediction function can be specified.</li>
 <li>For multi-output models, the last output is picked.</li>
 <li>Case weights are supported via the argument <code>w</code>.</li>
-<li>Binning of numeric features is done by the same options as <code>stats::hist()</code>. Additionally, very small and large values are winsorized (clipped) by default.</li>
+<li>Binning of numeric features is done by the same options as <code>stats::hist()</code>. Additionally, the smallest and largest 1% values are winsorized (clipped) by default.</li>
 </ul>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -105,7 +105,7 @@
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
-<p>We use a synthetic dataset with 1 Mio rows containing information on Motor TPL insurance policies and claims. The aim is to model claim frequency as a function of features like “driver_age” and “car_power”.</p>
+<p>We use synthetic data with 1 Mio rows containing information on Motor TPL insurance policies and claims. The aim is to model claim frequency as a function of features like “driver_age” and “car_power”.</p>
 <p>Before modeling, we want to study how the average response is associated with feature values.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/openml/openml-r" class="external-link">OpenML</a></span><span class="op">)</span></span>
@@ -123,11 +123,11 @@
 <span>  <span class="fu"><a href="reference/postprocess.html">postprocess</a></span><span class="op">(</span>sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span>share_y <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/avg_obs.svg"></p>
-<p>The plots have been automatically sorted by decreasing (exposure-weighted) variance of the average observed values. Using a shared y axis helps to compare the strength of the association.</p>
+<p>The plots have been automatically sorted by decreasing (exposure-weighted) variance of the average observed values. A shared y axis helps to compare the strength of the association across features.</p>
 <div class="section level3">
 <h3 id="fit-model">Fit model<a class="anchor" aria-label="anchor" href="#fit-model"></a>
 </h3>
-<p>Now, after having studied the data, we are ready to fit a boosted trees model. Note that hyper-parameters have been tuned outside this notebook via cross-validation over the training data.</p>
+<p>Next, let’s fit a boosted trees model.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># Data splits</span></span>
 <span><span class="va">ix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span>, <span class="fl">0.8</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span><span class="op">)</span></span>
@@ -169,7 +169,7 @@
 <p><strong>Comments</strong></p>
 <ol style="list-style-type: decimal">
 <li>Comparing average predicted with average observed values gives a hint about bias. In this case, the bias on the test data seems to be small. Studying the same plot on the training data would help to assess in-sample bias.</li>
-<li>Comparing the shape of the partial dependence curve with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors “driver_age” and “car_power”, the two lines are very similar. This means the marginal effect is really coming from the feature in question (and not of some other, correlated, feature).</li>
+<li>Comparing the shape of the partial dependence curve with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors “driver_age” and “car_power”, the two lines are very similar. This means the marginal effects are mainly due to the feature on the x-axis (and not of some other, correlated, feature).</li>
 <li>Sorting is done by decreasing exposure weighted variance of the partial dependence values.</li>
 </ol>
 </div>
