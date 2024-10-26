@@ -78,7 +78,8 @@ postprocess_one <- function(
 
   if (!is.null(drop_stats)) {
     stopifnot(drop_stats %in% all_stats)
-    x <- x[setdiff(colnames(x), drop_stats)]
+    # If "pd" in drop_stats, we also drop the non-existent pd_sd
+    x <- x[setdiff(colnames(x), c(drop_stats, paste0(drop_stats, "_sd")))]
   }
 
   if (num) {

@@ -296,7 +296,7 @@ calculate_stats <- function(
   if (is.double(x)) {
     x <- x + 0.0
   }
-  g <- funique(x)
+  g <- collapse::funique(x)
 
   # DISCRETE
   if (!is.numeric(x) || length(g) <= discrete_m) {
