@@ -274,6 +274,17 @@ plot_marginal_plotly <- function(
     scatter_mode <-  "lines+markers"
   }
 
+  # Deal with NAs in categorical X
+  if (!num && anyNA(x$bar_at)) {
+    lvl <- levels(x$bar_at)
+    if ("NA" %in% lvl) {
+      warning("Can't show NA level on x axis because there is already a level 'NA'")
+    } else {
+      levels(x$bar_at) <- levels(x$eval_at) <- c(lvl, "NA")
+      x[is.na(x$bar_at), c("bar_at", "eval_at")] <- "NA"
+    }
+  }
+
   fig <- plotly::plot_ly()
 
   if (scale_exposure > 0) {

@@ -11,7 +11,6 @@ postprocess(
   eval_at_center = FALSE,
   collapse_m = Inf,
   drop_below_n = 0,
-  explicit_na = TRUE,
   na.rm = FALSE
 )
 }
@@ -28,9 +27,9 @@ Subset of "pred", "obs", "pd". Not vectorized over \code{x}.}
 
 \item{eval_at_center}{If \code{FALSE} (default), the points are aligned with (weighted)
 average X values per bin. If \code{TRUE}, the points are aligned with bar centers.
-Since categoricals are always evaluated at bar centers, this only affects numerics.
-Note that partial dependence of numeric X is always evaluated at bar means, not
-centers. Vectorized over \code{x}.}
+Since categorical X are always evaluated at bar centers, this only affects
+numeric X. Note that partial dependence of numeric X is always evaluated at
+bar means, not centers. Vectorized over \code{x}.}
 
 \item{collapse_m}{If a categorical X has more than \code{collapse_m} levels,
 low exposure levels are collapsed into a new level "Other".
@@ -38,9 +37,6 @@ By default \code{Inf} (no collapsing). Vectorized over \code{x}.}
 
 \item{drop_below_n}{Drop bins with exposure below this value. Applied after the
 effect of \code{collapse_m}. Vectorized over \code{x}.}
-
-\item{explicit_na}{Should \code{NA} levels be converted to strings?
-Only for categorical X variables. Vectorized over \code{x}.}
 
 \item{na.rm}{Should \code{NA} levels in X be dropped?}
 }
