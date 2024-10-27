@@ -20,10 +20,11 @@ wins_iqr <- function(x, m = 1.5, nmax = 10000L) {
 # pmin() and pmax() are surprisingly fast for large vectors
 # and need less memory than subsetting
 winsorize <- function(x, low = -Inf, high = Inf) {
-  if (is.finite(low)) {
+  r <- collapse::.range(x, na.rm = TRUE)
+  if (r[1L] < low) {
     x <- pmax(x, low)
   }
-  if (is.finite(high)) pmin(x, high) else x
+  if (r[2L] > high) pmin(x, high) else x
 }
 
 #' Stack some Columns (from hstats)
