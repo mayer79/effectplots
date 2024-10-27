@@ -55,7 +55,6 @@ library(marginalplot)
 set.seed(1)
 
 df <- getOMLDataSet(data.id = 45106L)$data
-df[] <- lapply(df, as.integer)
 
 xvars <- c("year", "town", "driver_age", "car_weight", "car_power", "car_age")
 
@@ -110,7 +109,7 @@ After modeling, we use the test (or validation) data to crunch average observed,
 # 0.4 second on laptop
 marginal(fit, v = xvars, data = X_test, y = test$claim_nb) |>
   postprocess(sort = TRUE) |> 
-  plot(share_y = TRUE)
+  plot()
 ```
 
 ![](man/figures/marginal.svg)
