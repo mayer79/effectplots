@@ -118,7 +118,7 @@
 <span></span>
 <span><span class="va">xvars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"year"</span>, <span class="st">"town"</span>, <span class="st">"driver_age"</span>, <span class="st">"car_weight"</span>, <span class="st">"car_power"</span>, <span class="st">"car_age"</span><span class="op">)</span></span>
 <span></span>
-<span><span class="co"># 0.5 seconds on laptop</span></span>
+<span><span class="co"># 0.4s on laptop</span></span>
 <span><span class="fu"><a href="reference/average_observed.html">average_observed</a></span><span class="op">(</span><span class="va">xvars</span>, data <span class="op">=</span> <span class="va">df</span>, y <span class="op">=</span> <span class="st">"claim_nb"</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/postprocess.html">postprocess</a></span><span class="op">(</span>sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span>share_y <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
@@ -161,7 +161,7 @@
 </h3>
 <p>After modeling, we use the test (or validation) data to crunch average observed, average predicted, and partial dependence per feature values/bins to gain insights about the model. Calculations are lightning fast.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># 0.4 second on laptop</span></span>
+<code class="sourceCode R"><span><span class="co"># 0.5s on laptop</span></span>
 <span><span class="fu"><a href="reference/marginal.html">marginal</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">X_test</span>, y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">claim_nb</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="reference/postprocess.html">postprocess</a></span><span class="op">(</span>sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
