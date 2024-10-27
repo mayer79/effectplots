@@ -33,7 +33,8 @@
 #' @param right Should bins created via [graphics::hist()] be right-closed?
 #'   The default is `TRUE`. Vectorized over `v`. Only relevant for numeric X.
 #' @param discrete_m Numeric X variables with up to this number of unique values
-#'   should not be binned. The default is 2. Vectorized over `v`.
+#'   should not be binned and treated as a factor (after calculating partial dependence)
+#'   The default is 5. Vectorized over `v`.
 #' @param outlier_iqr Outliers of a numeric X are capped via the boxplot rule, i.e.,
 #'   outside `outlier_iqr` * IQR from the quartiles. The default is 2 is more
 #'   conservative than the usual rule to account for right-skewed distributions.
@@ -74,7 +75,7 @@ marginal.default <- function(
     w = NULL,
     breaks = "Sturges",
     right = TRUE,
-    discrete_m = 2L,
+    discrete_m = 5L,
     outlier_iqr = 2,
     calc_pred = TRUE,
     pd_n = 500L,
@@ -175,7 +176,7 @@ marginal.ranger <- function(
     w = NULL,
     breaks = "Sturges",
     right = TRUE,
-    discrete_m = 2L,
+    discrete_m = 5L,
     outlier_iqr = 2,
     calc_pred = TRUE,
     pd_n = 500L,
@@ -216,7 +217,7 @@ marginal.explainer <- function(
   w = object[["weights"]],
   breaks = "Sturges",
   right = TRUE,
-  discrete_m = 2L,
+  discrete_m = 5L,
   outlier_iqr = 2,
   calc_pred = TRUE,
   pd_n = 500L,

@@ -31,7 +31,7 @@ partial_dependence.default <- function(
     w = NULL,
     breaks = "Sturges",
     right = TRUE,
-    discrete_m = 2L,
+    discrete_m = 5L,
     outlier_iqr = 2,
     pd_n = 500L,
     ...
@@ -63,7 +63,7 @@ partial_dependence.ranger <- function(
     w = NULL,
     breaks = "Sturges",
     right = TRUE,
-    discrete_m = 2L,
+    discrete_m = 5L,
     outlier_iqr = 2,
     pd_n = 500L,
     ...
@@ -98,7 +98,7 @@ partial_dependence.explainer <- function(
     w = object[["weights"]],
     breaks = "Sturges",
     right = TRUE,
-    discrete_m = 2L,
+    discrete_m = 5L,
     outlier_iqr = 2,
     pd_n = 500L,
     ...

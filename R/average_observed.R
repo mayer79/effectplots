@@ -20,7 +20,7 @@ average_observed <- function(
     w = NULL,
     breaks = "Sturges",
     right = TRUE,
-    discrete_m = 2L,
+    discrete_m = 5L,
     outlier_iqr = 2,
     ...
 ) {
