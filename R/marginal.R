@@ -9,8 +9,8 @@
 #'
 #' For numeric variables with more than `discrete_m = 2` disjoint values,
 #' the same binning options (specified by `breaks`) are available as in
-#' [graphics::hist()]. Before calculating bins, outliers are capped (not removed) via
-#' the boxplot rule. For more conservative capping, increase `outlier_iqr = 1.5`.
+#' [graphics::hist()]. Before calculating bins, outliers are capped via modified boxplot
+#' rule using an IQR factor `outlier_iqr = 2` instead of 1.5.
 #'
 #' Note that partial dependence of numeric features is evaluated at (possibly weighted)
 #' bin means, i.e., not at the bin center.
@@ -34,10 +34,11 @@
 #'   The default is `TRUE`. Vectorized over `v`. Only relevant for numeric X.
 #' @param discrete_m Numeric X variables with up to this number of unique values
 #'   should not be binned. The default is 2. Vectorized over `v`.
-#' @param outlier_iqr Numeric X are capped via the boxplot rule, i.e., outside
-#'   `outlier_iqr` * IQR from the quartiles. The default is 1.5.
-#'   Set to 0 or `Inf` for no capping. Note that at most 10k observations
-#'   are sampled to calculate quartiles (uses random seed). Vectorized over `v`.
+#' @param outlier_iqr Outliers of a numeric X are capped via the boxplot rule, i.e.,
+#'   outside `outlier_iqr` * IQR from the quartiles. The default is 2 is more
+#'   conservative than the usual rule to account for right-skewed distributions.
+#'   Set to 0 or `Inf` for no capping. Note that at most 10k observations are sampled
+#'   to calculate quartiles (uses random seed). Vectorized over `v`.
 #' @param calc_pred Should predictions be calculated? Default is `TRUE`. Only relevant
 #'   if `pred = NULL`.
 #' @param pd_n Size of the data used for calculating partial dependence.
@@ -74,7 +75,7 @@ marginal.default <- function(
     breaks = "Sturges",
     right = TRUE,
     discrete_m = 2L,
-    outlier_iqr = 1.5,
+    outlier_iqr = 2,
     calc_pred = TRUE,
     pd_n = 500L,
     ...
@@ -175,7 +176,7 @@ marginal.ranger <- function(
     breaks = "Sturges",
     right = TRUE,
     discrete_m = 2L,
-    outlier_iqr = 1.5,
+    outlier_iqr = 2,
     calc_pred = TRUE,
     pd_n = 500L,
     ...
@@ -216,7 +217,7 @@ marginal.explainer <- function(
   breaks = "Sturges",
   right = TRUE,
   discrete_m = 2L,
-  outlier_iqr = 1.5,
+  outlier_iqr = 2,
   calc_pred = TRUE,
   pd_n = 500L,
   ...

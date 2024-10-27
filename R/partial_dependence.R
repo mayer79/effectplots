@@ -32,7 +32,7 @@ partial_dependence.default <- function(
     breaks = "Sturges",
     right = TRUE,
     discrete_m = 2L,
-    outlier_iqr = 1.5,
+    outlier_iqr = 2,
     pd_n = 500L,
     ...
 ) {
@@ -64,7 +64,7 @@ partial_dependence.ranger <- function(
     breaks = "Sturges",
     right = TRUE,
     discrete_m = 2L,
-    outlier_iqr = 1.5,
+    outlier_iqr = 2,
     pd_n = 500L,
     ...
 ) {
@@ -99,7 +99,7 @@ partial_dependence.explainer <- function(
     breaks = "Sturges",
     right = TRUE,
     discrete_m = 2L,
-    outlier_iqr = 1.5,
+    outlier_iqr = 2,
     pd_n = 500L,
     ...
 ) {

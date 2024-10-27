@@ -12,7 +12,7 @@ average_observed(
   breaks = "Sturges",
   right = TRUE,
   discrete_m = 2L,
-  outlier_iqr = 1.5,
+  outlier_iqr = 2,
   ...
 )
 }
@@ -37,10 +37,11 @@ The default is \code{TRUE}. Vectorized over \code{v}. Only relevant for numeric 
 \item{discrete_m}{Numeric X variables with up to this number of unique values
 should not be binned. The default is 2. Vectorized over \code{v}.}
 
-\item{outlier_iqr}{Numeric X are capped via the boxplot rule, i.e., outside
-\code{outlier_iqr} * IQR from the quartiles. The default is 1.5.
-Set to 0 or \code{Inf} for no capping. Note that at most 10k observations
-are sampled to calculate quartiles (uses random seed). Vectorized over \code{v}.}
+\item{outlier_iqr}{Outliers of a numeric X are capped via the boxplot rule, i.e.,
+outside \code{outlier_iqr} * IQR from the quartiles. The default is 2 is more
+conservative than the usual rule to account for right-skewed distributions.
+Set to 0 or \code{Inf} for no capping. Note that at most 10k observations are sampled
+to calculate quartiles (uses random seed). Vectorized over \code{v}.}
 
 \item{...}{Currently unused.}
 }
