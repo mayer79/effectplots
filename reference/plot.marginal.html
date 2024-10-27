@@ -61,7 +61,7 @@ You can switch to plotly by setting <code>backend = "plotly"</code>.</p>
 <span>  ncols <span class="op">=</span> <span class="fl">2L</span>,</span>
 <span>  share_y <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  scale_exposure <span class="op">=</span> <span class="fl">1</span>,</span>
+<span>  scale_bars <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  cat_lines <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  num_points <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"marginalplot.colors"</span><span class="op">)</span>,</span>
@@ -96,8 +96,8 @@ No effect if <code>ylim</code> is passed. Only if <code>length(x) &gt; 1</code> 
 <dd><p>Manual y axis range.</p></dd>
 
 
-<dt id="arg-scale-exposure">scale_exposure<a class="anchor" aria-label="anchor" href="#arg-scale-exposure"></a></dt>
-<dd><p>Vertical scaling of the exposure bars (between 0 and 1).
+<dt id="arg-scale-bars">scale_bars<a class="anchor" aria-label="anchor" href="#arg-scale-bars"></a></dt>
+<dd><p>Vertical scaling of the bars (between 0 and 1).
 The default is 1. Set to 0 for no bars. With "plotly", values between 0 and 1 are
 currently not possible.</p></dd>
 

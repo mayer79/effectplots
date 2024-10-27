@@ -66,7 +66,7 @@ This function is a convenience wrapper around <code><a href="marginal.html">marg
 <span>  w <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  breaks <span class="op">=</span> <span class="st">"Sturges"</span>,</span>
 <span>  right <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  discrete_m <span class="op">=</span> <span class="fl">2L</span>,</span>
+<span>  discrete_m <span class="op">=</span> <span class="fl">5L</span>,</span>
 <span>  outlier_iqr <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  pd_n <span class="op">=</span> <span class="fl">500L</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -81,7 +81,7 @@ This function is a convenience wrapper around <code><a href="marginal.html">marg
 <span>  w <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  breaks <span class="op">=</span> <span class="st">"Sturges"</span>,</span>
 <span>  right <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  discrete_m <span class="op">=</span> <span class="fl">2L</span>,</span>
+<span>  discrete_m <span class="op">=</span> <span class="fl">5L</span>,</span>
 <span>  outlier_iqr <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  pd_n <span class="op">=</span> <span class="fl">500L</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -96,7 +96,7 @@ This function is a convenience wrapper around <code><a href="marginal.html">marg
 <span>  w <span class="op">=</span> <span class="va">object</span><span class="op">[[</span><span class="st">"weights"</span><span class="op">]</span><span class="op">]</span>,</span>
 <span>  breaks <span class="op">=</span> <span class="st">"Sturges"</span>,</span>
 <span>  right <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  discrete_m <span class="op">=</span> <span class="fl">2L</span>,</span>
+<span>  discrete_m <span class="op">=</span> <span class="fl">5L</span>,</span>
 <span>  outlier_iqr <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  pd_n <span class="op">=</span> <span class="fl">500L</span>,</span>
 <span>  <span class="va">...</span></span>
@@ -147,7 +147,8 @@ The default is <code>TRUE</code>. Vectorized over <code>v</code>. Only relevant 
 
 <dt id="arg-discrete-m">discrete_m<a class="anchor" aria-label="anchor" href="#arg-discrete-m"></a></dt>
 <dd><p>Numeric X variables with up to this number of unique values
-should not be binned. The default is 2. Vectorized over <code>v</code>.</p></dd>
+should not be binned and treated as a factor (after calculating partial dependence)
+The default is 5. Vectorized over <code>v</code>.</p></dd>
 
 
 <dt id="arg-outlier-iqr">outlier_iqr<a class="anchor" aria-label="anchor" href="#arg-outlier-iqr"></a></dt>

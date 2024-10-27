@@ -64,7 +64,7 @@ length as <code>x</code>.</p>
 <span>  sort <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  drop_stats <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  eval_at_center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  collapse_m <span class="op">=</span> <span class="cn">Inf</span>,</span>
+<span>  collapse_m <span class="op">=</span> <span class="fl">30L</span>,</span>
 <span>  drop_below_n <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -80,9 +80,9 @@ length as <code>x</code>.</p>
 
 <dt id="arg-sort">sort<a class="anchor" aria-label="anchor" href="#arg-sort"></a></dt>
 <dd><p>Should <code>x</code> be sorted in decreasing order of feature importance?
-Importance is measured by the exposure weighted variance of the most
+Importance is measured by the weighted variance of the most
 relevant available statistic (pd &gt; pred &gt; obs). The default is <code>FALSE</code>.
-Importance is calculated after the other postprocessing steps.</p></dd>
+Importance is calculated after the other postprocessings.</p></dd>
 
 
 <dt id="arg-drop-stats">drop_stats<a class="anchor" aria-label="anchor" href="#arg-drop-stats"></a></dt>
@@ -100,12 +100,12 @@ bar means, not centers. Vectorized over <code>x</code>.</p></dd>
 
 <dt id="arg-collapse-m">collapse_m<a class="anchor" aria-label="anchor" href="#arg-collapse-m"></a></dt>
 <dd><p>If a categorical X has more than <code>collapse_m</code> levels,
-low exposure levels are collapsed into a new level "Other".
-By default <code>Inf</code> (no collapsing). Vectorized over <code>x</code>.</p></dd>
+rare levels are collapsed into a new level "Other".
+By default 30. Set to <code>Inf</code> for no collapsing. Vectorized over <code>x</code>.</p></dd>
 
 
 <dt id="arg-drop-below-n">drop_below_n<a class="anchor" aria-label="anchor" href="#arg-drop-below-n"></a></dt>
-<dd><p>Drop bins with exposure below this value. Applied after the
+<dd><p>Drop bins with weight below this value. Applied after the
 effect of <code>collapse_m</code>. Vectorized over <code>x</code>.</p></dd>
 
 
@@ -125,7 +125,7 @@ effect of <code>collapse_m</code>. Vectorized over <code>x</code>.</p></dd>
 <span class="r-in"><span><span class="fu"><a href="marginal.html">marginal</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">iris</span>, y <span class="op">=</span> <span class="st">"Sepal.Length"</span>, breaks <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu">postprocess</span><span class="op">(</span>sort <span class="op">=</span> <span class="cn">TRUE</span>, eval_at_center <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span>num_points <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
-<span class="r-msg co"><span class="r-pr">#&gt;</span> Importance via exposure weighted variance of 'pd'</span>
+<span class="r-msg co"><span class="r-pr">#&gt;</span> Importance via weighted variance of 'pd'</span>
 <span class="r-plt img"><img src="postprocess-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
