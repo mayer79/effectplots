@@ -66,65 +66,28 @@ postprocess <- function(
 }
 
 postprocess_one <- function(
-  x,
-  drop_stats,
-  collapse_m,
-  eval_at_center,
-  drop_below_n,
-  na.rm
+    x, drop_stats, collapse_m, eval_at_center, drop_below_n, na.rm
 ) {
   num <- is.numeric(x$eval_at)
-  all_stats <- c("pred", "obs", "pd")
 
   if (!is.null(drop_stats)) {
-    stopifnot(drop_stats %in% all_stats)
-    # If "pd" in drop_stats, we also drop the non-existent pd_sd
+    stopifnot(drop_stats %in% c("pred", "obs", "pd"))
+    # We also drop the (non-existent) pd_sd
     x <- x[setdiff(colnames(x), c(drop_stats, paste0(drop_stats, "_sd")))]
   }
-
-  if (num) {
-    if (isTRUE(eval_at_center)) {
-      x$eval_at <- x$bar_at
-    }
+  if (num && isTRUE(eval_at_center)) {
+    x$eval_at <- x$bar_at
   }
-
-  if (!num) {
-    if (collapse_m < nrow(x)) {
-      x_list <- split(x, order(x$N, decreasing = TRUE) < collapse_m)
-      x_keep <- x_list$`TRUE`
-      x_agg <- x_list$`FALSE`
-
-      # Prepare new factors
-      x_keep <- droplevels(x_keep)
-      lvl <- levels(x_keep$bar_at)
-      oth <- make.names(c(lvl, "other"), unique = TRUE)[length(lvl) + 1L]
-      levels(x_keep$bar_at) <- levels(x_keep$eval_at) <- c(lvl, oth)
-
-      # Collapse other rows
-      M <- x_agg[intersect(colnames(x), all_stats)]
-      S <- x_agg[intersect(colnames(x), c("obs_sd", "pred_sd"))]
-      w <- x_agg$N
-      x_new <- data.frame(
-        bar_at = oth,
-        bar_width = 0.7,
-        eval_at = oth,
-        N = sum(w),
-        collapse::fmean(M, w = w, drop = FALSE),
-        sqrt(collapse::fsum(S^2 * (w - 1), drop = FALSE) / (sum(w) - 1))  # OK?
-      )
-      x <- rbind(x_keep, x_new)  # Column order of x_new does not matter
-    }
+  if (!num && collapse_m < nrow(x)) {
+    x <- .collapse_m(x, m = collapse_m)
   }
-
   if (drop_below_n > 0) {
     x <- subset(x, N >= drop_below_n)
   }
-
   if (isTRUE(na.rm)) {
     x <- subset(x, !is.na(bar_at))
   }
-
-  droplevels(x)
+  return(droplevels(x))
 }
 
 #' Main Effect Importance
@@ -152,8 +115,34 @@ main_effect_importance <- function(x, statistic = NULL) {
   vapply(x, FUN = .one_imp, v = statistic, FUN.VALUE = numeric(1))
 }
 
-# Helper function
+# Helper functions
 .one_imp <- function(x, v) {
   ok <- is.finite(x[[v]])
   stats::cov.wt(x[ok, v, drop = FALSE], x[["N"]][ok], method = "ML")$cov[1L, 1L]
+}
+
+.collapse_m <- function(x, m) {
+  x_list <- split(x, order(x$N, decreasing = TRUE) < m)
+  x_keep <- x_list$`TRUE`
+  x_agg <- x_list$`FALSE`
+
+  # Prepare new factors
+  x_keep <- droplevels(x_keep)
+  lvl <- levels(x_keep$bar_at)
+  oth <- make.names(c(lvl, "other"), unique = TRUE)[length(lvl) + 1L]
+  levels(x_keep$bar_at) <- levels(x_keep$eval_at) <- c(lvl, oth)
+
+  # Collapse other rows
+  M <- x_agg[intersect(colnames(x), c("pred", "obs", "pd"))]
+  S <- x_agg[intersect(colnames(x), c("pred_sd", "obs_sd"))]
+  N <- x_agg$N
+  x_new <- data.frame(
+    bar_at = oth,
+    bar_width = 0.7,
+    eval_at = oth,
+    N = sum(N),
+    collapse::fmean(M, w = N, drop = FALSE, na.rm = TRUE),
+    sqrt(collapse::fsum(S^2 * (N - 1), drop = FALSE, na.rm = TRUE) / (sum(N) - 1))  # OK?
+  )
+  rbind(x_keep, x_new)  # Column order of x_new does not matter
 }

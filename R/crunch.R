@@ -139,7 +139,10 @@ prep_vector <- function(x) {
     x <- as.vector(x)
   }
   if (!is.numeric(x) && !is.logical(x)) {
-    stop("Predictions must be numeric or logical.")
+    stop("Values must be numeric or logical.")
+  }
+  if (anyNA(x)) {
+    stop("Values can't contain NA")
   }
   if (is.double(x)) x else as.double(x)
 }
