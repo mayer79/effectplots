@@ -18,7 +18,7 @@ use_description(
     Version = "0.0.1",
     Description = "Provides tools to create high-quality plots for model analysis.
     The main function 'marginal()' calculates average observed values of the model
-    response, average predicted values, partial dependence, and exposure for each
+    response, average predicted values, partial dependence, and weight for each
     feature and (possibly binned) feature value.
     Visualization can be done via 'ggplot2' or 'plotly'.
     Optimized for speed and convenience, the package supports models with numeric

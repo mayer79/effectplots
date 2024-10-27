@@ -7,7 +7,7 @@
 #'
 #' @param x Object of class "marginal".
 #' @param sort Should `x` be sorted in decreasing order of feature importance?
-#'   Importance is measured by the exposure weighted variance of the most
+#'   Importance is measured by the weighted variance of the most
 #'   relevant available statistic (pd > pred > obs). The default is `FALSE`.
 #'   Importance is calculated after the other postprocessing steps.
 #' @param drop_stats Statistics to drop, by default `NULL`.
@@ -18,9 +18,9 @@
 #'   numeric X. Note that partial dependence of numeric X is always evaluated at
 #'   bar means, not centers. Vectorized over `x`.
 #' @param collapse_m If a categorical X has more than `collapse_m` levels,
-#'   low exposure levels are collapsed into a new level "Other".
+#'   rare levels are collapsed into a new level "Other".
 #'   By default `Inf` (no collapsing). Vectorized over `x`.
-#' @param drop_below_n Drop bins with exposure below this value. Applied after the
+#' @param drop_below_n Drop bins with weight below this value. Applied after the
 #'   effect of `collapse_m`. Vectorized over `x`.
 #' @param na.rm Should `NA` levels in X be dropped?
 #' @seealso [marginal()], [average_observed()], [partial_dependence()]
@@ -90,7 +90,7 @@ postprocess_one <- function(
 
   if (!num) {
     if (collapse_m < nrow(x)) {
-      x_list <- split(x, order(x$exposure, decreasing = TRUE) < collapse_m)
+      x_list <- split(x, order(x$weight, decreasing = TRUE) < collapse_m)
       x_keep <- x_list$`TRUE`
       x_agg <- x_list$`FALSE`
 
@@ -105,12 +105,12 @@ postprocess_one <- function(
       # Collapse other rows
       M <- x_agg[intersect(colnames(x), all_stats)]
       S <- x_agg[intersect(colnames(x), c("obs_sd", "pred_sd"))]
-      w <- x_agg$exposure
+      w <- x_agg$weight
       x_new <- data.frame(
         bar_at = "Other",
         bar_width = 0.7,
         eval_at = "Other",
-        exposure = sum(w),
+        weight = sum(w),
         collapse::fmean(M, w = w, drop = FALSE),
         sqrt(collapse::fsum(S^2 * (w - 1), drop = FALSE) / (sum(w) - 1))  # OK?
       )
@@ -119,7 +119,7 @@ postprocess_one <- function(
   }
 
   if (drop_below_n > 0) {
-    x <- subset(x, exposure >= drop_below_n)
+    x <- subset(x, weight >= drop_below_n)
   }
 
   if (isTRUE(na.rm)) {
@@ -131,7 +131,7 @@ postprocess_one <- function(
 
 #' Main Effect Importance
 #'
-#' Extracts the exposure weighted variances of the most relevant statistic
+#' Extracts the weighted variances of the most relevant statistic
 #' (pd > pred > obs) from a "marginal" object. This serves as a simple "main effect"
 #' importance measure.
 #'
@@ -149,7 +149,7 @@ main_effect_importance <- function(x, statistic = NULL) {
   if (is.null(statistic)) {
     vars <- intersect(c("pd", "pred", "obs"), colnames(x[[1L]]))
     statistic <- vars[1L]
-    message("Importance via exposure weighted variance of '", statistic, "'")
+    message("Importance via weighted variance of '", statistic, "'")
   }
   vapply(x, FUN = .one_imp, v = statistic, FUN.VALUE = numeric(1))
 }
@@ -157,5 +157,5 @@ main_effect_importance <- function(x, statistic = NULL) {
 # Helper function
 .one_imp <- function(x, v) {
   ok <- is.finite(x[[v]])
-  stats::cov.wt(x[ok, v, drop = FALSE], x[["exposure"]][ok], method = "ML")$cov[1L, 1L]
+  stats::cov.wt(x[ok, v, drop = FALSE], x[["weight"]][ok], method = "ML")$cov[1L, 1L]
 }

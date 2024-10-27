@@ -14,7 +14,7 @@ Per feature and feature value, the main function `marginal()` calculates
 - average observed response (and std),
 - average predicted values (and std),
 - partial dependence, and
-- the exposure.
+- counts/weights.
 
 The workflow is as follows:
 
@@ -66,7 +66,7 @@ average_observed(xvars, data = df, y = "claim_nb") |>
 
 ![](man/figures/avg_obs.svg)
 
-The plots have been automatically sorted by decreasing (exposure-weighted) variance of the average observed values. A shared y axis helps to compare the strength of the association across features.
+The plots have been automatically sorted by decreasing (weighted) variance of the average observed values. A shared y axis helps to compare the strength of the association across features.
 
 ### Fit model
 
@@ -118,4 +118,4 @@ marginal(fit, v = xvars, data = X_test, y = test$claim_nb) |>
 
 1. Comparing average predicted with average observed values gives a hint about bias. In this case, the bias on the test data seems to be small. Studying the same plot on the training data would help to assess in-sample bias.
 2. Comparing the shape of the partial dependence curve with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors "driver_age" and "car_power", the two lines are very similar. This means the marginal effects are mainly due to the feature on the x-axis (and not of some other, correlated, feature).
-3. Sorting is done by decreasing exposure weighted variance of the partial dependence values.
+3. Sorting is done by decreasing weighted variance of the partial dependence values.

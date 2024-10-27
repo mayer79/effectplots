@@ -306,7 +306,7 @@ calculate_stats <- function(
       gix <- c(gix, NA)
       bar_width <- c(bar_width, NA)  #  Can't be plotted anyway
     }
-    out <- data.frame(bar_at = g, bar_width = bar_width, eval_at = g, exposure = 0)
+    out <- data.frame(bar_at = g, bar_width = bar_width, eval_at = g, weight = 0)
 
     # Integer encoding
     ix <- findInterval(

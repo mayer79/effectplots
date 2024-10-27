@@ -6,12 +6,12 @@ Authors@R:
 Description: Provides tools to create high-quality plots for model
     analysis.  The main function 'marginal()' calculates average observed
     values of the model response, average predicted values, partial
-    dependence, and exposure for each feature and (possibly binned)
+    dependence, and weight for each feature and (possibly binned)
     feature value.  Visualization can be done via 'ggplot2' or 'plotly'.
     Optimized for speed and convenience, the package supports models with
     numeric predictions, including regression and probabilistic binary
     classification. It is compatible with many models out-of-the-box, 
-    alsos those wrapped with 'DALEX' explainers or 'Tidymodels'.
+    also those wrapped with 'DALEX' explainers or 'Tidymodels'.
 License: GPL (>= 2)
 Depends: 
     R (>= 4.1.0)

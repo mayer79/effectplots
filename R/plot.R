@@ -11,7 +11,7 @@
 #' @param share_y Should y axis be shared across all subplots?
 #'   No effect if `ylim` is passed. Only if `length(x) > 1` (multiple plots).
 #' @param ylim Manual y axis range.
-#' @param scale_exposure Vertical scaling of the exposure bars (between 0 and 1).
+#' @param scale_bars Vertical scaling of the bars (between 0 and 1).
 #'   The default is 1. Set to 0 for no bars. With "plotly", values between 0 and 1 are
 #'   currently not possible.
 #' @param cat_lines Show lines for non-numeric features. Default is `TRUE`.
@@ -41,7 +41,7 @@ plot.marginal <- function(
     ncols = 2L,
     share_y = FALSE,
     ylim = NULL,
-    scale_exposure = 1,
+    scale_bars = 1,
     cat_lines = TRUE,
     num_points = FALSE,
     colors = getOption("marginalplot.colors"),
@@ -66,7 +66,7 @@ plot.marginal <- function(
         v = names(x),
         vars_to_show = vars_to_show,
         ylim = ylim,
-        scale_exposure = scale_exposure,
+        scale_bars = scale_bars,
         cat_lines = cat_lines,
         num_points = num_points,
         colors = colors,
@@ -82,7 +82,7 @@ plot.marginal <- function(
         v = names(x),
         vars_to_show = vars_to_show,
         ylim = ylim,
-        scale_exposure = scale_exposure,
+        scale_bars = scale_bars,
         cat_lines = cat_lines,
         num_points = num_points,
         colors = colors,
@@ -119,7 +119,7 @@ plot.marginal <- function(
         vars_to_show = vars_to_show,
         show_title = TRUE,
         ylim = ylim,
-        scale_exposure = scale_exposure,
+        scale_bars = scale_bars,
         colors = colors,
         fill = fill
       ),
@@ -140,7 +140,7 @@ plot.marginal <- function(
         vars_to_show = vars_to_show,
         show_title = TRUE,
         ylim = ylim,
-        scale_exposure = scale_exposure,
+        scale_bars = scale_bars,
         colors = colors,
         fill = fill
       ),
@@ -162,7 +162,7 @@ plot_marginal_ggplot <- function(
     v,
     vars_to_show,
     ylim,
-    scale_exposure,
+    scale_bars,
     num_points,
     cat_lines,
     colors,
@@ -177,7 +177,7 @@ plot_marginal_ggplot <- function(
   num <- is.numeric(x$eval_at)
   df <- poor_man_stack(x, vars_to_show)
 
-  # Calculate transformation of exposure bars on the right y axis
+  # Calculate transformation of bars on the right y axis
   if (is.null(ylim)) {
     r <- grDevices::extendrange(df$value_, f = 0.03)
   } else {
@@ -186,16 +186,16 @@ plot_marginal_ggplot <- function(
 
   p <- ggplot2::ggplot(df, ggplot2::aes(x = eval_at, y = value_))
 
-  # Add optional exposure bars on secondary y axis
-  if (scale_exposure > 0) {
-    mult <- scale_exposure * diff(r) / max(x$exposure)
+  # Add optional bars on secondary y axis
+  if (scale_bars > 0) {
+    mult <- scale_bars * diff(r) / max(x$weight)
 
     p <- p + ggplot2::geom_tile(
       x,
       mapping = ggplot2::aes(
         x = bar_at,
-        y = exposure / 2 * mult + r[1L],
-        height = exposure * mult,
+        y = weight / 2 * mult + r[1L],
+        height = weight * mult,
         width = bar_width
       ),
       show.legend = FALSE,
@@ -253,7 +253,7 @@ plot_marginal_plotly <- function(
     v,
     vars_to_show,
     ylim,
-    scale_exposure,
+    scale_bars,
     cat_lines,
     num_points,
     colors,
@@ -287,16 +287,16 @@ plot_marginal_plotly <- function(
 
   fig <- plotly::plot_ly()
 
-  if (scale_exposure > 0) {
+  if (scale_bars > 0) {
     fig <- plotly::add_bars(
       fig,
       x = ~bar_at,
-      y = ~exposure,
+      y = ~weight,
       width = ~bar_width,
       data = x,
       yaxis = "y2",
       color = I(fill),
-      name = "exposure",
+      name = "weight",
       showlegend = FALSE,
       marker = list(line = list(color = fill, width = 1))  # to remove tiny white gaps
     )

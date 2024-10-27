@@ -55,12 +55,12 @@ poor_man_stack <- function(data, to_stack) {
 grouped_stats <- function(x, g, w = NULL) {
   W <- collapse::fsum.default(rep.int(1, times = length(g)), g = g, w = w)
   if (is.null(x)) {
-    return(cbind(exposure = W))
+    return(cbind(weight = W))
   }
   M <- collapse::fmean.matrix(x, g = g, w = w, use.g.names = FALSE)
   S <- collapse::fsd.matrix(x, g = g, w = w, use.g.names = FALSE)
   colnames(S) <- paste0(colnames(S), "_sd")
-  cbind(exposure = W, M, S)
+  cbind(weight = W, M, S)
 }
 
 # Grouped stats without {collapse}
@@ -70,13 +70,13 @@ grouped_stats <- function(x, g, w = NULL) {
 #   } else if (!is.null(x)) {
 #     x <- x * w
 #   }
-#   suppressWarnings(exposure <- rowsum(w, group = g))  # silence warning about missings
-#   colnames(exposure) <- "exposure"
+#   suppressWarnings(weight <- rowsum(w, group = g))  # silence warning about missings
+#   colnames(weight) <- "weight"
 #   if (is.null(x)) {
-#     return(exposure)
+#     return(weight)
 #   }
 #   suppressWarnings(S <- rowsum(x, group = g))         # silence warning about missings
-#   cbind(exposure, S / as.numeric(exposure))
+#   cbind(weight, S / as.numeric(weight))
 # }
 #
 # # ML estimate of sd. M is the result of grouped_mean(). Currently unused as too slow
@@ -91,7 +91,7 @@ grouped_stats <- function(x, g, w = NULL) {
 #   if (!is.null(w)) {
 #     z <- z * w
 #   }
-#   sqrt(rowsum(z, group = g) / M[, "exposure"])
+#   sqrt(rowsum(z, group = g) / M[, "weight"])
 # }
 
 wrowmean <- function(x, ngroups = 1L, w = NULL) {
