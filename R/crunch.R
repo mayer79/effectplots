@@ -53,7 +53,10 @@ poor_man_stack <- function(data, to_stack) {
   transform(out, varying_ = factor(varying_, levels = to_stack))
 }
 
+# Later replace by collapse::qsu()
 grouped_stats <- function(x, g, w = NULL) {
+  # returns rows in order sort(unique(x)) + NA, or levels(x) + NA (if factor)
+  g <- collapse::qF(g)
   W <- collapse::fsum.default(rep.int(1, times = length(g)), g = g, w = w)
   if (is.null(x)) {
     return(cbind(weight = W))

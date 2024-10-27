@@ -105,6 +105,8 @@ marginal.default <- function(
     y <- prep_vector(name_or_vector(y, data))
   }
 
+  PY <- cbind(pred = pred, obs = y)  # cbind(NULL, NULL) gives NULL
+
   # Prepare w
   if (!is.null(w)) {
     w <- prep_vector(name_or_vector(w, data))
@@ -148,8 +150,7 @@ marginal.default <- function(
     discrete_m = discrete_m,
     outlier_iqr = outlier_iqr,
     MoreArgs = list(
-      pred = pred,
-      y = y,
+      PY = PY,
       w = w,
       data = data,
       object = object,
@@ -261,8 +262,7 @@ print.marginal <- function(x, ...) {
 
 calculate_stats <- function(
     v,
-    pred,
-    y,
+    PY,
     w,
     data,
     breaks,
@@ -277,20 +277,20 @@ calculate_stats <- function(
 ) {
   x <- if (is.matrix(data)) data[, v] else data[[v]]
   if (is.double(x)) {
-    # {collapse} seems to distinguish positive and negative double zeros
+    # {collapse} seems to distinguish positive and negative zeros
     # https://github.com/SebKrantz/collapse/issues/648
     # Adding 0 to a double turns negative 0 to positive ones (ISO/IEC 60559)
-    x <- x + 0.0
+    x <- x + 0
   }
   g <- collapse::funique(x)
 
   # DISCRETE
   if (!is.numeric(x) || length(g) <= discrete_m) {
     num <- FALSE
-    # Ordered by sort(g) (+ NA). For factors, this equals levels(g) (+ NA)
-    S <- grouped_stats(cbind(pred = pred, obs = y), g = x, w = w)
+    # Ordered by sort(g) (+ NA). For factors: levels(x) (+ NA)
+    M <- grouped_stats(PY, g = x, w = w)
     g <- sort(g, na.last = TRUE)
-    out <- data.frame(bar_at = g, bar_width = 0.7, eval_at = g, S)
+    out <- data.frame(bar_at = g, bar_width = 0.7, eval_at = g, M)
     rownames(out) <- NULL
   } else {
     # "CONTINUOUS" case. Tricky because there can be empty bins.
@@ -315,7 +315,7 @@ calculate_stats <- function(
     )
     M <- cbind(
       eval_at = collapse::fmean.default(x, g = ix, w = w),
-      grouped_stats(cbind(pred = pred, obs = y), g = ix, w = w)
+      grouped_stats(PY, g = ix, w = w)
     )
     reindex <- match(as.integer(rownames(M)), gix)
     out[reindex, colnames(M)] <- M  # Fill gaps
