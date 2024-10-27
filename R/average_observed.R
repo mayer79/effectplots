@@ -21,8 +21,7 @@ average_observed <- function(
     breaks = "Sturges",
     right = TRUE,
     discrete_m = 2L,
-    wprob_low = 0.01,
-    wprob_high = 0.99,
+    outlier_iqr = 2,
     ...
 ) {
   marginal.default(
@@ -34,8 +33,7 @@ average_observed <- function(
     breaks = breaks,
     right = right,
     discrete_m = discrete_m,
-    wprob_low = wprob_low,
-    wprob_high = wprob_high,
+    outlier_iqr = outlier_iqr,
     calc_pred = FALSE,
     pd_n = 0L
   )

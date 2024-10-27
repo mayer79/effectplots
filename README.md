@@ -106,10 +106,10 @@ fit <- lgb.train(
 After modeling, we use the test (or validation) data to crunch average observed, average predicted, and partial dependence per feature values/bins to gain insights about the model. Calculations are lightning fast.
 
 ```r
-# 0.8 second on laptop
+# 0.4 second on laptop
 marginal(fit, v = xvars, data = X_test, y = test$claim_nb) |>
   postprocess(sort = TRUE) |> 
-  plot(share_y = TRUE)
+  plot()
 ```
 
 ![](man/figures/marginal.svg)

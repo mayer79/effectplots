@@ -15,7 +15,7 @@ hist2 <- function(x, breaks = "Sturges") {
     breaks <- breaks(x)
   }
   if (length(breaks) == 1L) {
-    breaks <- pretty(collapse::.range(x), n = breaks, min.n = 1)
+    breaks <- pretty(collapse::.range(x, na.rm = TRUE), n = breaks, min.n = 1)
   } else if (is.numeric(breaks)) {
     breaks <- sort(unique(breaks))
   } else {

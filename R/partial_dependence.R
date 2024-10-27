@@ -32,8 +32,7 @@ partial_dependence.default <- function(
     breaks = "Sturges",
     right = TRUE,
     discrete_m = 2L,
-    wprob_low = 0.01,
-    wprob_high = 0.99,
+    outlier_iqr = 2,
     pd_n = 500L,
     ...
 ) {
@@ -47,8 +46,7 @@ partial_dependence.default <- function(
     breaks = breaks,
     right = right,
     discrete_m = discrete_m,
-    wprob_low = wprob_low,
-    wprob_high = wprob_high,
+    outlier_iqr = outlier_iqr,
     calc_pred = FALSE,
     pd_n = pd_n,
     ...
@@ -66,8 +64,7 @@ partial_dependence.ranger <- function(
     breaks = "Sturges",
     right = TRUE,
     discrete_m = 2L,
-    wprob_low = 0.01,
-    wprob_high = 0.99,
+    outlier_iqr = 2,
     pd_n = 500L,
     ...
 ) {
@@ -85,8 +82,7 @@ partial_dependence.ranger <- function(
     breaks = breaks,
     right = right,
     discrete_m = discrete_m,
-    wprob_low = wprob_low,
-    wprob_high = wprob_high,
+    outlier_iqr = outlier_iqr,
     pd_n = pd_n,
     ...
   )
@@ -103,8 +99,7 @@ partial_dependence.explainer <- function(
     breaks = "Sturges",
     right = TRUE,
     discrete_m = 2L,
-    wprob_low = 0.01,
-    wprob_high = 0.99,
+    outlier_iqr = 2,
     pd_n = 500L,
     ...
 ) {
@@ -117,8 +112,7 @@ partial_dependence.explainer <- function(
     breaks = breaks,
     right = right,
     discrete_m = discrete_m,
-    wprob_low = wprob_low,
-    wprob_high = wprob_high,
+    outlier_iqr = outlier_iqr,
     pd_n = pd_n,
     ...
   )

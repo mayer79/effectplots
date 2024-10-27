@@ -20,8 +20,7 @@ marginal(object, ...)
   breaks = "Sturges",
   right = TRUE,
   discrete_m = 2L,
-  wprob_low = 0.01,
-  wprob_high = 0.99,
+  outlier_iqr = 2,
   calc_pred = TRUE,
   pd_n = 500L,
   ...
@@ -38,8 +37,7 @@ marginal(object, ...)
   breaks = "Sturges",
   right = TRUE,
   discrete_m = 2L,
-  wprob_low = 0.01,
-  wprob_high = 0.99,
+  outlier_iqr = 2,
   calc_pred = TRUE,
   pd_n = 500L,
   ...
@@ -56,8 +54,7 @@ marginal(object, ...)
   breaks = "Sturges",
   right = TRUE,
   discrete_m = 2L,
-  wprob_low = 0.01,
-  wprob_high = 0.99,
+  outlier_iqr = 2,
   calc_pred = TRUE,
   pd_n = 500L,
   ...
@@ -96,13 +93,11 @@ The default is \code{TRUE}. Vectorized over \code{v}. Only relevant for numeric 
 \item{discrete_m}{Numeric X variables with up to this number of unique values
 should not be binned. The default is 2. Vectorized over \code{v}.}
 
-\item{wprob_low}{The smallest values of a numeric X are capped at the corresponding
-quantile. Set to 0 to avoid Winsorizing. Note that at most 100k observations
-are sampled to calculate the quantile (uses random seed). Vectorized over \code{v}.}
-
-\item{wprob_high}{The largest values of a numeric X are capped at the corresponding
-quantile. Set to 1 to avoid Winsorizing. Note that at most 100k observations
-are sampled to calculate the quantile (uses random seed). Vectorized over \code{v}.}
+\item{outlier_iqr}{Outliers of a numeric X are capped via the boxplot rule, i.e.,
+outside \code{outlier_iqr} * IQR from the quartiles. The default is 2 is more
+conservative than the usual rule to account for right-skewed distributions.
+Set to 0 or \code{Inf} for no capping. Note that at most 10k observations are sampled
+to calculate quartiles (uses random seed). Vectorized over \code{v}.}
 
 \item{calc_pred}{Should predictions be calculated? Default is \code{TRUE}. Only relevant
 if \code{pred = NULL}.}
@@ -119,19 +114,18 @@ single bracket subsetting to select part of the output.
 \description{
 This is the main function of the package. It calculates
 \itemize{
-\item average observed,
-\item average predicted,
+\item average observed (and std),
+\item average predicted (and std),
 \item partial dependence, and
 \item counts/weights
 over (possibly binned) features X specified by their column names \code{v}.
-Besides averages, it calculates standard deviations of observed and predicted values.
 }
 }
 \details{
 For numeric variables with more than \code{discrete_m = 2} disjoint values,
 the same binning options (specified by \code{breaks}) are available as in
-\code{\link[graphics:hist]{graphics::hist()}}. Before calculating bins, the smallest and largest 1\% of the
-values are winsorized (capped) at the corresponding observed (approximate) quantiles.
+\code{\link[graphics:hist]{graphics::hist()}}. Before calculating bins, outliers are capped via modified boxplot
+rule using an IQR factor \code{outlier_iqr = 2} instead of 1.5.
 
 Note that partial dependence of numeric features is evaluated at (possibly weighted)
 bin means, i.e., not at the bin center.
