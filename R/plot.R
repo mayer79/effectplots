@@ -188,14 +188,14 @@ plot_marginal_ggplot <- function(
 
   # Add optional bars on secondary y axis
   if (scale_bars > 0) {
-    mult <- scale_bars * diff(r) / max(x$weight)
+    mult <- scale_bars * diff(r) / max(x$N)
 
     p <- p + ggplot2::geom_tile(
       x,
       mapping = ggplot2::aes(
         x = bar_at,
-        y = weight / 2 * mult + r[1L],
-        height = weight * mult,
+        y = N / 2 * mult + r[1L],
+        height = N * mult,
         width = bar_width
       ),
       show.legend = FALSE,
@@ -291,12 +291,12 @@ plot_marginal_plotly <- function(
     fig <- plotly::add_bars(
       fig,
       x = ~bar_at,
-      y = ~weight,
+      y = ~N,
       width = ~bar_width,
       data = x,
       yaxis = "y2",
       color = I(fill),
-      name = "weight",
+      name = "N",
       showlegend = FALSE,
       marker = list(line = list(color = fill, width = 1))  # to remove tiny white gaps
     )

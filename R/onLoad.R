@@ -14,5 +14,5 @@
 
 # Fix undefined global variable note
 utils::globalVariables(
-  c("bar_at", "weight", "bar_width", "eval_at", "varying_", "value_")
+  c("bar_at", "N", "bar_width", "eval_at", "varying_", "value_")
 )

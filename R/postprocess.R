@@ -90,7 +90,7 @@ postprocess_one <- function(
 
   if (!num) {
     if (collapse_m < nrow(x)) {
-      x_list <- split(x, order(x$weight, decreasing = TRUE) < collapse_m)
+      x_list <- split(x, order(x$N, decreasing = TRUE) < collapse_m)
       x_keep <- x_list$`TRUE`
       x_agg <- x_list$`FALSE`
 
@@ -103,12 +103,12 @@ postprocess_one <- function(
       # Collapse other rows
       M <- x_agg[intersect(colnames(x), all_stats)]
       S <- x_agg[intersect(colnames(x), c("obs_sd", "pred_sd"))]
-      w <- x_agg$weight
+      w <- x_agg$N
       x_new <- data.frame(
         bar_at = oth,
         bar_width = 0.7,
         eval_at = oth,
-        weight = sum(w),
+        N = sum(w),
         collapse::fmean(M, w = w, drop = FALSE),
         sqrt(collapse::fsum(S^2 * (w - 1), drop = FALSE) / (sum(w) - 1))  # OK?
       )
@@ -117,7 +117,7 @@ postprocess_one <- function(
   }
 
   if (drop_below_n > 0) {
-    x <- subset(x, weight >= drop_below_n)
+    x <- subset(x, N >= drop_below_n)
   }
 
   if (isTRUE(na.rm)) {
@@ -155,5 +155,5 @@ main_effect_importance <- function(x, statistic = NULL) {
 # Helper function
 .one_imp <- function(x, v) {
   ok <- is.finite(x[[v]])
-  stats::cov.wt(x[ok, v, drop = FALSE], x[["weight"]][ok], method = "ML")$cov[1L, 1L]
+  stats::cov.wt(x[ok, v, drop = FALSE], x[["N"]][ok], method = "ML")$cov[1L, 1L]
 }
