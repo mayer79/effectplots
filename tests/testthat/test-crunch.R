@@ -66,7 +66,7 @@ test_that("grouped_stats() works", {
 
   r <- grouped_stats(x, g = g)
   rownames(r) <- NULL
-  expect_equal(r[, 1:3], cbind(weight = c(4, 2), a = c(4.5, 1.5), b = c(2.5, 5.5)))
+  expect_equal(r[, 1:3], cbind(N = c(4, 2), a = c(4.5, 1.5), b = c(2.5, 5.5)))
 
   # Grouped and weighted
   rw1 <- grouped_stats(x, g = g, w = w1)
@@ -77,7 +77,7 @@ test_that("grouped_stats() works", {
   rownames(rw2) <- c("g1", "g2")
   g1 <- colSums(x[g == 1, ] * w2[g == 1]) / sum(w2[g == 1])
   g2 <- colSums(x[g == 2, ] * w2[g == 2]) / sum(w2[g == 2])
-  expect_equal(rw2[, 1:3], cbind(weight = c(18, 3), rbind(g1, g2)))
+  expect_equal(rw2[, 1:3], cbind(N = c(18, 3), rbind(g1, g2)))
 })
 
 test_that("Test that grouped_stats() uses sort(funique) + NA as order", {

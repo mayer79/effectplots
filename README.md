@@ -58,7 +58,7 @@ df <- getOMLDataSet(data.id = 45106L)$data
 
 xvars <- c("year", "town", "driver_age", "car_weight", "car_power", "car_age")
 
-# 0.4s on laptop
+# 0.3s on laptop
 average_observed(xvars, data = df, y = "claim_nb") |>
   postprocess(sort = TRUE) |> 
   plot(share_y = TRUE)
@@ -106,7 +106,7 @@ fit <- lgb.train(
 After modeling, we use the test (or validation) data to crunch average observed, average predicted, and partial dependence per feature values/bins to gain insights about the model. Calculations are lightning fast.
 
 ```r
-# 0.5s on laptop
+# 0.3s on laptop
 marginal(fit, v = xvars, data = X_test, y = test$claim_nb) |>
   postprocess(sort = TRUE) |> 
   plot()
