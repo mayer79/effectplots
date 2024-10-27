@@ -13,7 +13,7 @@ main_effect_importance(x, statistic = NULL)
 One of 'pd', 'pred', or 'obs'.}
 }
 \description{
-Extracts the exposure weighted variances of the most relevant statistic
+Extracts the weighted variances of the most relevant statistic
 (pd > pred > obs) from a "marginal" object. This serves as a simple "main effect"
 importance measure.
 }

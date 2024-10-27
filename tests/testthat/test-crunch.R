@@ -43,28 +43,6 @@ test_that("wrowmean() works", {
   expect_equal(out, c(a, b))
 })
 
-test_that("grouped_stats() works", {
-  x <- cbind(a = 1:6, b = 6:1)
-  g <- c(2, 2, 1, 1, 1, 1)
-  w1 <- rep(2, times = 6)
-  w2 <- 1:6
-
-  r <- grouped_stats(x, g = g)
-  rownames(r) <- NULL
-  expect_equal(r[, 1:3], cbind(exposure = c(4, 2), a = c(4.5, 1.5), b = c(2.5, 5.5)))
-
-  # Grouped and weighted
-  rw1 <- grouped_stats(x, g = g, w = w1)
-  rownames(rw1) <- NULL
-  expect_equal(r[, 2:3], rw1[, 2:3])
-
-  rw2 <- grouped_stats(x, g = g, w = w2)
-  rownames(rw2) <- c("g1", "g2")
-  g1 <- colSums(x[g == 1, ] * w2[g == 1]) / sum(w2[g == 1])
-  g2 <- colSums(x[g == 2, ] * w2[g == 2]) / sum(w2[g == 2])
-  expect_equal(rw2[, 1:3], cbind(exposure = c(18, 3), rbind(g1, g2)))
-})
-
 test_that("poor_man_stack() works (test could be improved)", {
   y <- c("a", "b", "c")
   z <- c("aa", "bb", "cc")
@@ -78,6 +56,28 @@ test_that("poor_man_stack() works (test could be improved)", {
   expect_equal(out, xpected)
 
   expect_error(poor_man_stack(cbind(a = 1:3, b = 2:4), to_stack = "b"))
+})
+
+test_that("grouped_stats() works", {
+  x <- cbind(a = 1:6, b = 6:1)
+  g <- c(2, 2, 1, 1, 1, 1)
+  w1 <- rep(2, times = 6)
+  w2 <- 1:6
+
+  r <- grouped_stats(x, g = g)
+  rownames(r) <- NULL
+  expect_equal(r[, 1:3], cbind(weight = c(4, 2), a = c(4.5, 1.5), b = c(2.5, 5.5)))
+
+  # Grouped and weighted
+  rw1 <- grouped_stats(x, g = g, w = w1)
+  rownames(rw1) <- NULL
+  expect_equal(r[, 2:3], rw1[, 2:3])
+
+  rw2 <- grouped_stats(x, g = g, w = w2)
+  rownames(rw2) <- c("g1", "g2")
+  g1 <- colSums(x[g == 1, ] * w2[g == 1]) / sum(w2[g == 1])
+  g2 <- colSums(x[g == 2, ] * w2[g == 2]) / sum(w2[g == 2])
+  expect_equal(rw2[, 1:3], cbind(weight = c(18, 3), rbind(g1, g2)))
 })
 
 test_that("Test that grouped_stats() uses sort(funique) + NA as order", {

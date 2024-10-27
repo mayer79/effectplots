@@ -9,7 +9,7 @@ postprocess(
   sort = FALSE,
   drop_stats = NULL,
   eval_at_center = FALSE,
-  collapse_m = Inf,
+  collapse_m = 30L,
   drop_below_n = 0,
   na.rm = FALSE
 )
@@ -18,9 +18,9 @@ postprocess(
 \item{x}{Object of class "marginal".}
 
 \item{sort}{Should \code{x} be sorted in decreasing order of feature importance?
-Importance is measured by the exposure weighted variance of the most
+Importance is measured by the weighted variance of the most
 relevant available statistic (pd > pred > obs). The default is \code{FALSE}.
-Importance is calculated after the other postprocessing steps.}
+Importance is calculated after the other postprocessings.}
 
 \item{drop_stats}{Statistics to drop, by default \code{NULL}.
 Subset of "pred", "obs", "pd". Not vectorized over \code{x}.}
@@ -32,10 +32,10 @@ numeric X. Note that partial dependence of numeric X is always evaluated at
 bar means, not centers. Vectorized over \code{x}.}
 
 \item{collapse_m}{If a categorical X has more than \code{collapse_m} levels,
-low exposure levels are collapsed into a new level "Other".
-By default \code{Inf} (no collapsing). Vectorized over \code{x}.}
+rare levels are collapsed into a new level "Other".
+By default 30. Set to \code{Inf} for no collapsing. Vectorized over \code{x}.}
 
-\item{drop_below_n}{Drop bins with exposure below this value. Applied after the
+\item{drop_below_n}{Drop bins with weight below this value. Applied after the
 effect of \code{collapse_m}. Vectorized over \code{x}.}
 
 \item{na.rm}{Should \code{NA} levels in X be dropped?}

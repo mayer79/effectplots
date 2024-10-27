@@ -9,7 +9,7 @@
 #' @param sort Should `x` be sorted in decreasing order of feature importance?
 #'   Importance is measured by the weighted variance of the most
 #'   relevant available statistic (pd > pred > obs). The default is `FALSE`.
-#'   Importance is calculated after the other postprocessing steps.
+#'   Importance is calculated after the other postprocessings.
 #' @param drop_stats Statistics to drop, by default `NULL`.
 #'   Subset of "pred", "obs", "pd". Not vectorized over `x`.
 #' @param eval_at_center If `FALSE` (default), the points are aligned with (weighted)
@@ -19,7 +19,7 @@
 #'   bar means, not centers. Vectorized over `x`.
 #' @param collapse_m If a categorical X has more than `collapse_m` levels,
 #'   rare levels are collapsed into a new level "Other".
-#'   By default `Inf` (no collapsing). Vectorized over `x`.
+#'   By default 30. Set to `Inf` for no collapsing. Vectorized over `x`.
 #' @param drop_below_n Drop bins with weight below this value. Applied after the
 #'   effect of `collapse_m`. Vectorized over `x`.
 #' @param na.rm Should `NA` levels in X be dropped?
@@ -36,7 +36,7 @@ postprocess <- function(
   sort = FALSE,
   drop_stats = NULL,
   eval_at_center = FALSE,
-  collapse_m = Inf,
+  collapse_m = 30L,
   drop_below_n = 0,
   na.rm = FALSE
 ) {
@@ -97,19 +97,17 @@ postprocess_one <- function(
       # Prepare new factors
       x_keep <- droplevels(x_keep)
       lvl <- levels(x_keep$bar_at)
-      if ("Other" %in% lvl) {
-        stop("Factor level 'Other' already exists in 'bar_at'!")
-      }
-      levels(x_keep$bar_at) <- levels(x_keep$eval_at) <- c(lvl, "Other")
+      oth <- make.names(c(lvl, "other"), unique = TRUE)[length(lvl) + 1L]
+      levels(x_keep$bar_at) <- levels(x_keep$eval_at) <- c(lvl, oth)
 
       # Collapse other rows
       M <- x_agg[intersect(colnames(x), all_stats)]
       S <- x_agg[intersect(colnames(x), c("obs_sd", "pred_sd"))]
       w <- x_agg$weight
       x_new <- data.frame(
-        bar_at = "Other",
+        bar_at = oth,
         bar_width = 0.7,
-        eval_at = "Other",
+        eval_at = oth,
         weight = sum(w),
         collapse::fmean(M, w = w, drop = FALSE),
         sqrt(collapse::fsum(S^2 * (w - 1), drop = FALSE) / (sum(w) - 1))  # OK?

@@ -9,7 +9,7 @@
   ncols = 2L,
   share_y = FALSE,
   ylim = NULL,
-  scale_exposure = 1,
+  scale_bars = 1,
   cat_lines = TRUE,
   num_points = FALSE,
   colors = getOption("marginalplot.colors"),
@@ -32,7 +32,7 @@ No effect if \code{ylim} is passed. Only if \code{length(x) > 1} (multiple plots
 
 \item{ylim}{Manual y axis range.}
 
-\item{scale_exposure}{Vertical scaling of the exposure bars (between 0 and 1).
+\item{scale_bars}{Vertical scaling of the bars (between 0 and 1).
 The default is 1. Set to 0 for no bars. With "plotly", values between 0 and 1 are
 currently not possible.}
 
