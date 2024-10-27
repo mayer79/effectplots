@@ -65,8 +65,7 @@ This function is a convenience wrapper around <code><a href="marginal.html">marg
 <span>  breaks <span class="op">=</span> <span class="st">"Sturges"</span>,</span>
 <span>  right <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  discrete_m <span class="op">=</span> <span class="fl">2L</span>,</span>
-<span>  wprob_low <span class="op">=</span> <span class="fl">0.01</span>,</span>
-<span>  wprob_high <span class="op">=</span> <span class="fl">0.99</span>,</span>
+<span>  outlier_iqr <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -109,16 +108,12 @@ The default is <code>TRUE</code>. Vectorized over <code>v</code>. Only relevant 
 should not be binned. The default is 2. Vectorized over <code>v</code>.</p></dd>
 
 
-<dt id="arg-wprob-low">wprob_low<a class="anchor" aria-label="anchor" href="#arg-wprob-low"></a></dt>
-<dd><p>The smallest values of a numeric X are capped at the corresponding
-quantile. Set to 0 to avoid Winsorizing. Note that at most 100k observations
-are sampled to calculate the quantile (uses random seed). Vectorized over <code>v</code>.</p></dd>
-
-
-<dt id="arg-wprob-high">wprob_high<a class="anchor" aria-label="anchor" href="#arg-wprob-high"></a></dt>
-<dd><p>The largest values of a numeric X are capped at the corresponding
-quantile. Set to 1 to avoid Winsorizing. Note that at most 100k observations
-are sampled to calculate the quantile (uses random seed). Vectorized over <code>v</code>.</p></dd>
+<dt id="arg-outlier-iqr">outlier_iqr<a class="anchor" aria-label="anchor" href="#arg-outlier-iqr"></a></dt>
+<dd><p>Outliers of a numeric X are capped via the boxplot rule, i.e.,
+outside <code>outlier_iqr</code> * IQR from the quartiles. The default is 2 is more
+conservative than the usual rule to account for right-skewed distributions.
+Set to 0 or <code>Inf</code> for no capping. Note that at most 10k observations are sampled
+to calculate quartiles (uses random seed). Vectorized over <code>v</code>.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
