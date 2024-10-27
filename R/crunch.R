@@ -1,19 +1,29 @@
-wins_prob <- function(x, probs = 0:1, nmax = 1e5) {
-  if (!is.numeric(x) || (probs[1L] == 0 && probs[2L] == 1)) {
+wins_iqr <- function(x, m = 1.5, nmax = 10000L) {
+  xs <- if (length(x) > nmax) sample(x, nmax) else x
+  q <- collapse::fquantile(xs, probs = c(0.25, 0.75), na.rm = TRUE, names = FALSE)
+  r <- m * diff(q)
+  if (r <= 0) {
     return(x)
   }
-  xs <- if (length(x) > nmax) sample(x, nmax) else x
-  q <- stats::quantile(xs, probs = probs, na.rm = TRUE, names = FALSE)
-  winsorize(x, low = q[1L], high = q[2L])
+  winsorize(x, low = q[1L] - r, high = q[2L] + r)
 }
+
+# wins_prob <- function(x, probs = 0:1, nmax = 1e5) {
+#   if (!is.numeric(x) || (probs[1L] == 0 && probs[2L] == 1)) {
+#     return(x)
+#   }
+#   xs <- if (length(x) > nmax) sample(x, nmax) else x
+#   q <- stats::quantile(xs, probs = probs, na.rm = TRUE, names = FALSE)
+#   winsorize(x, low = q[1L], high = q[2L])
+# }
 
 # pmin() and pmax() are surprisingly fast for large vectors
 # and need less memory than subsetting
 winsorize <- function(x, low = -Inf, high = Inf) {
-  if (low != -Inf) {
+  if (is.finite(low)) {
     x <- pmax(x, low)
   }
-  if (high != Inf) pmin(x, high) else x
+  if (is.finite(high)) pmin(x, high) else x
 }
 
 #' Stack some Columns (from hstats)

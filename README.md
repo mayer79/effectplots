@@ -55,6 +55,7 @@ library(marginalplot)
 set.seed(1)
 
 df <- getOMLDataSet(data.id = 45106L)$data
+df[] <- lapply(df, as.integer)
 
 xvars <- c("year", "town", "driver_age", "car_weight", "car_power", "car_age")
 

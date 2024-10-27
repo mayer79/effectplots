@@ -12,8 +12,7 @@ average_observed(
   breaks = "Sturges",
   right = TRUE,
   discrete_m = 2L,
-  wprob_low = 0.01,
-  wprob_high = 0.99,
+  outlier_iqr = 1.5,
   ...
 )
 }
@@ -38,13 +37,10 @@ The default is \code{TRUE}. Vectorized over \code{v}. Only relevant for numeric 
 \item{discrete_m}{Numeric X variables with up to this number of unique values
 should not be binned. The default is 2. Vectorized over \code{v}.}
 
-\item{wprob_low}{The smallest values of a numeric X are capped at the corresponding
-quantile. Set to 0 to avoid Winsorizing. Note that at most 100k observations
-are sampled to calculate the quantile (uses random seed). Vectorized over \code{v}.}
-
-\item{wprob_high}{The largest values of a numeric X are capped at the corresponding
-quantile. Set to 1 to avoid Winsorizing. Note that at most 100k observations
-are sampled to calculate the quantile (uses random seed). Vectorized over \code{v}.}
+\item{outlier_iqr}{Numeric X are capped via the boxplot rule, i.e., outside
+\code{outlier_iqr} * IQR from the quartiles. The default is 1.5.
+Set to 0 or \code{Inf} for no capping. Note that at most 10k observations
+are sampled to calculate quartiles (uses random seed). Vectorized over \code{v}.}
 
 \item{...}{Currently unused.}
 }

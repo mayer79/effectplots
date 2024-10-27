@@ -1,17 +1,16 @@
 #' Marginal Statistics
 #'
 #' This is the main function of the package. It calculates
-#' - average observed,
-#' - average predicted,
+#' - average observed (and std),
+#' - average predicted (and std),
 #' - partial dependence, and
 #' - counts/weights
 #' over (possibly binned) features X specified by their column names `v`.
-#' Besides averages, it calculates standard deviations of observed and predicted values.
 #'
 #' For numeric variables with more than `discrete_m = 2` disjoint values,
 #' the same binning options (specified by `breaks`) are available as in
-#' [graphics::hist()]. Before calculating bins, the smallest and largest 1% of the
-#' values are winsorized (capped) at the corresponding observed (approximate) quantiles.
+#' [graphics::hist()]. Before calculating bins, outliers are capped (not removed) via
+#' the boxplot rule. For more conservative capping, increase `outlier_iqr = 1.5`.
 #'
 #' Note that partial dependence of numeric features is evaluated at (possibly weighted)
 #' bin means, i.e., not at the bin center.
@@ -35,12 +34,10 @@
 #'   The default is `TRUE`. Vectorized over `v`. Only relevant for numeric X.
 #' @param discrete_m Numeric X variables with up to this number of unique values
 #'   should not be binned. The default is 2. Vectorized over `v`.
-#' @param wprob_low The smallest values of a numeric X are capped at the corresponding
-#'   quantile. Set to 0 to avoid Winsorizing. Note that at most 100k observations
-#'   are sampled to calculate the quantile (uses random seed). Vectorized over `v`.
-#' @param wprob_high The largest values of a numeric X are capped at the corresponding
-#'   quantile. Set to 1 to avoid Winsorizing. Note that at most 100k observations
-#'   are sampled to calculate the quantile (uses random seed). Vectorized over `v`.
+#' @param outlier_iqr Numeric X are capped via the boxplot rule, i.e., outside
+#'   `outlier_iqr` * IQR from the quartiles. The default is 1.5.
+#'   Set to 0 or `Inf` for no capping. Note that at most 10k observations
+#'   are sampled to calculate quartiles (uses random seed). Vectorized over `v`.
 #' @param calc_pred Should predictions be calculated? Default is `TRUE`. Only relevant
 #'   if `pred = NULL`.
 #' @param pd_n Size of the data used for calculating partial dependence.
@@ -77,8 +74,7 @@ marginal.default <- function(
     breaks = "Sturges",
     right = TRUE,
     discrete_m = 2L,
-    wprob_low = 0.01,
-    wprob_high = 0.99,
+    outlier_iqr = 1.5,
     calc_pred = TRUE,
     pd_n = 500L,
     ...
@@ -87,7 +83,7 @@ marginal.default <- function(
     is.data.frame(data) || is.matrix(data),
     is.function(pred_fun),
     v %in% colnames(data),
-    wprob_low <= wprob_high
+    outlier_iqr >= 0
   )
 
   # Prepare pred
@@ -148,8 +144,7 @@ marginal.default <- function(
     breaks = breaks,
     right = right,
     discrete_m = discrete_m,
-    wprob_low = wprob_low,
-    wprob_high = wprob_high,
+    outlier_iqr = outlier_iqr,
     MoreArgs = list(
       pred = pred,
       y = y,
@@ -180,8 +175,7 @@ marginal.ranger <- function(
     breaks = "Sturges",
     right = TRUE,
     discrete_m = 2L,
-    wprob_low = 0.01,
-    wprob_high = 0.99,
+    outlier_iqr = 1.5,
     calc_pred = TRUE,
     pd_n = 500L,
     ...
@@ -202,8 +196,7 @@ marginal.ranger <- function(
     breaks = breaks,
     right = right,
     discrete_m = discrete_m,
-    wprob_low = wprob_low,
-    wprob_high = wprob_high,
+    outlier_iqr = outlier_iqr,
     calc_pred = calc_pred,
     pd_n = pd_n,
     ...
@@ -223,8 +216,7 @@ marginal.explainer <- function(
   breaks = "Sturges",
   right = TRUE,
   discrete_m = 2L,
-  wprob_low = 0.01,
-  wprob_high = 0.99,
+  outlier_iqr = 1.5,
   calc_pred = TRUE,
   pd_n = 500L,
   ...
@@ -240,8 +232,7 @@ marginal.explainer <- function(
     breaks = breaks,
     right = right,
     discrete_m = discrete_m,
-    wprob_low = wprob_low,
-    wprob_high = wprob_high,
+    outlier_iqr = outlier_iqr,
     calc_pred = calc_pred,
     pd_n = pd_n,
     ...
@@ -275,25 +266,18 @@ calculate_stats <- function(
     breaks,
     right,
     discrete_m,
-    wprob_low,
-    wprob_high,
+    outlier_iqr,
     object,
     pred_fun,
     pd_X,
     pd_w,
     ...
 ) {
-
-  # Prepare x
   x <- if (is.matrix(data)) data[, v] else data[[v]]
-  if (is.numeric(x) && (wprob_low > 0 || wprob_high < 1)) {
-    x <- wins_prob(x, probs = c(wprob_low, wprob_high), nmax = 1e5)
-  }
-
-  # {collapse} seems to distinguish positive and negative double zeros
-  # https://github.com/SebKrantz/collapse/issues/648
-  # Adding 0 to a double turns negative 0 to positive ones (ISO/IEC 60559)
   if (is.double(x)) {
+    # {collapse} seems to distinguish positive and negative double zeros
+    # https://github.com/SebKrantz/collapse/issues/648
+    # Adding 0 to a double turns negative 0 to positive ones (ISO/IEC 60559)
     x <- x + 0.0
   }
   g <- collapse::funique(x)
@@ -309,6 +293,9 @@ calculate_stats <- function(
   } else {
     # "CONTINUOUS" case. Tricky because there can be empty bins.
     num <- TRUE
+    if (outlier_iqr > 0 && is.finite(outlier_iqr)) {
+      x <- wins_iqr(x, m = outlier_iqr)
+    }
     H <- hist2(x, breaks = breaks)
     g <- H$mids
     gix <- seq_along(g)
