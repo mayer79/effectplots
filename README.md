@@ -59,7 +59,7 @@ df <- getOMLDataSet(data.id = 45106L)$data
 xvars <- c("year", "town", "driver_age", "car_weight", "car_power", "car_age")
 
 # 0.3s on laptop
-average_observed(xvars, data = df, y = "claim_nb") |>
+average_observed(df[xvars], y = df$claim_nb) |>
   postprocess(sort = TRUE) |> 
   plot(share_y = TRUE)
 ```

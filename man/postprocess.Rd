@@ -32,7 +32,8 @@ numeric X. Note that partial dependence of numeric X is always evaluated at
 bar means, not centers. Vectorized over \code{x}.}
 
 \item{collapse_m}{If a categorical X has more than \code{collapse_m} levels,
-rare levels are collapsed into a new level "Other".
+rare levels are collapsed into a new level "Other". Standard deviations are
+collapsed via root of the weighted average variances.
 By default 30. Set to \code{Inf} for no collapsing. Vectorized over \code{x}.}
 
 \item{drop_below_n}{Drop bins with weight below this value. Applied after the

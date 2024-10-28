@@ -5,10 +5,10 @@
 \title{Average Observed}
 \usage{
 average_observed(
-  v,
-  data,
+  X,
   y,
   w = NULL,
+  x_name = "x",
   breaks = "Sturges",
   right = TRUE,
   discrete_m = 5L,
@@ -17,14 +17,13 @@ average_observed(
 )
 }
 \arguments{
-\item{v}{Vector of variable names to calculate statistics.}
+\item{X}{A vector, matrix, or data.frame with variable(s) to be shown on the x axis.}
 
-\item{data}{Matrix or data.frame.}
+\item{y}{A numeric vector of observed responses.}
 
-\item{y}{Numeric vector with observed values of the response.
-Can also be a column name in \code{data}. Omitted if \code{NULL} (default).}
+\item{w}{An optional numeric vector of weights.}
 
-\item{w}{Optional vector with case weights. Can also be a column name in \code{data}.}
+\item{x_name}{If \code{X} is a vector: what is the name of the variable? By default "x".}
 
 \item{breaks}{An integer, vector, string or function specifying the bins
 of the numeric X variables as in \code{\link[graphics:hist]{graphics::hist()}}. The default is "Sturges".
@@ -51,14 +50,17 @@ A list (of class "marginal") with a data.frame of statistics per feature. Use
 single bracket subsetting to select part of the output.
 }
 \description{
-Calculates average observed \code{y} values over one or multiple X variables \code{v}.
-The \code{y} argument can either be a numeric vector or a column name in \code{data}.
+Calculates average observed \code{y} values over one or multiple \code{X} variables.
 This function is a convenience wrapper around \code{\link[=marginal]{marginal()}}.
 }
 \examples{
-M <- average_observed(v = "Species", y = "Sepal.Length", data = iris)
+M <- average_observed(iris$Species, y = iris$Sepal.Length)
 M
 M |> plot()
+
+# Or multiple potential features X
+average_observed(iris[2:5], y = iris[, 1], breaks = 5) |>
+  plot()
 }
 \seealso{
 \code{\link[=marginal]{marginal()}}
