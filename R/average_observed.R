@@ -32,7 +32,7 @@ average_observed <- function(
     ...
 ) {
   if (NCOL(X) == 1L && (is.vector(X) || is.factor(X))) {
-    X <- stats::setNames(data.frame(X), x_name)
+    X <- collapse::frename(collapse::qDF(X), x_name)
   }
   marginal.default(
     object = NULL,

@@ -87,6 +87,7 @@ marginal.default <- function(
     v %in% colnames(data),
     outlier_iqr >= 0
   )
+  n <- nrow(data)
 
   # Prepare pred
   if (is.null(pred)) {
@@ -94,7 +95,7 @@ marginal.default <- function(
       pred <- prep_pred(pred_fun(object, data, ...))
     }
   } else {
-    if (length(pred) != nrow(data)) {
+    if (length(pred) != n) {
       stop("'pred' should be a vector of length nrow(data), or NULL.")
     }
     pred <- prep_pred(pred)
@@ -117,9 +118,9 @@ marginal.default <- function(
 
   # Prepare pd_X and pd_w
   if (pd_n > 0L) {
-    if (nrow(data) > pd_n) {
-      ix <- sample(nrow(data), pd_n)
-      pd_X <- data[ix, , drop = FALSE]
+    if (n > pd_n) {
+      ix <- sample(n, pd_n)
+      pd_X <- collapse::ss(data, ix)
       pd_w <- if (!is.null(w)) w[ix]
     } else {
       pd_X <- data
@@ -161,8 +162,7 @@ marginal.default <- function(
     ),
     SIMPLIFY = FALSE
   )
-  class(out) <- "marginal"
-  return(out)
+  structure(out, class = "marginal")
 }
 
 #' @describeIn marginal Method for "ranger" models.
@@ -280,7 +280,7 @@ calculate_stats <- function(
     # {collapse} seems to distinguish positive and negative zeros
     # https://github.com/SebKrantz/collapse/issues/648
     # Adding 0 to a double turns negative 0 to positive ones (ISO/IEC 60559)
-    x <- x + 0
+    collapse::setop(x, "+", 0.0)
   }
   g <- collapse::funique(x)
 

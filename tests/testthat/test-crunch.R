@@ -6,25 +6,6 @@ test_that("winsorize() works", {
   expect_equal(winsorize(x, low = 3, high = 7), pmax(3, pmin(7, x)))
 })
 
-test_that("rep_rows() gives the same as usual subsetting (except rownames)", {
-  setrn <- function(x) {rownames(x) <- 1:nrow(x); x}
-
-  expect_equal(rep_rows(iris, 1), iris[1, ])
-  expect_equal(rep_rows(iris, 2:1), setrn(iris[2:1, ]))
-  expect_equal(rep_rows(iris, c(1, 1, 1)), setrn(iris[c(1, 1, 1), ]))
-
-  ir <- iris[1, ]
-  ir$y <- list(list(a = 1, b = 2))
-  expect_equal(rep_rows(ir, c(1, 1)), setrn(ir[c(1, 1), ]))
-})
-
-test_that("rep_rows() gives the same as usual subsetting for matrices", {
-  ir <- data.matrix(iris[1:4])
-
-  expect_equal(rep_rows(ir, c(1, 1, 2)), ir[c(1, 1, 2), ])
-  expect_equal(rep_rows(ir, 1), ir[1, , drop = FALSE])
-})
-
 test_that("wrowmean() works", {
   x <- 6:1
   out <- wrowmean(x, ngroups = 2L)

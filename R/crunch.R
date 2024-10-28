@@ -8,15 +8,6 @@ wins_iqr <- function(x, m = 1.5, nmax = 10000L) {
   winsorize(x, low = q[1L] - r, high = q[2L] + r)
 }
 
-# wins_prob <- function(x, probs = 0:1, nmax = 1e5) {
-#   if (!is.numeric(x) || (probs[1L] == 0 && probs[2L] == 1)) {
-#     return(x)
-#   }
-#   xs <- if (length(x) > nmax) sample(x, nmax) else x
-#   q <- stats::quantile(xs, probs = probs, na.rm = TRUE, names = FALSE)
-#   winsorize(x, low = q[1L], high = q[2L])
-# }
-
 # pmin() and pmax() are surprisingly fast for large vectors
 # and need less memory than subsetting
 winsorize <- function(x, low = -Inf, high = Inf) {
@@ -67,65 +58,22 @@ grouped_stats <- function(x, g, w = NULL) {
   cbind(N = N, M, S)
 }
 
-# Grouped stats without {collapse}
-# grouped_mean <- function(x, g, w = NULL) {
-#   if (is.null(w)) {
-#     w <- rep.int(1, length(g))
-#   } else if (!is.null(x)) {
-#     x <- x * w
-#   }
-#   suppressWarnings(N <- rowsum(w, group = g))  # silence warning about missings
-#   colnames(N) <- "N"
-#   if (is.null(x)) {
-#     return(N)
-#   }
-#   suppressWarnings(S <- rowsum(x, group = g))         # silence warning about missings
-#   cbind(N, S / as.numeric(N))
-# }
-#
-# # ML estimate of sd. M is the result of grouped_mean(). Currently unused as too slow
-# grouped_sd <- function(x, g, M, w = NULL) {
-#   if (NCOL(x) == 0L) {
-#     return(NULL)
-#   }
-#   MM <- M[match(g, rownames(M)), colnames(x)]  # slow for large data
-#   # MM <- M[g]
-#   z <- (x - MM)^2
-#   colnames(z) <- paste0(colnames(z), "_sd")
-#   if (!is.null(w)) {
-#     z <- z * w
-#   }
-#   sqrt(rowsum(z, group = g) / M[, "N"])
-# }
-
 wrowmean <- function(x, ngroups = 1L, w = NULL) {
   dim(x) <- c(length(x) %/% ngroups, ngroups)
   if (is.null(w)) colMeans(x) else colSums(x * w) / sum(w)
 }
 
-# Copied from hstats:::rep_rows
-rep_rows <- function(x, i) {
-  if (!(all(class(x) == "data.frame"))) {
-    return(x[i, , drop = FALSE])
-  }
-  out <- lapply(x, function(z) if (length(dim(z)) != 2L)
-    z[i]
-    else z[i, , drop = FALSE]
-  )
-  attr(out, "row.names") <- .set_row_names(length(i))
-  class(out) <- "data.frame"
-  out
-}
-
 partial_dep <- function(object, v, X, grid, pred_fun = stats::predict, w = NULL, ...) {
-  X_pred <- rep_rows(X, rep.int(seq_len(nrow(X)), length(grid)))
-  grid_pred <- rep(grid, each = nrow(X))
+  n <- nrow(X)
+  p <- length(grid)
+  X_pred <- collapse::ss(X, rep.int(seq_len(n), p))
+  grid_pred <- rep(grid, each = n)
   if (is.data.frame(X_pred)) {
     X_pred[[v]] <- grid_pred
   } else {
     X_pred[, v] <- grid_pred
   }
-  wrowmean(prep_pred(pred_fun(object, X_pred, ...)), ngroups = length(grid), w = w)
+  wrowmean(prep_pred(pred_fun(object, X_pred, ...)), ngroups = p, w = w)
 }
 
 # Input handling
