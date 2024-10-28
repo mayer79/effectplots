@@ -91,27 +91,27 @@ marginal.default <- function(
   # Prepare pred
   if (is.null(pred)) {
     if (isTRUE(calc_pred)) {
-      pred <- prep_vector(pred_fun(object, data, ...))
+      pred <- prep_pred(pred_fun(object, data, ...))
     }
   } else {
     if (length(pred) != nrow(data)) {
       stop("'pred' should be a vector of length nrow(data), or NULL.")
     }
-    pred <- prep_vector(pred)
+    pred <- prep_pred(pred)
   }
 
   # Prepare y
   if (!is.null(y)) {
-    y <- prep_vector(name_or_vector(y, data))
+    y <- prep_vec(name_or_vector(y, data))
   }
 
   PY <- cbind(pred = pred, obs = y)  # cbind(NULL, NULL) gives NULL
 
   # Prepare w
   if (!is.null(w)) {
-    w <- prep_vector(name_or_vector(w, data))
-    if (any(w < 0) || anyNA(w)) {
-      stop("'w' can't have negative or missing values")
+    w <- prep_vec(name_or_vector(w, data))
+    if (any(w < 0)) {
+      stop("'w' can't have negative values")
     }
   }
 
