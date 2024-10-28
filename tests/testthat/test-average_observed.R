@@ -2,7 +2,7 @@ test_that("average_observed() is consistent with marginal()", {
   fit <- lm(Sepal.Length ~ ., data = iris)
   v <- c("Sepal.Width", "Species")
 
-  avg_obs <- average_observed(v = v, data = iris, y = iris$Sepal.Length, w = 1:150)
+  avg_obs <- average_observed(iris[v], y = iris$Sepal.Length, w = 1:150)
   marg <- marginal(
     fit,
     v = v,
