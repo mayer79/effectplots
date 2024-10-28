@@ -100,7 +100,8 @@ bar means, not centers. Vectorized over <code>x</code>.</p></dd>
 
 <dt id="arg-collapse-m">collapse_m<a class="anchor" aria-label="anchor" href="#arg-collapse-m"></a></dt>
 <dd><p>If a categorical X has more than <code>collapse_m</code> levels,
-rare levels are collapsed into a new level "Other".
+rare levels are collapsed into a new level "Other". Standard deviations are
+collapsed via root of the weighted average variances.
 By default 30. Set to <code>Inf</code> for no collapsing. Vectorized over <code>x</code>.</p></dd>
 
 
