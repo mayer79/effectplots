@@ -125,11 +125,21 @@ partial_dep <- function(object, v, X, grid, pred_fun = stats::predict, w = NULL,
   } else {
     X_pred[, v] <- grid_pred
   }
-  preds <- prep_vector(pred_fun(object, X_pred, ...))
-  return(wrowmean(preds, ngroups = length(grid), w = w))
+  wrowmean(prep_pred(pred_fun(object, X_pred, ...)), ngroups = length(grid), w = w)
 }
 
-prep_vector <- function(x) {
+# Input handling
+prep_vec <- function(x) {
+  if (!is.numeric(x) && !is.logical(x)) {
+    stop("Values must be numeric, or logical.")
+  }
+  if (anyNA(x)) {
+    stop("Values can't contain NA")
+  }
+  if (is.double(x)) x else as.double(x)
+}
+
+prep_pred <- function(x) {
   p <- NCOL(x)
   if (is.data.frame(x)) {
     x <- x[[p]]
@@ -138,13 +148,7 @@ prep_vector <- function(x) {
   } else if (!is.vector(x)) {
     x <- as.vector(x)
   }
-  if (!is.numeric(x) && !is.logical(x)) {
-    stop("Values must be numeric or logical.")
-  }
-  if (anyNA(x)) {
-    stop("Values can't contain NA")
-  }
-  if (is.double(x)) x else as.double(x)
+  prep_vec(x)
 }
 
 name_or_vector <- function(z, data) {
