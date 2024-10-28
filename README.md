@@ -118,4 +118,10 @@ marginal(fit, v = xvars, data = X_test, y = test$claim_nb) |>
 
 1. Comparing average predicted with average observed values gives a hint about bias. In this case, the bias on the test data seems to be small. Studying the same plot on the training data would help to assess in-sample bias.
 2. Comparing the shape of the partial dependence curve with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors "driver_age" and "car_power", the two lines are very similar. This means the marginal effects are mainly due to the feature on the x-axis (and not of some other, correlated, feature).
-3. Sorting is done by decreasing weighted variance of the partial dependence values.
+3. Sorting is done by decreasing weighted variance of the partial dependence values, a measure of main-effect strength closely related (but not 100% identical) to [1].
+
+# References
+
+1. Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy. 
+*A Simple and Effective Model-Based Variable Importance Measure.* Arxiv (2018).
+

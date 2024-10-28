@@ -18,9 +18,8 @@ postprocess(
 \item{x}{Object of class "marginal".}
 
 \item{sort}{Should \code{x} be sorted in decreasing order of feature importance?
-Importance is measured by the weighted variance of the most
-relevant available statistic (pd > pred > obs). The default is \code{FALSE}.
-Importance is calculated after the other postprocessings.}
+Importance is measured by the weighted variance of the most relevant available
+statistic (pd > pred > obs), see Details. The default is \code{FALSE}.}
 
 \item{drop_stats}{Statistics to drop, by default \code{NULL}.
 Subset of "pred", "obs", "pd". Not vectorized over \code{x}.}
@@ -43,9 +42,19 @@ effect of \code{collapse_m}. Vectorized over \code{x}.}
 }
 \description{
 This function helps to improve the output of \code{\link[=marginal]{marginal()}},
-\code{\link[=partial_dependence]{partial_dependence()}}, \code{\link[=average_observed]{average_observed()}}. Except for \code{sort} and \code{drop_stats},
-all arguments are vectorized, i.e., you can pass a vector or list of the same
-length as \code{x}.
+\code{\link[=partial_dependence]{partial_dependence()}}, and \code{\link[=average_observed]{average_observed()}}.
+}
+\details{
+If \code{sort = TRUE}, the features will be sorted by a simple variable importance
+measure. It is calculated as the variance of the most relevant available statistic
+(pd > pred > obs). The variance is weighted by N to reflect the data distribution.
+For "pd", this measure is similar (but not identical) to the suggestion of
+Greenwell et al. (2018).
+Importance is calculated after the other postprocessings, e.g., after collapsing
+rare levels.
+
+Except for \code{sort} and \code{drop_stats}, all arguments are vectorized, i.e., you can
+pass a vector or list of the same length as \code{x}.
 }
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)
@@ -53,6 +62,10 @@ xvars <- colnames(iris)[-1]
 marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5) |>
   postprocess(sort = TRUE, eval_at_center = TRUE) |>
   plot(num_points = TRUE)
+}
+\references{
+Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy.
+\emph{A Simple and Effective Model-Based Variable Importance Measure.} Arxiv (2018).
 }
 \seealso{
 \code{\link[=marginal]{marginal()}}, \code{\link[=average_observed]{average_observed()}}, \code{\link[=partial_dependence]{partial_dependence()}}

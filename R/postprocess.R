@@ -1,15 +1,24 @@
 #' Postprocess Marginal Object
 #'
 #' This function helps to improve the output of [marginal()],
-#' [partial_dependence()], [average_observed()]. Except for `sort` and `drop_stats`,
-#' all arguments are vectorized, i.e., you can pass a vector or list of the same
-#' length as `x`.
+#' [partial_dependence()], and [average_observed()].
+#'
+#' @details
+#' If `sort = TRUE`, the features will be sorted by a simple variable importance
+#' measure. It is calculated as the variance of the most relevant available statistic
+#' (pd > pred > obs). The variance is weighted by N to reflect the data distribution.
+#' For "pd", this measure is similar (but not identical) to the suggestion of
+#' Greenwell et al. (2018).
+#' Importance is calculated after the other postprocessings, e.g., after collapsing
+#' rare levels.
+#'
+#' Except for `sort` and `drop_stats`, all arguments are vectorized, i.e., you can
+#' pass a vector or list of the same length as `x`.
 #'
 #' @param x Object of class "marginal".
 #' @param sort Should `x` be sorted in decreasing order of feature importance?
-#'   Importance is measured by the weighted variance of the most
-#'   relevant available statistic (pd > pred > obs). The default is `FALSE`.
-#'   Importance is calculated after the other postprocessings.
+#'   Importance is measured by the weighted variance of the most relevant available
+#'   statistic (pd > pred > obs), see Details. The default is `FALSE`.
 #' @param drop_stats Statistics to drop, by default `NULL`.
 #'   Subset of "pred", "obs", "pd". Not vectorized over `x`.
 #' @param eval_at_center If `FALSE` (default), the points are aligned with (weighted)
@@ -32,6 +41,9 @@
 #' marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5) |>
 #'   postprocess(sort = TRUE, eval_at_center = TRUE) |>
 #'   plot(num_points = TRUE)
+#' @references
+#'   Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy.
+#'   *A Simple and Effective Model-Based Variable Importance Measure.* Arxiv (2018).
 postprocess <- function(
   x,
   sort = FALSE,
