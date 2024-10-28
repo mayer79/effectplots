@@ -66,6 +66,7 @@
 
       </header><div class="row">
   <div class="contents col-md-9">
+
 <div class="section level1">
 <div class="page-header"><h1 id="marginalplot-">marginalplot <img src="reference/figures/logo.png" align="right" height="139" alt=""><a class="anchor" aria-label="anchor" href="#marginalplot-"></a>
 </h1></div>
@@ -170,11 +171,19 @@
 <ol style="list-style-type: decimal">
 <li>Comparing average predicted with average observed values gives a hint about bias. In this case, the bias on the test data seems to be small. Studying the same plot on the training data would help to assess in-sample bias.</li>
 <li>Comparing the shape of the partial dependence curve with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors “driver_age” and “car_power”, the two lines are very similar. This means the marginal effects are mainly due to the feature on the x-axis (and not of some other, correlated, feature).</li>
-<li>Sorting is done by decreasing weighted variance of the partial dependence values.</li>
+<li>Sorting is done by decreasing weighted variance of the partial dependence values, a measure of main-effect strength closely related (but not 100% identical) to [1].</li>
 </ol>
 </div>
 </div>
 </div>
+<div class="section level1">
+<h1 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
+</h1>
+<ol style="list-style-type: decimal">
+<li>Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy. <em>A Simple and Effective Model-Based Variable Importance Measure.</em> Arxiv (2018).</li>
+</ol>
+</div>
+
   </div>
 
   <div class="col-md-3 hidden-xs hidden-sm" id="pkgdown-sidebar">
