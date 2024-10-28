@@ -29,7 +29,7 @@ The workflow is as follows:
 - Most models (including DALEX explainers and meta-learners such as Tidymodels) work out-of-the box. If not, a tailored prediction function can be specified.
 - For multi-output models, the last output is picked.
 - Case weights are supported via the argument `w`.
-- Binning of numeric features is done by the same options as `stats::hist()`. Additionally, the smallest and largest 1% values are winsorized (clipped) by default.
+- Binning of numeric features is done by the same options as `stats::hist()`. Additionally, outliers are capped (not removed) at +-2 IQR from the quartiles by default.
 
 ## Installation
 
