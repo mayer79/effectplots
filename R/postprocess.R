@@ -18,7 +18,8 @@
 #'   numeric X. Note that partial dependence of numeric X is always evaluated at
 #'   bar means, not centers. Vectorized over `x`.
 #' @param collapse_m If a categorical X has more than `collapse_m` levels,
-#'   rare levels are collapsed into a new level "Other".
+#'   rare levels are collapsed into a new level "Other". Standard deviations are
+#'   collapsed via root of the weighted average variances.
 #'   By default 30. Set to `Inf` for no collapsing. Vectorized over `x`.
 #' @param drop_below_n Drop bins with weight below this value. Applied after the
 #'   effect of `collapse_m`. Vectorized over `x`.
@@ -142,7 +143,7 @@ main_effect_importance <- function(x, statistic = NULL) {
     eval_at = oth,
     N = sum(N),
     collapse::fmean(M, w = N, drop = FALSE, na.rm = TRUE),
-    sqrt(collapse::fsum(S^2 * (N - 1), drop = FALSE, na.rm = TRUE) / (sum(N) - 1))  # OK?
+    sqrt(collapse::fmean(S^2, w = N, drop = FALSE, na.rm = TRUE))
   )
   rbind(x_keep, x_new)  # Column order of x_new does not matter
 }
