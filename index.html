@@ -93,7 +93,7 @@
 <li>Most models (including DALEX explainers and meta-learners such as Tidymodels) work out-of-the box. If not, a tailored prediction function can be specified.</li>
 <li>For multi-output models, the last output is picked.</li>
 <li>Case weights are supported via the argument <code>w</code>.</li>
-<li>Binning of numeric features is done by the same options as <code>stats::hist()</code>. Additionally, the smallest and largest 1% values are winsorized (clipped) by default.</li>
+<li>Binning of numeric features is done by the same options as <code>stats::hist()</code>. Additionally, outliers are capped (not removed) at +-2 IQR from the quartiles by default.</li>
 </ul>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
