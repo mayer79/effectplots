@@ -94,6 +94,7 @@
 <li>For multi-output models, the last output is picked.</li>
 <li>Case weights are supported via the argument <code>w</code>.</li>
 <li>Binning of numeric features is done by the same options as <code>stats::hist()</code>. Additionally, outliers are capped (not removed) at +-2 IQR from the quartiles by default.</li>
+<li>Computational bottlenecks: (A) calculating predictions (cannot be avoided), and (B) <code><a href="https://rdrr.io/r/base/findInterval.html" class="external-link">findInterval()</a></code> for histogram binning (C code).</li>
 </ul>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -173,6 +174,30 @@
 <li>Comparing the shape of the partial dependence curve with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors “driver_age” and “car_power”, the two lines are very similar. This means the marginal effects are mainly due to the feature on the x-axis (and not of some other, correlated, feature).</li>
 <li>Sorting is done by decreasing weighted variance of the partial dependence values, a measure of main-effect strength closely related (but not 100% identical) to [1].</li>
 </ol>
+</div>
+<div class="section level3">
+<h3 id="flexibility">Flexibility<a class="anchor" aria-label="anchor" href="#flexibility"></a>
+</h3>
+<p>Thanks to the flexibility of the package, you can modify the results as you wish. For instance: what about putting results on training data besides those on test?</p>
+<div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="va">m_train</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/marginal.html">marginal</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">X_train</span>, y <span class="op">=</span> <span class="va">train</span><span class="op">$</span><span class="va">claim_nb</span><span class="op">)</span> </span>
+<span><span class="va">m_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/marginal.html">marginal</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">X_test</span>, y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">claim_nb</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Rename list elements</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">m_train</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">xvars</span>, <span class="st">"train"</span>, sep <span class="op">=</span> <span class="st">" - "</span><span class="op">)</span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">m_test</span><span class="op">)</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/paste.html" class="external-link">paste</a></span><span class="op">(</span><span class="va">xvars</span>, <span class="st">"test"</span>, sep <span class="op">=</span> <span class="st">" - "</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Pick top m each and combine</span></span>
+<span><span class="va">m</span> <span class="op">&lt;-</span> <span class="fl">3</span></span>
+<span><span class="va">pick</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/order.html" class="external-link">order</a></span><span class="op">(</span><span class="fu"><a href="reference/main_effect_importance.html">main_effect_importance</a></span><span class="op">(</span><span class="va">m_train</span><span class="op">)</span>, decreasing <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span><span class="op">[</span><span class="fl">1</span><span class="op">:</span><span class="va">m</span><span class="op">]</span></span>
+<span><span class="va">m_both</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">m_train</span><span class="op">[</span><span class="va">pick</span><span class="op">]</span>, <span class="va">m_test</span><span class="op">[</span><span class="va">pick</span><span class="op">]</span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># Change order and plot</span></span>
+<span><span class="va">alternate</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/t.html" class="external-link">t</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/matrix.html" class="external-link">matrix</a></span><span class="op">(</span><span class="fl">1</span><span class="op">:</span><span class="op">(</span><span class="fl">2</span> <span class="op">*</span> <span class="va">m</span><span class="op">)</span>, ncol <span class="op">=</span> <span class="fl">2</span><span class="op">)</span><span class="op">)</span><span class="op">)</span>  <span class="co"># 1, 4, 2, 5, 3, 6</span></span>
+<span></span>
+<span><span class="va">m_both</span><span class="op">[</span><span class="va">alternate</span><span class="op">]</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span>share_y <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/train_test.svg"></p>
 </div>
 </div>
 </div>
