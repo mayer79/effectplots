@@ -290,7 +290,7 @@ calculate_stats <- function(
     # Ordered by sort(g) (+ NA). For factors: levels(x) (+ NA)
     M <- grouped_stats(PY, g = x, w = w)
     g <- sort(g, na.last = TRUE)
-    out <- data.frame(bar_at = g, bar_width = 0.7, eval_at = g, M)
+    out <- data.frame(bin_center = g, bin_width = 0.7, eval_at = g, M)
     rownames(out) <- NULL
   } else {
     # "CONTINUOUS" case. Tricky because there can be empty bins.
@@ -301,13 +301,13 @@ calculate_stats <- function(
     H <- hist2(x, breaks = breaks)
     g <- H$mids
     gix <- seq_along(g)
-    bar_width <- diff(H$breaks)
+    bin_width <- diff(H$breaks)
     if (anyNA(x)) {
       g <- c(g, NA)
       gix <- c(gix, NA)
-      bar_width <- c(bar_width, NA)  #  Can't be plotted anyway
+      bin_width <- c(bin_width, NA)  #  Can't be plotted anyway
     }
-    out <- data.frame(bar_at = g, bar_width = bar_width, eval_at = g, N = 0)
+    out <- data.frame(bin_center = g, bin_width = bin_width, eval_at = g, N = 0)
 
     # Integer encoding
     ix <- findInterval(
@@ -336,7 +336,7 @@ calculate_stats <- function(
 
   # Convert non-numeric levels *after* calculation of partial dependence!
   if (!num && !is.factor(out[["eval_at"]])) {
-    out[["bar_at"]] <- out[["eval_at"]] <- factor(out[["eval_at"]])
+    out[["bin_center"]] <- out[["eval_at"]] <- factor(out[["eval_at"]])
   }
   return(out)
 }

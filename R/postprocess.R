@@ -89,7 +89,7 @@ postprocess_one <- function(
     x <- x[setdiff(colnames(x), c(drop_stats, paste0(drop_stats, "_sd")))]
   }
   if (num && isTRUE(eval_at_center)) {
-    x$eval_at <- x$bar_at
+    x$eval_at <- x$bin_center
   }
   if (!num && collapse_m < nrow(x)) {
     x <- .collapse_m(x, m = collapse_m)
@@ -98,7 +98,7 @@ postprocess_one <- function(
     x <- subset(x, N >= drop_below_n)
   }
   if (isTRUE(na.rm)) {
-    x <- subset(x, !is.na(bar_at))
+    x <- subset(x, !is.na(bin_center))
   }
   return(droplevels(x))
 }
@@ -141,17 +141,17 @@ main_effect_importance <- function(x, statistic = NULL) {
 
   # Prepare new factors
   x_keep <- droplevels(x_keep)
-  lvl <- levels(x_keep$bar_at)
+  lvl <- levels(x_keep$bin_center)
   oth <- make.names(c(lvl, "other"), unique = TRUE)[length(lvl) + 1L]
-  levels(x_keep$bar_at) <- levels(x_keep$eval_at) <- c(lvl, oth)
+  levels(x_keep$bin_center) <- levels(x_keep$eval_at) <- c(lvl, oth)
 
   # Collapse other rows
   M <- x_agg[intersect(colnames(x), c("pred", "obs", "pd"))]
   S <- x_agg[intersect(colnames(x), c("pred_sd", "obs_sd"))]
   N <- x_agg$N
   x_new <- data.frame(
-    bar_at = oth,
-    bar_width = 0.7,
+    bin_center = oth,
+    bin_width = 0.7,
     eval_at = oth,
     N = sum(N),
     collapse::fmean(M, w = N, drop = FALSE, na.rm = TRUE),

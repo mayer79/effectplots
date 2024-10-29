@@ -14,6 +14,7 @@
   num_points = FALSE,
   colors = getOption("marginalplot.colors"),
   fill = getOption("marginalplot.fill"),
+  bar_width = 0.7,
   wrap_x = 10,
   rotate_x = 0,
   backend = getOption("marginalplot.backend"),
@@ -42,12 +43,15 @@ Vectorized over \code{x}.}
 \item{num_points}{Show points for numeric features. Default is \code{FALSE}.
 Vectorized over \code{x}.}
 
-\item{colors}{Line colors. By default, a color blind friendly
-palette from "ggthemes", namely \code{c("#CC79A7", "#009E73", "#56B4E9")}.
+\item{colors}{Line colors in the order "obs", "pred", "pd" (or a subset thereof).
+By default, a color blind friendly palette from "ggthemes", namely
+\code{c("#CC79A7", "#009E73", "#56B4E9")}.
 To change globally, set \verb{options(marginalplot.colors = new colors)}.}
 
 \item{fill}{Fill color of bars. The default equals "lightgrey".
 To change globally, set \verb{options(marginalplot.fill = new color)}.}
+
+\item{bar_width}{Relative bar width of non-numeric features, by default 0.7.}
 
 \item{wrap_x}{Should categorical xaxis labels be wrapped after this length?
 The default is 10. Set to 0 for no wrapping. Vectorized over \code{x}.

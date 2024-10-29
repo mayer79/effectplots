@@ -12,17 +12,18 @@
 #'   No effect if `ylim` is passed. Only if `length(x) > 1` (multiple plots).
 #' @param ylim Manual y axis range.
 #' @param scale_bars Vertical scaling of the bars (between 0 and 1).
-#'   The default is 1. Set to 0 for no bars. With "plotly", values between 0 and 1 are
-#'   currently not possible.
+#'   The default is 1. Set to 0 for no bars.
 #' @param cat_lines Show lines for non-numeric features. Default is `TRUE`.
 #'   Vectorized over `x`.
 #' @param num_points Show points for numeric features. Default is `FALSE`.
 #'   Vectorized over `x`.
-#' @param colors Line colors. By default, a color blind friendly
-#'   palette from "ggthemes", namely `c("#CC79A7", "#009E73", "#56B4E9")`.
+#' @param colors Line colors in the order "obs", "pred", "pd" (or a subset thereof).
+#'   By default, a color blind friendly palette from "ggthemes", namely
+#'   `c("#CC79A7", "#009E73", "#56B4E9")`.
 #'   To change globally, set `options(marginalplot.colors = new colors)`.
 #' @param fill Fill color of bars. The default equals "lightgrey".
 #'   To change globally, set `options(marginalplot.fill = new color)`.
+#' @param bar_width Relative bar width of non-numeric features, by default 0.7.
 #' @param wrap_x Should categorical xaxis labels be wrapped after this length?
 #'   The default is 10. Set to 0 for no wrapping. Vectorized over `x`.
 #'   Only for "ggplot2" backend.
@@ -46,6 +47,7 @@ plot.marginal <- function(
     num_points = FALSE,
     colors = getOption("marginalplot.colors"),
     fill = getOption("marginalplot.fill"),
+    bar_width = 0.7,
     wrap_x = 10,
     rotate_x = 0,
     backend = getOption("marginalplot.backend"),
@@ -58,6 +60,9 @@ plot.marginal <- function(
     backend %in% c("ggplot2", "plotly"),
     length(colors) >= length(vars_to_show)
   )
+
+  # Overwrite bin_width of categorical features
+  x <- lapply(x, function(z) {if (!is.numeric(z$eval_at)) z$bin_width <- bar_width; z})
 
   if (length(x) == 1L) {
     if (backend == "ggplot2") {
@@ -193,10 +198,10 @@ plot_marginal_ggplot <- function(
     p <- p + ggplot2::geom_tile(
       x,
       mapping = ggplot2::aes(
-        x = bar_at,
+        x = bin_center,
         y = N / 2 * mult + r[1L],
         height = N * mult,
-        width = bar_width
+        width = bin_width
       ),
       show.legend = FALSE,
       fill = fill,
@@ -275,13 +280,13 @@ plot_marginal_plotly <- function(
   }
 
   # Deal with NAs in categorical X
-  if (!num && anyNA(x$bar_at)) {
-    lvl <- levels(x$bar_at)
+  if (!num && anyNA(x$bin_center)) {
+    lvl <- levels(x$bin_center)
     if ("NA" %in% lvl) {
       warning("Can't show NA level on x axis because there is already a level 'NA'")
     } else {
-      levels(x$bar_at) <- levels(x$eval_at) <- c(lvl, "NA")
-      x[is.na(x$bar_at), c("bar_at", "eval_at")] <- "NA"
+      levels(x$bin_center) <- levels(x$eval_at) <- c(lvl, "NA")
+      x[is.na(x$bin_center), c("bin_center", "eval_at")] <- "NA"
     }
   }
 
@@ -290,9 +295,9 @@ plot_marginal_plotly <- function(
   if (scale_bars > 0) {
     fig <- plotly::add_bars(
       fig,
-      x = ~bar_at,
+      x = ~bin_center,
       y = ~N,
-      width = ~bar_width,
+      width = ~bin_width,
       data = x,
       yaxis = "y2",
       color = I(fill),
@@ -300,6 +305,7 @@ plot_marginal_plotly <- function(
       showlegend = FALSE,
       marker = list(line = list(color = fill, width = 1))  # to remove tiny white gaps
     )
+
   }
 
   for (i in seq_along(vars_to_show)) {
@@ -343,7 +349,12 @@ plot_marginal_plotly <- function(
       overlaying = overlay,
       zeroline = FALSE
     ),
-    yaxis2 = list(side = "right", showgrid = FALSE, showticklabels = FALSE),
+    yaxis2 = list(
+      side = "right",
+      showgrid = FALSE,
+      showticklabels = FALSE,
+      range = if (scale_bars > 0) c(0, max(x$N, na.rm = TRUE) / scale_bars / 0.95)
+    ),
     xaxis = list(title = v),
     legend = list(orientation = "v", x = 1.05, xanchor = "left")
   )
