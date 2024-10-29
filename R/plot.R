@@ -71,6 +71,7 @@ plot.marginal <- function(
         v = names(x),
         vars_to_show = vars_to_show,
         ylim = ylim,
+        share_y = FALSE,
         scale_bars = scale_bars,
         cat_lines = cat_lines,
         num_points = num_points,
@@ -87,6 +88,7 @@ plot.marginal <- function(
         v = names(x),
         vars_to_show = vars_to_show,
         ylim = ylim,
+        share_y = FALSE,
         scale_bars = scale_bars,
         cat_lines = cat_lines,
         num_points = num_points,
@@ -106,7 +108,7 @@ plot.marginal <- function(
 
   if (share_y && is.null(ylim)) {
     r <- range(sapply(x, function(z) range(z[vars_to_show], na.rm = TRUE)))
-    ylim <- grDevices::extendrange(r)
+    ylim <- grDevices::extendrange(r, f = 0.05)
   }
 
   if (backend == "ggplot2") {
@@ -124,6 +126,7 @@ plot.marginal <- function(
         vars_to_show = vars_to_show,
         show_title = TRUE,
         ylim = ylim,
+        share_y = share_y,
         scale_bars = scale_bars,
         colors = colors,
         fill = fill
@@ -145,9 +148,11 @@ plot.marginal <- function(
         vars_to_show = vars_to_show,
         show_title = TRUE,
         ylim = ylim,
+        share_y = share_y,
         scale_bars = scale_bars,
         colors = colors,
-        fill = fill
+        fill = fill,
+        share_y = share_y
       ),
       SIMPLIFY = FALSE
     )
@@ -167,6 +172,7 @@ plot_marginal_ggplot <- function(
     v,
     vars_to_show,
     ylim,
+    share_y,
     scale_bars,
     num_points,
     cat_lines,
@@ -184,9 +190,10 @@ plot_marginal_ggplot <- function(
 
   # Calculate transformation of bars on the right y axis
   if (is.null(ylim)) {
-    r <- grDevices::extendrange(df$value_, f = 0.03)
+    r <- range(df$value_, f = 0.02)
   } else {
-    r <- grDevices::extendrange(ylim, f = -0.05)  # ~remove 5% expansion
+    f <- if (isTRUE(share_y)) -0.05 else -0.02
+    r <- grDevices::extendrange(ylim, f = f)
   }
 
   p <- ggplot2::ggplot(df, ggplot2::aes(x = eval_at, y = value_))
@@ -258,6 +265,7 @@ plot_marginal_plotly <- function(
     v,
     vars_to_show,
     ylim,
+    share_y,
     scale_bars,
     cat_lines,
     num_points,
