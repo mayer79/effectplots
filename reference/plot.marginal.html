@@ -66,6 +66,7 @@ You can switch to plotly by setting <code>backend = "plotly"</code>.</p>
 <span>  num_points <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"marginalplot.colors"</span><span class="op">)</span>,</span>
 <span>  fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"marginalplot.fill"</span><span class="op">)</span>,</span>
+<span>  bar_width <span class="op">=</span> <span class="fl">0.7</span>,</span>
 <span>  wrap_x <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  rotate_x <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  backend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"marginalplot.backend"</span><span class="op">)</span>,</span>
@@ -113,14 +114,19 @@ Vectorized over <code>x</code>.</p></dd>
 
 
 <dt id="arg-colors">colors<a class="anchor" aria-label="anchor" href="#arg-colors"></a></dt>
-<dd><p>Line colors. By default, a color blind friendly
-palette from "ggthemes", namely <code>c("#CC79A7", "#009E73", "#56B4E9")</code>.
+<dd><p>Line colors in the order "obs", "pred", "pd" (or a subset thereof).
+By default, a color blind friendly palette from "ggthemes", namely
+<code>c("#CC79A7", "#009E73", "#56B4E9")</code>.
 To change globally, set <code>options(marginalplot.colors = new colors)</code>.</p></dd>
 
 
 <dt id="arg-fill">fill<a class="anchor" aria-label="anchor" href="#arg-fill"></a></dt>
 <dd><p>Fill color of bars. The default equals "lightgrey".
 To change globally, set <code>options(marginalplot.fill = new color)</code>.</p></dd>
+
+
+<dt id="arg-bar-width">bar_width<a class="anchor" aria-label="anchor" href="#arg-bar-width"></a></dt>
+<dd><p>Relative bar width of non-numeric features, by default 0.7.</p></dd>
 
 
 <dt id="arg-wrap-x">wrap_x<a class="anchor" aria-label="anchor" href="#arg-wrap-x"></a></dt>
