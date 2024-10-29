@@ -16,15 +16,13 @@ use_description(
   fields = list(
     Title = "Marginal Plots",
     Version = "0.0.1",
-    Description = "Provides tools to create high-quality plots for model analysis.
+    Description = "Provides high-quality marginal plots for regression and
+    probabilistic classification.
     The main function 'marginal()' calculates average observed values of the model
-    response, average predicted values, partial dependence, and weight for each
-    feature and (possibly binned) feature value.
-    Visualization can be done via 'ggplot2' or 'plotly'.
-    Optimized for speed and convenience, the package supports models with numeric
-    predictions, including regression and probabilistic binary classification.
-    It is compatible with many models out-of-the-box, also those wrapped with
-    'DALEX' explainers or 'Tidymodels'.",
+    response, average predictions, and partial dependence for each
+    feature value. Visualization can be done via 'ggplot2' or 'plotly'.
+    Optimized for large data, the package is compatible with most models
+    out-of-the-box, including those wrapped with 'DALEX' or 'Tidymodels'.",
     `Authors@R` = "person('Michael', 'Mayer', email = 'mayermichael79@gmail.com', role = c('aut', 'cre'))",
     Depends = "R (>= 4.1.0)",
     LazyData = NULL
@@ -39,11 +37,12 @@ use_package("patchwork", "Imports")
 use_package("plotly", "Imports")
 use_package("stats", "Imports")
 
-use_gpl_license(2)
+use_gpl_license()
 
 # Your files that do not belong to the package itself (others are added by "use_* function")
-use_build_ignore(c("^packaging.R$", "[.]Rproj$", "^logo.png$",
-                   "^docu$", "^backlog$"), escape = FALSE)
+use_build_ignore(
+  c("^packaging.R$", "[.]Rproj$", "^logo.png$", "^claims.parquet$"), escape = FALSE
+)
 
 # Add short docu in Markdown (without running R code)
 use_readme_md()

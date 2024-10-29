@@ -3,10 +3,8 @@
 [.]Rproj$
 ^logo.png$
 ^docu$
-^backlog$
 ^\.github$
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^cran-comments\.md$
-^bench\.R$
 ^claims\.parquet$
