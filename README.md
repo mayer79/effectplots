@@ -30,6 +30,7 @@ The workflow is as follows:
 - For multi-output models, the last output is picked.
 - Case weights are supported via the argument `w`.
 - Binning of numeric features is done by the same options as `stats::hist()`. Additionally, outliers are capped (not removed) at +-2 IQR from the quartiles by default.
+- Computational bottlenecks: (A) calculating predictions (cannot be avoided), and (B) `findInterval()` for histogram binning (C code).
 
 ## Installation
 
@@ -119,6 +120,32 @@ marginal(fit, v = xvars, data = X_test, y = test$claim_nb) |>
 1. Comparing average predicted with average observed values gives a hint about bias. In this case, the bias on the test data seems to be small. Studying the same plot on the training data would help to assess in-sample bias.
 2. Comparing the shape of the partial dependence curve with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors "driver_age" and "car_power", the two lines are very similar. This means the marginal effects are mainly due to the feature on the x-axis (and not of some other, correlated, feature).
 3. Sorting is done by decreasing weighted variance of the partial dependence values, a measure of main-effect strength closely related (but not 100% identical) to [1].
+
+### Flexibility
+
+Thanks to the flexibility of the package, you can modify the results as you wish. For instance: what about putting results on training data besides those on test?
+
+```r
+m_train <- marginal(fit, v = xvars, data = X_train, y = train$claim_nb) 
+m_test <- marginal(fit, v = xvars, data = X_test, y = test$claim_nb)
+
+# Rename list elements
+names(m_train) <- paste(xvars, "train", sep = " - ")
+names(m_test) <- paste(xvars, "test", sep = " - ")
+
+# Pick top m each and combine
+m <- 3
+pick <- order(main_effect_importance(m_train), decreasing = TRUE)[1:m]
+m_both <- c(m_train[pick], m_test[pick])
+
+# Change order and plot
+alternate <- c(t(matrix(1:(2 * m), ncol = 2)))  # 1, 4, 2, 5, 3, 6
+
+m_both[alternate] |> 
+  plot(share_y = TRUE)
+```
+
+![](man/figures/train_test.svg)
 
 # References
 

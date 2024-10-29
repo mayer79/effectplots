@@ -260,6 +260,11 @@ print.marginal <- function(x, ...) {
   structure(NextMethod(), class = "marginal")
 }
 
+#' @export
+`c.marginal` <- function(x, ...) {
+  structure(NextMethod(), class = "marginal")
+}
+
 calculate_stats <- function(
     v,
     PY,

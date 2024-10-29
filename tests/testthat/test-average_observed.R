@@ -14,3 +14,15 @@ test_that("average_observed() is consistent with marginal()", {
   )
   expect_equal(avg_obs, marg)
 })
+
+test_that("single vector input works", {
+  fit <- lm(Sepal.Length ~ ., data = iris)
+  v <- c("Sepal.Width", "Species")
+
+  out1 <- average_observed(iris$Species, y = iris$Sepal.Length)
+  names(out1) <- "Species"
+  out2 <- average_observed(iris$Species, y = iris$Sepal.Length, x_name = "Species")
+  out3 <- average_observed(iris["Species"], y = iris$Sepal.Length)
+  expect_equal(out1, out2)
+  expect_equal(out1, out3)
+})
