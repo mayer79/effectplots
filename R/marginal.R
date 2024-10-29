@@ -298,10 +298,10 @@ calculate_stats <- function(
     if (outlier_iqr > 0 && is.finite(outlier_iqr)) {
       x <- wins_iqr(x, m = outlier_iqr)
     }
-    H <- hist2(x, breaks = breaks)
-    g <- H$mids
+    br <- hist2(x, breaks = breaks)
+    g <- 0.5 * (br[-1L] + br[-length(br)])  # mids
     gix <- seq_along(g)
-    bin_width <- diff(H$breaks)
+    bin_width <- diff(br)
     if (anyNA(x)) {
       g <- c(g, NA)
       gix <- c(gix, NA)
@@ -311,7 +311,7 @@ calculate_stats <- function(
 
     # Integer encoding
     ix <- findInterval(
-      x, vec = H$breaks, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
+      x, vec = br, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
     )
     M <- cbind(
       eval_at = collapse::fmean.default(x, g = ix, w = w),

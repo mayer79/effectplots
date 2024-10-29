@@ -1,4 +1,4 @@
-# Simplified version of hist(), without calculating bin counts
+# Simplified version of hist(), returns only breaks
 hist2 <- function(x, breaks = "Sturges") {
   x <- x[is.finite(x)]
   if (is.character(breaks)) {
@@ -21,7 +21,5 @@ hist2 <- function(x, breaks = "Sturges") {
   } else {
     stop("Wrongly specified breaks")
   }
-  nB <- length(breaks)
-  mids <- 0.5 * (breaks[-1L] + breaks[-nB])
-  list(breaks = breaks, mids = mids)
+  return(breaks)
 }
