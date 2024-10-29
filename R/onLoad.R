@@ -11,8 +11,3 @@
   }
   invisible()
 }
-
-# Fix undefined global variable note
-utils::globalVariables(
-  c("bar_at", "N", "bar_width", "eval_at", "varying_", "value_")
-)

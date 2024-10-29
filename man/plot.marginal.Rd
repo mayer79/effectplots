@@ -34,8 +34,7 @@ No effect if \code{ylim} is passed. Only if \code{length(x) > 1} (multiple plots
 \item{ylim}{Manual y axis range.}
 
 \item{scale_bars}{Vertical scaling of the bars (between 0 and 1).
-The default is 1. Set to 0 for no bars. With "plotly", values between 0 and 1 are
-currently not possible.}
+The default is 1. Set to 0 for no bars.}
 
 \item{cat_lines}{Show lines for non-numeric features. Default is \code{TRUE}.
 Vectorized over \code{x}.}

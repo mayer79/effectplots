@@ -17,13 +17,7 @@ test_that("plot() returns correct class", {
 })
 
 test_that("ncols has an effect", {
-  p <- list(
-    p1 = plot(M, ncols = 1),
-    p2 = plot(M, ncols = 4)
-  )
-  r <- lapply(p, function(z) diff(z$x$layout$xaxis$domain))
-  expect_equal(r$p1, 1)
-  expect_true(r$p1 <= 0.25)
+  # How to do with patchwork??
 
 
   # Plotly
@@ -33,7 +27,7 @@ test_that("ncols has an effect", {
   )
   r <- lapply(p, function(z) diff(z$x$layout$xaxis$domain))
   expect_equal(r$p1, 1)
-  expect_true(r$p1 <= 0.25)
+  expect_true(r$p2 <= 0.25)
 })
 
 test_that("ylim can bet set", {
