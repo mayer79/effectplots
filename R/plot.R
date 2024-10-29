@@ -151,8 +151,7 @@ plot.marginal <- function(
         share_y = share_y,
         scale_bars = scale_bars,
         colors = colors,
-        fill = fill,
-        share_y = share_y
+        fill = fill
       ),
       SIMPLIFY = FALSE
     )
@@ -190,7 +189,7 @@ plot_marginal_ggplot <- function(
 
   # Calculate transformation of bars on the right y axis
   if (is.null(ylim)) {
-    r <- range(df$value_, f = 0.02)
+    r <- grDevices::extendrange(df$value_, f = 0.02)
   } else {
     f <- if (isTRUE(share_y)) -0.05 else -0.02
     r <- grDevices::extendrange(ylim, f = f)
@@ -313,7 +312,9 @@ plot_marginal_plotly <- function(
       showlegend = FALSE,
       marker = list(line = list(color = fill, width = 1))  # to remove tiny white gaps
     )
-
+    # Fix bars slightly above observed maximum value of a line
+    f <- if (isFALSE(share_y) && !is.null(ylim)) 1.01 else 0.98
+    r <- c(0, max(x$N) / scale_bars / f)
   }
 
   for (i in seq_along(vars_to_show)) {
@@ -361,7 +362,7 @@ plot_marginal_plotly <- function(
       side = "right",
       showgrid = FALSE,
       showticklabels = FALSE,
-      range = if (scale_bars > 0) c(0, max(x$N, na.rm = TRUE) / scale_bars / 0.95)
+      range = if (scale_bars > 0) r
     ),
     xaxis = list(title = v),
     legend = list(orientation = "v", x = 1.05, xanchor = "left")
