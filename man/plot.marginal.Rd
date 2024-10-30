@@ -11,6 +11,7 @@
   ylim = NULL,
   cat_lines = TRUE,
   num_points = FALSE,
+  line_names = c(obs = "y_mean", pred = "pred_mean", pd = "pd"),
   colors = getOption("marginalplot.colors"),
   fill = getOption("marginalplot.fill"),
   bar_height = 1,
@@ -40,7 +41,11 @@ Vectorized over \code{x}.}
 \item{num_points}{Show points for numeric features. Default is \code{FALSE}.
 Vectorized over \code{x}.}
 
-\item{colors}{Line colors in the order "obs", "pred", "pd" (or a subset thereof).
+\item{line_names}{Named vector controlling the legend labels, the lines shown, and
+the line order. By default \code{c(obs = "y_mean", pred = "pred_mean", pd = "pd")}.
+The names of the vector will be shown in the legend.}
+
+\item{colors}{Line colors corresponding to (available) \code{line_names}.
 By default, a color blind friendly palette from "ggthemes", namely
 \code{c("#CC79A7", "#009E73", "#56B4E9")}.
 To change globally, set \verb{options(marginalplot.colors = new colors)}.}

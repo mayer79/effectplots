@@ -5,7 +5,7 @@
 #' - average predicted (with std),
 #' - partial dependence,
 #' - counts, and
-#' - weight sums
+#' - weights (same as counts if no weights `w` are passed)
 #' over (possibly binned) features X specified by their column names `v`.
 #'
 #' For numeric variables with more than `discrete_m = 2` disjoint values,
@@ -107,7 +107,7 @@ marginal.default <- function(
     y <- prep_vec(name_or_vector(y, data))
   }
 
-  PY <- cbind(pred = pred, obs = y)  # cbind(NULL, NULL) gives NULL
+  PY <- cbind(pred = pred, y = y)  # cbind(NULL, NULL) gives NULL
 
   # Prepare w
   if (!is.null(w)) {

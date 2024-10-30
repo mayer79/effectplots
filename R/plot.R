@@ -15,7 +15,10 @@
 #'   Vectorized over `x`.
 #' @param num_points Show points for numeric features. Default is `FALSE`.
 #'   Vectorized over `x`.
-#' @param colors Line colors in the order "obs", "pred", "pd" (or a subset thereof).
+#' @param line_names Named vector controlling the legend labels, the lines shown, and
+#'   the line order. By default `c(obs = "y_mean", pred = "pred_mean", pd = "pd")`.
+#'   The names of the vector will be shown in the legend.
+#' @param colors Line colors corresponding to (available) `line_names`.
 #'   By default, a color blind friendly palette from "ggthemes", namely
 #'   `c("#CC79A7", "#009E73", "#56B4E9")`.
 #'   To change globally, set `options(marginalplot.colors = new colors)`.
@@ -44,6 +47,7 @@ plot.marginal <- function(
     ylim = NULL,
     cat_lines = TRUE,
     num_points = FALSE,
+    line_names = c(obs = "y_mean", pred = "pred_mean", pd = "pd"),
     colors = getOption("marginalplot.colors"),
     fill = getOption("marginalplot.fill"),
     bar_height = 1,
@@ -55,13 +59,14 @@ plot.marginal <- function(
     ...
 ) {
   bar_measure <- match.arg(bar_measure)
-  vars_to_show <- intersect(c("obs", "pred", "pd"), colnames(x[[1L]]))
-  show_legend <- (length(vars_to_show) > 1L)
-
+  line_names <- line_names[line_names %in% colnames(x[[1L]])]
+  nn <- length(line_names)
   stopifnot(
     backend %in% c("ggplot2", "plotly"),
-    length(colors) >= length(vars_to_show)
+    nn > 0L,
+    length(colors) >= nn
   )
+  show_legend <- nn > 1L
 
   # Overwrite bin_width of categorical features
   x <- lapply(x, function(z) {if (!is.numeric(z$eval_at)) z$bin_width <- bar_width; z})
@@ -71,11 +76,11 @@ plot.marginal <- function(
       p <- plot_marginal_ggplot(
         x[[1L]],
         v = names(x),
-        vars_to_show = vars_to_show,
         ylim = ylim,
         share_y = FALSE,
         cat_lines = cat_lines,
         num_points = num_points,
+        line_names = line_names,
         colors = colors,
         fill = fill,
         bar_height = bar_height,
@@ -89,11 +94,11 @@ plot.marginal <- function(
       p <- plot_marginal_plotly(
         x[[1L]],
         v = names(x),
-        vars_to_show = vars_to_show,
         ylim = ylim,
         share_y = FALSE,
         cat_lines = cat_lines,
         num_points = num_points,
+        line_names = line_names,
         colors = colors,
         fill = fill,
         bar_height = bar_height,
@@ -111,7 +116,7 @@ plot.marginal <- function(
   show_legend <- show_legend & row_i == 1L & col_i == ncols
 
   if (share_y && is.null(ylim)) {
-    r <- range(sapply(x, function(z) range(z[vars_to_show], na.rm = TRUE)))
+    r <- range(sapply(x, function(z) range(z[line_names], na.rm = TRUE)))
     ylim <- grDevices::extendrange(r, f = 0.05)
   }
 
@@ -127,10 +132,10 @@ plot.marginal <- function(
       wrap_x = wrap_x,
       rotate_x = rotate_x,
       MoreArgs = list(
-        vars_to_show = vars_to_show,
         show_title = TRUE,
         ylim = ylim,
         share_y = share_y,
+        line_names = line_names,
         colors = colors,
         fill = fill,
         bar_height = bar_height,
@@ -150,10 +155,10 @@ plot.marginal <- function(
       cat_lines = cat_lines,
       num_points = num_points,
       MoreArgs = list(
-        vars_to_show = vars_to_show,
         show_title = TRUE,
         ylim = ylim,
         share_y = share_y,
+        line_names = line_names,
         colors = colors,
         fill = fill,
         bar_height = bar_height,
@@ -175,11 +180,11 @@ plot.marginal <- function(
 plot_marginal_ggplot <- function(
     x,
     v,
-    vars_to_show,
     ylim,
     share_y,
     num_points,
     cat_lines,
+    line_names,
     colors,
     fill,
     bar_height,
@@ -192,7 +197,10 @@ plot_marginal_ggplot <- function(
     ...
 ) {
   num <- is.numeric(x$eval_at)
-  df <- poor_man_stack(x, vars_to_show)
+  df <- transform(
+    poor_man_stack(x, line_names),
+    varying_ = factor(varying_, levels = line_names, labels = names(line_names))
+  )
 
   # Calculate transformation of bars on the right y axis
   if (is.null(ylim)) {
@@ -208,7 +216,6 @@ plot_marginal_ggplot <- function(
   if (bar_height > 0) {
     x[["size"]] <- x[[bar_measure]]
     mult <- bar_height * diff(r) / max(x$size)
-
 
     p <- p + ggplot2::geom_tile(
       x,
@@ -271,11 +278,11 @@ plot_marginal_ggplot <- function(
 plot_marginal_plotly <- function(
     x,
     v,
-    vars_to_show,
     ylim,
     share_y,
     cat_lines,
     num_points,
+    line_names,
     colors,
     fill,
     bar_height,
@@ -327,8 +334,8 @@ plot_marginal_plotly <- function(
     r <- c(0, max(x[[bar_measure]]) / bar_height / f)
   }
 
-  for (i in seq_along(vars_to_show)) {
-    z <- vars_to_show[i]
+  for (i in seq_along(line_names)) {
+    z <- line_names[i]
     fig <- plotly::add_trace(
       fig,
       x = ~eval_at,
@@ -337,7 +344,7 @@ plot_marginal_plotly <- function(
       yaxis = "y",
       mode = scatter_mode,
       type = "scatter",
-      name = z,
+      name = names(z),
       showlegend = show_legend,
       color = I(colors[i])
     )

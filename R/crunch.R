@@ -34,6 +34,7 @@ grouped_stats <- function(x, g, w = NULL) {
   }
   M <- collapse::fmean.matrix(x, g = g, w = w, use.g.names = FALSE)
   S <- collapse::fsd.matrix(x, g = g, w = w, use.g.names = FALSE)
+  colnames(M) <- paste0(colnames(S), "_mean")
   colnames(S) <- paste0(colnames(S), "_sd")
   return(cbind(out, M, S))
 }

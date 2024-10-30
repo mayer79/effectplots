@@ -10,12 +10,12 @@ main_effect_importance(x, statistic = NULL)
 \item{x}{Marginal object.}
 
 \item{statistic}{The statistic used to calculate the variance for.
-One of 'pd', 'pred', or 'obs'.}
+One of 'pd', 'pred_mean', or 'obs_mean'.}
 }
 \description{
 Extracts the weighted variances of the most relevant statistic
-(pd > pred > obs) from a "marginal" object. This serves as a simple "main effect"
-importance measure.
+(pd > pred_mean > y_mean) from a "marginal" object.
+Serves as a simple "main effect" importance measure.
 }
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)

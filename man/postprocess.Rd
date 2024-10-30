@@ -7,7 +7,6 @@
 postprocess(
   x,
   sort = FALSE,
-  drop_stats = NULL,
   eval_at_center = FALSE,
   collapse_m = 30L,
   collapse_by = c("weight", "N"),
@@ -22,9 +21,6 @@ postprocess(
 \item{sort}{Should \code{x} be sorted in decreasing order of feature importance?
 Importance is measured by the weighted variance of the most relevant available
 statistic (pd > pred > obs), see Details. The default is \code{FALSE}.}
-
-\item{drop_stats}{Statistics to drop, by default \code{NULL}.
-Subset of "pred", "obs", "pd". Not vectorized over \code{x}.}
 
 \item{eval_at_center}{If \code{FALSE} (default), the points are aligned with (weighted)
 average X values per bin. If \code{TRUE}, the points are aligned with bar centers.
@@ -46,6 +42,9 @@ Vectorized over \code{x}.}
 collapsing. Vectorized over \code{x}.}
 
 \item{na.rm}{Should missing bin centers be dropped? Default is \code{FALSE}.}
+
+\item{drop_stats}{Statistics to drop, by default \code{NULL}.
+Subset of "pred", "obs", "pd". Not vectorized over \code{x}.}
 }
 \description{
 This function helps to improve the output of \code{\link[=marginal]{marginal()}},

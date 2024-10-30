@@ -50,7 +50,6 @@
 postprocess <- function(
   x,
   sort = FALSE,
-  drop_stats = NULL,
   eval_at_center = FALSE,
   collapse_m = 30L,
   collapse_by = c("weight", "N"),
@@ -73,7 +72,6 @@ postprocess <- function(
     drop_below_n = drop_below_n,
     drop_below_weight = drop_below_weight,
     na.rm = na.rm,
-    MoreArgs = list(drop_stats = drop_stats),
     SIMPLIFY = FALSE
   )
 
@@ -88,7 +86,6 @@ postprocess <- function(
 
 postprocess_one <- function(
     x,
-    drop_stats,
     collapse_m,
     collapse_by,
     eval_at_center,
@@ -98,11 +95,6 @@ postprocess_one <- function(
 ) {
   num <- is.numeric(x$eval_at)
 
-  if (!is.null(drop_stats)) {
-    stopifnot(drop_stats %in% c("pred", "obs", "pd"))
-    # We also drop the (non-existent) pd_sd
-    x <- x[setdiff(colnames(x), c(drop_stats, paste0(drop_stats, "_sd")))]
-  }
   if (num && isTRUE(eval_at_center)) {
     x$eval_at <- x$bin_center
   }
@@ -124,12 +116,12 @@ postprocess_one <- function(
 #' Main Effect Importance
 #'
 #' Extracts the weighted variances of the most relevant statistic
-#' (pd > pred > obs) from a "marginal" object. This serves as a simple "main effect"
-#' importance measure.
+#' (pd > pred_mean > y_mean) from a "marginal" object.
+#' Serves as a simple "main effect" importance measure.
 #'
 #' @param x Marginal object.
 #' @param statistic The statistic used to calculate the variance for.
-#' One of 'pd', 'pred', or 'obs'.
+#' One of 'pd', 'pred_mean', or 'obs_mean'.
 #' @seealso [postprocess()]
 #' @export
 #' @examples
@@ -139,7 +131,7 @@ postprocess_one <- function(
 #' main_effect_importance(M)
 main_effect_importance <- function(x, statistic = NULL) {
   if (is.null(statistic)) {
-    vars <- intersect(c("pd", "pred", "obs"), colnames(x[[1L]]))
+    vars <- intersect(c("pd", "pred_mean", "y_mean"), colnames(x[[1L]]))
     statistic <- vars[1L]
     message("Importance via weighted variance of '", statistic, "'")
   }
@@ -164,17 +156,19 @@ main_effect_importance <- function(x, statistic = NULL) {
   levels(x_keep$bin_center) <- levels(x_keep$eval_at) <- c(lvl, oth)
 
   # Collapse other rows
-  M <- x_agg[intersect(colnames(x), c("pred", "obs", "pd"))]
-  S <- x_agg[intersect(colnames(x), c("pred_sd", "obs_sd"))]
+  M <- x_agg[intersect(colnames(x), c("pred_mean", "y_mean", "pd"))]
+  S <- x_agg[intersect(colnames(x), c("pred_sd", "y_sd"))]
   w <- x_agg$weight
   x_new <- data.frame(
-    bin_center = oth,
-    bin_width = 0.7,
-    eval_at = oth,
-    N = sum(x_agg$N),
-    weight = sum(w),
-    collapse::fmean(M, w = w, drop = FALSE, na.rm = TRUE),
-    sqrt(collapse::fmean(S^2, w = w, drop = FALSE, na.rm = TRUE))
+    bin_center = oth, bin_width = 0.7, eval_at = oth, N = sum(x_agg$N), weight = sum(w)
   )
+  if (NCOL(M)) {
+    x_new[, colnames(M)] <- collapse::fmean(M, w = w, drop = FALSE, na.rm = TRUE)
+  }
+  if (NCOL(S)) {
+    x_new[, colnames(S)] <- sqrt(
+      collapse::fmean(S^2, w = w, drop = FALSE, na.rm = TRUE)
+    )
+  }
   rbind(x_keep, x_new)  # Column order of x_new does not matter
 }

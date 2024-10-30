@@ -119,7 +119,7 @@ This is the main function of the package. It calculates
 \item average predicted (with std),
 \item partial dependence,
 \item counts, and
-\item weight sums
+\item weights (same as counts if no weights \code{w} are passed)
 over (possibly binned) features X specified by their column names \code{v}.
 }
 }
