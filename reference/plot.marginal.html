@@ -61,12 +61,13 @@ You can switch to plotly by setting <code>backend = "plotly"</code>.</p>
 <span>  ncols <span class="op">=</span> <span class="fl">2L</span>,</span>
 <span>  share_y <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  scale_bars <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  cat_lines <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  num_points <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"marginalplot.colors"</span><span class="op">)</span>,</span>
 <span>  fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"marginalplot.fill"</span><span class="op">)</span>,</span>
+<span>  bar_height <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  bar_width <span class="op">=</span> <span class="fl">0.7</span>,</span>
+<span>  bar_measure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weight"</span>, <span class="st">"N"</span><span class="op">)</span>,</span>
 <span>  wrap_x <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  rotate_x <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  backend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"marginalplot.backend"</span><span class="op">)</span>,</span>
@@ -97,11 +98,6 @@ No effect if <code>ylim</code> is passed. Only if <code>length(x) &gt; 1</code> 
 <dd><p>Manual y axis range.</p></dd>
 
 
-<dt id="arg-scale-bars">scale_bars<a class="anchor" aria-label="anchor" href="#arg-scale-bars"></a></dt>
-<dd><p>Vertical scaling of the bars (between 0 and 1).
-The default is 1. Set to 0 for no bars.</p></dd>
-
-
 <dt id="arg-cat-lines">cat_lines<a class="anchor" aria-label="anchor" href="#arg-cat-lines"></a></dt>
 <dd><p>Show lines for non-numeric features. Default is <code>TRUE</code>.
 Vectorized over <code>x</code>.</p></dd>
@@ -124,8 +120,16 @@ To change globally, set <code>options(marginalplot.colors = new colors)</code>.<
 To change globally, set <code>options(marginalplot.fill = new color)</code>.</p></dd>
 
 
+<dt id="arg-bar-height">bar_height<a class="anchor" aria-label="anchor" href="#arg-bar-height"></a></dt>
+<dd><p>Relative bar height (default 1). Set to 0 for no bars.</p></dd>
+
+
 <dt id="arg-bar-width">bar_width<a class="anchor" aria-label="anchor" href="#arg-bar-width"></a></dt>
 <dd><p>Relative bar width of non-numeric features, by default 0.7.</p></dd>
+
+
+<dt id="arg-bar-measure">bar_measure<a class="anchor" aria-label="anchor" href="#arg-bar-measure"></a></dt>
+<dd><p>What should bars represent? Either "weight" (default) or "N".</p></dd>
 
 
 <dt id="arg-wrap-x">wrap_x<a class="anchor" aria-label="anchor" href="#arg-wrap-x"></a></dt>
