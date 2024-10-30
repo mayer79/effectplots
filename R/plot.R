@@ -38,7 +38,7 @@
 #'   The default is 0 (no rotation). Vectorized over `x`. Only for "ggplot2" backend.
 #' @param backend Plot backend, either "ggplot2" (default) or "plotly".
 #'   To change globally, set `options(marginalplot.backend = "plotly")`.
-#' @param ... Currently unused.
+#' @param ... Passed to `patchwork::plot_layout()` or `plotly::subplot()`.
 #' @returns
 #'   If `length(x) == 1` (single plot), an object of class  "ggplot" or "plotly".
 #'   Otherwise, an object of class "patchwork", or a "plotly" subplot.
@@ -388,6 +388,7 @@ plot_marginal_plotly <- function(
     yaxis = list(
       side = "left",
       title = if (show_ylab) "Response" else "",
+      showticklabels = show_ylab || is.null(ylim),
       overlaying = overlay,
       zeroline = FALSE
     ),
