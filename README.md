@@ -83,7 +83,7 @@ test <- df[-ix, ]
 X_train <- data.matrix(train[xvars])
 X_test <- data.matrix(test[xvars])
 
-# Training, using slightly opimized parameters found via cross-validation
+# Training, using slightly optimized parameters found via cross-validation
 params <- list(
   learning_rate = 0.05,
   objective = "poisson",
