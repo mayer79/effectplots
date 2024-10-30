@@ -148,11 +148,11 @@ main_effect_importance <- function(x, statistic = NULL) {
     bin_mid = oth, bin_width = 0.7, bin_mean = oth, N = sum(x_agg$N), weight = sum(w)
   )
   if (NCOL(M)) {
-    x_new[, colnames(M)] <- collapse::fmean(M, w = w, drop = FALSE, na.rm = TRUE)
+    x_new[, colnames(M)] <- collapse::fmean(M, w = w, drop = FALSE)
   }
   if (NCOL(S)) {
     x_new[, colnames(S)] <- sqrt(
-      collapse::fmean(S^2, w = w, drop = FALSE, na.rm = TRUE)
+      collapse::fmean(S^2, w = w, drop = FALSE, na.rm = TRUE)  # Bins with N=1 can be NA
     )
   }
   rbind(x_keep, x_new)  # Column order of x_new does not matter
