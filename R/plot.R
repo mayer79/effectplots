@@ -11,8 +11,6 @@
 #' @param share_y Should y axis be shared across all subplots?
 #'   No effect if `ylim` is passed. Only if `length(x) > 1` (multiple plots).
 #' @param ylim Manual y axis range.
-#' @param scale_bars Vertical scaling of the bars (between 0 and 1).
-#'   The default is 1. Set to 0 for no bars.
 #' @param cat_lines Show lines for non-numeric features. Default is `TRUE`.
 #'   Vectorized over `x`.
 #' @param num_points Show points for numeric features. Default is `FALSE`.
@@ -23,7 +21,9 @@
 #'   To change globally, set `options(marginalplot.colors = new colors)`.
 #' @param fill Fill color of bars. The default equals "lightgrey".
 #'   To change globally, set `options(marginalplot.fill = new color)`.
+#' @param bar_height Relative bar height (default 1). Set to 0 for no bars.
 #' @param bar_width Relative bar width of non-numeric features, by default 0.7.
+#' @param bar_measure What should bars represent? Either "weight" (default) or "N".
 #' @param wrap_x Should categorical xaxis labels be wrapped after this length?
 #'   The default is 10. Set to 0 for no wrapping. Vectorized over `x`.
 #'   Only for "ggplot2" backend.
@@ -42,17 +42,19 @@ plot.marginal <- function(
     ncols = 2L,
     share_y = FALSE,
     ylim = NULL,
-    scale_bars = 1,
     cat_lines = TRUE,
     num_points = FALSE,
     colors = getOption("marginalplot.colors"),
     fill = getOption("marginalplot.fill"),
+    bar_height = 1,
     bar_width = 0.7,
+    bar_measure = c("weight", "N"),
     wrap_x = 10,
     rotate_x = 0,
     backend = getOption("marginalplot.backend"),
     ...
 ) {
+  bar_measure <- match.arg(bar_measure)
   vars_to_show <- intersect(c("obs", "pred", "pd"), colnames(x[[1L]]))
   show_legend <- (length(vars_to_show) > 1L)
 
@@ -72,11 +74,12 @@ plot.marginal <- function(
         vars_to_show = vars_to_show,
         ylim = ylim,
         share_y = FALSE,
-        scale_bars = scale_bars,
         cat_lines = cat_lines,
         num_points = num_points,
         colors = colors,
         fill = fill,
+        bar_height = bar_height,
+        bar_measure = bar_measure,
         wrap_x = wrap_x,
         rotate_x = rotate_x,
         show_legend = show_legend,
@@ -89,11 +92,12 @@ plot.marginal <- function(
         vars_to_show = vars_to_show,
         ylim = ylim,
         share_y = FALSE,
-        scale_bars = scale_bars,
         cat_lines = cat_lines,
         num_points = num_points,
         colors = colors,
         fill = fill,
+        bar_height = bar_height,
+        bar_measure = bar_measure,
         show_legend = show_legend,
         ...
       )
@@ -127,9 +131,10 @@ plot.marginal <- function(
         show_title = TRUE,
         ylim = ylim,
         share_y = share_y,
-        scale_bars = scale_bars,
         colors = colors,
-        fill = fill
+        fill = fill,
+        bar_height = bar_height,
+        bar_measure = bar_measure
       ),
       SIMPLIFY = FALSE
     )
@@ -149,9 +154,10 @@ plot.marginal <- function(
         show_title = TRUE,
         ylim = ylim,
         share_y = share_y,
-        scale_bars = scale_bars,
         colors = colors,
-        fill = fill
+        fill = fill,
+        bar_height = bar_height,
+        bar_measure = bar_measure
       ),
       SIMPLIFY = FALSE
     )
@@ -172,11 +178,12 @@ plot_marginal_ggplot <- function(
     vars_to_show,
     ylim,
     share_y,
-    scale_bars,
     num_points,
     cat_lines,
     colors,
     fill,
+    bar_height,
+    bar_measure,
     wrap_x,
     rotate_x,
     show_title = FALSE,
@@ -198,15 +205,17 @@ plot_marginal_ggplot <- function(
   p <- ggplot2::ggplot(df, ggplot2::aes(x = eval_at, y = value_))
 
   # Add optional bars on secondary y axis
-  if (scale_bars > 0) {
-    mult <- scale_bars * diff(r) / max(x$N)
+  if (bar_height > 0) {
+    x[["size"]] <- x[[bar_measure]]
+    mult <- bar_height * diff(r) / max(x$size)
+
 
     p <- p + ggplot2::geom_tile(
       x,
       mapping = ggplot2::aes(
         x = bin_center,
-        y = N / 2 * mult + r[1L],
-        height = N * mult,
+        y = size / 2 * mult + r[1L],
+        height = size * mult,
         width = bin_width
       ),
       show.legend = FALSE,
@@ -265,11 +274,12 @@ plot_marginal_plotly <- function(
     vars_to_show,
     ylim,
     share_y,
-    scale_bars,
     cat_lines,
     num_points,
     colors,
     fill,
+    bar_height,
+    bar_measure,
     show_title = FALSE,
     show_ylab = TRUE,
     show_legend = TRUE,
@@ -299,22 +309,22 @@ plot_marginal_plotly <- function(
 
   fig <- plotly::plot_ly()
 
-  if (scale_bars > 0) {
+  if (bar_height > 0) {
     fig <- plotly::add_bars(
       fig,
       x = ~bin_center,
-      y = ~N,
+      y = x[[bar_measure]],
       width = ~bin_width,
       data = x,
       yaxis = "y2",
       color = I(fill),
-      name = "N",
+      name = bar_measure,
       showlegend = FALSE,
       marker = list(line = list(color = fill, width = 1))  # to remove tiny white gaps
     )
     # Fix bars slightly above observed maximum value of a line
     f <- if (isFALSE(share_y) && !is.null(ylim)) 1.01 else 0.98
-    r <- c(0, max(x$N) / scale_bars / f)
+    r <- c(0, max(x[[bar_measure]]) / bar_height / f)
   }
 
   for (i in seq_along(vars_to_show)) {
@@ -362,9 +372,37 @@ plot_marginal_plotly <- function(
       side = "right",
       showgrid = FALSE,
       showticklabels = FALSE,
-      range = if (scale_bars > 0) r
+      range = if (bar_height > 0) r
     ),
     xaxis = list(title = v),
     legend = list(orientation = "v", x = 1.05, xanchor = "left")
   )
+}
+
+# Helper
+
+#' Stack some Columns (from hstats)
+#'
+#' Internal function used in the plot method for "pd" objects. The function brings
+#' wide columns `to_stack` (the prediction dimensions) into long form.
+#'
+#' @noRd
+#' @keywords internal
+#'
+#' @param data A data.frame.
+#' @param to_stack Column names in `data` to bring from wide to long form.
+#' @returns
+#'   A data.frame with variables not in `to_stack`, a column "varying_" with
+#'   the column name from `to_stack`, and finally a column "value_" with stacked values.
+poor_man_stack <- function(data, to_stack) {
+  if (!is.data.frame(data)) {
+    stop("'data' must be a data.frame.")
+  }
+  keep <- setdiff(colnames(data), to_stack)
+  out <- lapply(
+    to_stack,
+    FUN = function(z) cbind.data.frame(data[keep], varying_ = z, value_ = data[, z])
+  )
+  out <- do.call(rbind, out)
+  transform(out, varying_ = factor(varying_, levels = to_stack))
 }

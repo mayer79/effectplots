@@ -115,10 +115,11 @@ single bracket subsetting to select part of the output.
 \description{
 This is the main function of the package. It calculates
 \itemize{
-\item average observed (and std),
-\item average predicted (and std),
-\item partial dependence, and
-\item counts/weights
+\item average observed (with std),
+\item average predicted (with std),
+\item partial dependence,
+\item counts, and
+\item weight sums
 over (possibly binned) features X specified by their column names \code{v}.
 }
 }

@@ -1,10 +1,11 @@
 #' Marginal Statistics
 #'
 #' This is the main function of the package. It calculates
-#' - average observed (and std),
-#' - average predicted (and std),
-#' - partial dependence, and
-#' - counts/weights
+#' - average observed (with std),
+#' - average predicted (with std),
+#' - partial dependence,
+#' - counts, and
+#' - weight sums
 #' over (possibly binned) features X specified by their column names `v`.
 #'
 #' For numeric variables with more than `discrete_m = 2` disjoint values,
@@ -289,7 +290,9 @@ calculate_stats <- function(
       gix <- c(gix, NA)
       bin_width <- c(bin_width, NA)  #  Can't be plotted anyway
     }
-    out <- data.frame(bin_center = g, bin_width = bin_width, eval_at = g, N = 0)
+    out <- data.frame(
+      bin_center = g, bin_width = bin_width, eval_at = g, N = 0, weight = 0
+    )
 
     # Integer encoding
     ix <- findInterval(

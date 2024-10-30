@@ -10,7 +10,9 @@ postprocess(
   drop_stats = NULL,
   eval_at_center = FALSE,
   collapse_m = 30L,
+  collapse_by = c("weight", "N"),
   drop_below_n = 0,
+  drop_below_weight = 0,
   na.rm = FALSE
 )
 }
@@ -35,10 +37,15 @@ rare levels are collapsed into a new level "Other". Standard deviations are
 collapsed via root of the weighted average variances.
 By default 30. Set to \code{Inf} for no collapsing. Vectorized over \code{x}.}
 
-\item{drop_below_n}{Drop bins with weight below this value. Applied after the
-effect of \code{collapse_m}. Vectorized over \code{x}.}
+\item{collapse_by}{How to determine "rare" levels? Either "weight" (default) or "N".}
 
-\item{na.rm}{Should \code{NA} levels in X be dropped?}
+\item{drop_below_n}{Drop bins with N below this value. Applied after collapsing.
+Vectorized over \code{x}.}
+
+\item{drop_below_weight}{Drop bins with weight below this value. Applied after
+collapsing. Vectorized over \code{x}.}
+
+\item{na.rm}{Should missing bin centers be dropped? Default is \code{FALSE}.}
 }
 \description{
 This function helps to improve the output of \code{\link[=marginal]{marginal()}},

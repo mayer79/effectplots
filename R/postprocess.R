@@ -30,9 +30,12 @@
 #'   rare levels are collapsed into a new level "Other". Standard deviations are
 #'   collapsed via root of the weighted average variances.
 #'   By default 30. Set to `Inf` for no collapsing. Vectorized over `x`.
-#' @param drop_below_n Drop bins with weight below this value. Applied after the
-#'   effect of `collapse_m`. Vectorized over `x`.
-#' @param na.rm Should `NA` levels in X be dropped?
+#' @param collapse_by How to determine "rare" levels? Either "weight" (default) or "N".
+#' @param drop_below_n Drop bins with N below this value. Applied after collapsing.
+#'   Vectorized over `x`.
+#' @param drop_below_weight Drop bins with weight below this value. Applied after
+#' collapsing. Vectorized over `x`.
+#' @param na.rm Should missing bin centers be dropped? Default is `FALSE`.
 #' @seealso [marginal()], [average_observed()], [partial_dependence()]
 #' @export
 #' @examples
@@ -50,20 +53,25 @@ postprocess <- function(
   drop_stats = NULL,
   eval_at_center = FALSE,
   collapse_m = 30L,
+  collapse_by = c("weight", "N"),
   drop_below_n = 0,
+  drop_below_weight = 0,
   na.rm = FALSE
 ) {
   stopifnot(
     inherits(x, "marginal"),
     collapse_m >= 2L
   )
+  collapse_by <- match.arg(collapse_by)
 
   out <- mapply(
     postprocess_one,
     x = x,
     eval_at_center = eval_at_center,
     collapse_m = collapse_m,
+    collapse_by = collapse_by,
     drop_below_n = drop_below_n,
+    drop_below_weight = drop_below_weight,
     na.rm = na.rm,
     MoreArgs = list(drop_stats = drop_stats),
     SIMPLIFY = FALSE
@@ -79,7 +87,14 @@ postprocess <- function(
 }
 
 postprocess_one <- function(
-    x, drop_stats, collapse_m, eval_at_center, drop_below_n, na.rm
+    x,
+    drop_stats,
+    collapse_m,
+    collapse_by,
+    eval_at_center,
+    drop_below_n,
+    drop_below_weight,
+    na.rm
 ) {
   num <- is.numeric(x$eval_at)
 
@@ -92,10 +107,13 @@ postprocess_one <- function(
     x$eval_at <- x$bin_center
   }
   if (!num && collapse_m < nrow(x)) {
-    x <- .collapse_m(x, m = collapse_m)
+    x <- .collapse_m(x, m = collapse_m, by = collapse_by)
   }
   if (drop_below_n > 0) {
     x <- subset(x, N >= drop_below_n)
+  }
+  if (drop_below_weight > 0) {
+    x <- subset(x, weight >= drop_below_weight)
   }
   if (isTRUE(na.rm)) {
     x <- subset(x, !is.na(bin_center))
@@ -134,8 +152,8 @@ main_effect_importance <- function(x, statistic = NULL) {
   stats::cov.wt(x[ok, v, drop = FALSE], x[["N"]][ok], method = "ML")$cov[1L, 1L]
 }
 
-.collapse_m <- function(x, m) {
-  x_list <- split(x, order(x$N, decreasing = TRUE) < m)
+.collapse_m <- function(x, m, by) {
+  x_list <- split(x, order(x[[by]], decreasing = TRUE) < m)
   x_keep <- x_list$`TRUE`
   x_agg <- x_list$`FALSE`
 
@@ -148,14 +166,15 @@ main_effect_importance <- function(x, statistic = NULL) {
   # Collapse other rows
   M <- x_agg[intersect(colnames(x), c("pred", "obs", "pd"))]
   S <- x_agg[intersect(colnames(x), c("pred_sd", "obs_sd"))]
-  N <- x_agg$N
+  w <- x_agg$weight
   x_new <- data.frame(
     bin_center = oth,
     bin_width = 0.7,
     eval_at = oth,
-    N = sum(N),
-    collapse::fmean(M, w = N, drop = FALSE, na.rm = TRUE),
-    sqrt(collapse::fmean(S^2, w = N, drop = FALSE, na.rm = TRUE))
+    N = sum(x_agg$N),
+    weight = sum(w),
+    collapse::fmean(M, w = w, drop = FALSE, na.rm = TRUE),
+    sqrt(collapse::fmean(S^2, w = w, drop = FALSE, na.rm = TRUE))
   )
   rbind(x_keep, x_new)  # Column order of x_new does not matter
 }

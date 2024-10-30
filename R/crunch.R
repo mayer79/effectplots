@@ -18,44 +18,24 @@ winsorize <- function(x, low = -Inf, high = Inf) {
   if (r[2L] > high) pmin(x, high) else x
 }
 
-#' Stack some Columns (from hstats)
-#'
-#' Internal function used in the plot method for "pd" objects. The function brings
-#' wide columns `to_stack` (the prediction dimensions) into long form.
-#'
-#' @noRd
-#' @keywords internal
-#'
-#' @param data A data.frame.
-#' @param to_stack Column names in `data` to bring from wide to long form.
-#' @returns
-#'   A data.frame with variables not in `to_stack`, a column "varying_" with
-#'   the column name from `to_stack`, and finally a column "value_" with stacked values.
-poor_man_stack <- function(data, to_stack) {
-  if (!is.data.frame(data)) {
-    stop("'data' must be a data.frame.")
-  }
-  keep <- setdiff(colnames(data), to_stack)
-  out <- lapply(
-    to_stack,
-    FUN = function(z) cbind.data.frame(data[keep], varying_ = z, value_ = data[, z])
-  )
-  out <- do.call(rbind, out)
-  transform(out, varying_ = factor(varying_, levels = to_stack))
-}
-
 # Later replace by collapse::qsu()
 grouped_stats <- function(x, g, w = NULL) {
   # returns rows in order sort(unique(x)) + NA, or levels(x) + NA (if factor)
   g <- collapse::qF(g)
-  N <- collapse::fsum.default(rep.int(1, times = length(g)), g = g, w = w)
+  N <- collapse::fsum.default(rep.int(1L, times = length(g)), g = g)
+  if (!is.null(w)) {
+    weight <- collapse::fsum.default(w, g = g)
+  } else {
+    weight <- N
+  }
+  out <- cbind(N = N, weight = weight)
   if (is.null(x)) {
-    return(cbind(N = N))
+    return(out)
   }
   M <- collapse::fmean.matrix(x, g = g, w = w, use.g.names = FALSE)
   S <- collapse::fsd.matrix(x, g = g, w = w, use.g.names = FALSE)
   colnames(S) <- paste0(colnames(S), "_sd")
-  cbind(N = N, M, S)
+  return(cbind(out, M, S))
 }
 
 wrowmean <- function(x, ngroups = 1L, w = NULL) {

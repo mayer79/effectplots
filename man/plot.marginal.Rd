@@ -9,12 +9,13 @@
   ncols = 2L,
   share_y = FALSE,
   ylim = NULL,
-  scale_bars = 1,
   cat_lines = TRUE,
   num_points = FALSE,
   colors = getOption("marginalplot.colors"),
   fill = getOption("marginalplot.fill"),
+  bar_height = 1,
   bar_width = 0.7,
+  bar_measure = c("weight", "N"),
   wrap_x = 10,
   rotate_x = 0,
   backend = getOption("marginalplot.backend"),
@@ -33,9 +34,6 @@ No effect if \code{ylim} is passed. Only if \code{length(x) > 1} (multiple plots
 
 \item{ylim}{Manual y axis range.}
 
-\item{scale_bars}{Vertical scaling of the bars (between 0 and 1).
-The default is 1. Set to 0 for no bars.}
-
 \item{cat_lines}{Show lines for non-numeric features. Default is \code{TRUE}.
 Vectorized over \code{x}.}
 
@@ -50,7 +48,11 @@ To change globally, set \verb{options(marginalplot.colors = new colors)}.}
 \item{fill}{Fill color of bars. The default equals "lightgrey".
 To change globally, set \verb{options(marginalplot.fill = new color)}.}
 
+\item{bar_height}{Relative bar height (default 1). Set to 0 for no bars.}
+
 \item{bar_width}{Relative bar width of non-numeric features, by default 0.7.}
+
+\item{bar_measure}{What should bars represent? Either "weight" (default) or "N".}
 
 \item{wrap_x}{Should categorical xaxis labels be wrapped after this length?
 The default is 10. Set to 0 for no wrapping. Vectorized over \code{x}.

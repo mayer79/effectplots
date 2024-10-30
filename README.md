@@ -9,12 +9,14 @@
 
 **{marginalplot}** provides high-quality plots for modeling.
 
-Per feature and feature value, the main function `marginal()` calculates
+The main function `marginal()` calculates
 
-- average observed response (and std),
-- average predicted values (and std),
-- partial dependence, and
-- counts/weights.
+- average observed response (with std),
+- average predicted values (with std),
+- partial dependence,
+- counts, and
+- weight sums
+per feature and feature value.
 
 The workflow is as follows:
 
