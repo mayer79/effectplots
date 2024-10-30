@@ -128,23 +128,21 @@ marginal(fit, v = xvars, data = X_test, y = test$claim_nb) |>
 Thanks to the flexibility of the package, you can modify the results as you wish. For instance: what about putting results on training data besides those on test?
 
 ```r
-m_train <- marginal(fit, v = xvars, data = X_train, y = train$claim_nb) 
+library(patchwork)
+
+m_train <- marginal(fit, v = xvars, data = X_train, y = train$claim_nb)
 m_test <- marginal(fit, v = xvars, data = X_test, y = test$claim_nb)
 
-# Rename list elements
-names(m_train) <- paste(xvars, "train", sep = " - ")
-names(m_test) <- paste(xvars, "test", sep = " - ")
+# Pick top 3 based on train
+m_train <- m_train |> 
+  postprocess(sort = TRUE) |> 
+  head(3)
+m_test <- m_test[names(m_train)]
 
-# Pick top m each and combine
-m <- 3
-pick <- order(main_effect_importance(m_train), decreasing = TRUE)[1:m]
-m_both <- c(m_train[pick], m_test[pick])
-
-# Change order and plot
-alternate <- c(t(matrix(1:(2 * m), ncol = 2)))  # 1, 4, 2, 5, 3, 6
-
-m_both[alternate] |> 
-  plot(share_y = TRUE)
+# Plot combined one
+c(m_train, m_test) |> 
+  plot(share_y = TRUE, byrow = FALSE) +
+  plot_annotation(title = "Left: Train - Right: Test")
 ```
 
 ![](man/figures/train_test.svg)

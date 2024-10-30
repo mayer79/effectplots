@@ -77,11 +77,11 @@ plot.marginal <- function(
   )
 
   # Overwrite bin_width of categorical features
-  x <- lapply(x, function(z) {if (!is.numeric(z$bin_mean)) z$bin_width <- bar_width; z})
+  x <- lapply(x, function(z) {if (!.num(z)) z$bin_width <- bar_width; z})
 
   # Modify where points of numeric features are shown
   if (eval_at == "mid") {
-    x <- lapply(x, function(z) {if (is.numeric(z$bin_mean)) z$bin_mean <- z$bin_mid; z})
+    x <- lapply(x, function(z) {if (.num(z)) z$bin_mean <- z$bin_mid; z})
   }
 
   if (length(x) == 1L) {
@@ -126,7 +126,6 @@ plot.marginal <- function(
   ncols <- min(ncols, length(x))
   col_i <- (seq_along(x) - 1L) %% ncols + 1L
   row_i <- ceiling(seq_along(x) / ncols)
-  show_legend <- show_legend & row_i == 1L & col_i == ncols
 
   if (share_y && is.null(ylim)) {
     r <- range(sapply(x, function(z) range(z[line_names], na.rm = TRUE)))
@@ -134,11 +133,18 @@ plot.marginal <- function(
   }
 
   if (backend == "ggplot2") {
+    if (show_legend) {
+      # Prefer lines without points. Thus, we pick such feature.
+      # {patchwork} moves the legend to the right
+      num <- .num(x)
+      no_lines <- !num & isFALSE(cat_lines)
+      has_points <- !num | isTRUE(num_points)
+      show_legend <- seq_along(x) == order(no_lines, has_points)[1L]
+    }
     plot_list <- mapply(
       plot_marginal_ggplot,
       x,
       v = names(x),
-      show_ylab = col_i == 1L,
       show_legend = show_legend,
       cat_lines = cat_lines,
       num_points = num_points,
@@ -152,18 +158,20 @@ plot.marginal <- function(
         colors = colors,
         fill = fill,
         bar_height = bar_height,
-        bar_measure = bar_measure
+        bar_measure = bar_measure,
+        ...
       ),
       SIMPLIFY = FALSE
     )
-    patchwork::wrap_plots(plot_list, ncol = ncols, ...)
+    patchwork::wrap_plots(plot_list) +
+      patchwork::plot_layout(ncol = ncols, guides = "collect", axes = "collect", ...)
   } else {
     plot_list <- mapply(
       plot_marginal_plotly,
       x,
       v = names(x),
       show_ylab = col_i == 1L,
-      show_legend = show_legend,
+      show_legend = show_legend & row_i == 1L & col_i == ncols,
       overlay = paste0("y", 2 * seq_along(x)),
       cat_lines = cat_lines,
       num_points = num_points,
@@ -175,7 +183,8 @@ plot.marginal <- function(
         colors = colors,
         fill = fill,
         bar_height = bar_height,
-        bar_measure = bar_measure
+        bar_measure = bar_measure,
+        ...
       ),
       SIMPLIFY = FALSE
     )
@@ -206,10 +215,9 @@ plot_marginal_ggplot <- function(
     rotate_x,
     show_title = FALSE,
     show_legend = TRUE,
-    show_ylab = TRUE,
     ...
 ) {
-  num <- is.numeric(x$bin_mean)
+  num <- .num(x)
   df <- transform(
     poor_man_stack(x, line_names),
     varying_ = factor(varying_, levels = line_names, labels = names(line_names))
@@ -263,13 +271,8 @@ plot_marginal_ggplot <- function(
   # Styling
   p <- p + ggplot2::scale_color_manual(values = colors) +
     ggplot2::theme_bw() +
-    ggplot2::theme(
-      legend.title = ggplot2::element_blank(),
-      legend.position = "right"
-    ) +
-    ggplot2::labs(
-      x = v, y = if (show_ylab) "Response" else ggplot2::element_blank()
-    )
+    ggplot2::theme(legend.title = ggplot2::element_blank(), legend.position = "right") +
+    ggplot2::labs(x = v, y = "Response")
 
   if (show_title) {
     p <- p + ggplot2::ggtitle(v)
@@ -306,7 +309,7 @@ plot_marginal_plotly <- function(
     overlay = "y2",
     ...
 ) {
-  num <- is.numeric(x$bin_mean)
+  num <- .num(x)
 
   if (num && isFALSE(num_points)) {
     scatter_mode <- "lines"
@@ -425,4 +428,12 @@ poor_man_stack <- function(data, to_stack) {
   )
   out <- do.call(rbind, out)
   transform(out, varying_ = factor(varying_, levels = to_stack))
+}
+
+.num <- function(x) {
+  f <- function(z) is.numeric(z$bin_mean)
+  if (inherits(x, "marginal")) {
+    return(vapply(x, FUN = f, FUN.VALUE = logical(1L), USE.NAMES = FALSE))
+  }
+  f(x)
 }
