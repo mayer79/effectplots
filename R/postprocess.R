@@ -72,8 +72,7 @@ postprocess <- function(
     out <- out[order(imp, decreasing = TRUE, na.last = TRUE)]
   }
 
-  class(out) <- "marginal"
-  out
+  return(structure(out, class = "marginal"))
 }
 
 postprocess_one <- function(
@@ -84,7 +83,7 @@ postprocess_one <- function(
     drop_below_weight,
     na.rm
 ) {
-  if (!is.numeric(x$bin_mean) && collapse_m < nrow(x)) {
+  if (!.num(x) && collapse_m < nrow(x)) {
     x <- .collapse_m(x, m = collapse_m, by = collapse_by)
   }
   if (drop_below_n > 0) {
@@ -121,7 +120,7 @@ main_effect_importance <- function(x, statistic = NULL) {
     statistic <- vars[1L]
     message("Importance via weighted variance of '", statistic, "'")
   }
-  vapply(x, FUN = .one_imp, v = statistic, FUN.VALUE = numeric(1))
+  vapply(x, FUN = .one_imp, v = statistic, FUN.VALUE = numeric(1L))
 }
 
 # Helper functions

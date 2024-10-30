@@ -75,7 +75,7 @@ The default is 0 (no rotation). Vectorized over \code{x}. Only for "ggplot2" bac
 \item{backend}{Plot backend, either "ggplot2" (default) or "plotly".
 To change globally, set \code{options(marginalplot.backend = "plotly")}.}
 
-\item{...}{Currently unused.}
+\item{...}{Passed to \code{patchwork::plot_layout()} or \code{plotly::subplot()}.}
 }
 \value{
 If \code{length(x) == 1} (single plot), an object of class  "ggplot" or "plotly".
