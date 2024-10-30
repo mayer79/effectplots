@@ -63,6 +63,7 @@ You can switch to plotly by setting <code>backend = "plotly"</code>.</p>
 <span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  cat_lines <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  num_points <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  line_names <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>obs <span class="op">=</span> <span class="st">"y_mean"</span>, pred <span class="op">=</span> <span class="st">"pred_mean"</span>, pd <span class="op">=</span> <span class="st">"pd"</span><span class="op">)</span>,</span>
 <span>  colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"marginalplot.colors"</span><span class="op">)</span>,</span>
 <span>  fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"marginalplot.fill"</span><span class="op">)</span>,</span>
 <span>  bar_height <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -108,8 +109,14 @@ Vectorized over <code>x</code>.</p></dd>
 Vectorized over <code>x</code>.</p></dd>
 
 
+<dt id="arg-line-names">line_names<a class="anchor" aria-label="anchor" href="#arg-line-names"></a></dt>
+<dd><p>Named vector controlling the legend labels, the lines shown, and
+the line order. By default <code>c(obs = "y_mean", pred = "pred_mean", pd = "pd")</code>.
+The names of the vector will be shown in the legend.</p></dd>
+
+
 <dt id="arg-colors">colors<a class="anchor" aria-label="anchor" href="#arg-colors"></a></dt>
-<dd><p>Line colors in the order "obs", "pred", "pd" (or a subset thereof).
+<dd><p>Line colors corresponding to (available) <code>line_names</code>.
 By default, a color blind friendly palette from "ggthemes", namely
 <code>c("#CC79A7", "#009E73", "#56B4E9")</code>.
 To change globally, set <code>options(marginalplot.colors = new colors)</code>.</p></dd>

@@ -4,7 +4,7 @@ average observed (with std),
 average predicted (with std),
 partial dependence,
 counts, and
-weight sums
+weights (same as counts if no weights w are passed)
 over (possibly binned) features X specified by their column names v.
 
 "><meta property="og:image" content="/logo.png"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -61,7 +61,7 @@ over (possibly binned) features X specified by their column names v.
 <li><p>average predicted (with std),</p></li>
 <li><p>partial dependence,</p></li>
 <li><p>counts, and</p></li>
-<li><p>weight sums
+<li><p>weights (same as counts if no weights <code>w</code> are passed)
 over (possibly binned) features X specified by their column names <code>v</code>.</p></li>
 </ul></div>
 
@@ -236,13 +236,13 @@ bin means, i.e., not at the bin center.</p>
 <span class="r-in"><span><span class="va">M</span></span></span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 'marginal' object of length 4, starting with 'Sepal.Width': </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   bin_center bin_width  eval_at  N weight     pred      obs    pred_sd</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1       2.25       0.5 2.368421 19     19 5.532860 5.605263 0.53635456</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2       2.75       0.5 2.867188 64     64 6.111200 6.081250 0.66215685</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3       3.25       0.5 3.277083 48     48 5.706627 5.702083 0.82695977</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4       3.75       0.5 3.756250 16     16 5.631317 5.668750 1.00225291</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5       4.25       0.5 4.200000  3      3 5.413218 5.466667 0.05961462</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>      obs_sd       pd</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>   bin_center bin_width  eval_at  N weight pred_mean   y_mean    pred_sd</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 1       2.25       0.5 2.368421 19     19  5.532860 5.605263 0.53635456</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 2       2.75       0.5 2.867188 64     64  6.111200 6.081250 0.66215685</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 3       3.25       0.5 3.277083 48     48  5.706627 5.702083 0.82695977</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 4       3.75       0.5 3.756250 16     16  5.631317 5.668750 1.00225291</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 5       4.25       0.5 4.200000  3      3  5.413218 5.466667 0.05961462</span>
+<span class="r-out co"><span class="r-pr">#&gt;</span>        y_sd       pd</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1 0.6041281 5.501709</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 0.7766176 5.749042</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3 0.8704339 5.952305</span>

@@ -58,7 +58,6 @@ partial_dependence(), and average_observed()."><meta property="og:image" content
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">postprocess</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  sort <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  drop_stats <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  eval_at_center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  collapse_m <span class="op">=</span> <span class="fl">30L</span>,</span>
 <span>  collapse_by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weight"</span>, <span class="st">"N"</span><span class="op">)</span>,</span>
@@ -80,11 +79,6 @@ partial_dependence(), and average_observed()."><meta property="og:image" content
 <dd><p>Should <code>x</code> be sorted in decreasing order of feature importance?
 Importance is measured by the weighted variance of the most relevant available
 statistic (pd &gt; pred &gt; obs), see Details. The default is <code>FALSE</code>.</p></dd>
-
-
-<dt id="arg-drop-stats">drop_stats<a class="anchor" aria-label="anchor" href="#arg-drop-stats"></a></dt>
-<dd><p>Statistics to drop, by default <code>NULL</code>.
-Subset of "pred", "obs", "pd". Not vectorized over <code>x</code>.</p></dd>
 
 
 <dt id="arg-eval-at-center">eval_at_center<a class="anchor" aria-label="anchor" href="#arg-eval-at-center"></a></dt>
@@ -118,6 +112,11 @@ collapsing. Vectorized over <code>x</code>.</p></dd>
 
 <dt id="arg-na-rm">na.rm<a class="anchor" aria-label="anchor" href="#arg-na-rm"></a></dt>
 <dd><p>Should missing bin centers be dropped? Default is <code>FALSE</code>.</p></dd>
+
+
+<dt id="arg-drop-stats">drop_stats<a class="anchor" aria-label="anchor" href="#arg-drop-stats"></a></dt>
+<dd><p>Statistics to drop, by default <code>NULL</code>.
+Subset of "pred", "obs", "pd". Not vectorized over <code>x</code>.</p></dd>
 
 </dl></div>
     <div id="details">
