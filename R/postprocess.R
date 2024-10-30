@@ -6,31 +6,25 @@
 #' @details
 #' If `sort = TRUE`, the features will be sorted by a simple variable importance
 #' measure. It is calculated as the variance of the most relevant available statistic
-#' (pd > pred > obs). The variance is weighted by N to reflect the data distribution.
-#' For "pd", this measure is similar (but not identical) to the suggestion of
-#' Greenwell et al. (2018).
+#' (pd > pred_mean > y_mean). The variance is weighted with bin weights to reflect
+#' the data distribution. For "pd", this measure is similar (but not identical) to the
+#' suggestion of Greenwell et al. (2018).
 #' Importance is calculated after the other postprocessings, e.g., after collapsing
 #' rare levels.
 #'
-#' Except for `sort` and `drop_stats`, all arguments are vectorized, i.e., you can
+#' Except for `sort`, all arguments are vectorized, i.e., you can
 #' pass a vector or list of the same length as `x`.
 #'
 #' @param x Object of class "marginal".
 #' @param sort Should `x` be sorted in decreasing order of feature importance?
 #'   Importance is measured by the weighted variance of the most relevant available
-#'   statistic (pd > pred > obs), see Details. The default is `FALSE`.
-#' @param drop_stats Statistics to drop, by default `NULL`.
-#'   Subset of "pred", "obs", "pd". Not vectorized over `x`.
-#' @param eval_at_center If `FALSE` (default), the points are aligned with (weighted)
-#'   average X values per bin. If `TRUE`, the points are aligned with bar centers.
-#'   Since categorical X are always evaluated at bar centers, this only affects
-#'   numeric X. Note that partial dependence of numeric X is always evaluated at
-#'   bar means, not centers. Vectorized over `x`.
+#'   statistic (pd > pred_mean > y_mean), see Details. The default is `FALSE`.
 #' @param collapse_m If a categorical X has more than `collapse_m` levels,
 #'   rare levels are collapsed into a new level "Other". Standard deviations are
-#'   collapsed via root of the weighted average variances.
-#'   By default 30. Set to `Inf` for no collapsing. Vectorized over `x`.
-#' @param collapse_by How to determine "rare" levels? Either "weight" (default) or "N".
+#'   collapsed via root of the weighted average variances. By default 30.
+#'   Set to `Inf` for no collapsing. Vectorized over `x`.
+#' @param collapse_by How to determine "rare" levels in `collapse_m`?
+#'   Either "weight" (default) or "N". Only matters in situations with case weights `w`.
 #' @param drop_below_n Drop bins with N below this value. Applied after collapsing.
 #'   Vectorized over `x`.
 #' @param drop_below_weight Drop bins with weight below this value. Applied after
@@ -42,15 +36,14 @@
 #' fit <- lm(Sepal.Length ~ ., data = iris)
 #' xvars <- colnames(iris)[-1]
 #' marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5) |>
-#'   postprocess(sort = TRUE, eval_at_center = TRUE) |>
-#'   plot(num_points = TRUE)
+#'   postprocess(sort = TRUE) |>
+#'   plot()
 #' @references
 #'   Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy.
 #'   *A Simple and Effective Model-Based Variable Importance Measure.* Arxiv (2018).
 postprocess <- function(
   x,
   sort = FALSE,
-  eval_at_center = FALSE,
   collapse_m = 30L,
   collapse_by = c("weight", "N"),
   drop_below_n = 0,
@@ -66,7 +59,6 @@ postprocess <- function(
   out <- mapply(
     postprocess_one,
     x = x,
-    eval_at_center = eval_at_center,
     collapse_m = collapse_m,
     collapse_by = collapse_by,
     drop_below_n = drop_below_n,
@@ -88,17 +80,11 @@ postprocess_one <- function(
     x,
     collapse_m,
     collapse_by,
-    eval_at_center,
     drop_below_n,
     drop_below_weight,
     na.rm
 ) {
-  num <- is.numeric(x$eval_at)
-
-  if (num && isTRUE(eval_at_center)) {
-    x$eval_at <- x$bin_center
-  }
-  if (!num && collapse_m < nrow(x)) {
+  if (!is.numeric(x$bin_mean) && collapse_m < nrow(x)) {
     x <- .collapse_m(x, m = collapse_m, by = collapse_by)
   }
   if (drop_below_n > 0) {
@@ -108,7 +94,7 @@ postprocess_one <- function(
     x <- subset(x, weight >= drop_below_weight)
   }
   if (isTRUE(na.rm)) {
-    x <- subset(x, !is.na(bin_center))
+    x <- subset(x, !is.na(bin_mid))
   }
   return(droplevels(x))
 }
@@ -121,7 +107,7 @@ postprocess_one <- function(
 #'
 #' @param x Marginal object.
 #' @param statistic The statistic used to calculate the variance for.
-#' One of 'pd', 'pred_mean', or 'obs_mean'.
+#' One of 'pd', 'pred_mean', or 'y_mean'.
 #' @seealso [postprocess()]
 #' @export
 #' @examples
@@ -141,7 +127,7 @@ main_effect_importance <- function(x, statistic = NULL) {
 # Helper functions
 .one_imp <- function(x, v) {
   ok <- is.finite(x[[v]])
-  stats::cov.wt(x[ok, v, drop = FALSE], x[["N"]][ok], method = "ML")$cov[1L, 1L]
+  stats::cov.wt(x[ok, v, drop = FALSE], x$weight[ok], method = "ML")$cov[1L, 1L]
 }
 
 .collapse_m <- function(x, m, by) {
@@ -151,16 +137,16 @@ main_effect_importance <- function(x, statistic = NULL) {
 
   # Prepare new factors
   x_keep <- droplevels(x_keep)
-  lvl <- levels(x_keep$bin_center)
+  lvl <- levels(x_keep$bin_mid)
   oth <- make.names(c(lvl, "other"), unique = TRUE)[length(lvl) + 1L]
-  levels(x_keep$bin_center) <- levels(x_keep$eval_at) <- c(lvl, oth)
+  levels(x_keep$bin_mid) <- levels(x_keep$bin_mean) <- c(lvl, oth)
 
   # Collapse other rows
   M <- x_agg[intersect(colnames(x), c("pred_mean", "y_mean", "pd"))]
   S <- x_agg[intersect(colnames(x), c("pred_sd", "y_sd"))]
   w <- x_agg$weight
   x_new <- data.frame(
-    bin_center = oth, bin_width = 0.7, eval_at = oth, N = sum(x_agg$N), weight = sum(w)
+    bin_mid = oth, bin_width = 0.7, bin_mean = oth, N = sum(x_agg$N), weight = sum(w)
   )
   if (NCOL(M)) {
     x_new[, colnames(M)] <- collapse::fmean(M, w = w, drop = FALSE, na.rm = TRUE)

@@ -17,6 +17,7 @@
   bar_height = 1,
   bar_width = 0.7,
   bar_measure = c("weight", "N"),
+  eval_at = c("mean", "mid"),
   wrap_x = 10,
   rotate_x = 0,
   backend = getOption("marginalplot.backend"),
@@ -43,7 +44,7 @@ Vectorized over \code{x}.}
 
 \item{line_names}{Named vector controlling the legend labels, the lines shown, and
 the line order. By default \code{c(obs = "y_mean", pred = "pred_mean", pd = "pd")}.
-The names of the vector will be shown in the legend.}
+The names of the vector will be shown as legend labels.}
 
 \item{colors}{Line colors corresponding to (available) \code{line_names}.
 By default, a color blind friendly palette from "ggthemes", namely
@@ -58,6 +59,11 @@ To change globally, set \verb{options(marginalplot.fill = new color)}.}
 \item{bar_width}{Relative bar width of non-numeric features, by default 0.7.}
 
 \item{bar_measure}{What should bars represent? Either "weight" (default) or "N".}
+
+\item{eval_at}{If \code{mean} (default), the points are aligned with (weighted)
+average bin means. If \code{mid}, the points are aligned with bin midpoints.
+Affects only numeric X. Note that partial dependence of numeric X is always
+evaluated at bin means, not midpoints.}
 
 \item{wrap_x}{Should categorical xaxis labels be wrapped after this length?
 The default is 10. Set to 0 for no wrapping. Vectorized over \code{x}.

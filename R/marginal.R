@@ -273,7 +273,7 @@ calculate_stats <- function(
     # Ordered by sort(g) (+ NA). For factors: levels(x) (+ NA)
     M <- grouped_stats(PY, g = x, w = w)
     g <- sort(g, na.last = TRUE)
-    out <- data.frame(bin_center = g, bin_width = 0.7, eval_at = g, M)
+    out <- data.frame(bin_mid = g, bin_width = 0.7, bin_mean = g, M)
     rownames(out) <- NULL
   } else {
     # "CONTINUOUS" case. Tricky because there can be empty bins.
@@ -291,7 +291,7 @@ calculate_stats <- function(
       bin_width <- c(bin_width, NA)  #  Can't be plotted anyway
     }
     out <- data.frame(
-      bin_center = g, bin_width = bin_width, eval_at = g, N = 0, weight = 0
+      bin_mid = g, bin_width = bin_width, bin_mean = g, N = 0, weight = 0
     )
 
     # Integer encoding
@@ -299,7 +299,7 @@ calculate_stats <- function(
       x, vec = br, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
     )
     M <- cbind(
-      eval_at = collapse::fmean.default(x, g = ix, w = w),
+      bin_mean = collapse::fmean.default(x, g = ix, w = w),
       grouped_stats(PY, g = ix, w = w)
     )
     reindex <- match(as.integer(rownames(M)), gix)
@@ -312,7 +312,7 @@ calculate_stats <- function(
       object = object,
       v = v,
       X = pd_X,
-      grid = out[["eval_at"]],
+      grid = out[["bin_mean"]],
       pred_fun = pred_fun,
       w = pd_w,
       ...
@@ -320,8 +320,8 @@ calculate_stats <- function(
   }
 
   # Convert non-numeric levels *after* calculation of partial dependence!
-  if (!num && !is.factor(out[["eval_at"]])) {
-    out[["bin_center"]] <- out[["eval_at"]] <- factor(out[["eval_at"]])
+  if (!num && !is.factor(out[["bin_mean"]])) {
+    out[["bin_mid"]] <- out[["bin_mean"]] <- factor(out[["bin_mean"]])
   }
   return(out)
 }

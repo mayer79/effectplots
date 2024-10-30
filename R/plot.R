@@ -17,7 +17,7 @@
 #'   Vectorized over `x`.
 #' @param line_names Named vector controlling the legend labels, the lines shown, and
 #'   the line order. By default `c(obs = "y_mean", pred = "pred_mean", pd = "pd")`.
-#'   The names of the vector will be shown in the legend.
+#'   The names of the vector will be shown as legend labels.
 #' @param colors Line colors corresponding to (available) `line_names`.
 #'   By default, a color blind friendly palette from "ggthemes", namely
 #'   `c("#CC79A7", "#009E73", "#56B4E9")`.
@@ -27,6 +27,10 @@
 #' @param bar_height Relative bar height (default 1). Set to 0 for no bars.
 #' @param bar_width Relative bar width of non-numeric features, by default 0.7.
 #' @param bar_measure What should bars represent? Either "weight" (default) or "N".
+#' @param eval_at If `mean` (default), the points are aligned with (weighted)
+#'   average bin means. If `mid`, the points are aligned with bin midpoints.
+#'   Affects only numeric X. Note that partial dependence of numeric X is always
+#'   evaluated at bin means, not midpoints.
 #' @param wrap_x Should categorical xaxis labels be wrapped after this length?
 #'   The default is 10. Set to 0 for no wrapping. Vectorized over `x`.
 #'   Only for "ggplot2" backend.
@@ -53,23 +57,32 @@ plot.marginal <- function(
     bar_height = 1,
     bar_width = 0.7,
     bar_measure = c("weight", "N"),
+    eval_at = c("mean", "mid"),
     wrap_x = 10,
     rotate_x = 0,
     backend = getOption("marginalplot.backend"),
     ...
 ) {
   bar_measure <- match.arg(bar_measure)
+  eval_at <- match.arg(eval_at)
+
   line_names <- line_names[line_names %in% colnames(x[[1L]])]
   nn <- length(line_names)
+  show_legend <- nn > 1L
+
   stopifnot(
     backend %in% c("ggplot2", "plotly"),
     nn > 0L,
     length(colors) >= nn
   )
-  show_legend <- nn > 1L
 
   # Overwrite bin_width of categorical features
-  x <- lapply(x, function(z) {if (!is.numeric(z$eval_at)) z$bin_width <- bar_width; z})
+  x <- lapply(x, function(z) {if (!is.numeric(z$bin_mean)) z$bin_width <- bar_width; z})
+
+  # Modify where points of numeric features are shown
+  if (eval_at == "mid") {
+    x <- lapply(x, function(z) {if (is.numeric(z$bin_mean)) z$bin_mean <- z$bin_mid; z})
+  }
 
   if (length(x) == 1L) {
     if (backend == "ggplot2") {
@@ -196,7 +209,7 @@ plot_marginal_ggplot <- function(
     show_ylab = TRUE,
     ...
 ) {
-  num <- is.numeric(x$eval_at)
+  num <- is.numeric(x$bin_mean)
   df <- transform(
     poor_man_stack(x, line_names),
     varying_ = factor(varying_, levels = line_names, labels = names(line_names))
@@ -210,7 +223,7 @@ plot_marginal_ggplot <- function(
     r <- grDevices::extendrange(ylim, f = f)
   }
 
-  p <- ggplot2::ggplot(df, ggplot2::aes(x = eval_at, y = value_))
+  p <- ggplot2::ggplot(df, ggplot2::aes(x = bin_mean, y = value_))
 
   # Add optional bars on secondary y axis
   if (bar_height > 0) {
@@ -220,7 +233,7 @@ plot_marginal_ggplot <- function(
     p <- p + ggplot2::geom_tile(
       x,
       mapping = ggplot2::aes(
-        x = bin_center,
+        x = bin_mid,
         y = size / 2 * mult + r[1L],
         height = size * mult,
         width = bin_width
@@ -293,7 +306,7 @@ plot_marginal_plotly <- function(
     overlay = "y2",
     ...
 ) {
-  num <- is.numeric(x$eval_at)
+  num <- is.numeric(x$bin_mean)
 
   if (num && isFALSE(num_points)) {
     scatter_mode <- "lines"
@@ -304,13 +317,13 @@ plot_marginal_plotly <- function(
   }
 
   # Deal with NAs in categorical X
-  if (!num && anyNA(x$bin_center)) {
-    lvl <- levels(x$bin_center)
+  if (!num && anyNA(x$bin_mid)) {
+    lvl <- levels(x$bin_mid)
     if ("NA" %in% lvl) {
       warning("Can't show NA level on x axis because there is already a level 'NA'")
     } else {
-      levels(x$bin_center) <- levels(x$eval_at) <- c(lvl, "NA")
-      x[is.na(x$bin_center), c("bin_center", "eval_at")] <- "NA"
+      levels(x$bin_mid) <- levels(x$bin_mean) <- c(lvl, "NA")
+      x[is.na(x$bin_mid), c("bin_mid", "bin_mean")] <- "NA"
     }
   }
 
@@ -319,7 +332,7 @@ plot_marginal_plotly <- function(
   if (bar_height > 0) {
     fig <- plotly::add_bars(
       fig,
-      x = ~bin_center,
+      x = ~bin_mid,
       y = x[[bar_measure]],
       width = ~bin_width,
       data = x,
@@ -338,7 +351,7 @@ plot_marginal_plotly <- function(
     z <- line_names[i]
     fig <- plotly::add_trace(
       fig,
-      x = ~eval_at,
+      x = ~bin_mean,
       y = x[[z]],
       data = x,
       yaxis = "y",

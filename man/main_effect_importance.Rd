@@ -10,7 +10,7 @@ main_effect_importance(x, statistic = NULL)
 \item{x}{Marginal object.}
 
 \item{statistic}{The statistic used to calculate the variance for.
-One of 'pd', 'pred_mean', or 'obs_mean'.}
+One of 'pd', 'pred_mean', or 'y_mean'.}
 }
 \description{
 Extracts the weighted variances of the most relevant statistic

@@ -7,7 +7,6 @@
 postprocess(
   x,
   sort = FALSE,
-  eval_at_center = FALSE,
   collapse_m = 30L,
   collapse_by = c("weight", "N"),
   drop_below_n = 0,
@@ -20,20 +19,15 @@ postprocess(
 
 \item{sort}{Should \code{x} be sorted in decreasing order of feature importance?
 Importance is measured by the weighted variance of the most relevant available
-statistic (pd > pred > obs), see Details. The default is \code{FALSE}.}
-
-\item{eval_at_center}{If \code{FALSE} (default), the points are aligned with (weighted)
-average X values per bin. If \code{TRUE}, the points are aligned with bar centers.
-Since categorical X are always evaluated at bar centers, this only affects
-numeric X. Note that partial dependence of numeric X is always evaluated at
-bar means, not centers. Vectorized over \code{x}.}
+statistic (pd > pred_mean > y_mean), see Details. The default is \code{FALSE}.}
 
 \item{collapse_m}{If a categorical X has more than \code{collapse_m} levels,
 rare levels are collapsed into a new level "Other". Standard deviations are
-collapsed via root of the weighted average variances.
-By default 30. Set to \code{Inf} for no collapsing. Vectorized over \code{x}.}
+collapsed via root of the weighted average variances. By default 30.
+Set to \code{Inf} for no collapsing. Vectorized over \code{x}.}
 
-\item{collapse_by}{How to determine "rare" levels? Either "weight" (default) or "N".}
+\item{collapse_by}{How to determine "rare" levels in \code{collapse_m}?
+Either "weight" (default) or "N". Only matters in situations with case weights \code{w}.}
 
 \item{drop_below_n}{Drop bins with N below this value. Applied after collapsing.
 Vectorized over \code{x}.}
@@ -42,9 +36,6 @@ Vectorized over \code{x}.}
 collapsing. Vectorized over \code{x}.}
 
 \item{na.rm}{Should missing bin centers be dropped? Default is \code{FALSE}.}
-
-\item{drop_stats}{Statistics to drop, by default \code{NULL}.
-Subset of "pred", "obs", "pd". Not vectorized over \code{x}.}
 }
 \description{
 This function helps to improve the output of \code{\link[=marginal]{marginal()}},
@@ -53,21 +44,21 @@ This function helps to improve the output of \code{\link[=marginal]{marginal()}}
 \details{
 If \code{sort = TRUE}, the features will be sorted by a simple variable importance
 measure. It is calculated as the variance of the most relevant available statistic
-(pd > pred > obs). The variance is weighted by N to reflect the data distribution.
-For "pd", this measure is similar (but not identical) to the suggestion of
-Greenwell et al. (2018).
+(pd > pred_mean > y_mean). The variance is weighted with bin weights to reflect
+the data distribution. For "pd", this measure is similar (but not identical) to the
+suggestion of Greenwell et al. (2018).
 Importance is calculated after the other postprocessings, e.g., after collapsing
 rare levels.
 
-Except for \code{sort} and \code{drop_stats}, all arguments are vectorized, i.e., you can
+Except for \code{sort}, all arguments are vectorized, i.e., you can
 pass a vector or list of the same length as \code{x}.
 }
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)
 xvars <- colnames(iris)[-1]
 marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5) |>
-  postprocess(sort = TRUE, eval_at_center = TRUE) |>
-  plot(num_points = TRUE)
+  postprocess(sort = TRUE) |>
+  plot()
 }
 \references{
 Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy.
