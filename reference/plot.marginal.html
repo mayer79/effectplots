@@ -69,6 +69,7 @@ You can switch to plotly by setting <code>backend = "plotly"</code>.</p>
 <span>  bar_height <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  bar_width <span class="op">=</span> <span class="fl">0.7</span>,</span>
 <span>  bar_measure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weight"</span>, <span class="st">"N"</span><span class="op">)</span>,</span>
+<span>  eval_at <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"mean"</span>, <span class="st">"mid"</span><span class="op">)</span>,</span>
 <span>  wrap_x <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  rotate_x <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  backend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"marginalplot.backend"</span><span class="op">)</span>,</span>
@@ -112,7 +113,7 @@ Vectorized over <code>x</code>.</p></dd>
 <dt id="arg-line-names">line_names<a class="anchor" aria-label="anchor" href="#arg-line-names"></a></dt>
 <dd><p>Named vector controlling the legend labels, the lines shown, and
 the line order. By default <code>c(obs = "y_mean", pred = "pred_mean", pd = "pd")</code>.
-The names of the vector will be shown in the legend.</p></dd>
+The names of the vector will be shown as legend labels.</p></dd>
 
 
 <dt id="arg-colors">colors<a class="anchor" aria-label="anchor" href="#arg-colors"></a></dt>
@@ -137,6 +138,13 @@ To change globally, set <code>options(marginalplot.fill = new color)</code>.</p>
 
 <dt id="arg-bar-measure">bar_measure<a class="anchor" aria-label="anchor" href="#arg-bar-measure"></a></dt>
 <dd><p>What should bars represent? Either "weight" (default) or "N".</p></dd>
+
+
+<dt id="arg-eval-at">eval_at<a class="anchor" aria-label="anchor" href="#arg-eval-at"></a></dt>
+<dd><p>If <code>mean</code> (default), the points are aligned with (weighted)
+average bin means. If <code>mid</code>, the points are aligned with bin midpoints.
+Affects only numeric X. Note that partial dependence of numeric X is always
+evaluated at bin means, not midpoints.</p></dd>
 
 
 <dt id="arg-wrap-x">wrap_x<a class="anchor" aria-label="anchor" href="#arg-wrap-x"></a></dt>

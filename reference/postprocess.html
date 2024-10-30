@@ -58,7 +58,6 @@ partial_dependence(), and average_observed()."><meta property="og:image" content
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">postprocess</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  sort <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  eval_at_center <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  collapse_m <span class="op">=</span> <span class="fl">30L</span>,</span>
 <span>  collapse_by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weight"</span>, <span class="st">"N"</span><span class="op">)</span>,</span>
 <span>  drop_below_n <span class="op">=</span> <span class="fl">0</span>,</span>
@@ -78,26 +77,19 @@ partial_dependence(), and average_observed()."><meta property="og:image" content
 <dt id="arg-sort">sort<a class="anchor" aria-label="anchor" href="#arg-sort"></a></dt>
 <dd><p>Should <code>x</code> be sorted in decreasing order of feature importance?
 Importance is measured by the weighted variance of the most relevant available
-statistic (pd &gt; pred &gt; obs), see Details. The default is <code>FALSE</code>.</p></dd>
-
-
-<dt id="arg-eval-at-center">eval_at_center<a class="anchor" aria-label="anchor" href="#arg-eval-at-center"></a></dt>
-<dd><p>If <code>FALSE</code> (default), the points are aligned with (weighted)
-average X values per bin. If <code>TRUE</code>, the points are aligned with bar centers.
-Since categorical X are always evaluated at bar centers, this only affects
-numeric X. Note that partial dependence of numeric X is always evaluated at
-bar means, not centers. Vectorized over <code>x</code>.</p></dd>
+statistic (pd &gt; pred_mean &gt; y_mean), see Details. The default is <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-collapse-m">collapse_m<a class="anchor" aria-label="anchor" href="#arg-collapse-m"></a></dt>
 <dd><p>If a categorical X has more than <code>collapse_m</code> levels,
 rare levels are collapsed into a new level "Other". Standard deviations are
-collapsed via root of the weighted average variances.
-By default 30. Set to <code>Inf</code> for no collapsing. Vectorized over <code>x</code>.</p></dd>
+collapsed via root of the weighted average variances. By default 30.
+Set to <code>Inf</code> for no collapsing. Vectorized over <code>x</code>.</p></dd>
 
 
 <dt id="arg-collapse-by">collapse_by<a class="anchor" aria-label="anchor" href="#arg-collapse-by"></a></dt>
-<dd><p>How to determine "rare" levels? Either "weight" (default) or "N".</p></dd>
+<dd><p>How to determine "rare" levels in <code>collapse_m</code>?
+Either "weight" (default) or "N". Only matters in situations with case weights <code>w</code>.</p></dd>
 
 
 <dt id="arg-drop-below-n">drop_below_n<a class="anchor" aria-label="anchor" href="#arg-drop-below-n"></a></dt>
@@ -113,22 +105,17 @@ collapsing. Vectorized over <code>x</code>.</p></dd>
 <dt id="arg-na-rm">na.rm<a class="anchor" aria-label="anchor" href="#arg-na-rm"></a></dt>
 <dd><p>Should missing bin centers be dropped? Default is <code>FALSE</code>.</p></dd>
 
-
-<dt id="arg-drop-stats">drop_stats<a class="anchor" aria-label="anchor" href="#arg-drop-stats"></a></dt>
-<dd><p>Statistics to drop, by default <code>NULL</code>.
-Subset of "pred", "obs", "pd". Not vectorized over <code>x</code>.</p></dd>
-
 </dl></div>
     <div id="details">
     <h2>Details</h2>
     <p>If <code>sort = TRUE</code>, the features will be sorted by a simple variable importance
 measure. It is calculated as the variance of the most relevant available statistic
-(pd &gt; pred &gt; obs). The variance is weighted by N to reflect the data distribution.
-For "pd", this measure is similar (but not identical) to the suggestion of
-Greenwell et al. (2018).
+(pd &gt; pred_mean &gt; y_mean). The variance is weighted with bin weights to reflect
+the data distribution. For "pd", this measure is similar (but not identical) to the
+suggestion of Greenwell et al. (2018).
 Importance is calculated after the other postprocessings, e.g., after collapsing
 rare levels.</p>
-<p>Except for <code>sort</code> and <code>drop_stats</code>, all arguments are vectorized, i.e., you can
+<p>Except for <code>sort</code>, all arguments are vectorized, i.e., you can
 pass a vector or list of the same length as <code>x</code>.</p>
     </div>
     <div id="references">
@@ -146,8 +133,8 @@ pass a vector or list of the same length as <code>x</code>.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">Sepal.Length</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">xvars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">iris</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="marginal.html">marginal</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">iris</span>, y <span class="op">=</span> <span class="st">"Sepal.Length"</span>, breaks <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu">postprocess</span><span class="op">(</span>sort <span class="op">=</span> <span class="cn">TRUE</span>, eval_at_center <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
-<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span>num_points <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span></span></span>
+<span class="r-in"><span>  <span class="fu">postprocess</span><span class="op">(</span>sort <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
+<span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></span>
 <span class="r-msg co"><span class="r-pr">#&gt;</span> Importance via weighted variance of 'pd'</span>
 <span class="r-plt img"><img src="postprocess-1.png" alt="" width="700" height="433"></span>
 </code></pre></div>
