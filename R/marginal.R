@@ -88,7 +88,6 @@ marginal.default <- function(
     v %in% colnames(data),
     outlier_iqr >= 0
   )
-  n <- nrow(data)
 
   # Prepare pred
   if (is.null(pred)) {
@@ -96,7 +95,7 @@ marginal.default <- function(
       pred <- prep_pred(pred_fun(object, data, ...))
     }
   } else {
-    if (length(pred) != n) {
+    if (length(pred) != nrow(data)) {
       stop("'pred' should be a vector of length nrow(data), or NULL.")
     }
     pred <- prep_pred(pred)
@@ -115,12 +114,23 @@ marginal.default <- function(
     if (any(w < 0)) {
       stop("'w' can't have negative values")
     }
+    ok <- w > 0
+    if (!any(ok)) {
+      stop("No positive 'w' detected")
+    }
+    if (!all(ok)){
+      w <- w[ok]
+      data <- collapse::ss(data, ok)
+      if (!is.null(PY)) {
+        PY <- PY[ok, , drop = FALSE]
+      }
+    }
   }
 
   # Prepare pd_X and pd_w
   if (pd_n > 0L) {
-    if (n > pd_n) {
-      ix <- sample(n, pd_n)
+    if (nrow(data) > pd_n) {
+      ix <- sample(nrow(data), pd_n)
       pd_X <- collapse::ss(data, ix)
       pd_w <- if (!is.null(w)) w[ix]
     } else {
