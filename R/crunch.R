@@ -20,8 +20,10 @@ winsorize <- function(x, low = -Inf, high = Inf) {
 
 # Later replace by collapse::qsu()
 grouped_stats <- function(x, g, w = NULL) {
+  if (!is.factor(g)) {
+    g <- collapse::qF(g, sort = TRUE)
+  }
   # returns rows in order sort(unique(x)) + NA, or levels(x) + NA (if factor)
-  g <- collapse::qF(g, sort = TRUE)
   N <- collapse::fsum.default(rep.int(1L, times = length(g)), g = g)
   if (!is.null(w)) {
     weight <- collapse::fsum.default(w, g = g)

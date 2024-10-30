@@ -298,6 +298,7 @@ calculate_stats <- function(
     ix <- findInterval(
       x, vec = br, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
     )
+    ix <- collapse::qF(ix, sort = TRUE)
     M <- cbind(
       bin_mean = collapse::fmean.default(x, g = ix, w = w),
       grouped_stats(PY, g = ix, w = w)
@@ -317,6 +318,29 @@ calculate_stats <- function(
       w = pd_w,
       ...
     )
+  }
+
+  if (num) {
+    ale <- numeric(nrow(out))
+    ok <- (out$weight > 0) & !is.na(out$bin_mid)
+    ale[ok] <- diff_ale(
+      object,
+      v = v,
+      X = data,
+      mid = out[ok, "bin_mid"],
+      width = out[ok, "bin_width"],
+      g = ix,
+      pred_fun = pred_fun,
+      ...
+    )
+    ale <- cumsum(ale)
+    center_vars <- intersect(c("pd", "pred_mean", "y_mean"), colnames(out))
+    if (length(center_vars) > 0L) {
+      ale <- ale -
+        collapse::fmean(ale, na.rm = TRUE, w = out$weight) +
+        collapse::fmean(out[[center_vars[1L]]], na.rm = TRUE, w = out$weight)
+    }
+    out$ale <- ale
   }
 
   # Convert non-numeric levels *after* calculation of partial dependence!
