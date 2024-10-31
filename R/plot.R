@@ -150,15 +150,16 @@ plot.marginal <- function(
     ylim <- grDevices::extendrange(r, f = 0.05)
   }
 
+  if (show_legend) {
+    # Prefer lines without points. Thus, we pick such feature.
+    # Legend placement is done correctly by {patchwork} and {plotly}.
+    num <- .num(x)
+    no_lines <- !num & isFALSE(cat_lines)
+    has_points <- !num | isTRUE(num_points)
+    show_legend <- seq_along(x) == order(no_lines, has_points)[1L]
+  }
+
   if (backend == "ggplot2") {
-    if (show_legend) {
-      # Prefer lines without points. Thus, we pick such feature.
-      # {patchwork} moves the legend to the right
-      num <- .num(x)
-      no_lines <- !num & isFALSE(cat_lines)
-      has_points <- !num | isTRUE(num_points)
-      show_legend <- seq_along(x) == order(no_lines, has_points)[1L]
-    }
     plot_list <- mapply(
       plot_marginal_ggplot,
       x,
@@ -187,14 +188,13 @@ plot.marginal <- function(
   } else {
     ncols <- min(ncols, length(x))
     col_i <- (seq_along(x) - 1L) %% ncols + 1L
-    row_i <- ceiling(seq_along(x) / ncols)
 
     plot_list <- mapply(
       plot_marginal_plotly,
       x,
       v = names(x),
       show_ylab = col_i == 1L,
-      show_legend = show_legend & row_i == 1L & col_i == ncols,
+      show_legend = show_legend,
       overlay = paste0("y", 2 * seq_along(x)),
       cat_lines = cat_lines,
       num_points = num_points,
@@ -220,6 +220,7 @@ plot.marginal <- function(
       margin = c(0.03, 0.05, 0.125, 0.03),
       ...
     )
+    #plotly::layout(fig, legend = list(x = 1.02, y = 0.5, xanchor = "left"))
   }
 }
 
@@ -388,6 +389,7 @@ plot_marginal_plotly <- function(
       type = "scatter",
       name = names(z),
       showlegend = show_legend,
+      legendgroup = z,
       color = I(colors[i])
     )
   }
@@ -425,7 +427,7 @@ plot_marginal_plotly <- function(
       range = if (bar_height > 0) r
     ),
     xaxis = list(title = v),
-    legend = list(orientation = "v", x = 1.05, xanchor = "left")
+    legend = list(x = 1.02, y = 0.5, xanchor = "left", tracegroupgap = 3)
   )
 }
 
