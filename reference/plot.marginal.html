@@ -58,7 +58,8 @@ You can switch to plotly by setting <code>backend = "plotly"</code>.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'marginal'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
-<span>  ncols <span class="op">=</span> <span class="fl">2L</span>,</span>
+<span>  ncol <span class="op">=</span> <span class="fl">2L</span>,</span>
+<span>  byrow <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  share_y <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  cat_lines <span class="op">=</span> <span class="cn">TRUE</span>,</span>
@@ -86,10 +87,15 @@ You can switch to plotly by setting <code>backend = "plotly"</code>.</p>
 <dd><p>An object of class "marginal".</p></dd>
 
 
-<dt id="arg-ncols">ncols<a class="anchor" aria-label="anchor" href="#arg-ncols"></a></dt>
+<dt id="arg-ncol">ncol<a class="anchor" aria-label="anchor" href="#arg-ncol"></a></dt>
 <dd><p>Number of columns in the plot layout.
 Only if <code>length(x) &gt; 1</code> (multiple plots). With "plotly" subplots, the result may
 differ slightly.</p></dd>
+
+
+<dt id="arg-byrow">byrow<a class="anchor" aria-label="anchor" href="#arg-byrow"></a></dt>
+<dd><p>Should plots be placed by row? Default is <code>TRUE</code>.
+Only if <code>length(x) &gt; 1</code> (multiple plots).</p></dd>
 
 
 <dt id="arg-share-y">share_y<a class="anchor" aria-label="anchor" href="#arg-share-y"></a></dt>
