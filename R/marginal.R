@@ -344,8 +344,11 @@ calculate_stats <- function(
     )
 
     # Integer encoding
-    ix <- findInterval(
-      x, vec = br, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
+    ix <- collapse::qF(
+      findInterval(
+        x, vec = br, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
+      ),
+      sort = TRUE
     )
     M <- cbind(
       bin_mean = collapse::fmean.default(x, g = ix, w = w),

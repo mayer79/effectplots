@@ -21,7 +21,9 @@ winsorize <- function(x, low = -Inf, high = Inf) {
 # Later replace by collapse::qsu()
 grouped_stats <- function(x, g, w = NULL) {
   # returns rows in order sort(unique(x)) + NA, or levels(x) + NA (if factor)
-  g <- collapse::qF(g, sort = TRUE)
+  if (!is.factor(g)) {
+    g <- collapse::qF(g, sort = TRUE)
+  }
   N <- collapse::fsum.default(rep.int(1L, times = length(g)), g = g)
   if (!is.null(w)) {
     weight <- collapse::fsum.default(w, g = g)
@@ -77,4 +79,78 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
   }
   pred <- prep_pred(pred_fun(object, X_pred, ...), trafo = trafo)
   return(wrowmean(pred, ngroups = p, w = w))
+}
+
+#' Barebone Accumulated Local Effects
+#'
+#' Very fast ALE calculations. Since the function does not do any
+#' input checks, it is mainly meant for internal use. Still, for developers, it can
+#' be handy.
+#'
+#' @param v Variable name in `data` to calculate ALE.
+#' @param X Matrix or data.frame.
+#' @param breaks Breaks for ALE calculation.
+#' @param right Should bins specified via `breaks` be right-closed?
+#'   The default is `TRUE`.
+#' @param max_bin_size Maximal number of observations used per bin. If there are more
+#'   observations in a bin, `n_bin` indices are randomly sampled. The default is 50.
+#' @param w Optional vector with case weights.
+#' @param g For internal use. The result of `factor(findInterval(...))`.
+#'   By default `NULL`.
+#' @inheritParams marginal
+#' @returns Vector of ALE values in the same order as `breaks[-length(breaks)]`.
+#' @export
+#' @seealso [partial_dependence()]
+#' @examples
+#' fit <- lm(Sepal.Length ~ ., data = iris)
+#' v <- "Sepal.Width"
+#' .ale(fit, v, X = iris, breaks = seq(2, 4, length.out = 5))
+.ale <- function(
+    object,
+    v,
+    X,
+    breaks,
+    right = TRUE,
+    pred_fun = stats::predict,
+    trafo = NULL,
+    max_bin_size = 50L,
+    w = NULL,
+    g = NULL,
+    ...
+) {
+  if (is.null(g)) {
+    g <- collapse::qF(
+      findInterval(
+        if (is.data.frame(X)) X[[v]] else X[, v],
+        vec = breaks,
+        rightmost.closed = TRUE,
+        left.open = right,
+        all.inside = TRUE
+      ),
+      sort = TRUE
+    )
+  }
+  J <- lapply(
+    collapse::gsplit(1:length(g), g = g, use.g.names = TRUE),
+    function(z) if (length(z) <= max_bin_size) z else sample(z, size = max_bin_size)
+  )
+  if (is.na(names(J)[length(J)])) {
+    J <- J[-length(J)]
+  }
+
+  out <- numeric(length(breaks) - 1L)
+  for (j in as.integer(names(J))) {
+    pdj <- .pd(
+      object,
+      v = v,
+      X = collapse::ss(X, J[[j]]),
+      grid = breaks[c(j, j + 1L)],
+      pred_fun = pred_fun,
+      trafo = trafo,
+      w = if (!is.null(w)) w[J[[j]]],
+      ...
+    )
+    out[j] <- diff(pdj)
+  }
+  return(cumsum(out))
 }
