@@ -6,7 +6,8 @@
 \usage{
 \method{plot}{marginal}(
   x,
-  ncols = 2L,
+  ncol = 2L,
+  byrow = TRUE,
   share_y = FALSE,
   ylim = NULL,
   cat_lines = TRUE,
@@ -28,9 +29,12 @@
 \arguments{
 \item{x}{An object of class "marginal".}
 
-\item{ncols}{Number of columns in the plot layout.
+\item{ncol}{Number of columns in the plot layout.
 Only if \code{length(x) > 1} (multiple plots). With "plotly" subplots, the result may
 differ slightly.}
+
+\item{byrow}{Should plots be placed by row? Default is \code{TRUE}.
+Only if \code{length(x) > 1} (multiple plots).}
 
 \item{share_y}{Should y axis be shared across all subplots?
 No effect if \code{ylim} is passed. Only if \code{length(x) > 1} (multiple plots).}

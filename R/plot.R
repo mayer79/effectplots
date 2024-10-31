@@ -5,9 +5,11 @@
 #'
 #' @importFrom ggplot2 .data
 #' @param x An object of class "marginal".
-#' @param ncols Number of columns in the plot layout.
+#' @param ncol Number of columns in the plot layout.
 #'   Only if `length(x) > 1` (multiple plots). With "plotly" subplots, the result may
 #'   differ slightly.
+#' @param byrow Should plots be placed by row? Default is `TRUE`.
+#'   Only if `length(x) > 1` (multiple plots).
 #' @param share_y Should y axis be shared across all subplots?
 #'   No effect if `ylim` is passed. Only if `length(x) > 1` (multiple plots).
 #' @param ylim Manual y axis range.
@@ -46,7 +48,8 @@
 #' @export
 plot.marginal <- function(
     x,
-    ncols = 2L,
+    ncol = 2L,
+    byrow = TRUE,
     share_y = FALSE,
     ylim = NULL,
     cat_lines = TRUE,
@@ -144,6 +147,19 @@ plot.marginal <- function(
   }
 
   # Now with multiple plots...
+  if (backend == "plotly") {
+    # Let's try to figure out how many columns our plotly subplot will really have...
+    nrows <- ceiling(nplots / min(ncol, nplots))
+    ncol <- ceiling(nplots / nrows)
+  }
+
+  # Can be useful if objects of different models/datasets are c() together
+  if (isFALSE(byrow)) {
+    alt <- c(t(matrix(seq_along(x), ncol = ncol)))
+    x <- x[alt]
+  }
+
+  # Shared y is solved via ylim + padding
   if (share_y && is.null(ylim)) {
     r <- range(sapply(x, function(z) range(z[line_names], na.rm = TRUE)))
     ylim <- grDevices::extendrange(r, f = 0.05)
@@ -178,13 +194,9 @@ plot.marginal <- function(
       SIMPLIFY = FALSE
     )
     patchwork::wrap_plots(plot_list) +
-      patchwork::plot_layout(ncol = ncols, guides = "collect", axes = "collect", ...)
+      patchwork::plot_layout(ncol = ncol, guides = "collect", axes = "collect", ...)
   } else {
-    # Let's try to figure out how many columns our suboplot will have...
-    nrows <- ceiling(nplots / min(ncols, nplots))
-    ncols <- ceiling(nplots / nrows)
-    col_i <- (seq_along(x) - 1L) %% ncols + 1L
-
+    col_i <- (seq_along(x) - 1L) %% ncol + 1L
     plot_list <- mapply(
       plot_marginal_plotly,
       x,
@@ -215,7 +227,7 @@ plot.marginal <- function(
       titleX = TRUE,
       titleY = FALSE,
       nrows = nrows,
-      widths = corr_margin(ncols, margin = margins[1L]),
+      widths = corr_margin(ncol, margin = margins[1L]),
       heights = corr_margin(nrows, margin = margins[2L]),
       margin = rep(margins, each = 2L),
       ...

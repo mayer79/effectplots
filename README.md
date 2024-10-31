@@ -141,16 +141,18 @@ m_test <- m_test[names(m_train)]
 
 # Plot combined one
 c(m_train, m_test) |> 
-  plot(share_y = TRUE, byrow = FALSE) +
+  plot(share_y = TRUE, ncol = 2, byrow = FALSE) +
   plot_annotation(title = "Left: Train - Right: Test")
   
-# Or via Plotly -> uses bycol, i.e., we need to alternate plots
-alt <- c(t(matrix(seq_len(6), ncol = 2)))
-c(m_train, m_test)[alt] |> 
-  plot(share_y = TRUE, backend = "plotly")
+# Or via Plotly
+c(m_train, m_test) |> 
+  plot(share_y = TRUE, ncol = 2, byrow = FALSE, backend = "plotly") |> 
+  plotly::layout(margin = list(t = 60), title = "Left: Train - Right: Test")
 ```
 
 ![](man/figures/train_test.svg)
+
+The same logic can also be used to compare different models.
 
 # References
 
