@@ -12,9 +12,7 @@
 #'   No effect if `ylim` is passed. Only if `length(x) > 1` (multiple plots).
 #' @param ylim Manual y axis range.
 #' @param cat_lines Show lines for non-numeric features. Default is `TRUE`.
-#'   Vectorized over `x`.
 #' @param num_points Show points for numeric features. Default is `FALSE`.
-#'   Vectorized over `x`.
 #' @param ylab Label of y axis. The default `NULL` automatically derives a reasonable
 #'   name based on the calculated statistics.
 #' @param line_names Named vector controlling the legend labels, the lines shown, and
@@ -74,6 +72,8 @@ plot.marginal <- function(
     line_names %in% c("y_mean", "pred_mean", "pd")
   )
 
+  nplots <- length(x)
+
   line_names <- line_names[line_names %in% colnames(x[[1L]])]
   nn <- length(line_names)
   show_legend <- nn > 1L
@@ -104,13 +104,13 @@ plot.marginal <- function(
     }
   }
 
-  if (length(x) == 1L) {
+  if (nplots == 1L) {
     if (backend == "ggplot2") {
       p <- plot_marginal_ggplot(
         x[[1L]],
         v = names(x),
-        ylim = ylim,
         share_y = FALSE,
+        ylim = ylim,
         cat_lines = cat_lines,
         num_points = num_points,
         ylab = ylab,
@@ -121,15 +121,14 @@ plot.marginal <- function(
         bar_measure = bar_measure,
         wrap_x = wrap_x,
         rotate_x = rotate_x,
-        show_legend = show_legend,
-        ...
+        show_legend = show_legend
       )
     } else {
       p <- plot_marginal_plotly(
         x[[1L]],
         v = names(x),
-        ylim = ylim,
         share_y = FALSE,
+        ylim = ylim,
         cat_lines = cat_lines,
         num_points = num_points,
         ylab = ylab,
@@ -138,20 +137,20 @@ plot.marginal <- function(
         fill = fill,
         bar_height = bar_height,
         bar_measure = bar_measure,
-        show_legend = show_legend,
-        ...
+        show_legend = show_legend
       )
     }
     return(p)
   }
 
+  # Now with multiple plots...
   if (share_y && is.null(ylim)) {
     r <- range(sapply(x, function(z) range(z[line_names], na.rm = TRUE)))
     ylim <- grDevices::extendrange(r, f = 0.05)
   }
 
   if (show_legend) {
-    # We prefer a numeric subplot as reference. Placement is done to the right center.
+    # We prefer a numeric subplot as reference. Placement is done at the right center.
     show_legend <- seq_along(x) == order(!.num(x))[1L]
   }
 
@@ -161,14 +160,14 @@ plot.marginal <- function(
       x,
       v = names(x),
       show_legend = show_legend,
-      cat_lines = cat_lines,
-      num_points = num_points,
       wrap_x = wrap_x,
       rotate_x = rotate_x,
       MoreArgs = list(
         show_title = TRUE,
-        ylim = ylim,
         share_y = share_y,
+        ylim = ylim,
+        cat_lines = cat_lines,
+        num_points = num_points,
         ylab = ylab,
         line_names = line_names,
         colors = colors,
@@ -182,23 +181,26 @@ plot.marginal <- function(
     patchwork::wrap_plots(plot_list) +
       patchwork::plot_layout(ncol = ncols, guides = "collect", axes = "collect", ...)
   } else {
-    ncols <- min(ncols, length(x))
+    # Let's try to figure out how many columns our suboplot will have...
+    nrows <- ceiling(nplots / min(ncols, nplots))
+    ncols <- ceiling(nplots / nrows)
     col_i <- (seq_along(x) - 1L) %% ncols + 1L
 
     plot_list <- mapply(
       plot_marginal_plotly,
       x,
       v = names(x),
-      show_ylab = col_i == 1L,
+      show_yticks = !share_y | (col_i == 1L),
       show_legend = show_legend,
       overlay = paste0("y", 2 * seq_along(x)),
-      cat_lines = cat_lines,
-      num_points = num_points,
       MoreArgs = list(
         show_title = TRUE,
-        ylim = ylim,
         share_y = share_y,
+        ylim = ylim,
+        cat_lines = cat_lines,
+        num_points = num_points,
         ylab = ylab,
+        show_ylab = FALSE,  # replaced by global annotation
         line_names = line_names,
         colors = colors,
         fill = fill,
@@ -208,22 +210,40 @@ plot.marginal <- function(
       ),
       SIMPLIFY = FALSE
     )
-    plotly::subplot(
+    margins <- c(0.03, 0.07)  # left/right - top/bottom (we use it symmetrically)
+    fig <- plotly::subplot(
       plot_list,
       titleX = TRUE,
-      titleY = TRUE,
-      nrows = ceiling(length(x) / ncols),
-      margin = c(0.03, 0.05, 0.125, 0.03),
+      titleY = FALSE,
+      nrows = nrows,
+      widths = corr_margin(ncols, margin = margins[1L]),
+      heights = corr_margin(nrows, margin = margins[2L]),
+      margin = rep(margins, each = 2L),
       ...
     )
+
+    # Make a single vertical y axis label. xshift does the dynamic shifting
+    ann <- list(
+      text = ylab,
+      x = 0,
+      y = 0.5,
+      xshift = -50,
+      font = list(size = 14),
+      textangle = 270,
+      xref = "paper",
+      yref = "paper",
+      showarrow = FALSE
+    )
+
+    plotly::layout(fig, annotations = ann)
   }
 }
 
 plot_marginal_ggplot <- function(
     x,
     v,
-    ylim,
     share_y,
+    ylim,
     num_points,
     cat_lines,
     ylab,
@@ -235,8 +255,7 @@ plot_marginal_ggplot <- function(
     wrap_x,
     rotate_x,
     show_title = FALSE,
-    show_legend = TRUE,
-    ...
+    show_legend = TRUE
 ) {
   num <- .num(x)
   df <- transform(
@@ -315,8 +334,8 @@ plot_marginal_ggplot <- function(
 plot_marginal_plotly <- function(
     x,
     v,
-    ylim,
     share_y,
+    ylim,
     cat_lines,
     num_points,
     ylab,
@@ -325,11 +344,11 @@ plot_marginal_plotly <- function(
     fill,
     bar_height,
     bar_measure,
+    show_ylab = TRUE,    # not vectorized
+    show_yticks = TRUE,  # vectorized, and all below as well
     show_title = FALSE,
-    show_ylab = TRUE,
     show_legend = TRUE,
-    overlay = "y2",
-    ...
+    overlay = "y2"
 ) {
   num <- .num(x)
 
@@ -395,9 +414,9 @@ plot_marginal_plotly <- function(
   if (show_title) {
     ann <- list(
       text = v,
-      x = 0.05,
-      y = 1.02,
-      font = list(size = 16),
+      x = 0,
+      y = 1,
+      font = list(size = 15),
       xanchor = "left",
       yanchor = "bottom",
       xref = "paper",
@@ -411,7 +430,7 @@ plot_marginal_plotly <- function(
     yaxis = list(
       side = "left",
       title = if (show_ylab) ylab else "",
-      showticklabels = show_ylab || is.null(ylim),
+      showticklabels = show_yticks,
       overlaying = overlay,
       zeroline = FALSE
     ),
@@ -421,8 +440,22 @@ plot_marginal_plotly <- function(
       showticklabels = FALSE,
       range = if (bar_height > 0) r
     ),
-    xaxis = list(title = v),
+    xaxis = list(title = list(text = v, standoff = 0)),
     legend = list(x = 1.02, y = 0.5, xanchor = "left", tracegroupgap = 3)
   )
 }
 
+# Helper function
+
+# subplots make inner plots smaller due to margins
+# https://github.com/plotly/plotly.R/issues/2144
+# We apply an approximate correction factor via heights and widths
+# The function assumes symmetric margin pairs ((left, right), (top, bottom))
+corr_margin <- function(m, margin) {
+  if (m >= 3L) {
+    f <- 1 / m * (1 - 2 * margin)  # ok? Or rather 1 / m / (1 + 2 * margin)?
+    n_inner <- m - 2L
+    return(c(f, rep((1 - 2 * f) / n_inner, times = n_inner), f))
+  }
+  return(NULL)
+}

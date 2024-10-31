@@ -37,11 +37,9 @@ No effect if \code{ylim} is passed. Only if \code{length(x) > 1} (multiple plots
 
 \item{ylim}{Manual y axis range.}
 
-\item{cat_lines}{Show lines for non-numeric features. Default is \code{TRUE}.
-Vectorized over \code{x}.}
+\item{cat_lines}{Show lines for non-numeric features. Default is \code{TRUE}.}
 
-\item{num_points}{Show points for numeric features. Default is \code{FALSE}.
-Vectorized over \code{x}.}
+\item{num_points}{Show points for numeric features. Default is \code{FALSE}.}
 
 \item{ylab}{Label of y axis. The default \code{NULL} automatically derives a reasonable
 name based on the calculated statistics.}
