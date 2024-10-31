@@ -1,4 +1,4 @@
-prep_pred <- function(x) {
+prep_pred <- function(x, trafo = NULL) {
   p <- NCOL(x)
   if (is.data.frame(x)) {
     x <- x[[p]]
@@ -6,6 +6,9 @@ prep_pred <- function(x) {
     x <- x[, p]
   } else if (!is.vector(x)) {
     x <- as.vector(x)
+  }
+  if (!is.null(trafo)) {
+    x <- trafo(x)
   }
   if (!is.numeric(x) && !is.logical(x)) {
     stop("Predictions must be numeric or logical.")

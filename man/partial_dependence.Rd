@@ -14,6 +14,7 @@ partial_dependence(object, ...)
   v,
   data,
   pred_fun = stats::predict,
+  trafo = NULL,
   w = NULL,
   breaks = "Sturges",
   right = TRUE,
@@ -28,6 +29,7 @@ partial_dependence(object, ...)
   v,
   data,
   pred_fun = NULL,
+  trafo = NULL,
   w = NULL,
   breaks = "Sturges",
   right = TRUE,
@@ -42,6 +44,7 @@ partial_dependence(object, ...)
   v,
   data = object[["data"]],
   pred_fun = object[["predict_function"]],
+  trafo = NULL,
   w = object[["weights"]],
   breaks = "Sturges",
   right = TRUE,
@@ -63,6 +66,10 @@ a \code{glm()} or (typically) \code{prob = TRUE} in binary probabilistic models.
 
 \item{pred_fun}{Prediction function, by default \code{stats::predict}.
 The function takes three arguments (names irrelevant): \code{object}, \code{data}, and \code{...}.}
+
+\item{trafo}{How should \strong{predictions} be transformed?
+A function or \code{NULL} (default). Examples are \code{log} (to switch to link scale)
+or \code{exp} (to switch from link scale to the original scale).}
 
 \item{w}{Optional vector with case weights. Can also be a column name in \code{data}.}
 

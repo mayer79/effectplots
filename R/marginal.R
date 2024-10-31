@@ -26,6 +26,9 @@
 #'   called multiple times.
 #' @param pred_fun Prediction function, by default `stats::predict`.
 #'   The function takes three arguments (names irrelevant): `object`, `data`, and `...`.
+#' @param trafo How should **predictions** be transformed?
+#'   A function or `NULL` (default). Examples are `log` (to switch to link scale)
+#'   or `exp` (to switch from link scale to the original scale).
 #' @param w Optional vector with case weights. Can also be a column name in `data`.
 #' @param breaks An integer, vector, string or function specifying the bins
 #'   of the numeric X variables as in [graphics::hist()]. The default is "Sturges".
@@ -73,6 +76,7 @@ marginal.default <- function(
     y = NULL,
     pred = NULL,
     pred_fun = stats::predict,
+    trafo = NULL,
     w = NULL,
     breaks = "Sturges",
     right = TRUE,
@@ -116,7 +120,7 @@ marginal.default <- function(
 
   # Prepare pred (part 1)
   if (!is.null(pred)) {
-    pred <- prep_pred(pred)
+    pred <- prep_pred(pred, trafo = trafo)
   }
 
   # Prepare w
@@ -151,7 +155,7 @@ marginal.default <- function(
 
   # Prepare pred (part 2)
   if (is.null(pred) && isTRUE(calc_pred)) {
-    pred <- prep_pred(pred_fun(object, data, ...))
+    pred <- prep_pred(pred_fun(object, data, ...), trafo = trafo)
   }
 
   PY <- cbind(pred = pred, y = y)  # cbind(NULL, NULL) gives NULL
@@ -196,6 +200,7 @@ marginal.default <- function(
       data = data,
       object = object,
       pred_fun = pred_fun,
+      trafo = trafo,
       pd_X = pd_X,
       pd_w = pd_w,
       ...
@@ -214,6 +219,7 @@ marginal.ranger <- function(
     y = NULL,
     pred = NULL,
     pred_fun = NULL,
+    trafo = NULL,
     w = NULL,
     breaks = "Sturges",
     right = TRUE,
@@ -235,6 +241,7 @@ marginal.ranger <- function(
     y = y,
     pred = pred,
     pred_fun = pred_fun,
+    trafo = trafo,
     w = w,
     breaks = breaks,
     right = right,
@@ -255,6 +262,7 @@ marginal.explainer <- function(
   y = NULL,
   pred = NULL,
   pred_fun = object[["predict_function"]],
+  trafo = NULL,
   w = object[["weights"]],
   breaks = "Sturges",
   right = TRUE,
@@ -271,6 +279,7 @@ marginal.explainer <- function(
     y = y,
     pred = pred,
     pred_fun = pred_fun,
+    trafo = trafo,
     w = w,
     breaks = breaks,
     right = right,
@@ -293,6 +302,7 @@ calculate_stats <- function(
     outlier_iqr,
     object,
     pred_fun,
+    trafo,
     pd_X,
     pd_w,
     ...
@@ -353,6 +363,7 @@ calculate_stats <- function(
       X = pd_X,
       grid = out[["bin_mean"]],
       pred_fun = pred_fun,
+      trafo = trafo,
       w = pd_w,
       ...
     )

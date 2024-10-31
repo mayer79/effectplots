@@ -44,7 +44,9 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
   if (is.null(w)) colMeans(x) else colSums(x * w) / sum(w)
 }
 
-partial_dep <- function(object, v, X, grid, pred_fun = stats::predict, w = NULL, ...) {
+partial_dep <- function(
+    object, v, X, grid, pred_fun = stats::predict, trafo = NULL, w = NULL, ...
+) {
   n <- nrow(X)
   p <- length(grid)
   X_pred <- collapse::ss(X, rep.int(seq_len(n), p))
@@ -54,5 +56,5 @@ partial_dep <- function(object, v, X, grid, pred_fun = stats::predict, w = NULL,
   } else {
     X_pred[, v] <- grid_pred
   }
-  wrowmean(prep_pred(pred_fun(object, X_pred, ...)), ngroups = p, w = w)
+  wrowmean(prep_pred(pred_fun(object, X_pred, ...), trafo = trafo), ngroups = p, w = w)
 }

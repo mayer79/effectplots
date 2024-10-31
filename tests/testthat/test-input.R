@@ -3,6 +3,8 @@ test_that("prep_pred() returns what it should", {
   expect_equal(p, 1:10)
   expect_true(is.double(p))
 
+  expect_equal(prep_pred(1:10, trafo = log), log(1:10))
+
   p <- prep_pred(c(TRUE, FALSE))
   expect_equal(p, c(1, 0))
   expect_true(is.double(p))
