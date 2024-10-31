@@ -146,7 +146,7 @@ fit <- lm(Sepal.Length ~ ., data = iris)
 xvars <- colnames(iris)[-1]
 M <- marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 M
-M |> postprocess(sort = TRUE) |> plot()
+M |> postprocess(sort = TRUE) |> plot(share_y = TRUE)
 }
 \seealso{
 \code{\link[=average_observed]{average_observed()}}, \code{\link[=partial_dependence]{partial_dependence()}}

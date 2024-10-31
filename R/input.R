@@ -1,13 +1,3 @@
-prep_vec <- function(x) {
-  if (!is.numeric(x) && !is.logical(x)) {
-    stop("Values must be numeric, or logical.")
-  }
-  if (anyNA(x)) {
-    stop("Values can't contain NA")
-  }
-  if (is.double(x)) x else as.double(x)
-}
-
 prep_pred <- function(x) {
   p <- NCOL(x)
   if (is.data.frame(x)) {
@@ -17,15 +7,16 @@ prep_pred <- function(x) {
   } else if (!is.vector(x)) {
     x <- as.vector(x)
   }
-  prep_vec(x)
+  if (!is.numeric(x) && !is.logical(x)) {
+    stop("Predictions must be numeric or logical.")
+  }
+  if (anyNA(x)) {
+    stop("Predictions can't contain NA")
+  }
+  if (is.double(x)) x else as.double(x)
 }
 
-name_or_vector <- function(z, data) {
-  if (length(z) == 1L && z %in% colnames(data)) {
-    z <- if (is.matrix(data)) data[, z] else data[[z]]
-  } else if (length(z) != nrow(data)) {
-    stop("'y' or 'w' should either be NULL, a variable name, or have length nrow(data)")
-  }
-  return(z)
+basic_check <- function(z, n, nms) {
+  is.null(z) || (length(z) == 1L && z %in% nms) || (is.vector(z) && length(z) == n)
 }
 

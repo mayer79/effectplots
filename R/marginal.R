@@ -59,7 +59,7 @@
 #' xvars <- colnames(iris)[-1]
 #' M <- marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 #' M
-#' M |> postprocess(sort = TRUE) |> plot()
+#' M |> postprocess(sort = TRUE) |> plot(share_y = TRUE)
 marginal <- function(object, ...) {
   UseMethod("marginal")
 }
@@ -82,55 +82,84 @@ marginal.default <- function(
     pd_n = 500L,
     ...
 ) {
+  # Input checks
   stopifnot(
     is.data.frame(data) || is.matrix(data),
-    is.function(pred_fun),
     v %in% colnames(data),
-    outlier_iqr >= 0
+    outlier_iqr >= 0,
+    pd_n >= 0L
   )
-
-  # Prepare pred
-  if (is.null(pred)) {
-    if (isTRUE(calc_pred)) {
-      pred <- prep_pred(pred_fun(object, data, ...))
-    }
-  } else {
-    if (length(pred) != nrow(data)) {
-      stop("'pred' should be a vector of length nrow(data), or NULL.")
-    }
-    pred <- prep_pred(pred)
-  }
+  n <- nrow(data)
+  nms <- colnames(data)
+  stopifnot(
+    n >= 2L,
+    basic_check(w, n = n, nms = nms),
+    basic_check(y, n = n, nms = nms),
+    basic_check(pred, n = n, nms = nms)
+  )
 
   # Prepare y
   if (!is.null(y)) {
-    y <- prep_vec(name_or_vector(y, data))
+    if (length(y) == 1L) {
+      y <- if (is.matrix(data)) data[, y] else data[[y]]
+    }
+    if (!is.numeric(y) && !is.logical(y)) {
+      stop("'y' must be numeric or logical.")
+    }
+    if (anyNA(y)) {
+      stop("'y' can't contain NA")
+    }
+    if (!is.double(y)) {
+      y <- as.double(y)
+    }
+  }
+
+  # Prepare pred (part 1)
+  if (!is.null(pred)) {
+    pred <- prep_pred(pred)
+  }
+
+  # Prepare w
+  if (!is.null(w)) {
+    if (length(w) == 1L) {
+      w <- if (is.matrix(data)) data[, w] else data[[w]]
+    }
+    if (!is.numeric(w) && !is.logical(w)) {
+      stop("'w' must be numeric, or logical.")
+    }
+    wpos <- !is.na(w) & w > 0
+    if (!any(wpos)) {
+      stop("No positive 'w'!")
+    }
+    if (!all(wpos)) {
+      message("Removing data with missing or non-positive weights 'w'.")
+      w <- w[wpos]
+      data <- collapse::ss(data, wpos)
+      n <- nrow(data)
+      stopifnot(n >= 2L)
+      if (!is.null(y)) {
+        y <- y[wpos]
+      }
+      if (!is.null(pred)) {
+        pred <- pred[wpos]
+      }
+    }
+    if (!is.double(w)) {
+      w <- as.double(w)
+    }
+  }
+
+  # Prepare pred (part 2)
+  if (is.null(pred) && isTRUE(calc_pred)) {
+    pred <- prep_pred(pred_fun(object, data, ...))
   }
 
   PY <- cbind(pred = pred, y = y)  # cbind(NULL, NULL) gives NULL
 
-  # Prepare w
-  if (!is.null(w)) {
-    w <- prep_vec(name_or_vector(w, data))
-    if (any(w < 0)) {
-      stop("'w' can't have negative values")
-    }
-    ok <- w > 0
-    if (!any(ok)) {
-      stop("No positive 'w' detected")
-    }
-    if (!all(ok)){
-      w <- w[ok]
-      data <- collapse::ss(data, ok)
-      if (!is.null(PY)) {
-        PY <- PY[ok, , drop = FALSE]
-      }
-    }
-  }
-
   # Prepare pd_X and pd_w
   if (pd_n > 0L) {
-    if (nrow(data) > pd_n) {
-      ix <- sample(nrow(data), pd_n)
+    if (n > pd_n) {
+      ix <- sample(n, pd_n)
       pd_X <- collapse::ss(data, ix)
       pd_w <- if (!is.null(w)) w[ix]
     } else {
