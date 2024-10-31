@@ -173,8 +173,7 @@ plot.marginal <- function(
         colors = colors,
         fill = fill,
         bar_height = bar_height,
-        bar_measure = bar_measure,
-        ...
+        bar_measure = bar_measure
       ),
       SIMPLIFY = FALSE
     )
@@ -205,12 +204,12 @@ plot.marginal <- function(
         colors = colors,
         fill = fill,
         bar_height = bar_height,
-        bar_measure = bar_measure,
-        ...
+        bar_measure = bar_measure
       ),
       SIMPLIFY = FALSE
     )
-    margins <- c(0.03, 0.07)  # left/right - top/bottom (we use it symmetrically)
+    # left/right - top/bottom (we use it symmetrically)
+    margins <- c(0.05 - share_y * 0.02, 0.07)
     fig <- plotly::subplot(
       plot_list,
       titleX = TRUE,

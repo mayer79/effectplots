@@ -143,6 +143,11 @@ m_test <- m_test[names(m_train)]
 c(m_train, m_test) |> 
   plot(share_y = TRUE, byrow = FALSE) +
   plot_annotation(title = "Left: Train - Right: Test")
+  
+# Or via Plotly -> uses bycol, i.e., we need to alternate plots
+alt <- c(t(matrix(seq_len(6), ncol = 2)))
+c(m_train, m_test)[alt] |> 
+  plot(share_y = TRUE, backend = "plotly")
 ```
 
 ![](man/figures/train_test.svg)

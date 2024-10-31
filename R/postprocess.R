@@ -126,7 +126,7 @@ main_effect_importance <- function(x, statistic = NULL) {
 # Helper functions
 .one_imp <- function(x, v) {
   ok <- is.finite(x[[v]])
-  stats::cov.wt(x[ok, v, drop = FALSE], x$weight[ok], method = "ML")$cov[1L, 1L]
+  stats::cov.wt(x[ok, v, drop = FALSE], wt = x$weight[ok], method = "ML")$cov[1L, 1L]
 }
 
 .collapse_m <- function(x, m, by) {
@@ -141,18 +141,21 @@ main_effect_importance <- function(x, statistic = NULL) {
   levels(x_keep$bin_mid) <- levels(x_keep$bin_mean) <- c(lvl, oth)
 
   # Collapse other rows
-  M <- x_agg[intersect(colnames(x), c("pred_mean", "y_mean", "pd"))]
-  S <- x_agg[intersect(colnames(x), c("pred_sd", "y_sd"))]
   w <- x_agg$weight
   x_new <- data.frame(
     bin_mid = oth, bin_width = 0.7, bin_mean = oth, N = sum(x_agg$N), weight = sum(w)
   )
-  if (NCOL(M)) {
-    x_new[, colnames(M)] <- collapse::fmean(M, w = w, drop = FALSE)
+
+  m_cols <- intersect(colnames(x), c("pred_mean", "y_mean", "pd"))
+  if (length(m_cols)) {
+    x_new[, m_cols] <- collapse::fmean(x_agg[m_cols], w = w, drop = FALSE)
   }
-  if (NCOL(S)) {
-    x_new[, colnames(S)] <- sqrt(
-      collapse::fmean(S^2, w = w, drop = FALSE, na.rm = TRUE)  # Bins with N=1 can be NA
+
+  s_cols <- intersect(colnames(x), c("pred_sd", "y_sd"))
+  if (length(s_cols)) {
+    # Bins with N = 1 can be NA, therefore na.rm = TRUE
+    x_new[, s_cols] <- sqrt(
+      collapse::fmean(x_agg[s_cols]^2, w = w, drop = FALSE, na.rm = TRUE)
     )
   }
   rbind(x_keep, x_new)  # Column order of x_new does not matter

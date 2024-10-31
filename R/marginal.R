@@ -97,9 +97,9 @@ marginal.default <- function(
   nms <- colnames(data)
   stopifnot(
     n >= 2L,
-    basic_check(w, n = n, nms = nms),
     basic_check(y, n = n, nms = nms),
-    basic_check(pred, n = n, nms = nms)
+    basic_check(pred, n = n, nms = nms),
+    basic_check(w, n = n, nms = nms)
   )
 
   # Prepare y
