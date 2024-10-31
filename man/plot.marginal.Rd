@@ -11,6 +11,7 @@
   ylim = NULL,
   cat_lines = TRUE,
   num_points = FALSE,
+  ylab = NULL,
   line_names = c(obs = "y_mean", pred = "pred_mean", pd = "pd"),
   colors = getOption("marginalplot.colors"),
   fill = getOption("marginalplot.fill"),
@@ -41,6 +42,9 @@ Vectorized over \code{x}.}
 
 \item{num_points}{Show points for numeric features. Default is \code{FALSE}.
 Vectorized over \code{x}.}
+
+\item{ylab}{Label of y axis. The default \code{NULL} automatically derives a reasonable
+name based on the calculated statistics.}
 
 \item{line_names}{Named vector controlling the legend labels, the lines shown, and
 the line order. By default \code{c(obs = "y_mean", pred = "pred_mean", pd = "pd")}.

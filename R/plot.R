@@ -15,6 +15,8 @@
 #'   Vectorized over `x`.
 #' @param num_points Show points for numeric features. Default is `FALSE`.
 #'   Vectorized over `x`.
+#' @param ylab Label of y axis. The default `NULL` automatically derives a reasonable
+#'   name based on the calculated statistics.
 #' @param line_names Named vector controlling the legend labels, the lines shown, and
 #'   the line order. By default `c(obs = "y_mean", pred = "pred_mean", pd = "pd")`.
 #'   The names of the vector will be shown as legend labels.
@@ -51,6 +53,7 @@ plot.marginal <- function(
     ylim = NULL,
     cat_lines = TRUE,
     num_points = FALSE,
+    ylab = NULL,
     line_names = c(obs = "y_mean", pred = "pred_mean", pd = "pd"),
     colors = getOption("marginalplot.colors"),
     fill = getOption("marginalplot.fill"),
@@ -66,12 +69,16 @@ plot.marginal <- function(
   bar_measure <- match.arg(bar_measure)
   eval_at <- match.arg(eval_at)
 
+  stopifnot(
+    backend %in% c("ggplot2", "plotly"),
+    line_names %in% c("y_mean", "pred_mean", "pd")
+  )
+
   line_names <- line_names[line_names %in% colnames(x[[1L]])]
   nn <- length(line_names)
   show_legend <- nn > 1L
 
   stopifnot(
-    backend %in% c("ggplot2", "plotly"),
     nn > 0L,
     length(colors) >= nn
   )
@@ -84,6 +91,19 @@ plot.marginal <- function(
     x <- lapply(x, function(z) {if (.num(z)) z$bin_mean <- z$bin_mid; z})
   }
 
+  # Derive a good ylab
+  if (is.null(ylab)) {
+    if (length(line_names) == 1L) {
+      ylab <- switch(
+        line_names, pd = "Partial Dependence", y_mean = "Response", "Prediction"
+      )
+    } else if ("y_mean" %in% line_names) {
+      ylab <- "Response"
+    } else {
+      ylab <- "Prediction"
+    }
+  }
+
   if (length(x) == 1L) {
     if (backend == "ggplot2") {
       p <- plot_marginal_ggplot(
@@ -93,6 +113,7 @@ plot.marginal <- function(
         share_y = FALSE,
         cat_lines = cat_lines,
         num_points = num_points,
+        ylab = ylab,
         line_names = line_names,
         colors = colors,
         fill = fill,
@@ -111,6 +132,7 @@ plot.marginal <- function(
         share_y = FALSE,
         cat_lines = cat_lines,
         num_points = num_points,
+        ylab = ylab,
         line_names = line_names,
         colors = colors,
         fill = fill,
@@ -150,6 +172,7 @@ plot.marginal <- function(
         show_title = TRUE,
         ylim = ylim,
         share_y = share_y,
+        ylab = ylab,
         line_names = line_names,
         colors = colors,
         fill = fill,
@@ -179,6 +202,7 @@ plot.marginal <- function(
         show_title = TRUE,
         ylim = ylim,
         share_y = share_y,
+        ylab = ylab,
         line_names = line_names,
         colors = colors,
         fill = fill,
@@ -206,6 +230,7 @@ plot_marginal_ggplot <- function(
     share_y,
     num_points,
     cat_lines,
+    ylab,
     line_names,
     colors,
     fill,
@@ -272,7 +297,7 @@ plot_marginal_ggplot <- function(
   p <- p + ggplot2::scale_color_manual(values = colors) +
     ggplot2::theme_bw() +
     ggplot2::theme(legend.title = ggplot2::element_blank(), legend.position = "right") +
-    ggplot2::labs(x = v, y = "Response")
+    ggplot2::labs(x = v, y = ylab)
 
   if (show_title) {
     p <- p + ggplot2::ggtitle(v)
@@ -298,6 +323,7 @@ plot_marginal_plotly <- function(
     share_y,
     cat_lines,
     num_points,
+    ylab,
     line_names,
     colors,
     fill,
@@ -387,7 +413,7 @@ plot_marginal_plotly <- function(
     fig,
     yaxis = list(
       side = "left",
-      title = if (show_ylab) "Response" else "",
+      title = if (show_ylab) ylab else "",
       showticklabels = show_ylab || is.null(ylim),
       overlaying = overlay,
       zeroline = FALSE

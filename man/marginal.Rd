@@ -67,7 +67,7 @@ marginal(object, ...)
 \item{object}{Fitted model.}
 
 \item{...}{Further arguments passed to \code{pred_fun()}, e.g., \code{type = "response"} in
-a \code{glm()} or (typically) \code{prob = TRUE} in binary probabilistic models.}
+a \code{glm()} or (typically) \code{prob = TRUE} in classification models.}
 
 \item{v}{Vector of variable names to calculate statistics.}
 
@@ -83,7 +83,7 @@ called multiple times.}
 \item{pred_fun}{Prediction function, by default \code{stats::predict}.
 The function takes three arguments (names irrelevant): \code{object}, \code{data}, and \code{...}.}
 
-\item{trafo}{How should \strong{predictions} be transformed?
+\item{trafo}{How should predictions be transformed?
 A function or \code{NULL} (default). Examples are \code{log} (to switch to link scale)
 or \code{exp} (to switch from link scale to the original scale).}
 

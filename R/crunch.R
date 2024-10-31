@@ -44,7 +44,26 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
   if (is.null(w)) colMeans(x) else colSums(x * w) / sum(w)
 }
 
-partial_dep <- function(
+#' Barebone Partial Dependence
+#'
+#' Very fast partial dependence calculations. Since the function does not do any
+#' input checks, it is mainly meant for internal use. Still, for developers, it can
+#' be handy.
+#'
+#' @param v Variable name in `data` to calculate partial dependence.
+#' @param X Matrix or data.frame.
+#' @param grid Vector or factor of values to calculate partial dependence for.
+#' @param w Optional vector with case weights.
+#' @inheritParams marginal
+#' @returns Vector of partial dependence values in the same order as `grid`.
+#' @export
+#' @seealso [partial_dependence()]
+#' @examples
+#' fit <- lm(Sepal.Length ~ ., data = iris)
+#'
+#' .pd(fit, "Sepal.Width", X = iris, grid = hist(iris$Sepal.Width, plot = FALSE)$mids)
+#' .pd(fit, "Species", X = iris, grid = levels(iris$Species))
+.pd <- function(
     object, v, X, grid, pred_fun = stats::predict, trafo = NULL, w = NULL, ...
 ) {
   n <- nrow(X)
@@ -56,5 +75,6 @@ partial_dep <- function(
   } else {
     X_pred[, v] <- grid_pred
   }
-  wrowmean(prep_pred(pred_fun(object, X_pred, ...), trafo = trafo), ngroups = p, w = w)
+  pred <- prep_pred(pred_fun(object, X_pred, ...), trafo = trafo)
+  return(wrowmean(pred, ngroups = p, w = w))
 }

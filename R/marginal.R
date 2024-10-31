@@ -26,7 +26,7 @@
 #'   called multiple times.
 #' @param pred_fun Prediction function, by default `stats::predict`.
 #'   The function takes three arguments (names irrelevant): `object`, `data`, and `...`.
-#' @param trafo How should **predictions** be transformed?
+#' @param trafo How should predictions be transformed?
 #'   A function or `NULL` (default). Examples are `log` (to switch to link scale)
 #'   or `exp` (to switch from link scale to the original scale).
 #' @param w Optional vector with case weights. Can also be a column name in `data`.
@@ -51,7 +51,7 @@
 #'   (uses random seed). Each variable specified by `v` uses the same subsample.
 #'   Set to 0 to omit.
 #' @param ... Further arguments passed to `pred_fun()`, e.g., `type = "response"` in
-#'   a `glm()` or (typically) `prob = TRUE` in binary probabilistic models.
+#'   a `glm()` or (typically) `prob = TRUE` in classification models.
 #' @returns
 #'   A list (of class "marginal") with a data.frame of statistics per feature. Use
 #'   single bracket subsetting to select part of the output.
@@ -357,7 +357,7 @@ calculate_stats <- function(
 
   # Add partial dependence
   if (!is.null(pd_X)) {
-    out[["pd"]] <- partial_dep(
+    out[["pd"]] <- .pd(
       object = object,
       v = v,
       X = pd_X,
