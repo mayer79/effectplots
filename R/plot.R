@@ -151,12 +151,8 @@ plot.marginal <- function(
   }
 
   if (show_legend) {
-    # Prefer lines without points. Thus, we pick such feature.
-    # Legend placement is done correctly by {patchwork} and {plotly}.
-    num <- .num(x)
-    no_lines <- !num & isFALSE(cat_lines)
-    has_points <- !num | isTRUE(num_points)
-    show_legend <- seq_along(x) == order(no_lines, has_points)[1L]
+    # We prefer a numeric subplot as reference. Placement is done to the right center.
+    show_legend <- seq_along(x) == order(!.num(x))[1L]
   }
 
   if (backend == "ggplot2") {
@@ -220,7 +216,6 @@ plot.marginal <- function(
       margin = c(0.03, 0.05, 0.125, 0.03),
       ...
     )
-    #plotly::layout(fig, legend = list(x = 1.02, y = 0.5, xanchor = "left"))
   }
 }
 
