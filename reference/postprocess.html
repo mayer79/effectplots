@@ -58,6 +58,7 @@ partial_dependence(), and average_observed()."><meta property="og:image" content
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">postprocess</span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
 <span>  sort <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  sort_by <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  collapse_m <span class="op">=</span> <span class="fl">30L</span>,</span>
 <span>  collapse_by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weight"</span>, <span class="st">"N"</span><span class="op">)</span>,</span>
 <span>  drop_below_n <span class="op">=</span> <span class="fl">0</span>,</span>
@@ -77,7 +78,13 @@ partial_dependence(), and average_observed()."><meta property="og:image" content
 <dt id="arg-sort">sort<a class="anchor" aria-label="anchor" href="#arg-sort"></a></dt>
 <dd><p>Should <code>x</code> be sorted in decreasing order of feature importance?
 Importance is measured by the weighted variance of the most relevant available
-statistic (pd &gt; pred_mean &gt; y_mean), see Details. The default is <code>FALSE</code>.</p></dd>
+statistic (pd &gt; pred_mean &gt; y_mean &gt; resid_mean). The default is <code>FALSE</code>.</p></dd>
+
+
+<dt id="arg-sort-by">sort_by<a class="anchor" aria-label="anchor" href="#arg-sort-by"></a></dt>
+<dd><p>If <code>sort = TRUE</code>, this measure used for sorting. One of
+'pd', 'pred_mean', 'y_mean', or 'resid_mean' (if available). The default is <code>NULL</code>,
+which picks the first of the listed statistics.</p></dd>
 
 
 <dt id="arg-collapse-m">collapse_m<a class="anchor" aria-label="anchor" href="#arg-collapse-m"></a></dt>
@@ -125,7 +132,8 @@ pass a vector or list of the same length as <code>x</code>.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p><code><a href="marginal.html">marginal()</a></code>, <code><a href="average_observed.html">average_observed()</a></code>, <code><a href="partial_dependence.html">partial_dependence()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="marginal.html">marginal()</a></code>, <code><a href="average_observed.html">average_observed()</a></code>, <code><a href="partial_dependence.html">partial_dependence()</a></code>,
+<code><a href="main_effect_importance.html">main_effect_importance()</a></code></p></div>
     </div>
 
     <div id="ref-examples">
