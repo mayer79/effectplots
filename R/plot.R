@@ -64,7 +64,6 @@ plot.marginal <- function(
     ...
 ) {
   bar_measure <- match.arg(bar_measure)
-  eval_at <- match.arg(eval_at)
 
   stopifnot(
     backend %in% c("ggplot2", "plotly"),

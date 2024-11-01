@@ -15,6 +15,7 @@ partial_dependence(object, ...)
   data,
   pred_fun = stats::predict,
   trafo = NULL,
+  which_pred = NULL,
   w = NULL,
   breaks = "Sturges",
   right = TRUE,
@@ -30,6 +31,7 @@ partial_dependence(object, ...)
   data,
   pred_fun = NULL,
   trafo = NULL,
+  which_pred = NULL,
   w = NULL,
   breaks = "Sturges",
   right = TRUE,
@@ -45,6 +47,7 @@ partial_dependence(object, ...)
   data = object[["data"]],
   pred_fun = object[["predict_function"]],
   trafo = NULL,
+  which_pred = NULL,
   w = object[["weights"]],
   breaks = "Sturges",
   right = TRUE,
@@ -70,6 +73,9 @@ The function takes three arguments (names irrelevant): \code{object}, \code{data
 \item{trafo}{How should predictions be transformed?
 A function or \code{NULL} (default). Examples are \code{log} (to switch to link scale)
 or \code{exp} (to switch from link scale to the original scale).}
+
+\item{which_pred}{If the predictions are multivariate: which column to pick
+(integer or column name). By default \code{NULL} (picks last column).}
 
 \item{w}{Optional vector with case weights. Can also be a column name in \code{data}.}
 

@@ -66,7 +66,15 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
 #' .pd(fit, "Sepal.Width", X = iris, grid = hist(iris$Sepal.Width, plot = FALSE)$mids)
 #' .pd(fit, "Species", X = iris, grid = levels(iris$Species))
 .pd <- function(
-    object, v, X, grid, pred_fun = stats::predict, trafo = NULL, w = NULL, ...
+    object,
+    v,
+    X,
+    grid,
+    pred_fun = stats::predict,
+    trafo = NULL,
+    which_pred = NULL,
+    w = NULL,
+    ...
 ) {
   n <- nrow(X)
   p <- length(grid)
@@ -77,7 +85,9 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
   } else {
     X_pred[, v] <- grid_pred
   }
-  pred <- prep_pred(pred_fun(object, X_pred, ...), trafo = trafo)
+  pred <- prep_pred(
+    pred_fun(object, X_pred, ...), trafo = trafo, which_pred = which_pred
+  )
   return(wrowmean(pred, ngroups = p, w = w))
 }
 
@@ -113,6 +123,7 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
     right = TRUE,
     pred_fun = stats::predict,
     trafo = NULL,
+    which_pred = NULL,
     max_bin_size = 50L,
     w = NULL,
     g = NULL,
@@ -147,6 +158,7 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
       grid = breaks[c(j, j + 1L)],
       pred_fun = pred_fun,
       trafo = trafo,
+      which_pred = which_pred,
       w = if (!is.null(w)) w[J[[j]]],
       ...
     )

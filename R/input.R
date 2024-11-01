@@ -1,9 +1,12 @@
-prep_pred <- function(x, trafo = NULL) {
+prep_pred <- function(x, trafo = NULL, which_pred = NULL) {
   p <- NCOL(x)
+  if (is.null(which_pred)) {
+    which_pred <- p
+  }
   if (is.data.frame(x)) {
-    x <- x[[p]]
+    x <- x[[if (p == 1L) 1L else which_pred]]
   } else if (p > 1L) {
-    x <- x[, p]
+    x <- x[, which_pred]
   } else if (!is.vector(x)) {
     x <- as.vector(x)
   }

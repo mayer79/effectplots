@@ -29,7 +29,6 @@ The workflow is as follows:
 - You can switch between {ggplot2}/{patchwork} plots and interactive {plotly} plots.
 - The implementation is optimized for large data.
 - Most models (including DALEX explainers and meta-learners such as Tidymodels) work out-of-the box. If not, a tailored prediction function can be specified.
-- For multi-output models, the last output is picked.
 - Case weights are supported via the argument `w`.
 - Binning of numeric features is done by the same options as `stats::hist()`. Additionally, outliers are capped (not removed) at +-2 IQR from the quartiles by default.
 - Computational bottlenecks: (A) calculating predictions (cannot be avoided), and (B) `findInterval()` for histogram binning (C code).

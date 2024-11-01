@@ -22,8 +22,8 @@ test_that("ncols has an effect", {
 
   # Plotly
   p <- list(
-    p1 = plot(M, backend = "plotly", ncols = 1),
-    p2 = plot(M, backend = "plotly", ncols = 4)
+    p1 = plot(M, backend = "plotly", ncol = 1),
+    p2 = plot(M, backend = "plotly", ncol = 4)
   )
   r <- lapply(p, function(z) diff(z$x$layout$xaxis$domain))
   expect_equal(r$p1, 1)

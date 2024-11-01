@@ -4,7 +4,17 @@
 \alias{.pd}
 \title{Barebone Partial Dependence}
 \usage{
-.pd(object, v, X, grid, pred_fun = stats::predict, trafo = NULL, w = NULL, ...)
+.pd(
+  object,
+  v,
+  X,
+  grid,
+  pred_fun = stats::predict,
+  trafo = NULL,
+  which_pred = NULL,
+  w = NULL,
+  ...
+)
 }
 \arguments{
 \item{object}{Fitted model.}
@@ -21,6 +31,9 @@ The function takes three arguments (names irrelevant): \code{object}, \code{data
 \item{trafo}{How should predictions be transformed?
 A function or \code{NULL} (default). Examples are \code{log} (to switch to link scale)
 or \code{exp} (to switch from link scale to the original scale).}
+
+\item{which_pred}{If the predictions are multivariate: which column to pick
+(integer or column name). By default \code{NULL} (picks last column).}
 
 \item{w}{Optional vector with case weights.}
 

@@ -13,10 +13,15 @@ test_that("prep_pred() returns what it should", {
   expect_equal(prep_pred(data.frame(a = 1:10, b = 10:1)), 10:1)
 
   expect_equal(prep_pred(cbind(a = 1:10)), 1:10)
-  expect_equal(prep_pred(cbind(a = 1:10, b = 10:1)), 10:1)
 
-  expect_error(prep_vec(LETTERS))
-  expect_error(prep_vec(c(1:3, NA, 3)))
+  x <- cbind(a = 1:10, b = 10:1)
+  for (X in list(x, data.frame(x))) {
+    expect_equal(prep_pred(X), 10:1)
+    expect_equal(prep_pred(X, which_pred = "b"), 10:1)
+
+    expect_equal(prep_pred(X, which_pred = 1), 1:10)
+    expect_equal(prep_pred(X, which_pred = "a"), 1:10)
+  }
 })
 
 test_that("basic_check() works", {

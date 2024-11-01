@@ -19,7 +19,6 @@
   bar_height = 1,
   bar_width = 0.7,
   bar_measure = c("weight", "N"),
-  eval_at = c("mean", "mid"),
   wrap_x = 10,
   rotate_x = 0,
   backend = getOption("marginalplot.backend"),
@@ -30,8 +29,7 @@
 \item{x}{An object of class "marginal".}
 
 \item{ncol}{Number of columns in the plot layout.
-Only if \code{length(x) > 1} (multiple plots). With "plotly" subplots, the result may
-differ slightly.}
+Only if \code{length(x) > 1} (multiple plots).}
 
 \item{byrow}{Should plots be placed by row? Default is \code{TRUE}.
 Only if \code{length(x) > 1} (multiple plots).}
@@ -39,18 +37,19 @@ Only if \code{length(x) > 1} (multiple plots).}
 \item{share_y}{Should y axis be shared across all subplots?
 No effect if \code{ylim} is passed. Only if \code{length(x) > 1} (multiple plots).}
 
-\item{ylim}{Manual y axis range.}
+\item{ylim}{A vector of length 2 with manual y axis limits.}
 
 \item{cat_lines}{Show lines for non-numeric features. Default is \code{TRUE}.}
 
 \item{num_points}{Show points for numeric features. Default is \code{FALSE}.}
 
-\item{ylab}{Label of y axis. The default \code{NULL} automatically derives a reasonable
-name based on the calculated statistics.}
+\item{ylab}{Label of the y axis. The default \code{NULL} automatically derives
+a reasonable name based on the calculated statistics.}
 
 \item{line_names}{Named vector controlling the legend labels, the lines shown, and
 the line order. By default \code{c(obs = "y_mean", pred = "pred_mean", pd = "pd")}.
-The names of the vector will be shown as legend labels.}
+The names of the vector will be shown as legend labels. The values refer to the
+calculated statistics.}
 
 \item{colors}{Line colors corresponding to (available) \code{line_names}.
 By default, a color blind friendly palette from "ggthemes", namely
@@ -66,12 +65,7 @@ To change globally, set \verb{options(marginalplot.fill = new color)}.}
 
 \item{bar_measure}{What should bars represent? Either "weight" (default) or "N".}
 
-\item{eval_at}{If \code{mean} (default), the points are aligned with (weighted)
-average bin means. If \code{mid}, the points are aligned with bin midpoints.
-Affects only numeric X. Note that partial dependence of numeric X is always
-evaluated at bin means, not midpoints.}
-
-\item{wrap_x}{Should categorical xaxis labels be wrapped after this length?
+\item{wrap_x}{Should categorical x axis labels be wrapped after this length?
 The default is 10. Set to 0 for no wrapping. Vectorized over \code{x}.
 Only for "ggplot2" backend.}
 
@@ -81,7 +75,8 @@ The default is 0 (no rotation). Vectorized over \code{x}. Only for "ggplot2" bac
 \item{backend}{Plot backend, either "ggplot2" (default) or "plotly".
 To change globally, set \code{options(marginalplot.backend = "plotly")}.}
 
-\item{...}{Passed to \code{patchwork::plot_layout()} or \code{plotly::subplot()}.}
+\item{...}{Passed to \code{patchwork::plot_layout()} or \code{plotly::subplot()}. Typically
+not used.}
 }
 \value{
 If \code{length(x) == 1} (single plot), an object of class  "ggplot" or "plotly".
