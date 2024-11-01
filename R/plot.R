@@ -139,15 +139,18 @@ plot.marginal <- function(
   }
 
   # Now with multiple plots...
+  ncol <- min(ncol, nplots)
+  nrow <- ceiling(nplots / ncol)
   if (backend == "plotly") {
-    # Let's try to figure out how many columns our plotly subplot will really have...
-    nrows <- ceiling(nplots / min(ncol, nplots))
-    ncol <- ceiling(nplots / nrows)
+    # Plotly uses nrows to set up the layout. Thus, we need to recalculated ncol
+    ncol <- ceiling(nplots / nrow)
   }
 
   # Can be useful if objects of different models/datasets are c() together
+  # For patchwork, we could also use its plot_layout(byrow = FALSE) argument. But let's
+  # keep things as identical as possible between patchwork and plotly.
   if (isFALSE(byrow)) {
-    alt <- c(t(matrix(seq_along(x), ncol = ncol)))
+    alt <- c(t(matrix(seq_len(nrow * ncol), ncol = ncol)))[seq_len(nplots)]
     x <- x[alt]
   }
 
@@ -230,9 +233,9 @@ plot.marginal <- function(
       plot_list,
       titleX = TRUE,
       titleY = FALSE,
-      nrows = nrows,
+      nrows = nrow,
       widths = corr_margin(ncol, margin = margins[1L]),
-      heights = corr_margin(nrows, margin = margins[2L]),
+      heights = corr_margin(nrow, margin = margins[2L]),
       margin = rep(margins, each = 2L),
       ...
     )
