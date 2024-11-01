@@ -96,6 +96,10 @@ outside \code{outlier_iqr} * IQR from the quartiles. The default is 2 is more
 conservative than the usual rule to account for right-skewed distributions.
 Set to 0 or \code{Inf} for no capping. Note that at most 10k observations are sampled
 to calculate quartiles (uses random seed). Vectorized over \code{v}.}
+
+\item{ale_bin_size}{Maximal number of observations used per bin for ALE calculations.
+If there are more observations in a bin, \code{ale_bin_size} indices are
+randomly sampled (uses random seed). The default is 200.}
 }
 \value{
 A list (of class "marginal") with a data.frame of statistics per feature. Use

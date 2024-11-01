@@ -16,15 +16,15 @@
   subplot_titles = TRUE,
   ylab = NULL,
   lines = c(obs = "y_mean", pred = "pred_mean", pd = "pd", ale = "ale"),
-  colors = getOption("marginalplot.colors"),
-  fill = getOption("marginalplot.fill"),
+  colors = getOption("effectplots.colors"),
+  fill = getOption("effectplots.fill"),
   alpha = 1,
   bar_height = 1,
   bar_width = 0.7,
   bar_measure = c("weight", "N"),
   wrap_x = 10,
   rotate_x = 0,
-  backend = getOption("marginalplot.backend"),
+  backend = getOption("effectplots.backend"),
   ...
 )
 }
@@ -60,10 +60,10 @@ To show only bias with "bias" as legend entry, use \code{c(bias = "resid_mean")}
 
 \item{colors}{Vector of line colors of sufficient length.
 By default, a color blind friendly palette from "ggthemes".
-To change globally, set \verb{options(marginalplot.colors = new colors)}.}
+To change globally, set \verb{options(effectplots.colors = new colors)}.}
 
 \item{fill}{Fill color of bars. The default equals "lightgrey".
-To change globally, set \verb{options(marginalplot.fill = new color)}.}
+To change globally, set \verb{options(effectplots.fill = new color)}.}
 
 \item{alpha}{Alpha transparency of lines and points with default 1.}
 
@@ -81,7 +81,7 @@ Only for "ggplot2" backend.}
 The default is 0 (no rotation). Vectorized over \code{x}. Only for "ggplot2" backend.}
 
 \item{backend}{Plot backend, either "ggplot2" (default) or "plotly".
-To change globally, set \code{options(marginalplot.backend = "plotly")}.}
+To change globally, set \code{options(effectplots.backend = "plotly")}.}
 
 \item{...}{Passed to \code{patchwork::plot_layout()} or \code{plotly::subplot()}. Typically
 not used.}

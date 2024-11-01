@@ -1,3 +1,3 @@
-# marginalplot 0.0.1
+# effectplots 0.0.1
 
 Initial release.

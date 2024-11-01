@@ -123,6 +123,10 @@ if \code{pred = NULL}.}
 The default is 500. For larger \code{data} (and \code{w}), \code{pd_n} rows are randomly sampled
 (uses random seed). Each variable specified by \code{v} uses the same subsample.
 Set to 0 to omit.}
+
+\item{ale_bin_size}{Maximal number of observations used per bin for ALE calculations.
+If there are more observations in a bin, \code{ale_bin_size} indices are
+randomly sampled (uses random seed). The default is 200.}
 }
 \value{
 A list (of class "marginal") with a data.frame of statistics per feature. Use

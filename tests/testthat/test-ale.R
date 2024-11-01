@@ -7,5 +7,5 @@ test_that("ale() is consistent with marginal()", {
   suppressMessages(
     marg <- marginal(fit, v = v, data = iris, calc_pred = FALSE, pd_n = 0, w = 1:150)
   )
-  expect_equal(pd, marg)
+  expect_equal(ale, marg)
 })

@@ -24,9 +24,9 @@
 #'   To show only bias with "bias" as legend entry, use `c(bias = "resid_mean")`.
 #' @param colors Vector of line colors of sufficient length.
 #'   By default, a color blind friendly palette from "ggthemes".
-#'   To change globally, set `options(marginalplot.colors = new colors)`.
+#'   To change globally, set `options(effectplots.colors = new colors)`.
 #' @param fill Fill color of bars. The default equals "lightgrey".
-#'   To change globally, set `options(marginalplot.fill = new color)`.
+#'   To change globally, set `options(effectplots.fill = new color)`.
 #' @param alpha Alpha transparency of lines and points with default 1.
 #' @param bar_height Relative bar height (default 1). Set to 0 for no bars.
 #' @param bar_width Relative bar width of non-numeric features, by default 0.7.
@@ -37,7 +37,7 @@
 #' @param rotate_x Should categorical xaxis labels be rotated by this angle?
 #'   The default is 0 (no rotation). Vectorized over `x`. Only for "ggplot2" backend.
 #' @param backend Plot backend, either "ggplot2" (default) or "plotly".
-#'   To change globally, set `options(marginalplot.backend = "plotly")`.
+#'   To change globally, set `options(effectplots.backend = "plotly")`.
 #' @param ... Passed to `patchwork::plot_layout()` or `plotly::subplot()`. Typically
 #'   not used.
 #' @returns
@@ -57,15 +57,15 @@ plot.marginal <- function(
     subplot_titles = TRUE,
     ylab = NULL,
     lines = c(obs = "y_mean", pred = "pred_mean", pd = "pd", ale = "ale"),
-    colors = getOption("marginalplot.colors"),
-    fill = getOption("marginalplot.fill"),
+    colors = getOption("effectplots.colors"),
+    fill = getOption("effectplots.fill"),
     alpha = 1,
     bar_height = 1,
     bar_width = 0.7,
     bar_measure = c("weight", "N"),
     wrap_x = 10,
     rotate_x = 0,
-    backend = getOption("marginalplot.backend"),
+    backend = getOption("effectplots.backend"),
     ...
 ) {
   bar_measure <- match.arg(bar_measure)

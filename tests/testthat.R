@@ -7,6 +7,6 @@
 # * https://testthat.r-lib.org/articles/special-files.html
 
 library(testthat)
-library(marginalplot)
+library(effectplots)
 
-test_check("marginalplot")
+test_check("effectplots")

@@ -53,6 +53,9 @@
 #'   The default is 500. For larger `data` (and `w`), `pd_n` rows are randomly sampled
 #'   (uses random seed). Each variable specified by `v` uses the same subsample.
 #'   Set to 0 to omit.
+#' @param ale_bin_size Maximal number of observations used per bin for ALE calculations.
+#'   If there are more observations in a bin, `ale_bin_size` indices are
+#'   randomly sampled (uses random seed). The default is 200.
 #' @param ... Further arguments passed to `pred_fun()`, e.g., `type = "response"` in
 #'   a `glm()` or (typically) `prob = TRUE` in classification models.
 #' @returns

@@ -1,13 +1,13 @@
-# marginalplot <img src="man/figures/logo.png" align="right" height="139" alt="" />
+# effectplots <img src="man/figures/logo.png" align="right" height="139" alt="" />
 
 <!-- badges: start -->
 
-[![R-CMD-check](https://github.com/mayer79/marginalplot/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mayer79/marginalplot/actions/workflows/R-CMD-check.yaml)
+[![R-CMD-check](https://github.com/mayer79/effectplots/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mayer79/effectplots/actions/workflows/R-CMD-check.yaml)
 [![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-experimental-orange.svg)](https://www.tidyverse.org/lifecycle/#experimental)
-[![Codecov test coverage](https://codecov.io/gh/mayer79/marginalplot/graph/badge.svg)](https://app.codecov.io/gh/mayer79/marginalplot)
+[![Codecov test coverage](https://codecov.io/gh/mayer79/effectplots/graph/badge.svg)](https://app.codecov.io/gh/mayer79/effectplots)
 <!-- badges: end -->
 
-**{marginalplot}** provides high-quality plots for modeling.
+**{effectplots}** provides high-quality plots for modeling.
 
 The main function `marginal()` calculates
 
@@ -36,11 +36,11 @@ The workflow is as follows:
 
 ## Installation
 
-You can install the development version of {marginalplot} from [GitHub](https://github.com/) with:
+You can install the development version of {effectplots} from [GitHub](https://github.com/) with:
 
 ``` r
 # install.packages("pak")
-pak::pak("mayer79/marginalplot")
+pak::pak("mayer79/effectplots")
 ```
 
 ## Usage
@@ -53,7 +53,7 @@ Before modeling, we want to study how the average response is associated with fe
 ``` r
 library(OpenML)
 library(lightgbm)
-library(marginalplot)
+library(effectplots)
 
 set.seed(1)
 
