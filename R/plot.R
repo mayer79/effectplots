@@ -27,6 +27,7 @@
 #'   To change globally, set `options(marginalplot.colors = new colors)`.
 #' @param fill Fill color of bars. The default equals "lightgrey".
 #'   To change globally, set `options(marginalplot.fill = new color)`.
+#' @param alpha Alpha transparency of lines and points with default 1.
 #' @param bar_height Relative bar height (default 1). Set to 0 for no bars.
 #' @param bar_width Relative bar width of non-numeric features, by default 0.7.
 #' @param bar_measure What should bars represent? Either "weight" (default) or "N".
@@ -58,6 +59,7 @@ plot.marginal <- function(
     lines = c(obs = "y_mean", pred = "pred_mean", pd = "pd"),
     colors = getOption("marginalplot.colors"),
     fill = getOption("marginalplot.fill"),
+    alpha = 1,
     bar_height = 1,
     bar_width = 0.7,
     bar_measure = c("weight", "N"),
@@ -106,6 +108,7 @@ plot.marginal <- function(
         lines = lines,
         colors = colors,
         fill = fill,
+        alpha = alpha,
         bar_height = bar_height,
         bar_measure = bar_measure,
         wrap_x = wrap_x,
@@ -126,6 +129,7 @@ plot.marginal <- function(
         lines = lines,
         colors = colors,
         fill = fill,
+        alpha = alpha,
         bar_height = bar_height,
         bar_measure = bar_measure,
         show_legend = show_legend
@@ -178,6 +182,7 @@ plot.marginal <- function(
         lines = lines,
         colors = colors,
         fill = fill,
+        alpha = alpha,
         bar_height = bar_height,
         bar_measure = bar_measure
       ),
@@ -213,6 +218,7 @@ plot.marginal <- function(
         lines = lines,
         colors = colors,
         fill = fill,
+        alpha = alpha,
         bar_height = bar_height,
         bar_measure = bar_measure
       ),
@@ -267,6 +273,7 @@ plot_marginal_ggplot <- function(
     lines,
     colors,
     fill,
+    alpha,
     bar_height,
     bar_measure,
     wrap_x,
@@ -311,7 +318,10 @@ plot_marginal_ggplot <- function(
   # Add optional points
   if (!num || isTRUE(num_points)) {
     p <- p + ggplot2::geom_point(
-      ggplot2::aes(color = varying_), size = 2, show.legend = show_legend
+      ggplot2::aes(color = varying_),
+      size = 2,
+      alpha = alpha,
+      show.legend = show_legend
     )
   }
 
@@ -320,6 +330,7 @@ plot_marginal_ggplot <- function(
     p <- p + ggplot2::geom_line(
       ggplot2::aes(color = varying_, group = varying_),
       linewidth = 0.8,
+      alpha = alpha,
       show.legend = show_legend
     )
   }
@@ -328,6 +339,7 @@ plot_marginal_ggplot <- function(
   p <- p + ggplot2::scale_color_manual(values = colors) +
     ggplot2::theme_bw() +
     ggplot2::theme(legend.title = ggplot2::element_blank(), legend.position = "right") +
+    ggplot2::guides(colour = ggplot2::guide_legend(override.aes = list(alpha = 1))) +
     ggplot2::labs(x = v, y = ylab)
 
   if (title != "") {
@@ -360,6 +372,7 @@ plot_marginal_plotly <- function(
     lines,
     colors,
     fill,
+    alpha,
     bar_height,
     bar_measure,
     show_ylab = TRUE,    # not vectorized
@@ -421,7 +434,8 @@ plot_marginal_plotly <- function(
       name = names(z),
       showlegend = show_legend,
       legendgroup = z,
-      color = I(colors[i])
+      color = I(colors[i]),
+      opacity = alpha
     )
   }
 

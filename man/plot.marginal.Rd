@@ -18,6 +18,7 @@
   lines = c(obs = "y_mean", pred = "pred_mean", pd = "pd"),
   colors = getOption("marginalplot.colors"),
   fill = getOption("marginalplot.fill"),
+  alpha = 1,
   bar_height = 1,
   bar_width = 0.7,
   bar_measure = c("weight", "N"),
@@ -63,6 +64,8 @@ To change globally, set \verb{options(marginalplot.colors = new colors)}.}
 
 \item{fill}{Fill color of bars. The default equals "lightgrey".
 To change globally, set \verb{options(marginalplot.fill = new color)}.}
+
+\item{alpha}{Alpha transparency of lines and points with default 1.}
 
 \item{bar_height}{Relative bar height (default 1). Set to 0 for no bars.}
 
