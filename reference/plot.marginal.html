@@ -70,6 +70,7 @@ You can switch to plotly by setting <code>backend = "plotly"</code>.</p>
 <span>  lines <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>obs <span class="op">=</span> <span class="st">"y_mean"</span>, pred <span class="op">=</span> <span class="st">"pred_mean"</span>, pd <span class="op">=</span> <span class="st">"pd"</span><span class="op">)</span>,</span>
 <span>  colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"marginalplot.colors"</span><span class="op">)</span>,</span>
 <span>  fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"marginalplot.fill"</span><span class="op">)</span>,</span>
+<span>  alpha <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  bar_height <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  bar_width <span class="op">=</span> <span class="fl">0.7</span>,</span>
 <span>  bar_measure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weight"</span>, <span class="st">"N"</span><span class="op">)</span>,</span>
@@ -144,6 +145,10 @@ To change globally, set <code>options(marginalplot.colors = new colors)</code>.<
 <dt id="arg-fill">fill<a class="anchor" aria-label="anchor" href="#arg-fill"></a></dt>
 <dd><p>Fill color of bars. The default equals "lightgrey".
 To change globally, set <code>options(marginalplot.fill = new color)</code>.</p></dd>
+
+
+<dt id="arg-alpha">alpha<a class="anchor" aria-label="anchor" href="#arg-alpha"></a></dt>
+<dd><p>Alpha transparency of lines and points with default 1.</p></dd>
 
 
 <dt id="arg-bar-height">bar_height<a class="anchor" aria-label="anchor" href="#arg-bar-height"></a></dt>
