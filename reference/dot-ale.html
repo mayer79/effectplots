@@ -65,6 +65,7 @@ be handy.</p>
 <span>  right <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  pred_fun <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span>,</span>
 <span>  trafo <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  which_pred <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  max_bin_size <span class="op">=</span> <span class="fl">50L</span>,</span>
 <span>  w <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  g <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -106,6 +107,11 @@ The function takes three arguments (names irrelevant): <code>object</code>, <cod
 <dd><p>How should predictions be transformed?
 A function or <code>NULL</code> (default). Examples are <code>log</code> (to switch to link scale)
 or <code>exp</code> (to switch from link scale to the original scale).</p></dd>
+
+
+<dt id="arg-which-pred">which_pred<a class="anchor" aria-label="anchor" href="#arg-which-pred"></a></dt>
+<dd><p>If the predictions are multivariate: which column to pick
+(integer or column name). By default <code>NULL</code> (picks last column).</p></dd>
 
 
 <dt id="arg-max-bin-size">max_bin_size<a class="anchor" aria-label="anchor" href="#arg-max-bin-size"></a></dt>

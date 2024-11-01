@@ -57,7 +57,17 @@ be handy.</p>
     </div>
 
     <div id="ref-usage">
-    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">.pd</span><span class="op">(</span><span class="va">object</span>, <span class="va">v</span>, <span class="va">X</span>, <span class="va">grid</span>, pred_fun <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span>, trafo <span class="op">=</span> <span class="cn">NULL</span>, w <span class="op">=</span> <span class="cn">NULL</span>, <span class="va">...</span><span class="op">)</span></span></code></pre></div>
+    <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="fu">.pd</span><span class="op">(</span></span>
+<span>  <span class="va">object</span>,</span>
+<span>  <span class="va">v</span>,</span>
+<span>  <span class="va">X</span>,</span>
+<span>  <span class="va">grid</span>,</span>
+<span>  pred_fun <span class="op">=</span> <span class="fu">stats</span><span class="fu">::</span><span class="va"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span>,</span>
+<span>  trafo <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  which_pred <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  w <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span></code></pre></div>
     </div>
 
     <div id="arguments">
@@ -89,6 +99,11 @@ The function takes three arguments (names irrelevant): <code>object</code>, <cod
 <dd><p>How should predictions be transformed?
 A function or <code>NULL</code> (default). Examples are <code>log</code> (to switch to link scale)
 or <code>exp</code> (to switch from link scale to the original scale).</p></dd>
+
+
+<dt id="arg-which-pred">which_pred<a class="anchor" aria-label="anchor" href="#arg-which-pred"></a></dt>
+<dd><p>If the predictions are multivariate: which column to pick
+(integer or column name). By default <code>NULL</code> (picks last column).</p></dd>
 
 
 <dt id="arg-w">w<a class="anchor" aria-label="anchor" href="#arg-w"></a></dt>
