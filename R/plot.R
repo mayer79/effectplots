@@ -6,20 +6,20 @@
 #' @importFrom ggplot2 .data
 #' @param x An object of class "marginal".
 #' @param ncol Number of columns in the plot layout.
-#'   Only if `length(x) > 1` (multiple plots). With "plotly" subplots, the result may
-#'   differ slightly.
+#'   Only if `length(x) > 1` (multiple plots).
 #' @param byrow Should plots be placed by row? Default is `TRUE`.
 #'   Only if `length(x) > 1` (multiple plots).
 #' @param share_y Should y axis be shared across all subplots?
 #'   No effect if `ylim` is passed. Only if `length(x) > 1` (multiple plots).
-#' @param ylim Manual y axis range.
+#' @param ylim A vector of length 2 with manual y axis limits.
 #' @param cat_lines Show lines for non-numeric features. Default is `TRUE`.
 #' @param num_points Show points for numeric features. Default is `FALSE`.
-#' @param ylab Label of y axis. The default `NULL` automatically derives a reasonable
-#'   name based on the calculated statistics.
+#' @param ylab Label of the y axis. The default `NULL` automatically derives
+#'   a reasonable name based on the calculated statistics.
 #' @param line_names Named vector controlling the legend labels, the lines shown, and
 #'   the line order. By default `c(obs = "y_mean", pred = "pred_mean", pd = "pd")`.
-#'   The names of the vector will be shown as legend labels.
+#'   The names of the vector will be shown as legend labels. The values refer to the
+#'   calculated statistics.
 #' @param colors Line colors corresponding to (available) `line_names`.
 #'   By default, a color blind friendly palette from "ggthemes", namely
 #'   `c("#CC79A7", "#009E73", "#56B4E9")`.
@@ -29,18 +29,15 @@
 #' @param bar_height Relative bar height (default 1). Set to 0 for no bars.
 #' @param bar_width Relative bar width of non-numeric features, by default 0.7.
 #' @param bar_measure What should bars represent? Either "weight" (default) or "N".
-#' @param eval_at If `mean` (default), the points are aligned with (weighted)
-#'   average bin means. If `mid`, the points are aligned with bin midpoints.
-#'   Affects only numeric X. Note that partial dependence of numeric X is always
-#'   evaluated at bin means, not midpoints.
-#' @param wrap_x Should categorical xaxis labels be wrapped after this length?
+#' @param wrap_x Should categorical x axis labels be wrapped after this length?
 #'   The default is 10. Set to 0 for no wrapping. Vectorized over `x`.
 #'   Only for "ggplot2" backend.
 #' @param rotate_x Should categorical xaxis labels be rotated by this angle?
 #'   The default is 0 (no rotation). Vectorized over `x`. Only for "ggplot2" backend.
 #' @param backend Plot backend, either "ggplot2" (default) or "plotly".
 #'   To change globally, set `options(marginalplot.backend = "plotly")`.
-#' @param ... Passed to `patchwork::plot_layout()` or `plotly::subplot()`.
+#' @param ... Passed to `patchwork::plot_layout()` or `plotly::subplot()`. Typically
+#'   not used.
 #' @returns
 #'   If `length(x) == 1` (single plot), an object of class  "ggplot" or "plotly".
 #'   Otherwise, an object of class "patchwork", or a "plotly" subplot.
@@ -61,7 +58,6 @@ plot.marginal <- function(
     bar_height = 1,
     bar_width = 0.7,
     bar_measure = c("weight", "N"),
-    eval_at = c("mean", "mid"),
     wrap_x = 10,
     rotate_x = 0,
     backend = getOption("marginalplot.backend"),
@@ -88,11 +84,6 @@ plot.marginal <- function(
 
   # Overwrite bin_width of categorical features
   x <- lapply(x, function(z) {if (!.num(z)) z$bin_width <- bar_width; z})
-
-  # Modify where points of numeric features are shown
-  if (eval_at == "mid") {
-    x <- lapply(x, function(z) {if (.num(z)) z$bin_mean <- z$bin_mid; z})
-  }
 
   # Derive a good ylab
   if (is.null(ylab)) {
