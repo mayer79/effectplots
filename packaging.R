@@ -16,10 +16,11 @@ use_description(
   fields = list(
     Title = "Marginal Plots",
     Version = "0.0.1",
-    Description = "Provides high-quality marginal plots for regression and
+    Description = "Provides high-quality effect plots for regression and
     probabilistic classification.
     The main function 'marginal()' calculates average observed values of the model
-    response, average predictions, and partial dependence for each
+    response, average predictions, average residuals (bias),
+    and partial dependence for each
     feature value. Visualization can be done via 'ggplot2' or 'plotly'.
     Optimized for large data, the package is compatible with most models
     out-of-the-box, including those wrapped with 'DALEX' or 'Tidymodels'.",

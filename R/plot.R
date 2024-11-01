@@ -18,13 +18,12 @@
 #'   Default is `TRUE`. Only for multiple plots.
 #' @param ylab Label of the y axis. The default `NULL` automatically derives
 #'   a reasonable name based on the calculated statistics.
-#' @param line_names Named vector controlling the legend labels, the lines shown, and
-#'   the line order. By default `c(obs = "y_mean", pred = "pred_mean", pd = "pd")`.
-#'   The names of the vector will be shown as legend labels. The values refer to the
-#'   calculated statistics.
-#' @param colors Line colors corresponding to (available) `line_names`.
-#'   By default, a color blind friendly palette from "ggthemes", namely
-#'   `c("#CC79A7", "#009E73", "#56B4E9")`.
+#' @param lines Named vector of the form `c(name = statistic, ...)` of statistics to
+#'   plot. `name` is used as legend label. By default
+#'   `c(obs = "y_mean", pred = "pred_mean", pd = "pd")`.
+#'   To show only bias with "bias" as legend entry, use `c(bias = "resid_mean")`.
+#' @param colors Vector of line colors of sufficient length.
+#'   By default, a color blind friendly palette from "ggthemes".
 #'   To change globally, set `options(marginalplot.colors = new colors)`.
 #' @param fill Fill color of bars. The default equals "lightgrey".
 #'   To change globally, set `options(marginalplot.fill = new color)`.
@@ -56,7 +55,7 @@ plot.marginal <- function(
     title = "",
     subplot_titles = TRUE,
     ylab = NULL,
-    line_names = c(obs = "y_mean", pred = "pred_mean", pd = "pd"),
+    lines = c(obs = "y_mean", pred = "pred_mean", pd = "pd"),
     colors = getOption("marginalplot.colors"),
     fill = getOption("marginalplot.fill"),
     bar_height = 1,
@@ -71,13 +70,13 @@ plot.marginal <- function(
 
   stopifnot(
     backend %in% c("ggplot2", "plotly"),
-    line_names %in% c("y_mean", "pred_mean", "pd")
+    lines %in% c("y_mean", "pred_mean", "resid_mean", "pd")
   )
 
   nplots <- length(x)
 
-  line_names <- line_names[line_names %in% colnames(x[[1L]])]
-  nn <- length(line_names)
+  lines <- lines[lines %in% colnames(x[[1L]])]
+  nn <- length(lines)
   show_legend <- nn > 1L
 
   stopifnot(
@@ -90,15 +89,7 @@ plot.marginal <- function(
 
   # Derive a good ylab
   if (is.null(ylab)) {
-    if (length(line_names) == 1L) {
-      ylab <- switch(
-        line_names, pd = "Partial Dependence", y_mean = "Response", "Prediction"
-      )
-    } else if ("y_mean" %in% line_names) {
-      ylab <- "Response"
-    } else {
-      ylab <- "Prediction"
-    }
+    ylab <- get_ylab(lines)
   }
 
   if (nplots == 1L) {
@@ -112,7 +103,7 @@ plot.marginal <- function(
         num_points = num_points,
         title = title,
         ylab = ylab,
-        line_names = line_names,
+        lines = lines,
         colors = colors,
         fill = fill,
         bar_height = bar_height,
@@ -132,7 +123,7 @@ plot.marginal <- function(
         title = title,
         title_as_ann = FALSE,
         ylab = ylab,
-        line_names = line_names,
+        lines = lines,
         colors = colors,
         fill = fill,
         bar_height = bar_height,
@@ -158,7 +149,7 @@ plot.marginal <- function(
 
   # Shared y is solved via ylim + padding
   if (share_y && is.null(ylim)) {
-    r <- range(sapply(x, function(z) range(z[line_names], na.rm = TRUE)))
+    r <- range(sapply(x, function(z) range(z[lines], na.rm = TRUE)))
     ylim <- grDevices::extendrange(r, f = 0.05)
   }
 
@@ -184,7 +175,7 @@ plot.marginal <- function(
         cat_lines = cat_lines,
         num_points = num_points,
         ylab = ylab,
-        line_names = line_names,
+        lines = lines,
         colors = colors,
         fill = fill,
         bar_height = bar_height,
@@ -219,7 +210,7 @@ plot.marginal <- function(
         num_points = num_points,
         ylab = ylab,
         show_ylab = FALSE,  # replaced by global annotation
-        line_names = line_names,
+        lines = lines,
         colors = colors,
         fill = fill,
         bar_height = bar_height,
@@ -273,7 +264,7 @@ plot_marginal_ggplot <- function(
     cat_lines,
     title,
     ylab,
-    line_names,
+    lines,
     colors,
     fill,
     bar_height,
@@ -284,8 +275,8 @@ plot_marginal_ggplot <- function(
 ) {
   num <- .num(x)
   df <- transform(
-    poor_man_stack(x, line_names),
-    varying_ = factor(varying_, levels = line_names, labels = names(line_names))
+    poor_man_stack(x, lines),
+    varying_ = factor(varying_, levels = lines, labels = names(lines))
   )
 
   # Calculate transformation of bars on the right y axis
@@ -366,7 +357,7 @@ plot_marginal_plotly <- function(
     title,
     title_as_ann = FALSE,
     ylab,
-    line_names,
+    lines,
     colors,
     fill,
     bar_height,
@@ -417,8 +408,8 @@ plot_marginal_plotly <- function(
     r <- c(0, max(x[[bar_measure]]) / bar_height / f)
   }
 
-  for (i in seq_along(line_names)) {
-    z <- line_names[i]
+  for (i in seq_along(lines)) {
+    z <- lines[i]
     fig <- plotly::add_trace(
       fig,
       x = ~bin_mean,
@@ -476,7 +467,7 @@ plot_marginal_plotly <- function(
   )
 }
 
-# Helper function
+# Helper functions
 
 # subplots make inner plots smaller due to margins
 # https://github.com/plotly/plotly.R/issues/2144
@@ -489,4 +480,19 @@ corr_margin <- function(m, margin) {
     return(c(f, rep((1 - 2 * f) / n_inner, times = n_inner), f))
   }
   return(NULL)
+}
+
+get_ylab <- function(lines) {
+  if (length(lines) == 1L) {
+    out <- switch(
+      lines,
+      y_mean = "Average response",
+      pred_mean = "Average prediction",
+      resid_mean = "Bias",
+      pd = "Partial Dependence"
+    )
+    return(out)
+  }
+  # No "average" (that would be overly specific)
+  if ("y_mean" %in% lines) "Response" else "Prediction"
 }

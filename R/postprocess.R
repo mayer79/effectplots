@@ -18,7 +18,10 @@
 #' @param x Object of class "marginal".
 #' @param sort Should `x` be sorted in decreasing order of feature importance?
 #'   Importance is measured by the weighted variance of the most relevant available
-#'   statistic (pd > pred_mean > y_mean), see Details. The default is `FALSE`.
+#'   statistic (pd > pred_mean > y_mean > resid_mean). The default is `FALSE`.
+#' @param sort_by If `sort = TRUE`, this measure used for sorting. One of
+#'   'pd', 'pred_mean', 'y_mean', or 'resid_mean' (if available). The default is `NULL`,
+#'   which picks the first of the listed statistics.
 #' @param collapse_m If a categorical X has more than `collapse_m` levels,
 #'   rare levels are collapsed into a new level "Other". Standard deviations are
 #'   collapsed via root of the weighted average variances. By default 30.
@@ -30,7 +33,9 @@
 #' @param drop_below_weight Drop bins with weight below this value. Applied after
 #' collapsing. Vectorized over `x`.
 #' @param na.rm Should missing bin centers be dropped? Default is `FALSE`.
-#' @seealso [marginal()], [average_observed()], [partial_dependence()]
+#' @seealso
+#'   [marginal()], [average_observed()], [partial_dependence()],
+#'   [main_effect_importance()]
 #' @export
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)
@@ -44,6 +49,7 @@
 postprocess <- function(
   x,
   sort = FALSE,
+  sort_by = NULL,
   collapse_m = 30L,
   collapse_by = c("weight", "N"),
   drop_below_n = 0,
@@ -68,7 +74,7 @@ postprocess <- function(
   )
 
   if (isTRUE(sort)) {
-    imp <- main_effect_importance(out)
+    imp <- main_effect_importance(out, by = sort_by)
     out <- out[order(imp, decreasing = TRUE, na.last = TRUE)]
   }
 
@@ -101,26 +107,31 @@ postprocess_one <- function(
 #' Main Effect Importance
 #'
 #' Extracts the weighted variances of the most relevant statistic
-#' (pd > pred_mean > y_mean) from a "marginal" object.
-#' Serves as a simple "main effect" importance measure.
+#' (pd > pred_mean > y_mean > resid_mean) from a "marginal" object.
+#' Serves as a simple measure of (main effect) importance. If partial dependence
+#' is used, the measure is closely related to the importance measure proposed in
+#' the reference below.
 #'
 #' @param x Marginal object.
-#' @param statistic The statistic used to calculate the variance for.
-#' One of 'pd', 'pred_mean', or 'y_mean'.
+#' @param by The statistic used to calculate the variance for.
+#' One of 'pd', 'pred_mean', 'y_mean', or 'resid_mean`. By default (`NULL`), the
+#' first available of above list.
 #' @seealso [postprocess()]
 #' @export
+#' @inherit postprocess references
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)
 #' xvars <- colnames(iris)[-1]
 #' M <- marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 #' main_effect_importance(M)
-main_effect_importance <- function(x, statistic = NULL) {
-  if (is.null(statistic)) {
-    vars <- intersect(c("pd", "pred_mean", "y_mean"), colnames(x[[1L]]))
-    statistic <- vars[1L]
-    message("Importance via weighted variance of '", statistic, "'")
+main_effect_importance <- function(x, by = NULL) {
+  if (is.null(by)) {
+    # "resid_mean" can never be picked if by = NULL, because there is also "pred_mean"
+    vars <- intersect(c("pd", "pred_mean", "y_mean", "resid_mean"), colnames(x[[1L]]))
+    by <- vars[1L]
+    message("Importance via weighted variance of '", by, "'")
   }
-  vapply(x, FUN = .one_imp, v = statistic, FUN.VALUE = numeric(1L))
+  vapply(x, FUN = .one_imp, v = by, FUN.VALUE = numeric(1L))
 }
 
 # Helper functions
@@ -146,12 +157,12 @@ main_effect_importance <- function(x, statistic = NULL) {
     bin_mid = oth, bin_width = 0.7, bin_mean = oth, N = sum(x_agg$N), weight = sum(w)
   )
 
-  m_cols <- intersect(colnames(x), c("pred_mean", "y_mean", "pd"))
+  m_cols <- intersect(colnames(x), c("pred_mean", "y_mean", "resid_mean", "pd"))
   if (length(m_cols)) {
     x_new[, m_cols] <- collapse::fmean(x_agg[m_cols], w = w, drop = FALSE)
   }
 
-  s_cols <- intersect(colnames(x), c("pred_sd", "y_sd"))
+  s_cols <- intersect(colnames(x), c("pred_sd", "y_sd", "resid_sd"))
   if (length(s_cols)) {
     # Bins with N = 1 can be NA, therefore na.rm = TRUE
     x_new[, s_cols] <- sqrt(

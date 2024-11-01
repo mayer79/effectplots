@@ -130,6 +130,7 @@ This is the main function of the package. It calculates
 \itemize{
 \item average observed (with std),
 \item average predicted (with std),
+\item average residual (= bias, with std),
 \item partial dependence,
 \item counts, and
 \item weights (same as counts if no weights \code{w} are passed)

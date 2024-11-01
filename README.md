@@ -13,6 +13,7 @@ The main function `marginal()` calculates
 
 - average observed response (with std),
 - average predicted values (with std),
+- average residuals (= bias, with std),
 - partial dependence,
 - counts, and
 - weight sums

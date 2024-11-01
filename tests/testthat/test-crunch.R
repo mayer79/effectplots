@@ -72,7 +72,7 @@ test_that("Test that grouped_stats() uses sort(funique) + NA as order", {
     char = f1
   )
   for (f in ff) {
-    out <- rownames(grouped_stats(cbind(1:6), g = f))
+    out <- rownames(grouped_stats(cbind(s = 1:6), g = f))
     expect_equal(out, as.character(sort(collapse::funique(f), na.last = TRUE)))
   }
 })

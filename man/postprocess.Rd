@@ -7,6 +7,7 @@
 postprocess(
   x,
   sort = FALSE,
+  sort_by = NULL,
   collapse_m = 30L,
   collapse_by = c("weight", "N"),
   drop_below_n = 0,
@@ -19,7 +20,11 @@ postprocess(
 
 \item{sort}{Should \code{x} be sorted in decreasing order of feature importance?
 Importance is measured by the weighted variance of the most relevant available
-statistic (pd > pred_mean > y_mean), see Details. The default is \code{FALSE}.}
+statistic (pd > pred_mean > y_mean > resid_mean). The default is \code{FALSE}.}
+
+\item{sort_by}{If \code{sort = TRUE}, this measure used for sorting. One of
+'pd', 'pred_mean', 'y_mean', or 'resid_mean' (if available). The default is \code{NULL},
+which picks the first of the listed statistics.}
 
 \item{collapse_m}{If a categorical X has more than \code{collapse_m} levels,
 rare levels are collapsed into a new level "Other". Standard deviations are
@@ -65,5 +70,6 @@ Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy.
 \emph{A Simple and Effective Model-Based Variable Importance Measure.} Arxiv (2018).
 }
 \seealso{
-\code{\link[=marginal]{marginal()}}, \code{\link[=average_observed]{average_observed()}}, \code{\link[=partial_dependence]{partial_dependence()}}
+\code{\link[=marginal]{marginal()}}, \code{\link[=average_observed]{average_observed()}}, \code{\link[=partial_dependence]{partial_dependence()}},
+\code{\link[=main_effect_importance]{main_effect_importance()}}
 }

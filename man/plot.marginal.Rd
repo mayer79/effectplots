@@ -15,7 +15,7 @@
   title = "",
   subplot_titles = TRUE,
   ylab = NULL,
-  line_names = c(obs = "y_mean", pred = "pred_mean", pd = "pd"),
+  lines = c(obs = "y_mean", pred = "pred_mean", pd = "pd"),
   colors = getOption("marginalplot.colors"),
   fill = getOption("marginalplot.fill"),
   bar_height = 1,
@@ -52,14 +52,13 @@ Default is \code{TRUE}. Only for multiple plots.}
 \item{ylab}{Label of the y axis. The default \code{NULL} automatically derives
 a reasonable name based on the calculated statistics.}
 
-\item{line_names}{Named vector controlling the legend labels, the lines shown, and
-the line order. By default \code{c(obs = "y_mean", pred = "pred_mean", pd = "pd")}.
-The names of the vector will be shown as legend labels. The values refer to the
-calculated statistics.}
+\item{lines}{Named vector of the form \code{c(name = statistic, ...)} of statistics to
+plot. \code{name} is used as legend label. By default
+\code{c(obs = "y_mean", pred = "pred_mean", pd = "pd")}.
+To show only bias with "bias" as legend entry, use \code{c(bias = "resid_mean")}.}
 
-\item{colors}{Line colors corresponding to (available) \code{line_names}.
-By default, a color blind friendly palette from "ggthemes", namely
-\code{c("#CC79A7", "#009E73", "#56B4E9")}.
+\item{colors}{Vector of line colors of sufficient length.
+By default, a color blind friendly palette from "ggthemes".
 To change globally, set \verb{options(marginalplot.colors = new colors)}.}
 
 \item{fill}{Fill color of bars. The default equals "lightgrey".

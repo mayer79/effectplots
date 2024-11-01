@@ -4,24 +4,31 @@
 \alias{main_effect_importance}
 \title{Main Effect Importance}
 \usage{
-main_effect_importance(x, statistic = NULL)
+main_effect_importance(x, by = NULL)
 }
 \arguments{
 \item{x}{Marginal object.}
 
-\item{statistic}{The statistic used to calculate the variance for.
-One of 'pd', 'pred_mean', or 'y_mean'.}
+\item{by}{The statistic used to calculate the variance for.
+One of 'pd', 'pred_mean', 'y_mean', or 'resid_mean\verb{. By default (}NULL`), the
+first available of above list.}
 }
 \description{
 Extracts the weighted variances of the most relevant statistic
-(pd > pred_mean > y_mean) from a "marginal" object.
-Serves as a simple "main effect" importance measure.
+(pd > pred_mean > y_mean > resid_mean) from a "marginal" object.
+Serves as a simple measure of (main effect) importance. If partial dependence
+is used, the measure is closely related to the importance measure proposed in
+the reference below.
 }
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)
 xvars <- colnames(iris)[-1]
 M <- marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 main_effect_importance(M)
+}
+\references{
+Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy.
+\emph{A Simple and Effective Model-Based Variable Importance Measure.} Arxiv (2018).
 }
 \seealso{
 \code{\link[=postprocess]{postprocess()}}

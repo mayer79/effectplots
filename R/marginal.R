@@ -3,6 +3,7 @@
 #' This is the main function of the package. It calculates
 #' - average observed (with std),
 #' - average predicted (with std),
+#' - average residual (= bias, with std),
 #' - partial dependence,
 #' - counts, and
 #' - weights (same as counts if no weights `w` are passed)
@@ -165,7 +166,8 @@ marginal.default <- function(
     )
   }
 
-  PY <- cbind(pred = pred, y = y)  # cbind(NULL, NULL) gives NULL
+  re <- !is.null(pred) && !is.null(y)
+  PYR <- cbind(pred = pred, y = y, resid = if (re) y - pred) # cbind(NULL, NULL) is NULL
 
   # Prepare pd_X and pd_w
   if (pd_n > 0L) {
@@ -202,7 +204,7 @@ marginal.default <- function(
     discrete_m = discrete_m,
     outlier_iqr = outlier_iqr,
     MoreArgs = list(
-      PY = PY,
+      PYR = PYR,
       w = w,
       data = data,
       object = object,
@@ -305,7 +307,7 @@ marginal.explainer <- function(
 
 calculate_stats <- function(
     v,
-    PY,
+    PYR,
     w,
     data,
     breaks,
@@ -333,7 +335,7 @@ calculate_stats <- function(
   if (!is.numeric(x) || length(g) <= discrete_m) {
     num <- FALSE
     # Ordered by sort(g) (+ NA). For factors: levels(x) (+ NA)
-    M <- grouped_stats(PY, g = x, w = w)
+    M <- grouped_stats(PYR, g = x, w = w)
     g <- sort(g, na.last = TRUE)
     out <- data.frame(bin_mid = g, bin_width = 0.7, bin_mean = g, M)
     rownames(out) <- NULL
@@ -365,7 +367,7 @@ calculate_stats <- function(
     )
     M <- cbind(
       bin_mean = collapse::fmean.default(x, g = ix, w = w),
-      grouped_stats(PY, g = ix, w = w)
+      grouped_stats(PYR, g = ix, w = w)
     )
     reindex <- match(as.integer(rownames(M)), gix)
     out[reindex, colnames(M)] <- M  # Fill gaps
