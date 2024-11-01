@@ -5,15 +5,17 @@
 #'
 #' @importFrom ggplot2 .data
 #' @param x An object of class "marginal".
-#' @param ncol Number of columns in the plot layout.
-#'   Only if `length(x) > 1` (multiple plots).
+#' @param ncol Number of columns in the plot layout. Only for multiple plots.
 #' @param byrow Should plots be placed by row? Default is `TRUE`.
-#'   Only if `length(x) > 1` (multiple plots).
+#'   Only for multiple plots.
 #' @param share_y Should y axis be shared across all subplots?
-#'   No effect if `ylim` is passed. Only if `length(x) > 1` (multiple plots).
+#'   No effect if `ylim` is passed. Only for multiple plots.
 #' @param ylim A vector of length 2 with manual y axis limits.
 #' @param cat_lines Show lines for non-numeric features. Default is `TRUE`.
 #' @param num_points Show points for numeric features. Default is `FALSE`.
+#' @param title Overall plot title, by default `""` (no title).
+#' @param subplot_titles Should variable names be shown as subplot titles?
+#'   Default is `TRUE`. Only for multiple plots.
 #' @param ylab Label of the y axis. The default `NULL` automatically derives
 #'   a reasonable name based on the calculated statistics.
 #' @param line_names Named vector controlling the legend labels, the lines shown, and
@@ -39,7 +41,7 @@
 #' @param ... Passed to `patchwork::plot_layout()` or `plotly::subplot()`. Typically
 #'   not used.
 #' @returns
-#'   If `length(x) == 1` (single plot), an object of class  "ggplot" or "plotly".
+#'   If single plot, an object of class  "ggplot" or "plotly".
 #'   Otherwise, an object of class "patchwork", or a "plotly" subplot.
 #' @seealso [marginal()], [average_observed()], [partial_dependence()]
 #' @export
@@ -51,6 +53,8 @@ plot.marginal <- function(
     ylim = NULL,
     cat_lines = TRUE,
     num_points = FALSE,
+    title = "",
+    subplot_titles = TRUE,
     ylab = NULL,
     line_names = c(obs = "y_mean", pred = "pred_mean", pd = "pd"),
     colors = getOption("marginalplot.colors"),
@@ -106,6 +110,7 @@ plot.marginal <- function(
         ylim = ylim,
         cat_lines = cat_lines,
         num_points = num_points,
+        title = title,
         ylab = ylab,
         line_names = line_names,
         colors = colors,
@@ -124,6 +129,8 @@ plot.marginal <- function(
         ylim = ylim,
         cat_lines = cat_lines,
         num_points = num_points,
+        title = title,
+        title_as_ann = FALSE,
         ylab = ylab,
         line_names = line_names,
         colors = colors,
@@ -160,16 +167,18 @@ plot.marginal <- function(
     show_legend <- seq_along(x) == order(!.num(x))[1L]
   }
 
+  titles <- if (isTRUE(subplot_titles)) names(x) else ""
+
   if (backend == "ggplot2") {
     plot_list <- mapply(
       plot_marginal_ggplot,
       x,
       v = names(x),
+      title = titles,
       show_legend = show_legend,
       wrap_x = wrap_x,
       rotate_x = rotate_x,
       MoreArgs = list(
-        show_title = TRUE,
         share_y = share_y,
         ylim = ylim,
         cat_lines = cat_lines,
@@ -183,19 +192,27 @@ plot.marginal <- function(
       ),
       SIMPLIFY = FALSE
     )
-    patchwork::wrap_plots(plot_list) +
+    p <- patchwork::wrap_plots(plot_list) +
       patchwork::plot_layout(ncol = ncol, guides = "collect", axes = "collect", ...)
+    if (title != "") {
+      p <- p + patchwork::plot_annotation(
+        title = title,
+        theme = ggplot2::theme(plot.title = ggplot2::element_text(hjust = 0.5))
+      )
+    }
+    p
   } else {
     col_i <- (seq_along(x) - 1L) %% ncol + 1L
     plot_list <- mapply(
       plot_marginal_plotly,
       x,
       v = names(x),
+      title = titles,
       show_yticks = !share_y | (col_i == 1L),
       show_legend = show_legend,
       overlay = paste0("y", 2 * seq_along(x)),
       MoreArgs = list(
-        show_title = TRUE,
+        title_as_ann = TRUE,
         share_y = share_y,
         ylim = ylim,
         cat_lines = cat_lines,
@@ -211,7 +228,7 @@ plot.marginal <- function(
       SIMPLIFY = FALSE
     )
     # left/right - top/bottom (we use it symmetrically)
-    margins <- c(0.05 - share_y * 0.02, 0.07)
+    margins <- c(0.05 - isTRUE(share_y) * 0.02, 0.05 + isTRUE(subplot_titles) * 0.02)
     fig <- plotly::subplot(
       plot_list,
       titleX = TRUE,
@@ -222,6 +239,13 @@ plot.marginal <- function(
       margin = rep(margins, each = 2L),
       ...
     )
+
+    # Global title (not via layout(title = ))
+    if (title != "") {
+      fig <- plotly::layout(
+        fig, margin = list(t = 40 + 10 * isTRUE(subplot_titles)), title = title
+      )
+    }
 
     # Make a single vertical y axis label. xshift does the dynamic shifting
     ann <- list(
@@ -247,6 +271,7 @@ plot_marginal_ggplot <- function(
     ylim,
     num_points,
     cat_lines,
+    title,
     ylab,
     line_names,
     colors,
@@ -255,7 +280,6 @@ plot_marginal_ggplot <- function(
     bar_measure,
     wrap_x,
     rotate_x,
-    show_title = FALSE,
     show_legend = TRUE
 ) {
   num <- .num(x)
@@ -315,8 +339,8 @@ plot_marginal_ggplot <- function(
     ggplot2::theme(legend.title = ggplot2::element_blank(), legend.position = "right") +
     ggplot2::labs(x = v, y = ylab)
 
-  if (show_title) {
-    p <- p + ggplot2::ggtitle(v)
+  if (title != "") {
+    p <- p + ggplot2::ggtitle(title)
   }
   if (!is.null(ylim)) {
     p <- p + ggplot2::ylim(ylim)
@@ -339,6 +363,8 @@ plot_marginal_plotly <- function(
     ylim,
     cat_lines,
     num_points,
+    title,
+    title_as_ann = FALSE,
     ylab,
     line_names,
     colors,
@@ -347,7 +373,6 @@ plot_marginal_plotly <- function(
     bar_measure,
     show_ylab = TRUE,    # not vectorized
     show_yticks = TRUE,  # vectorized, and all below as well
-    show_title = FALSE,
     show_legend = TRUE,
     overlay = "y2"
 ) {
@@ -412,20 +437,25 @@ plot_marginal_plotly <- function(
   if (!is.null(ylim)) {
     fig <- plotly::layout(fig, yaxis = list(range = ylim))
   }
-  if (show_title) {
-    ann <- list(
-      text = v,
-      x = 0,
-      y = 1,
-      font = list(size = 15),
-      xanchor = "left",
-      yanchor = "bottom",
-      xref = "paper",
-      yref = "paper",
-      showarrow = FALSE
-    )
-    fig <- plotly::layout(fig, annotations = ann)
+  if (title != "") {
+    if (!title_as_ann) {  # Normal title
+      fig <- plotly::layout(fig, title = title, margin = list(t = 40))
+    } else {  # subplot situation
+      ann <- list(
+        text = title,
+        x = 0,
+        y = 1,
+        font = list(size = 15),
+        xanchor = "left",
+        yanchor = "bottom",
+        xref = "paper",
+        yref = "paper",
+        showarrow = FALSE
+      )
+      fig <- plotly::layout(fig, annotations = ann)
+    }
   }
+
   plotly::layout(
     fig,
     yaxis = list(

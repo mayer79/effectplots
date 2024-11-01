@@ -12,6 +12,8 @@
   ylim = NULL,
   cat_lines = TRUE,
   num_points = FALSE,
+  title = "",
+  subplot_titles = TRUE,
   ylab = NULL,
   line_names = c(obs = "y_mean", pred = "pred_mean", pd = "pd"),
   colors = getOption("marginalplot.colors"),
@@ -28,20 +30,24 @@
 \arguments{
 \item{x}{An object of class "marginal".}
 
-\item{ncol}{Number of columns in the plot layout.
-Only if \code{length(x) > 1} (multiple plots).}
+\item{ncol}{Number of columns in the plot layout. Only for multiple plots.}
 
 \item{byrow}{Should plots be placed by row? Default is \code{TRUE}.
-Only if \code{length(x) > 1} (multiple plots).}
+Only for multiple plots.}
 
 \item{share_y}{Should y axis be shared across all subplots?
-No effect if \code{ylim} is passed. Only if \code{length(x) > 1} (multiple plots).}
+No effect if \code{ylim} is passed. Only for multiple plots.}
 
 \item{ylim}{A vector of length 2 with manual y axis limits.}
 
 \item{cat_lines}{Show lines for non-numeric features. Default is \code{TRUE}.}
 
 \item{num_points}{Show points for numeric features. Default is \code{FALSE}.}
+
+\item{title}{Overall plot title, by default \code{""} (no title).}
+
+\item{subplot_titles}{Should variable names be shown as subplot titles?
+Default is \code{TRUE}. Only for multiple plots.}
 
 \item{ylab}{Label of the y axis. The default \code{NULL} automatically derives
 a reasonable name based on the calculated statistics.}
@@ -79,7 +85,7 @@ To change globally, set \code{options(marginalplot.backend = "plotly")}.}
 not used.}
 }
 \value{
-If \code{length(x) == 1} (single plot), an object of class  "ggplot" or "plotly".
+If single plot, an object of class  "ggplot" or "plotly".
 Otherwise, an object of class "patchwork", or a "plotly" subplot.
 }
 \description{

@@ -127,8 +127,6 @@ marginal(fit, v = xvars, data = X_test, y = test$claim_nb) |>
 Thanks to the flexibility of the package, you can modify the results as you wish. For instance: what about putting results on training data besides those on test?
 
 ```r
-library(patchwork)
-
 m_train <- marginal(fit, v = xvars, data = X_train, y = train$claim_nb)
 m_test <- marginal(fit, v = xvars, data = X_test, y = test$claim_nb)
 
@@ -140,13 +138,17 @@ m_test <- m_test[names(m_train)]
 
 # Plot combined one
 c(m_train, m_test) |> 
-  plot(share_y = TRUE, ncol = 2, byrow = FALSE) +
-  plot_annotation(title = "Left: Train - Right: Test")
+  plot(share_y = TRUE, ncol = 2, byrow = FALSE, title = "Left: Train - Right: Test")
   
 # Or via Plotly
 c(m_train, m_test) |> 
-  plot(share_y = TRUE, ncol = 2, byrow = FALSE, backend = "plotly") |> 
-  plotly::layout(margin = list(t = 60), title = "Left: Train - Right: Test")
+  plot(
+    share_y = TRUE,
+    ncol = 2,
+    byrow = FALSE,
+    title = "Left: Train - Right: Test",
+    backend = "plotly"
+  )
 ```
 
 ![](man/figures/train_test.svg)
