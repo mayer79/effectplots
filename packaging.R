@@ -14,7 +14,7 @@ library(usethis)
 # Sketch of description file
 use_description(
   fields = list(
-    Title = "Marginal Plots",
+    Title = "Model Effects",
     Version = "0.0.1",
     Description = "Provides high-quality effect plots for regression and
     probabilistic classification.

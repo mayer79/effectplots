@@ -217,6 +217,18 @@ marginal.default <- function(
     ),
     SIMPLIFY = FALSE
   )
+
+  # Remove empty results (only ALE to be calculated, and feature is discrete)
+  ok <- lengths(out) > 0L  # non-null (has some columns)
+  if (!all(ok)) {
+    if (!any(ok)) {
+      stop("Nothing has been calculated!")
+    }
+    message(
+      "Dropping variables without results:\n", paste(names(out)[!ok], collapse = ", ")
+    )
+    out <- out[ok]
+  }
   structure(out, class = "marginal")
 }
 
@@ -330,10 +342,14 @@ calculate_stats <- function(
     collapse::setop(x, "+", 0.0)
   }
   g <- collapse::funique(x)
+  num <- is.numeric(x) && (length(g) > discrete_m)
+
+  if (is.null(PYR) && is.null(pd_X)) {  # && (!num || ale_n_bin == 0L)
+    return(NULL)
+  }
 
   # DISCRETE
-  if (!is.numeric(x) || length(g) <= discrete_m) {
-    num <- FALSE
+  if (!num) {
     # Ordered by sort(g) (+ NA). For factors: levels(x) (+ NA)
     M <- grouped_stats(PYR, g = x, w = w)
     g <- sort(g, na.last = TRUE)
@@ -341,7 +357,6 @@ calculate_stats <- function(
     rownames(out) <- NULL
   } else {
     # "CONTINUOUS" case. Tricky because there can be empty bins.
-    num <- TRUE
     if (outlier_iqr > 0 && is.finite(outlier_iqr)) {
       x <- wins_iqr(x, m = outlier_iqr)
     }
