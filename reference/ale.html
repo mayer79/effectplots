@@ -175,6 +175,12 @@ conservative than the usual rule to account for right-skewed distributions.
 Set to 0 or <code>Inf</code> for no capping. Note that at most 10k observations are sampled
 to calculate quartiles (uses random seed). Vectorized over <code>v</code>.</p></dd>
 
+
+<dt id="arg-ale-bin-size">ale_bin_size<a class="anchor" aria-label="anchor" href="#arg-ale-bin-size"></a></dt>
+<dd><p>Maximal number of observations used per bin for ALE calculations.
+If there are more observations in a bin, <code>ale_bin_size</code> indices are
+randomly sampled (uses random seed). The default is 200.</p></dd>
+
 </dl></div>
     <div id="value">
     <h2>Value</h2>

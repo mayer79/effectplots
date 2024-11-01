@@ -68,15 +68,15 @@ You can switch to plotly by setting <code>backend = "plotly"</code>.</p>
 <span>  subplot_titles <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  ylab <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  lines <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>obs <span class="op">=</span> <span class="st">"y_mean"</span>, pred <span class="op">=</span> <span class="st">"pred_mean"</span>, pd <span class="op">=</span> <span class="st">"pd"</span>, ale <span class="op">=</span> <span class="st">"ale"</span><span class="op">)</span>,</span>
-<span>  colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"marginalplot.colors"</span><span class="op">)</span>,</span>
-<span>  fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"marginalplot.fill"</span><span class="op">)</span>,</span>
+<span>  colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"effectplots.colors"</span><span class="op">)</span>,</span>
+<span>  fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"effectplots.fill"</span><span class="op">)</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  bar_height <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  bar_width <span class="op">=</span> <span class="fl">0.7</span>,</span>
 <span>  bar_measure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weight"</span>, <span class="st">"N"</span><span class="op">)</span>,</span>
 <span>  wrap_x <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  rotate_x <span class="op">=</span> <span class="fl">0</span>,</span>
-<span>  backend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"marginalplot.backend"</span><span class="op">)</span>,</span>
+<span>  backend <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"effectplots.backend"</span><span class="op">)</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -139,12 +139,12 @@ To show only bias with "bias" as legend entry, use <code>c(bias = "resid_mean")<
 <dt id="arg-colors">colors<a class="anchor" aria-label="anchor" href="#arg-colors"></a></dt>
 <dd><p>Vector of line colors of sufficient length.
 By default, a color blind friendly palette from "ggthemes".
-To change globally, set <code>options(marginalplot.colors = new colors)</code>.</p></dd>
+To change globally, set <code>options(effectplots.colors = new colors)</code>.</p></dd>
 
 
 <dt id="arg-fill">fill<a class="anchor" aria-label="anchor" href="#arg-fill"></a></dt>
 <dd><p>Fill color of bars. The default equals "lightgrey".
-To change globally, set <code>options(marginalplot.fill = new color)</code>.</p></dd>
+To change globally, set <code>options(effectplots.fill = new color)</code>.</p></dd>
 
 
 <dt id="arg-alpha">alpha<a class="anchor" aria-label="anchor" href="#arg-alpha"></a></dt>
@@ -176,7 +176,7 @@ The default is 0 (no rotation). Vectorized over <code>x</code>. Only for "ggplot
 
 <dt id="arg-backend">backend<a class="anchor" aria-label="anchor" href="#arg-backend"></a></dt>
 <dd><p>Plot backend, either "ggplot2" (default) or "plotly".
-To change globally, set <code>options(marginalplot.backend = "plotly")</code>.</p></dd>
+To change globally, set <code>options(effectplots.backend = "plotly")</code>.</p></dd>
 
 
 <dt id="arg--">...<a class="anchor" aria-label="anchor" href="#arg--"></a></dt>
