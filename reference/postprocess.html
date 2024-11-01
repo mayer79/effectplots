@@ -78,13 +78,13 @@ partial_dependence(), and average_observed()."><meta property="og:image" content
 <dt id="arg-sort">sort<a class="anchor" aria-label="anchor" href="#arg-sort"></a></dt>
 <dd><p>Should <code>x</code> be sorted in decreasing order of feature importance?
 Importance is measured by the weighted variance of the most relevant available
-statistic (pd &gt; pred_mean &gt; y_mean &gt; resid_mean). The default is <code>FALSE</code>.</p></dd>
+statistic (pd &gt; pred_mean &gt; y_mean &gt; resid_mean &gt; ale). The default is <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-sort-by">sort_by<a class="anchor" aria-label="anchor" href="#arg-sort-by"></a></dt>
 <dd><p>If <code>sort = TRUE</code>, this measure used for sorting. One of
-'pd', 'pred_mean', 'y_mean', or 'resid_mean' (if available). The default is <code>NULL</code>,
-which picks the first of the listed statistics.</p></dd>
+'pd', 'pred_mean', 'y_mean', 'resid_mean', or 'ale' (if available).
+The default is <code>NULL</code>, which picks the first of the listed statistics.</p></dd>
 
 
 <dt id="arg-collapse-m">collapse_m<a class="anchor" aria-label="anchor" href="#arg-collapse-m"></a></dt>
@@ -117,8 +117,9 @@ collapsing. Vectorized over <code>x</code>.</p></dd>
     <h2>Details</h2>
     <p>If <code>sort = TRUE</code>, the features will be sorted by a simple variable importance
 measure. It is calculated as the variance of the most relevant available statistic
-(pd &gt; pred_mean &gt; y_mean). The variance is weighted with bin weights to reflect
-the data distribution. For "pd", this measure is similar (but not identical) to the
+(pd &gt; pred_mean &gt; y_mean &gt; resid_mean &gt; ale).
+The variance is weighted with bin weights to reflect the data distribution.
+For "pd", this measure is similar (but not identical) to the
 suggestion of Greenwell et al. (2018).
 Importance is calculated after the other postprocessings, e.g., after collapsing
 rare levels.</p>
