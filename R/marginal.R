@@ -229,14 +229,14 @@ marginal.default <- function(
     SIMPLIFY = FALSE
   )
 
-  # Remove empty results (only ALE to be calculated, and feature is discrete)
+  # Remove empty results (happens if feature is discrete and only ALE was calculated)
   ok <- lengths(out) > 0L  # non-null (has some columns)
   if (!all(ok)) {
     if (!any(ok)) {
       stop("Nothing has been calculated!")
     }
     message(
-      "Dropping variables without results:\n", paste(names(out)[!ok], collapse = ", ")
+      "Dropping variables without results: ", paste(names(out)[!ok], collapse = ", ")
     )
     out <- out[ok]
   }

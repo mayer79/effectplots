@@ -10,12 +10,12 @@ main_effect_importance(x, by = NULL)
 \item{x}{Marginal object.}
 
 \item{by}{The statistic used to calculate the variance for.
-One of 'pd', 'pred_mean', 'y_mean', or 'resid_mean\verb{. By default (}NULL`), the
-first available of above list.}
+One of 'pd', 'pred_mean', 'y_mean', 'resid_mean', or 'ale'.
+By default (\code{NULL}), the first available of above list.}
 }
 \description{
 Extracts the weighted variances of the most relevant statistic
-(pd > pred_mean > y_mean > resid_mean) from a "marginal" object.
+(pd > pred_mean > y_mean > resid_mean > ale) from a "marginal" object.
 Serves as a simple measure of (main effect) importance. If partial dependence
 is used, the measure is almost identical to the importance measure proposed in
 the reference below.

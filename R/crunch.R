@@ -111,10 +111,7 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
 #' @returns Vector of ALE values in the same order as `breaks[-length(breaks)]`.
 #' @export
 #' @seealso [partial_dependence()]
-#' @references
-#'   Apley, Daniel W., and Jingyu Zhu. 2016. *Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.*
-#'     Journal of the Royal Statistical Society Series B: Statistical Methodology,
-#'     82 (4): 1059–1086. doi:10.1111/rssb.12377.
+#' @inherit ale references
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)
 #' v <- "Sepal.Width"
@@ -154,16 +151,17 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
   }
 
   out <- numeric(length(breaks) - 1L)
-  for (j in as.integer(names(J))) {
+  for (nm in names(J)) {
+    j <- as.integer(nm)
     pdj <- .pd(
       object,
       v = v,
-      X = collapse::ss(X, J[[j]]),
+      X = collapse::ss(X, J[[nm]]),
       grid = breaks[c(j, j + 1L)],
       pred_fun = pred_fun,
       trafo = trafo,
       which_pred = which_pred,
-      w = if (!is.null(w)) w[J[[j]]],
+      w = if (!is.null(w)) w[J[[nm]]],
       ...
     )
     out[j] <- diff(pdj)

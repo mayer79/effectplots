@@ -56,7 +56,7 @@ get_ylab <- function(lines) {
       pred_mean = "Average prediction",
       resid_mean = "Bias",
       pd = "Partial Dependence",
-      ale = "Accumulated local effect"
+      ale = "Accumulated local effects"
     )
     return(out)
   }

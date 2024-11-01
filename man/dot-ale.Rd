@@ -13,7 +13,7 @@
   pred_fun = stats::predict,
   trafo = NULL,
   which_pred = NULL,
-  max_bin_size = 50L,
+  bin_size = 200L,
   w = NULL,
   g = NULL,
   ...
@@ -41,8 +41,8 @@ or \code{exp} (to switch from link scale to the original scale).}
 \item{which_pred}{If the predictions are multivariate: which column to pick
 (integer or column name). By default \code{NULL} (picks last column).}
 
-\item{max_bin_size}{Maximal number of observations used per bin. If there are more
-observations in a bin, \code{n_bin} indices are randomly sampled. The default is 50.}
+\item{bin_size}{Maximal number of observations used per bin. If there are more
+observations in a bin, \code{bin_size} indices are randomly sampled. The default is 200.}
 
 \item{w}{Optional vector with case weights.}
 

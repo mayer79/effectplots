@@ -10,6 +10,7 @@ test_that("average_observed() is consistent with marginal()", {
     y = iris$Sepal.Length,
     calc_pred = FALSE,
     pd_n = 0,
+    ale_bin_size = 0,
     w = 1:150
   )
   expect_equal(avg_obs, marg)

@@ -15,7 +15,7 @@
   title = "",
   subplot_titles = TRUE,
   ylab = NULL,
-  lines = c(obs = "y_mean", pred = "pred_mean", pd = "pd"),
+  lines = c(obs = "y_mean", pred = "pred_mean", pd = "pd", ale = "ale"),
   colors = getOption("marginalplot.colors"),
   fill = getOption("marginalplot.fill"),
   alpha = 1,
@@ -55,7 +55,7 @@ a reasonable name based on the calculated statistics.}
 
 \item{lines}{Named vector of the form \code{c(name = statistic, ...)} of statistics to
 plot. \code{name} is used as legend label. By default
-\code{c(obs = "y_mean", pred = "pred_mean", pd = "pd")}.
+\code{c(obs = "y_mean", pred = "pred_mean", pd = "pd", ale = "ale")}.
 To show only bias with "bias" as legend entry, use \code{c(bias = "resid_mean")}.}
 
 \item{colors}{Vector of line colors of sufficient length.

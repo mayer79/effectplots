@@ -20,11 +20,11 @@ postprocess(
 
 \item{sort}{Should \code{x} be sorted in decreasing order of feature importance?
 Importance is measured by the weighted variance of the most relevant available
-statistic (pd > pred_mean > y_mean > resid_mean). The default is \code{FALSE}.}
+statistic (pd > pred_mean > y_mean > resid_mean > ale). The default is \code{FALSE}.}
 
 \item{sort_by}{If \code{sort = TRUE}, this measure used for sorting. One of
-'pd', 'pred_mean', 'y_mean', or 'resid_mean' (if available). The default is \code{NULL},
-which picks the first of the listed statistics.}
+'pd', 'pred_mean', 'y_mean', 'resid_mean', or 'ale' (if available).
+The default is \code{NULL}, which picks the first of the listed statistics.}
 
 \item{collapse_m}{If a categorical X has more than \code{collapse_m} levels,
 rare levels are collapsed into a new level "Other". Standard deviations are
@@ -49,8 +49,9 @@ This function helps to improve the output of \code{\link[=marginal]{marginal()}}
 \details{
 If \code{sort = TRUE}, the features will be sorted by a simple variable importance
 measure. It is calculated as the variance of the most relevant available statistic
-(pd > pred_mean > y_mean). The variance is weighted with bin weights to reflect
-the data distribution. For "pd", this measure is similar (but not identical) to the
+(pd > pred_mean > y_mean > resid_mean > ale).
+The variance is weighted with bin weights to reflect the data distribution.
+For "pd", this measure is similar (but not identical) to the
 suggestion of Greenwell et al. (2018).
 Importance is calculated after the other postprocessings, e.g., after collapsing
 rare levels.
