@@ -6,8 +6,8 @@
 #' @inheritParams marginal
 #' @inherit marginal return
 #' @references
-#'   Friedman, Jerome H. *"Greedy Function Approximation: A Gradient Boosting Machine."*
-#'     Annals of Statistics 29, no. 5 (2001): 1189-1232.
+#'   Friedman, Jerome H. 2001, *Greedy Function Approximation: A Gradient Boosting Machine.*
+#'     Annals of Statistics 29 (5): 1189-1232. doi:10.1214/aos/1013203451.
 #' @seealso [marginal()]
 #' @export
 #' @examples

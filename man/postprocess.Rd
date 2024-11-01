@@ -66,8 +66,9 @@ marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5) |>
   plot()
 }
 \references{
-Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy.
-\emph{A Simple and Effective Model-Based Variable Importance Measure.} Arxiv (2018).
+Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy. 2018.
+\emph{A Simple and Effective Model-Based Variable Importance Measure.}
+arXiv preprint. \url{https://arxiv.org/abs/1805.04755}.
 }
 \seealso{
 \code{\link[=marginal]{marginal()}}, \code{\link[=average_observed]{average_observed()}}, \code{\link[=partial_dependence]{partial_dependence()}},

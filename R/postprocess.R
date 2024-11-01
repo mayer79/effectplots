@@ -36,6 +36,10 @@
 #' @seealso
 #'   [marginal()], [average_observed()], [partial_dependence()],
 #'   [main_effect_importance()]
+#' @references
+#'   Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy. 2018.
+#'     *A Simple and Effective Model-Based Variable Importance Measure.*
+#'     arXiv preprint. <https://arxiv.org/abs/1805.04755>.
 #' @export
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)
@@ -43,9 +47,6 @@
 #' marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5) |>
 #'   postprocess(sort = TRUE) |>
 #'   plot()
-#' @references
-#'   Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy.
-#'   *A Simple and Effective Model-Based Variable Importance Measure.* Arxiv (2018).
 postprocess <- function(
   x,
   sort = FALSE,
@@ -109,8 +110,11 @@ postprocess_one <- function(
 #' Extracts the weighted variances of the most relevant statistic
 #' (pd > pred_mean > y_mean > resid_mean) from a "marginal" object.
 #' Serves as a simple measure of (main effect) importance. If partial dependence
-#' is used, the measure is closely related to the importance measure proposed in
+#' is used, the measure is almost identical to the importance measure proposed in
 #' the reference below.
+#'
+#' If the importance cannot be calculated on a variable X (e.g., if X is constant),
+#' its importance is set to 0.
 #'
 #' @param x Marginal object.
 #' @param by The statistic used to calculate the variance for.
@@ -137,6 +141,9 @@ main_effect_importance <- function(x, by = NULL) {
 # Helper functions
 .one_imp <- function(x, v) {
   ok <- is.finite(x[[v]])
+  if (sum(ok) < 2L) {
+    return(0)
+  }
   stats::cov.wt(x[ok, v, drop = FALSE], wt = x$weight[ok], method = "ML")$cov[1L, 1L]
 }
 

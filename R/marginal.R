@@ -59,6 +59,14 @@
 #'   A list (of class "marginal") with a data.frame of statistics per feature. Use
 #'   single bracket subsetting to select part of the output.
 #' @seealso [average_observed()], [partial_dependence()]
+#' @references
+#'   1. Molnar, Christoph. 2019. *Interpretable Machine Learning: A Guide for Making Black Box Models Explainable*.
+#'     <https://christophm.github.io/interpretable-ml-book>.
+#'   2. Friedman, Jerome H. 2001, *Greedy Function Approximation: A Gradient Boosting Machine.*
+#'     Annals of Statistics 29 (5): 1189-1232. doi:10.1214/aos/1013203451.3.
+#'   3. Apley, Daniel W., and Jingyu Zhu. 2016. *Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.*
+#'     Journal of the Royal Statistical Society Series B: Statistical Methodology,
+#'     82 (4): 1059–1086. doi:10.1111/rssb.12377.
 #' @export
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)

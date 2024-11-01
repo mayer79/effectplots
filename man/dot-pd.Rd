@@ -44,15 +44,18 @@ a \code{glm()} or (typically) \code{prob = TRUE} in classification models.}
 Vector of partial dependence values in the same order as \code{grid}.
 }
 \description{
-Very fast partial dependence calculations. Since the function does not do any
-input checks, it is mainly meant for internal use. Still, for developers, it can
-be handy.
+This is a barebone implementation of Friedman's partial dependence
+intended for developers.
 }
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)
 
 .pd(fit, "Sepal.Width", X = iris, grid = hist(iris$Sepal.Width, plot = FALSE)$mids)
 .pd(fit, "Species", X = iris, grid = levels(iris$Species))
+}
+\references{
+Friedman, Jerome H. 2001, \emph{Greedy Function Approximation: A Gradient Boosting Machine.}
+Annals of Statistics 29 (5): 1189-1232. doi:10.1214/aos/1013203451.
 }
 \seealso{
 \code{\link[=partial_dependence]{partial_dependence()}}

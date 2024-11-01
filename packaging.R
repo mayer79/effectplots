@@ -14,16 +14,18 @@ library(usethis)
 # Sketch of description file
 use_description(
   fields = list(
-    Title = "Model Effects",
+    Title = "Effect Plots",
     Version = "0.0.1",
-    Description = "Provides high-quality effect plots for regression and
-    probabilistic classification.
-    The main function 'marginal()' calculates average observed values of the model
-    response, average predictions, average residuals (bias),
-    and partial dependence for each
-    feature value. Visualization can be done via 'ggplot2' or 'plotly'.
-    Optimized for large data, the package is compatible with most models
-    out-of-the-box, including those wrapped with 'DALEX' or 'Tidymodels'.",
+    Description = "High-performance implementation of various effect plots
+    useful for regression and probabilistic classification tasks.
+    The package includes partial dependence plots
+    (Friedman, 2021, <doi:10.1214/aos/1013203451.3>), accumulated local effect plots
+    and M-plots (both from Apley and Zhu, 2016, <doi:10.1111/rssb.12377>),
+    as well as plots that describe the statistical associations between model
+    response and features.
+    It supports visualizations with either 'ggplot2' or 'plotly',
+    and is compatible with most models, including 'Tidymodels', models wrapped in
+    'DALEX' explainers, or models with case weights.",
     `Authors@R` = "person('Michael', 'Mayer', email = 'mayermichael79@gmail.com', role = c('aut', 'cre'))",
     Depends = "R (>= 4.1.0)",
     LazyData = NULL

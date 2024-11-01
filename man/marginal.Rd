@@ -162,6 +162,17 @@ M <- marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 M
 M |> postprocess(sort = TRUE) |> plot(share_y = TRUE)
 }
+\references{
+\enumerate{
+\item Molnar, Christoph. 2019. \emph{Interpretable Machine Learning: A Guide for Making Black Box Models Explainable}.
+\url{https://christophm.github.io/interpretable-ml-book}.
+\item Friedman, Jerome H. 2001, \emph{Greedy Function Approximation: A Gradient Boosting Machine.}
+Annals of Statistics 29 (5): 1189-1232. doi:10.1214/aos/1013203451.3.
+\item Apley, Daniel W., and Jingyu Zhu. 2016. \emph{Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.}
+Journal of the Royal Statistical Society Series B: Statistical Methodology,
+82 (4): 1059–1086. doi:10.1111/rssb.12377.
+}
+}
 \seealso{
 \code{\link[=average_observed]{average_observed()}}, \code{\link[=partial_dependence]{partial_dependence()}}
 }

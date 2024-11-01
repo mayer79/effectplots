@@ -48,9 +48,8 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
 
 #' Barebone Partial Dependence
 #'
-#' Very fast partial dependence calculations. Since the function does not do any
-#' input checks, it is mainly meant for internal use. Still, for developers, it can
-#' be handy.
+#' This is a barebone implementation of Friedman's partial dependence
+#' intended for developers.
 #'
 #' @param v Variable name in `data` to calculate partial dependence.
 #' @param X Matrix or data.frame.
@@ -60,6 +59,7 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
 #' @returns Vector of partial dependence values in the same order as `grid`.
 #' @export
 #' @seealso [partial_dependence()]
+#' @inherit partial_dependence references
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)
 #'
@@ -111,6 +111,10 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
 #' @returns Vector of ALE values in the same order as `breaks[-length(breaks)]`.
 #' @export
 #' @seealso [partial_dependence()]
+#' @references
+#'   Apley, Daniel W., and Jingyu Zhu. 2016. *Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.*
+#'     Journal of the Royal Statistical Society Series B: Statistical Methodology,
+#'     82 (4): 1059–1086. doi:10.1111/rssb.12377.
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)
 #' v <- "Sepal.Width"

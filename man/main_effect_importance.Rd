@@ -17,8 +17,12 @@ first available of above list.}
 Extracts the weighted variances of the most relevant statistic
 (pd > pred_mean > y_mean > resid_mean) from a "marginal" object.
 Serves as a simple measure of (main effect) importance. If partial dependence
-is used, the measure is closely related to the importance measure proposed in
+is used, the measure is almost identical to the importance measure proposed in
 the reference below.
+}
+\details{
+If the importance cannot be calculated on a variable X (e.g., if X is constant),
+its importance is set to 0.
 }
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)
@@ -27,8 +31,9 @@ M <- marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 main_effect_importance(M)
 }
 \references{
-Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy.
-\emph{A Simple and Effective Model-Based Variable Importance Measure.} Arxiv (2018).
+Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy. 2018.
+\emph{A Simple and Effective Model-Based Variable Importance Measure.}
+arXiv preprint. \url{https://arxiv.org/abs/1805.04755}.
 }
 \seealso{
 \code{\link[=postprocess]{postprocess()}}

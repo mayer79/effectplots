@@ -65,6 +65,11 @@ fit <- lm(Sepal.Length ~ ., data = iris)
 v <- "Sepal.Width"
 .ale(fit, v, X = iris, breaks = seq(2, 4, length.out = 5))
 }
+\references{
+Apley, Daniel W., and Jingyu Zhu. 2016. \emph{Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.}
+Journal of the Royal Statistical Society Series B: Statistical Methodology,
+82 (4): 1059–1086. doi:10.1111/rssb.12377.
+}
 \seealso{
 \code{\link[=partial_dependence]{partial_dependence()}}
 }

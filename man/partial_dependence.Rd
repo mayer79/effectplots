@@ -128,8 +128,8 @@ M2 <- partial_dependence(fit, v = colnames(iris)[-1], data = iris)
 plot(M2, share_y = TRUE)
 }
 \references{
-Friedman, Jerome H. \emph{"Greedy Function Approximation: A Gradient Boosting Machine."}
-Annals of Statistics 29, no. 5 (2001): 1189-1232.
+Friedman, Jerome H. 2001, \emph{Greedy Function Approximation: A Gradient Boosting Machine.}
+Annals of Statistics 29 (5): 1189-1232. doi:10.1214/aos/1013203451.
 }
 \seealso{
 \code{\link[=marginal]{marginal()}}
