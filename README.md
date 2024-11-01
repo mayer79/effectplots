@@ -139,7 +139,13 @@ m_test <- m_test[names(m_train)]
 
 # Plot combined one
 c(m_train, m_test) |> 
-  plot(share_y = TRUE, ncol = 2, byrow = FALSE, title = "Left: Train - Right: Test")
+  plot(
+    share_y = TRUE,
+    ncol = 2,
+    byrow = FALSE,
+    subplot_titles = FALSE,
+    title = "Left: Train - Right: Test",
+  )
   
 # Or via Plotly
 c(m_train, m_test) |> 
@@ -147,6 +153,7 @@ c(m_train, m_test) |>
     share_y = TRUE,
     ncol = 2,
     byrow = FALSE,
+    subplot_titles = FALSE,
     title = "Left: Train - Right: Test",
     backend = "plotly"
   )

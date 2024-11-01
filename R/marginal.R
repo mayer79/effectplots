@@ -96,6 +96,7 @@ marginal.default <- function(
     outlier_iqr = 2,
     calc_pred = TRUE,
     pd_n = 500L,
+    ale_bin_size = 200L,
     ...
 ) {
   # Input checks
@@ -105,7 +106,8 @@ marginal.default <- function(
     is.function(pred_fun),
     is.null(trafo) || is.function(trafo),
     outlier_iqr >= 0,
-    pd_n >= 0L
+    pd_n >= 0L,
+    ale_bin_size >= 0L
   )
   n <- nrow(data)
   nms <- colnames(data)
@@ -221,6 +223,7 @@ marginal.default <- function(
       which_pred = which_pred,
       pd_X = pd_X,
       pd_w = pd_w,
+      ale_bin_size,
       ...
     ),
     SIMPLIFY = FALSE
@@ -258,6 +261,7 @@ marginal.ranger <- function(
     outlier_iqr = 2,
     calc_pred = TRUE,
     pd_n = 500L,
+    ale_bin_size = 200L,
     ...
 ) {
   if (is.null(pred_fun)) {
@@ -281,6 +285,7 @@ marginal.ranger <- function(
     outlier_iqr = outlier_iqr,
     calc_pred = calc_pred,
     pd_n = pd_n,
+    ale_bin_size = ale_bin_size,
     ...
   )
 }
@@ -303,6 +308,7 @@ marginal.explainer <- function(
   outlier_iqr = 2,
   calc_pred = TRUE,
   pd_n = 500L,
+  ale_bin_size = 200L,
   ...
 ) {
   marginal.default(
@@ -321,6 +327,7 @@ marginal.explainer <- function(
     outlier_iqr = outlier_iqr,
     calc_pred = calc_pred,
     pd_n = pd_n,
+    ale_bin_size = ale_bin_size,
     ...
   )
 }
@@ -340,6 +347,7 @@ calculate_stats <- function(
     which_pred,
     pd_X,
     pd_w,
+    ale_bin_size,
     ...
 ) {
   x <- if (is.matrix(data)) data[, v] else data[[v]]
@@ -352,7 +360,7 @@ calculate_stats <- function(
   g <- collapse::funique(x)
   num <- is.numeric(x) && (length(g) > discrete_m)
 
-  if (is.null(PYR) && is.null(pd_X)) {  # && (!num || ale_n_bin == 0L)
+  if (is.null(PYR) && is.null(pd_X) && (!num || ale_bin_size == 0L)) {
     return(NULL)
   }
 
@@ -411,7 +419,39 @@ calculate_stats <- function(
     )
   }
 
-  # Convert non-numeric levels *after* calculation of partial dependence!
+  # Add ALE
+  if (ale_bin_size > 0L) {
+    out[["ale"]] <- NA
+    if (num) {
+      ok <- !is.na(out$bin_mid)
+      ale <- .ale(
+        object = object,
+        v = v,
+        X = data,
+        breaks = br,
+        right = right,  # does not matter because we pass g
+        pred_fun = pred_fun,
+        trafo = trafo,
+        which_pred = which_pred,
+        n_per_bin = ale_bin_size,
+        w = w,
+        g = ix,
+        ...
+      )
+      # Centering possible?
+      cvars <- intersect(c("pd", "pred_mean", "y_mean"), colnames(out))
+      if (length(cvars)) {
+        w_ok <- out[["weight"]][ok]  # when w_ok = 0, cvars[1] is NA
+        shift <- collapse::fmean(out[[cvars[1L]]][ok], na.rm = TRUE, w = w_ok) -
+          collapse::fmean(ale, w = w_ok)
+      } else {
+        shift <- 0
+      }
+      out[ok, "ale"] <- ale + shift
+    }
+  }
+
+  # Convert non-numeric levels *after* calculation of partial dependence and ale!
   if (!num && !is.factor(out[["bin_mean"]])) {
     out[["bin_mid"]] <- out[["bin_mean"]] <- factor(out[["bin_mean"]])
   }

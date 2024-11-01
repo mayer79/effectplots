@@ -20,7 +20,7 @@
 #'   a reasonable name based on the calculated statistics.
 #' @param lines Named vector of the form `c(name = statistic, ...)` of statistics to
 #'   plot. `name` is used as legend label. By default
-#'   `c(obs = "y_mean", pred = "pred_mean", pd = "pd")`.
+#'   `c(obs = "y_mean", pred = "pred_mean", pd = "pd", ale = "ale")`.
 #'   To show only bias with "bias" as legend entry, use `c(bias = "resid_mean")`.
 #' @param colors Vector of line colors of sufficient length.
 #'   By default, a color blind friendly palette from "ggthemes".
@@ -56,7 +56,7 @@ plot.marginal <- function(
     title = "",
     subplot_titles = TRUE,
     ylab = NULL,
-    lines = c(obs = "y_mean", pred = "pred_mean", pd = "pd"),
+    lines = c(obs = "y_mean", pred = "pred_mean", pd = "pd", ale = "ale"),
     colors = getOption("marginalplot.colors"),
     fill = getOption("marginalplot.fill"),
     alpha = 1,
@@ -72,7 +72,7 @@ plot.marginal <- function(
 
   stopifnot(
     backend %in% c("ggplot2", "plotly"),
-    lines %in% c("y_mean", "pred_mean", "resid_mean", "pd")
+    lines %in% c("y_mean", "pred_mean", "resid_mean", "pd", "ale")
   )
 
   nplots <- length(x)
@@ -284,6 +284,11 @@ plot_marginal_ggplot <- function(
     show_legend = TRUE
 ) {
   num <- .num(x)
+  if (!num && ("ale" %in% lines)) {
+    # For discrete variables, we don't have ALE. We temporarily drop it from lines
+    # to avoid unnecessary warnings about NAs. (Same done also with plotly)
+    lines <- lines[lines != "ale"]
+  }
   df <- transform(
     poor_man_stack(x, lines),
     varying_ = factor(varying_, levels = lines, labels = names(lines))
@@ -384,6 +389,11 @@ plot_marginal_plotly <- function(
     overlay = "y2"
 ) {
   num <- .num(x)
+  if (!num && ("ale" %in% lines)) {
+    # For discrete variables, we don't have ALE. We temporarily drop it from lines
+    # to avoid unnecessary warnings about NAs (identical solution as with ggplot)
+    lines <- lines[lines != "ale"]
+  }
 
   if (num && isFALSE(num_points)) {
     scatter_mode <- "lines"
@@ -482,34 +492,4 @@ plot_marginal_plotly <- function(
     xaxis = list(title = list(text = v, standoff = 0)),
     legend = list(x = 1.02, y = 0.5, xanchor = "left", tracegroupgap = 3)
   )
-}
-
-# Helper functions
-
-# subplots make inner plots smaller due to margins
-# https://github.com/plotly/plotly.R/issues/2144
-# We apply an approximate correction factor via heights and widths
-# The function assumes symmetric margin pairs ((left, right), (top, bottom))
-corr_margin <- function(m, margin) {
-  if (m >= 3L) {
-    f <- 1 / m * (1 - 2 * margin)  # ok? Or rather 1 / m / (1 + 2 * margin)?
-    n_inner <- m - 2L
-    return(c(f, rep((1 - 2 * f) / n_inner, times = n_inner), f))
-  }
-  return(NULL)
-}
-
-get_ylab <- function(lines) {
-  if (length(lines) == 1L) {
-    out <- switch(
-      lines,
-      y_mean = "Average response",
-      pred_mean = "Average prediction",
-      resid_mean = "Bias",
-      pd = "Partial Dependence"
-    )
-    return(out)
-  }
-  # No "average" (that would be overly specific)
-  if ("y_mean" %in% lines) "Response" else "Prediction"
 }

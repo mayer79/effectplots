@@ -53,6 +53,7 @@ partial_dependence.default <- function(
     outlier_iqr = outlier_iqr,
     calc_pred = FALSE,
     pd_n = pd_n,
+    ale_bin_size = 0L,
     ...
   )
 }

@@ -6,8 +6,9 @@
 #' @details
 #' If `sort = TRUE`, the features will be sorted by a simple variable importance
 #' measure. It is calculated as the variance of the most relevant available statistic
-#' (pd > pred_mean > y_mean). The variance is weighted with bin weights to reflect
-#' the data distribution. For "pd", this measure is similar (but not identical) to the
+#' (pd > pred_mean > y_mean > resid_mean > ale).
+#' The variance is weighted with bin weights to reflect the data distribution.
+#' For "pd", this measure is similar (but not identical) to the
 #' suggestion of Greenwell et al. (2018).
 #' Importance is calculated after the other postprocessings, e.g., after collapsing
 #' rare levels.
@@ -18,10 +19,10 @@
 #' @param x Object of class "marginal".
 #' @param sort Should `x` be sorted in decreasing order of feature importance?
 #'   Importance is measured by the weighted variance of the most relevant available
-#'   statistic (pd > pred_mean > y_mean > resid_mean). The default is `FALSE`.
+#'   statistic (pd > pred_mean > y_mean > resid_mean > ale). The default is `FALSE`.
 #' @param sort_by If `sort = TRUE`, this measure used for sorting. One of
-#'   'pd', 'pred_mean', 'y_mean', or 'resid_mean' (if available). The default is `NULL`,
-#'   which picks the first of the listed statistics.
+#'   'pd', 'pred_mean', 'y_mean', 'resid_mean', or 'ale' (if available).
+#'   The default is `NULL`, which picks the first of the listed statistics.
 #' @param collapse_m If a categorical X has more than `collapse_m` levels,
 #'   rare levels are collapsed into a new level "Other". Standard deviations are
 #'   collapsed via root of the weighted average variances. By default 30.
@@ -108,7 +109,7 @@ postprocess_one <- function(
 #' Main Effect Importance
 #'
 #' Extracts the weighted variances of the most relevant statistic
-#' (pd > pred_mean > y_mean > resid_mean) from a "marginal" object.
+#' (pd > pred_mean > y_mean > resid_mean > ale) from a "marginal" object.
 #' Serves as a simple measure of (main effect) importance. If partial dependence
 #' is used, the measure is almost identical to the importance measure proposed in
 #' the reference below.
@@ -118,8 +119,8 @@ postprocess_one <- function(
 #'
 #' @param x Marginal object.
 #' @param by The statistic used to calculate the variance for.
-#' One of 'pd', 'pred_mean', 'y_mean', or 'resid_mean`. By default (`NULL`), the
-#' first available of above list.
+#' One of 'pd', 'pred_mean', 'y_mean', 'resid_mean', or 'ale'.
+#' By default (`NULL`), the first available of above list.
 #' @seealso [postprocess()]
 #' @export
 #' @inherit postprocess references
@@ -131,7 +132,9 @@ postprocess_one <- function(
 main_effect_importance <- function(x, by = NULL) {
   if (is.null(by)) {
     # "resid_mean" can never be picked if by = NULL, because there is also "pred_mean"
-    vars <- intersect(c("pd", "pred_mean", "y_mean", "resid_mean"), colnames(x[[1L]]))
+    vars <- intersect(
+      c("pd", "pred_mean", "y_mean", "resid_mean", "ale"), colnames(x[[1L]])
+    )
     by <- vars[1L]
     message("Importance via weighted variance of '", by, "'")
   }
@@ -164,7 +167,7 @@ main_effect_importance <- function(x, by = NULL) {
     bin_mid = oth, bin_width = 0.7, bin_mean = oth, N = sum(x_agg$N), weight = sum(w)
   )
 
-  m_cols <- intersect(colnames(x), c("pred_mean", "y_mean", "resid_mean", "pd"))
+  m_cols <- intersect(colnames(x), c("pred_mean", "y_mean", "resid_mean", "pd", "ale"))
   if (length(m_cols)) {
     x_new[, m_cols] <- collapse::fmean(x_agg[m_cols], w = w, drop = FALSE)
   }

@@ -102,8 +102,8 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
 #' @param breaks Breaks for ALE calculation.
 #' @param right Should bins specified via `breaks` be right-closed?
 #'   The default is `TRUE`.
-#' @param max_bin_size Maximal number of observations used per bin. If there are more
-#'   observations in a bin, `n_bin` indices are randomly sampled. The default is 50.
+#' @param bin_size Maximal number of observations used per bin. If there are more
+#'   observations in a bin, `bin_size` indices are randomly sampled. The default is 200.
 #' @param w Optional vector with case weights.
 #' @param g For internal use. The result of `factor(findInterval(...))`.
 #'   By default `NULL`.
@@ -128,7 +128,7 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
     pred_fun = stats::predict,
     trafo = NULL,
     which_pred = NULL,
-    max_bin_size = 50L,
+    bin_size = 200L,
     w = NULL,
     g = NULL,
     ...
@@ -147,7 +147,7 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
   }
   J <- lapply(
     collapse::gsplit(1:length(g), g = g, use.g.names = TRUE),
-    function(z) if (length(z) <= max_bin_size) z else sample(z, size = max_bin_size)
+    function(z) if (length(z) <= bin_size) z else sample(z, size = bin_size)
   )
   if (is.na(names(J)[length(J)])) {
     J <- J[-length(J)]

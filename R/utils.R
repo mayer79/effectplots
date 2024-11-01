@@ -32,3 +32,34 @@ poor_man_stack <- function(data, to_stack) {
   }
   f(x)
 }
+
+# Helper functions
+
+# subplots make inner plots smaller due to margins
+# https://github.com/plotly/plotly.R/issues/2144
+# We apply an approximate correction factor via heights and widths
+# The function assumes symmetric margin pairs ((left, right), (top, bottom))
+corr_margin <- function(m, margin) {
+  if (m >= 3L) {
+    f <- 1 / m * (1 - 2 * margin)  # ok? Or rather 1 / m / (1 + 2 * margin)?
+    n_inner <- m - 2L
+    return(c(f, rep((1 - 2 * f) / n_inner, times = n_inner), f))
+  }
+  return(NULL)
+}
+
+get_ylab <- function(lines) {
+  if (length(lines) == 1L) {
+    out <- switch(
+      lines,
+      y_mean = "Average response",
+      pred_mean = "Average prediction",
+      resid_mean = "Bias",
+      pd = "Partial Dependence",
+      ale = "Accumulated local effect"
+    )
+    return(out)
+  }
+  # No "average" (that would be overly specific)
+  if ("y_mean" %in% lines) "Response" else "Prediction"
+}
