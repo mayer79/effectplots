@@ -58,6 +58,7 @@ You can switch to plotly by setting <code>backend = "plotly"</code>.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span><span class="co"># S3 method for class 'marginal'</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>  <span class="va">x</span>,</span>
+<span>  statistics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"y_mean"</span>, <span class="st">"pred_mean"</span>, <span class="st">"pd"</span>, <span class="st">"ale"</span><span class="op">)</span>,</span>
 <span>  ncol <span class="op">=</span> <span class="fl">2L</span>,</span>
 <span>  byrow <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  share_y <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -67,7 +68,7 @@ You can switch to plotly by setting <code>backend = "plotly"</code>.</p>
 <span>  title <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  subplot_titles <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  ylab <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  lines <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span>obs <span class="op">=</span> <span class="st">"y_mean"</span>, pred <span class="op">=</span> <span class="st">"pred_mean"</span>, pd <span class="op">=</span> <span class="st">"pd"</span>, ale <span class="op">=</span> <span class="st">"ale"</span><span class="op">)</span>,</span>
+<span>  legend_labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"effectplots.colors"</span><span class="op">)</span>,</span>
 <span>  fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"effectplots.fill"</span><span class="op">)</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -89,8 +90,16 @@ You can switch to plotly by setting <code>backend = "plotly"</code>.</p>
 <dd><p>An object of class "marginal".</p></dd>
 
 
+<dt id="arg-statistics">statistics<a class="anchor" aria-label="anchor" href="#arg-statistics"></a></dt>
+<dd><p>Vector of (available) statistics to show. By default
+<code>c("y_mean", "pred_mean", "pd", "ale")</code>. E.g., used to hide certain
+statistics, or to show only <code>"resid_mean"</code>.
+Additionally, it controls the order in which the lines are added to the plot
+(the last one is placed on top).</p></dd>
+
+
 <dt id="arg-ncol">ncol<a class="anchor" aria-label="anchor" href="#arg-ncol"></a></dt>
-<dd><p>Number of columns in the plot layout. Only for multiple plots.</p></dd>
+<dd><p>Number of columns of the plot layout. Only for multiple plots.</p></dd>
 
 
 <dt id="arg-byrow">byrow<a class="anchor" aria-label="anchor" href="#arg-byrow"></a></dt>
@@ -126,19 +135,17 @@ Default is <code>TRUE</code>. Only for multiple plots.</p></dd>
 
 <dt id="arg-ylab">ylab<a class="anchor" aria-label="anchor" href="#arg-ylab"></a></dt>
 <dd><p>Label of the y axis. The default <code>NULL</code> automatically derives
-a reasonable name based on the calculated statistics.</p></dd>
+a reasonable name.</p></dd>
 
 
-<dt id="arg-lines">lines<a class="anchor" aria-label="anchor" href="#arg-lines"></a></dt>
-<dd><p>Named vector of the form <code>c(name = statistic, ...)</code> of statistics to
-plot. <code>name</code> is used as legend label. By default
-<code>c(obs = "y_mean", pred = "pred_mean", pd = "pd", ale = "ale")</code>.
-To show only bias with "bias" as legend entry, use <code>c(bias = "resid_mean")</code>.</p></dd>
+<dt id="arg-legend-labels">legend_labels<a class="anchor" aria-label="anchor" href="#arg-legend-labels"></a></dt>
+<dd><p>Vector of legend labels corresponding to <code>statistics</code>.
+Either <code>NULL</code> or a vector of the same length as <code>statistics</code>.</p></dd>
 
 
 <dt id="arg-colors">colors<a class="anchor" aria-label="anchor" href="#arg-colors"></a></dt>
-<dd><p>Vector of line colors of sufficient length.
-By default, a color blind friendly palette from "ggthemes".
+<dd><p>Vector of line/point colors at least as long as "statistics".
+By default, a color blind friendly palette from "ggthemes" with five values.
 To change globally, set <code>options(effectplots.colors = new colors)</code>.</p></dd>
 
 
@@ -148,7 +155,7 @@ To change globally, set <code>options(effectplots.fill = new color)</code>.</p><
 
 
 <dt id="arg-alpha">alpha<a class="anchor" aria-label="anchor" href="#arg-alpha"></a></dt>
-<dd><p>Alpha transparency of lines and points with default 1.</p></dd>
+<dd><p>Alpha transparency of lines and points. Default is 1.</p></dd>
 
 
 <dt id="arg-bar-height">bar_height<a class="anchor" aria-label="anchor" href="#arg-bar-height"></a></dt>
@@ -175,7 +182,7 @@ The default is 0 (no rotation). Vectorized over <code>x</code>. Only for "ggplot
 
 
 <dt id="arg-backend">backend<a class="anchor" aria-label="anchor" href="#arg-backend"></a></dt>
-<dd><p>Plot backend, either "ggplot2" (default) or "plotly".
+<dd><p>Plotting backend, either "ggplot2" (default) or "plotly".
 To change globally, set <code>options(effectplots.backend = "plotly")</code>.</p></dd>
 
 
@@ -186,7 +193,7 @@ not used.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>If single plot, an object of class  "ggplot" or "plotly".
+    <p>If a single plot, an object of class  "ggplot" or "plotly".
 Otherwise, an object of class "patchwork", or a "plotly" subplot.</p>
     </div>
     <div id="see-also">

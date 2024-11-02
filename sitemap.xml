@@ -8,11 +8,11 @@
 <url><loc>/reference/average_observed.html</loc></url>
 <url><loc>/reference/dot-ale.html</loc></url>
 <url><loc>/reference/dot-pd.html</loc></url>
+<url><loc>/reference/ep_importance.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
-<url><loc>/reference/main_effect_importance.html</loc></url>
 <url><loc>/reference/marginal.html</loc></url>
 <url><loc>/reference/partial_dependence.html</loc></url>
 <url><loc>/reference/plot.marginal.html</loc></url>
-<url><loc>/reference/postprocess.html</loc></url>
+<url><loc>/reference/update.marginal.html</loc></url>
 </urlset>
 
