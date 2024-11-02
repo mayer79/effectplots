@@ -1,3 +1,12 @@
+.num <- function(x) {
+  f <- function(z) is.numeric(z$bin_mean)
+  if (inherits(x, "marginal")) {
+    return(vapply(x, FUN = f, FUN.VALUE = logical(1L), USE.NAMES = FALSE))
+  }
+  f(x)
+}
+
+# -> plot()
 
 #' Stack some Columns (from hstats)
 #'
@@ -24,16 +33,6 @@ poor_man_stack <- function(data, to_stack) {
   out <- do.call(rbind, out)
   transform(out, varying_ = factor(varying_, levels = to_stack))
 }
-
-.num <- function(x) {
-  f <- function(z) is.numeric(z$bin_mean)
-  if (inherits(x, "marginal")) {
-    return(vapply(x, FUN = f, FUN.VALUE = logical(1L), USE.NAMES = FALSE))
-  }
-  f(x)
-}
-
-# Helper functions
 
 # subplots make inner plots smaller due to margins
 # https://github.com/plotly/plotly.R/issues/2144

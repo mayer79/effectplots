@@ -22,7 +22,7 @@ per feature and feature value.
 The workflow is as follows:
 
 1. Crunch values via `marginal()` or the convenience wrappers `average_observed()` and `partial_dependence()`.
-2. Post-process the results with `postprocess()`, e.g., to collapse rare levels of categorical features.
+2. Post-process the results with `update()`, e.g., to collapse rare levels of categorical features or to sort the results by a simple variable importance measure.
 3. Plot the results with `plot()`.
 
 **Notes**
@@ -32,7 +32,7 @@ The workflow is as follows:
 - Most models (including DALEX explainers and meta-learners such as Tidymodels) work out-of-the box. If not, a tailored prediction function can be specified.
 - Case weights are supported via the argument `w`.
 - Binning of numeric features is done by the same options as `stats::hist()`. Additionally, outliers are capped (not removed) at +-2 IQR from the quartiles by default.
-- Computational bottlenecks: (A) calculating predictions (cannot be avoided), and (B) `findInterval()` for histogram binning (C code).
+- Computational bottlenecks: (A) calculating predictions (cannot be avoided), and (B) `findInterval()` for histogram binning (bisection algorithm implemented in C).
 
 ## Installation
 
@@ -63,7 +63,7 @@ xvars <- c("year", "town", "driver_age", "car_weight", "car_power", "car_age")
 
 # 0.3s on laptop
 average_observed(df[xvars], y = df$claim_nb) |>
-  postprocess(sort = TRUE) |> 
+  update(sort_by = "y_mean") |> 
   plot(share_y = TRUE)
 ```
 
@@ -111,7 +111,7 @@ After modeling, we use the test (or validation) data to crunch average observed,
 ```r
 # 0.4s on laptop
 marginal(fit, v = xvars, data = X_test, y = test$claim_nb) |>
-  postprocess(sort = TRUE) |> 
+  update(sort_by = "pd") |> 
   plot()
 ```
 
@@ -133,7 +133,7 @@ m_test <- marginal(fit, v = xvars, data = X_test, y = test$claim_nb)
 
 # Pick top 3 based on train
 m_train <- m_train |> 
-  postprocess(sort = TRUE) |> 
+  update(sort_by = "pd") |> 
   head(3)
 m_test <- m_test[names(m_train)]
 
