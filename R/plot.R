@@ -5,7 +5,11 @@
 #'
 #' @importFrom ggplot2 .data
 #' @param x An object of class "marginal".
-#' @param ncol Number of columns in the plot layout. Only for multiple plots.
+#' @param statistics Vector of (available) statistics to show. By default
+#'   `c("y_mean", "pred_mean", "pd", "ale")`. E.g., used to hide certain
+#'   statistics, or to show only `"resid_mean"`.
+#'   Additionally, it controls the order in which the lines are added to the plot.
+#' @param ncol Number of columns of the plot layout. Only for multiple plots.
 #' @param byrow Should plots be placed by row? Default is `TRUE`.
 #'   Only for multiple plots.
 #' @param share_y Should y axis be shared across all subplots?
@@ -17,17 +21,15 @@
 #' @param subplot_titles Should variable names be shown as subplot titles?
 #'   Default is `TRUE`. Only for multiple plots.
 #' @param ylab Label of the y axis. The default `NULL` automatically derives
-#'   a reasonable name based on the calculated statistics.
-#' @param lines Named vector of the form `c(name = statistic, ...)` of statistics to
-#'   plot. `name` is used as legend label. By default
-#'   `c(obs = "y_mean", pred = "pred_mean", pd = "pd", ale = "ale")`.
-#'   To show only bias with "bias" as legend entry, use `c(bias = "resid_mean")`.
-#' @param colors Vector of line colors of sufficient length.
-#'   By default, a color blind friendly palette from "ggthemes".
+#'   a reasonable name.
+#' @param legend_labels Vector of legend labels corresponding to `statistics`.
+#'   Either `NULL` or a vector of the same length as `statistics`.
+#' @param colors Vector of line/point colors at least as long as "statistics".
+#'   By default, a color blind friendly palette from "ggthemes" with five values.
 #'   To change globally, set `options(effectplots.colors = new colors)`.
 #' @param fill Fill color of bars. The default equals "lightgrey".
 #'   To change globally, set `options(effectplots.fill = new color)`.
-#' @param alpha Alpha transparency of lines and points with default 1.
+#' @param alpha Alpha transparency of lines and points. Default is 1.
 #' @param bar_height Relative bar height (default 1). Set to 0 for no bars.
 #' @param bar_width Relative bar width of non-numeric features, by default 0.7.
 #' @param bar_measure What should bars represent? Either "weight" (default) or "N".
@@ -36,17 +38,18 @@
 #'   Only for "ggplot2" backend.
 #' @param rotate_x Should categorical xaxis labels be rotated by this angle?
 #'   The default is 0 (no rotation). Vectorized over `x`. Only for "ggplot2" backend.
-#' @param backend Plot backend, either "ggplot2" (default) or "plotly".
+#' @param backend Plotting backend, either "ggplot2" (default) or "plotly".
 #'   To change globally, set `options(effectplots.backend = "plotly")`.
 #' @param ... Passed to `patchwork::plot_layout()` or `plotly::subplot()`. Typically
 #'   not used.
 #' @returns
-#'   If single plot, an object of class  "ggplot" or "plotly".
+#'   If a single plot, an object of class  "ggplot" or "plotly".
 #'   Otherwise, an object of class "patchwork", or a "plotly" subplot.
 #' @seealso [marginal()], [average_observed()], [partial_dependence()]
 #' @export
 plot.marginal <- function(
     x,
+    statistics = c("y_mean", "pred_mean", "pd", "ale"),
     ncol = 2L,
     byrow = TRUE,
     share_y = FALSE,
@@ -56,7 +59,7 @@ plot.marginal <- function(
     title = "",
     subplot_titles = TRUE,
     ylab = NULL,
-    lines = c(obs = "y_mean", pred = "pred_mean", pd = "pd", ale = "ale"),
+    legend_labels = NULL,
     colors = getOption("effectplots.colors"),
     fill = getOption("effectplots.fill"),
     alpha = 1,
@@ -70,30 +73,58 @@ plot.marginal <- function(
 ) {
   bar_measure <- match.arg(bar_measure)
 
+  # Info of the form c(legend label = col name, ...). The order does not matter *yet*.
+  stat_info <- c(
+    obs = "y_mean", pred = "pred_mean", bias = "resid_mean", pd = "pd", ale = "ale"
+  )
   stopifnot(
     backend %in% c("ggplot2", "plotly"),
-    lines %in% c("y_mean", "pred_mean", "resid_mean", "pd", "ale")
+    length(statistics) >= 1L,
+    statistics %in% stat_info,
+    is.null(legend_labels) || length(legend_labels) == length(statistics),
+    length(colors) >= length(statistics)
   )
 
-  nplots <- length(x)
+  # The next part looks a bit complicated. We build a vector with statistics like "pd"
+  # (having legend_labels as names), and a corresponding vector of colors.
+  # Afterwards, we don't need legend_labels and statistics anymore.
+  stat_info <- stat_info[match(statistics, stat_info)]  # Use order of `statistics`
+  if (!is.null(legend_labels)) {
+    names(stat_info) <- legend_labels
+  }
+  stat_info <- stat_info[stat_info %in% colnames(x[[1L]])]  # only *available* stats
+  nstat <- length(stat_info)
+  stopifnot(nstat >= 1L)
+  colors <- colors[seq_len(nstat)]
+  # End of complicated part
 
-  lines <- lines[lines %in% colnames(x[[1L]])]
-  nn <- length(lines)
-  show_legend <- nn > 1L
+  # If user manually sets statistics = "ale", we need to drop non-numeric features.
+  if (nstat == 1L && stat_info == "ale") {
+    ok <- .num(x)
+    if (!all(ok)) {
+      if (!any(ok)) {
+        stop("Nothing to plot!")
+      }
+      message(
+        "Dropping discrete variables (no ALE): ", paste(names(x)[!ok], collapse = ", ")
+      )
+      x <- x[ok]
+    }
+  }
 
-  stopifnot(
-    nn > 0L,
-    length(colors) >= nn
-  )
+  # No legend for single lines
+  show_legend <- length(stat_info) > 1L
 
   # Overwrite bin_width of categorical features
   x <- lapply(x, function(z) {if (!.num(z)) z$bin_width <- bar_width; z})
 
   # Derive a good ylab
   if (is.null(ylab)) {
-    ylab <- get_ylab(lines)
+    ylab <- get_ylab(stat_info)
   }
 
+  # Finally ready to plot something
+  nplots <- length(x)
   if (nplots == 1L) {
     if (backend == "ggplot2") {
       p <- plot_marginal_ggplot(
@@ -105,7 +136,7 @@ plot.marginal <- function(
         num_points = num_points,
         title = title,
         ylab = ylab,
-        lines = lines,
+        stat_info = stat_info,
         colors = colors,
         fill = fill,
         alpha = alpha,
@@ -126,7 +157,7 @@ plot.marginal <- function(
         title = title,
         title_as_ann = FALSE,
         ylab = ylab,
-        lines = lines,
+        stat_info = stat_info,
         colors = colors,
         fill = fill,
         alpha = alpha,
@@ -138,7 +169,7 @@ plot.marginal <- function(
     return(p)
   }
 
-  # Now with multiple plots...
+  # We need some additional preparation with multiple plots
   ncol <- min(ncol, nplots)
   nrow <- ceiling(nplots / ncol)
   if (backend == "plotly") {
@@ -146,17 +177,17 @@ plot.marginal <- function(
     ncol <- ceiling(nplots / nrow)
   }
 
-  # Can be useful if objects of different models/datasets are c() together
-  # For patchwork, we could also use its plot_layout(byrow = FALSE) argument. But let's
-  # keep things as identical as possible between patchwork and plotly.
+  # Can be useful if "marginal" objects of different models/datasets are c() together
+  # For patchwork, we could also use its plot_layout(byrow = FALSE) argument.
   if (isFALSE(byrow)) {
+    # alternating indices, e.g., 1, 4, 2, 5, 3 with ncol = 2 and nplots 0 5
     alt <- c(t(matrix(seq_len(nrow * ncol), ncol = ncol)))[seq_len(nplots)]
     x <- x[alt]
   }
 
   # Shared y is solved via ylim + padding
   if (share_y && is.null(ylim)) {
-    r <- range(sapply(x, function(z) range(z[lines], na.rm = TRUE)))
+    r <- range(sapply(x, function(z) range(z[stat_info], na.rm = TRUE)))
     ylim <- grDevices::extendrange(r, f = 0.05)
   }
 
@@ -182,7 +213,7 @@ plot.marginal <- function(
         cat_lines = cat_lines,
         num_points = num_points,
         ylab = ylab,
-        lines = lines,
+        stat_info = stat_info,
         colors = colors,
         fill = fill,
         alpha = alpha,
@@ -218,7 +249,7 @@ plot.marginal <- function(
         num_points = num_points,
         ylab = ylab,
         show_ylab = FALSE,  # replaced by global annotation
-        lines = lines,
+        stat_info = stat_info,
         colors = colors,
         fill = fill,
         alpha = alpha,
@@ -273,7 +304,7 @@ plot_marginal_ggplot <- function(
     cat_lines,
     title,
     ylab,
-    lines,
+    stat_info,
     colors,
     fill,
     alpha,
@@ -284,14 +315,16 @@ plot_marginal_ggplot <- function(
     show_legend = TRUE
 ) {
   num <- .num(x)
-  if (!num && ("ale" %in% lines)) {
-    # For discrete variables, we don't have ALE. We temporarily drop it from lines
-    # to avoid unnecessary warnings about NAs. (Same done also with plotly)
-    lines <- lines[lines != "ale"]
+  if (!num && ("ale" %in% stat_info)) {
+    # We don't have ALE for discrete variables. To avoid warnings, we drop it from
+    # stat_info and colors. Dito in plotly
+    keep <- stat_info != "ale"
+    stat_info <- stat_info[keep]
+    colors <- colors[keep]
   }
   df <- transform(
-    poor_man_stack(x, lines),
-    varying_ = factor(varying_, levels = lines, labels = names(lines))
+    poor_man_stack(x, stat_info),
+    varying_ = factor(varying_, levels = stat_info, labels = names(stat_info))
   )
 
   # Calculate transformation of bars on the right y axis
@@ -343,7 +376,7 @@ plot_marginal_ggplot <- function(
     )
   }
 
-  # Styling
+  # Styling. The color subsetting is due to having dropped "ale" for categoricals
   p <- p + ggplot2::scale_color_manual(values = colors) +
     ggplot2::theme_bw() +
     ggplot2::theme(legend.title = ggplot2::element_blank(), legend.position = "right") +
@@ -377,7 +410,7 @@ plot_marginal_plotly <- function(
     title,
     title_as_ann = FALSE,
     ylab,
-    lines,
+    stat_info,
     colors,
     fill,
     alpha,
@@ -389,10 +422,12 @@ plot_marginal_plotly <- function(
     overlay = "y2"
 ) {
   num <- .num(x)
-  if (!num && ("ale" %in% lines)) {
-    # For discrete variables, we don't have ALE. We temporarily drop it from lines
-    # to avoid unnecessary warnings about NAs (identical solution as with ggplot)
-    lines <- lines[lines != "ale"]
+  if (!num && ("ale" %in% stat_info)) {
+    # We don't have ALE for discrete variables. To avoid warnings, we drop it from
+    # stat_info and colors. Same solution as with ggplot.
+    keep <- stat_info != "ale"
+    stat_info <- stat_info[keep]
+    colors <- colors[keep]
   }
 
   if (num && isFALSE(num_points)) {
@@ -434,8 +469,8 @@ plot_marginal_plotly <- function(
     r <- c(0, max(x[[bar_measure]]) / bar_height / f)
   }
 
-  for (i in seq_along(lines)) {
-    z <- lines[i]
+  for (i in seq_along(stat_info)) {
+    z <- stat_info[i]
     fig <- plotly::add_trace(
       fig,
       x = ~bin_mean,

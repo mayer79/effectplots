@@ -9,13 +9,14 @@
   ncol = 2L,
   byrow = TRUE,
   share_y = FALSE,
+  stat = c("y_mean", "pred_mean", "pd", "ale"),
   ylim = NULL,
   cat_lines = TRUE,
   num_points = FALSE,
   title = "",
   subplot_titles = TRUE,
   ylab = NULL,
-  lines = c(obs = "y_mean", pred = "pred_mean", pd = "pd", ale = "ale"),
+  legend_labels = NULL,
   colors = getOption("effectplots.colors"),
   fill = getOption("effectplots.fill"),
   alpha = 1,
@@ -31,13 +32,18 @@
 \arguments{
 \item{x}{An object of class "marginal".}
 
-\item{ncol}{Number of columns in the plot layout. Only for multiple plots.}
+\item{ncol}{Number of columns of the plot layout. Only for multiple plots.}
 
 \item{byrow}{Should plots be placed by row? Default is \code{TRUE}.
 Only for multiple plots.}
 
 \item{share_y}{Should y axis be shared across all subplots?
 No effect if \code{ylim} is passed. Only for multiple plots.}
+
+\item{stat}{Vector of (available) statistics to show. By default
+\code{c("y_mean", "pred_mean", "pd", "ale")}. You can use this option to hide certain
+lines, or to show only \code{"resid_mean"} (which lives on a different scale).
+Additionally, it controls the order in which the lines are added to the plot.}
 
 \item{ylim}{A vector of length 2 with manual y axis limits.}
 
@@ -51,12 +57,10 @@ No effect if \code{ylim} is passed. Only for multiple plots.}
 Default is \code{TRUE}. Only for multiple plots.}
 
 \item{ylab}{Label of the y axis. The default \code{NULL} automatically derives
-a reasonable name based on the calculated statistics.}
+a reasonable name.}
 
-\item{lines}{Named vector of the form \code{c(name = statistic, ...)} of statistics to
-plot. \code{name} is used as legend label. By default
-\code{c(obs = "y_mean", pred = "pred_mean", pd = "pd", ale = "ale")}.
-To show only bias with "bias" as legend entry, use \code{c(bias = "resid_mean")}.}
+\item{legend_labels}{Legend labels of the statistics. Must be \code{NULL} (default) or
+a character vector of the same length as \code{stat}.}
 
 \item{colors}{Vector of line colors of sufficient length.
 By default, a color blind friendly palette from "ggthemes".
@@ -80,14 +84,14 @@ Only for "ggplot2" backend.}
 \item{rotate_x}{Should categorical xaxis labels be rotated by this angle?
 The default is 0 (no rotation). Vectorized over \code{x}. Only for "ggplot2" backend.}
 
-\item{backend}{Plot backend, either "ggplot2" (default) or "plotly".
+\item{backend}{Plotting backend, either "ggplot2" (default) or "plotly".
 To change globally, set \code{options(effectplots.backend = "plotly")}.}
 
 \item{...}{Passed to \code{patchwork::plot_layout()} or \code{plotly::subplot()}. Typically
 not used.}
 }
 \value{
-If single plot, an object of class  "ggplot" or "plotly".
+If a single plot, an object of class  "ggplot" or "plotly".
 Otherwise, an object of class "patchwork", or a "plotly" subplot.
 }
 \description{

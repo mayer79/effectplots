@@ -123,8 +123,8 @@ fit <- lm(Sepal.Length ~ ., data = iris)
 M <- ale(fit, v = "Petal.Length", data = iris)
 M |> plot()
 
-M2 <- ale(fit, v = colnames(iris)[-1], data = iris)
-plot(M2, share_y = TRUE)
+M2 <- ale(fit, v = colnames(iris)[-1], data = iris, breaks = 5)
+plot(M2, share_y = TRUE)  # Only numeric variables shown
 }
 \references{
 Apley, Daniel W., and Jingyu Zhu. 2016. \emph{Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.}
