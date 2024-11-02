@@ -6,10 +6,10 @@
 \usage{
 \method{plot}{marginal}(
   x,
+  statistics = c("y_mean", "pred_mean", "pd", "ale"),
   ncol = 2L,
   byrow = TRUE,
   share_y = FALSE,
-  stat = c("y_mean", "pred_mean", "pd", "ale"),
   ylim = NULL,
   cat_lines = TRUE,
   num_points = FALSE,
@@ -32,6 +32,12 @@
 \arguments{
 \item{x}{An object of class "marginal".}
 
+\item{statistics}{Vector of (available) statistics to show. By default
+\code{c("y_mean", "pred_mean", "pd", "ale")}. E.g., used to hide certain
+statistics, or to show only \code{"resid_mean"}.
+Additionally, it controls the order in which the lines are added to the plot
+(the last one is placed on top).}
+
 \item{ncol}{Number of columns of the plot layout. Only for multiple plots.}
 
 \item{byrow}{Should plots be placed by row? Default is \code{TRUE}.
@@ -39,11 +45,6 @@ Only for multiple plots.}
 
 \item{share_y}{Should y axis be shared across all subplots?
 No effect if \code{ylim} is passed. Only for multiple plots.}
-
-\item{stat}{Vector of (available) statistics to show. By default
-\code{c("y_mean", "pred_mean", "pd", "ale")}. You can use this option to hide certain
-lines, or to show only \code{"resid_mean"} (which lives on a different scale).
-Additionally, it controls the order in which the lines are added to the plot.}
 
 \item{ylim}{A vector of length 2 with manual y axis limits.}
 
@@ -59,17 +60,17 @@ Default is \code{TRUE}. Only for multiple plots.}
 \item{ylab}{Label of the y axis. The default \code{NULL} automatically derives
 a reasonable name.}
 
-\item{legend_labels}{Legend labels of the statistics. Must be \code{NULL} (default) or
-a character vector of the same length as \code{stat}.}
+\item{legend_labels}{Vector of legend labels corresponding to \code{statistics}.
+Either \code{NULL} or a vector of the same length as \code{statistics}.}
 
-\item{colors}{Vector of line colors of sufficient length.
-By default, a color blind friendly palette from "ggthemes".
+\item{colors}{Vector of line/point colors at least as long as "statistics".
+By default, a color blind friendly palette from "ggthemes" with five values.
 To change globally, set \verb{options(effectplots.colors = new colors)}.}
 
 \item{fill}{Fill color of bars. The default equals "lightgrey".
 To change globally, set \verb{options(effectplots.fill = new color)}.}
 
-\item{alpha}{Alpha transparency of lines and points with default 1.}
+\item{alpha}{Alpha transparency of lines and points. Default is 1.}
 
 \item{bar_height}{Relative bar height (default 1). Set to 0 for no bars.}
 

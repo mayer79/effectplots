@@ -106,8 +106,29 @@ A list (of class "marginal") with a data.frame of statistics per feature. Use
 single bracket subsetting to select part of the output.
 }
 \description{
-Calculates uncentered ALE of one or more X variables (\code{v}) in \code{data}.
-This function is a convenience wrapper around \code{\link[=marginal]{marginal()}}.
+Calculates ALE for one or multiple \code{X} variables.
+
+The concept of ALE was introduced in Apley et al. (2020) as an alternative to
+partial dependence (PD). The Ceteris Paribus clause behind PD is a blessing and
+a curse at the same time:
+\itemize{
+\item Blessing: The interpretation is easy and similar to what we know from linear
+regression  (just averaging out interaction effects).
+\item Curse: The model is applied to very unlikely or even impossible feature
+combinations, especially with strongly dependent features.
+}
+
+ALE fixes the curse as follows: Partial dependence is calculated for the lower and
+upper endpoint of a bin, using all (or a sample) of observations falling into this
+bin. Its slope provides the \emph{local effect} over the bin.
+This is repeated for all bins, and the values are \emph{accumulated}. Since the resulting
+sum starts at 0, one typically shifts the result vertically, e.g., to the average
+prediction. This is not done by \code{\link[=ale]{ale()}}, however.
+
+The function is a convenience wrapper around \code{\link[=marginal]{marginal()}}, which calls
+the barebone implementation \code{\link[=.ale]{.ale()}} to calculate ALE. The ALE values calculated
+by \code{\link[=marginal]{marginal()}} are vertically shifted to the same (weighted) average than the
+partial dependence curve, for optimal comparability.
 }
 \section{Methods (by class)}{
 \itemize{
@@ -127,10 +148,10 @@ M2 <- ale(fit, v = colnames(iris)[-1], data = iris, breaks = 5)
 plot(M2, share_y = TRUE)  # Only numeric variables shown
 }
 \references{
-Apley, Daniel W., and Jingyu Zhu. 2016. \emph{Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.}
+Apley, Daniel W., and Jingyu Zhu. 2020. \emph{Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.}
 Journal of the Royal Statistical Society Series B: Statistical Methodology,
 82 (4): 1059–1086. doi:10.1111/rssb.12377.
 }
 \seealso{
-\code{\link[=marginal]{marginal()}}
+\code{\link[=marginal]{marginal()}}, \code{\link[=.ale]{.ale()}}
 }

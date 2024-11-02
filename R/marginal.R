@@ -61,7 +61,8 @@
 #' @returns
 #'   A list (of class "marginal") with a data.frame of statistics per feature. Use
 #'   single bracket subsetting to select part of the output.
-#' @seealso [update.marginal()]
+#' @seealso [plot.marginal()], [update.marginal()], [partial_dependence()],
+#'   [ale()], [average_observed]
 #' @references
 #'   1. Molnar, Christoph. 2019. *Interpretable Machine Learning: A Guide for Making Black Box Models Explainable*.
 #'     <https://christophm.github.io/interpretable-ml-book>.

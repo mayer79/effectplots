@@ -50,8 +50,12 @@ A list (of class "marginal") with a data.frame of statistics per feature. Use
 single bracket subsetting to select part of the output.
 }
 \description{
-Calculates average observed \code{y} values over one or multiple \code{X} variables.
-This function is a convenience wrapper around \code{\link[=marginal]{marginal()}}.
+Calculates average observed \code{y} values over the values of one or multiple
+\code{X} variables. This describes the statistical association between \code{y}
+and potential model features.
+}
+\details{
+The function is a convenience wrapper around \code{\link[=marginal]{marginal()}}.
 }
 \examples{
 M <- average_observed(iris$Species, y = iris$Sepal.Length)

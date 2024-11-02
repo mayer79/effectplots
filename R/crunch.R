@@ -49,7 +49,8 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
 #' Barebone Partial Dependence
 #'
 #' This is a barebone implementation of Friedman's partial dependence
-#' intended for developers.
+#' intended for developers. To get more information on partial dependence, see
+#' [partial_dependence()].
 #'
 #' @param v Variable name in `data` to calculate partial dependence.
 #' @param X Matrix or data.frame.
@@ -91,11 +92,10 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
   return(wrowmean(pred, ngroups = p, w = w))
 }
 
-#' Barebone Accumulated Local Effects
+#' Barebone Accumulated Local Effects (ALE)
 #'
-#' Very fast ALE calculations. Since the function does not do any
-#' input checks, it is mainly meant for internal use. Still, for developers, it can
-#' be handy.
+#' This is a barebone implementation of Apley's ALE intended for developers.
+#' To get more information on ALE, see [ale()].
 #'
 #' @param v Variable name in `data` to calculate ALE.
 #' @param X Matrix or data.frame.

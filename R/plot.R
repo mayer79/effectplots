@@ -8,7 +8,8 @@
 #' @param statistics Vector of (available) statistics to show. By default
 #'   `c("y_mean", "pred_mean", "pd", "ale")`. E.g., used to hide certain
 #'   statistics, or to show only `"resid_mean"`.
-#'   Additionally, it controls the order in which the lines are added to the plot.
+#'   Additionally, it controls the order in which the lines are added to the plot
+#'   (the last one is placed on top).
 #' @param ncol Number of columns of the plot layout. Only for multiple plots.
 #' @param byrow Should plots be placed by row? Default is `TRUE`.
 #'   Only for multiple plots.

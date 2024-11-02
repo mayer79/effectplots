@@ -1,14 +1,27 @@
 #' Partial Dependence
 #'
-#' Calculates partial dependence of one or more X variables (`v`) in `data`.
-#' This function is a convenience wrapper around [marginal()].
+#' @description
+#'
+#' Calculates PD for one or multiple `X` variables.
+#'
+#' PD was introduced by Friedman (2001) to study the (main) effects
+#' of a ML model. PD of a model f and variable `X` at a certain value g
+#' is derived by replacing the `X` values in a reference `data` by g,
+#' and then calculating the average prediction of f over this modified data.
+#' This is done for different g  to see how the average prediction of f changes in `X`,
+#' keeping all other feature values constant (Ceteris Paribus).
+#'
+#' This function is a convenience wrapper around [marginal()], which calls
+#' the barebone implementation [.pd()] to calculate PD.
+#' As grid points, it uses the arithmetic mean of `X` per bin (specified by `breaks`),
+#' and eventually weighted by `w`.
 #'
 #' @inheritParams marginal
 #' @inherit marginal return
 #' @references
 #'   Friedman, Jerome H. 2001, *Greedy Function Approximation: A Gradient Boosting Machine.*
 #'     Annals of Statistics 29 (5): 1189-1232. doi:10.1214/aos/1013203451.
-#' @seealso [marginal()]
+#' @seealso [marginal()], [.pd()], [ale()].
 #' @export
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)

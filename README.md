@@ -168,7 +168,7 @@ The same logic can also be used to compare different models.
 1. Molnar, Christoph. 2019. *Interpretable Machine Learning: A Guide for
 Making Black Box Models Explainable*. <https://christophm.github.io/interpretable-ml-book>.
 2. Friedman, Jerome H. 2001. *Greedy Function Approximation: A Gradient Boosting Machine.* Annals of Statistics 29 (5): 1189–1232. doi:10.1214/aos/1013203451.
-3. Apley, Daniel W., and Jingyu Zhu. 2016. *Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.*
+3. Apley, Daniel W., and Jingyu Zhu. 2020. *Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.*
 Journal of the Royal Statistical Society Series B: Statistical Methodology, 82 (4): 1059–1086. doi:10.1111/rssb.12377.
 4. Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy. 2018. *A simple and effective model-based variable importance measure.* arXiv preprint. <https://arxiv.org/abs/1805.04755>.
 

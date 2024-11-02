@@ -1,7 +1,10 @@
 #' Average Observed
 #'
-#' Calculates average observed `y` values over one or multiple `X` variables.
-#' This function is a convenience wrapper around [marginal()].
+#' Calculates average observed `y` values over the values of one or multiple
+#' `X` variables. This describes the statistical association between `y`
+#' and potential model features.
+#'
+#' The function is a convenience wrapper around [marginal()].
 #'
 #' @param X A vector, matrix, or data.frame with variable(s) to be shown on the x axis.
 #' @param y A numeric vector of observed responses.

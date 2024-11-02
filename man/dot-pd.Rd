@@ -45,7 +45,8 @@ Vector of partial dependence values in the same order as \code{grid}.
 }
 \description{
 This is a barebone implementation of Friedman's partial dependence
-intended for developers.
+intended for developers. To get more information on partial dependence, see
+\code{\link[=partial_dependence]{partial_dependence()}}.
 }
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)

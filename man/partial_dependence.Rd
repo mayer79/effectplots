@@ -107,8 +107,19 @@ A list (of class "marginal") with a data.frame of statistics per feature. Use
 single bracket subsetting to select part of the output.
 }
 \description{
-Calculates partial dependence of one or more X variables (\code{v}) in \code{data}.
-This function is a convenience wrapper around \code{\link[=marginal]{marginal()}}.
+Calculates PD for one or multiple \code{X} variables.
+
+PD was introduced by Friedman (2001) to study the (main) effects
+of a ML model. PD of a model f and variable \code{X} at a certain value g
+is derived by replacing the \code{X} values in a reference \code{data} by g,
+and then calculating the average prediction of f over this modified data.
+This is done for different g  to see how the average prediction of f changes in \code{X},
+keeping all other feature values constant (Ceteris Paribus).
+
+This function is a convenience wrapper around \code{\link[=marginal]{marginal()}}, which calls
+the barebone implementation \code{\link[=.pd]{.pd()}} to calculate PD.
+As grid points, it uses the arithmetic mean of \code{X} per bin (specified by \code{breaks}),
+and eventually weighted by \code{w}.
 }
 \section{Methods (by class)}{
 \itemize{
@@ -132,5 +143,5 @@ Friedman, Jerome H. 2001, \emph{Greedy Function Approximation: A Gradient Boosti
 Annals of Statistics 29 (5): 1189-1232. doi:10.1214/aos/1013203451.
 }
 \seealso{
-\code{\link[=marginal]{marginal()}}
+\code{\link[=marginal]{marginal()}}, \code{\link[=.pd]{.pd()}}, \code{\link[=ale]{ale()}}.
 }

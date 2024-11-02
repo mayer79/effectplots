@@ -1,15 +1,36 @@
 #' Accumulated Local Effects (ALE)
 #'
-#' Calculates uncentered ALE of one or more X variables (`v`) in `data`.
-#' This function is a convenience wrapper around [marginal()].
+#' @description
+#' Calculates ALE for one or multiple `X` variables.
+#'
+#' The concept of ALE was introduced in Apley et al. (2020) as an alternative to
+#' partial dependence (PD). The Ceteris Paribus clause behind PD is a blessing and
+#' a curse at the same time:
+#'
+#' - Blessing: The interpretation is easy and similar to what we know from linear
+#'   regression  (just averaging out interaction effects).
+#' - Curse: The model is applied to very unlikely or even impossible feature
+#'   combinations, especially with strongly dependent features.
+#'
+#' ALE fixes the curse as follows: Partial dependence is calculated for the lower and
+#' upper endpoint of a bin, using all (or a sample) of observations falling into this
+#' bin. Its slope provides the *local effect* over the bin.
+#' This is repeated for all bins, and the values are *accumulated*. Since the resulting
+#' sum starts at 0, one typically shifts the result vertically, e.g., to the average
+#' prediction. This is not done by [ale()], however.
+#'
+#' The function is a convenience wrapper around [marginal()], which calls
+#' the barebone implementation [.ale()] to calculate ALE. The ALE values calculated
+#' by [marginal()] are vertically shifted to the same (weighted) average than the
+#' partial dependence curve, for optimal comparability.
 #'
 #' @inheritParams marginal
 #' @inherit marginal return
 #' @references
-#'   Apley, Daniel W., and Jingyu Zhu. 2016. *Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.*
+#'   Apley, Daniel W., and Jingyu Zhu. 2020. *Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.*
 #'     Journal of the Royal Statistical Society Series B: Statistical Methodology,
 #'     82 (4): 1059–1086. doi:10.1111/rssb.12377.
-#' @seealso [marginal()]
+#' @seealso [marginal()], [.ale()]
 #' @export
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)

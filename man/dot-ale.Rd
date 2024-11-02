@@ -2,7 +2,7 @@
 % Please edit documentation in R/crunch.R
 \name{.ale}
 \alias{.ale}
-\title{Barebone Accumulated Local Effects}
+\title{Barebone Accumulated Local Effects (ALE)}
 \usage{
 .ale(
   object,
@@ -56,9 +56,8 @@ a \code{glm()} or (typically) \code{prob = TRUE} in classification models.}
 Vector of ALE values in the same order as \code{breaks[-length(breaks)]}.
 }
 \description{
-Very fast ALE calculations. Since the function does not do any
-input checks, it is mainly meant for internal use. Still, for developers, it can
-be handy.
+This is a barebone implementation of Apley's ALE intended for developers.
+To get more information on ALE, see \code{\link[=ale]{ale()}}.
 }
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)
@@ -66,7 +65,7 @@ v <- "Sepal.Width"
 .ale(fit, v, X = iris, breaks = seq(2, 4, length.out = 5))
 }
 \references{
-Apley, Daniel W., and Jingyu Zhu. 2016. \emph{Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.}
+Apley, Daniel W., and Jingyu Zhu. 2020. \emph{Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.}
 Journal of the Royal Statistical Society Series B: Statistical Methodology,
 82 (4): 1059–1086. doi:10.1111/rssb.12377.
 }
