@@ -62,3 +62,7 @@ get_ylab <- function(lines) {
   # No "average" (that would be overly specific)
   if ("y_mean" %in% lines) "Response" else "Prediction"
 }
+
+common_range <- function(x, stat_info) {
+  range(sapply(x, function(z) range(z[stat_info], na.rm = TRUE)))
+}

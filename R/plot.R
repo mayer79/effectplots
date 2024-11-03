@@ -186,9 +186,11 @@ plot.marginal <- function(
     x <- x[alt]
   }
 
+  col_i <- (seq_along(x) - 1L) %% ncol + 1L
+
   # Shared y is solved via ylim + padding
   if (share_y && is.null(ylim)) {
-    r <- range(sapply(x, function(z) range(z[stat_info], na.rm = TRUE)))
+    r <- common_range(x, stat_info)
     ylim <- grDevices::extendrange(r, f = 0.05)
   }
 
@@ -233,13 +235,15 @@ plot.marginal <- function(
     }
     p
   } else {
-    col_i <- (seq_along(x) - 1L) %% ncol + 1L
+    # Manually reduce horizontal margin and hide right ticks for equal scale
+    hide_some_yticks <- isTRUE(share_y) || !is.null(ylim)
+
     plot_list <- mapply(
       plot_marginal_plotly,
       x,
       v = names(x),
       title = titles,
-      show_yticks = !share_y | (col_i == 1L),
+      show_yticks = (col_i == 1L) | !hide_some_yticks,
       show_legend = show_legend,
       overlay = paste0("y", 2 * seq_along(x)),
       MoreArgs = list(
@@ -260,7 +264,7 @@ plot.marginal <- function(
       SIMPLIFY = FALSE
     )
     # left/right - top/bottom (we use it symmetrically)
-    margins <- c(0.05 - isTRUE(share_y) * 0.02, 0.05 + isTRUE(subplot_titles) * 0.02)
+    margins <- c(0.05 - hide_some_yticks * 0.02, 0.05 + isTRUE(subplot_titles) * 0.02)
     fig <- plotly::subplot(
       plot_list,
       titleX = TRUE,
