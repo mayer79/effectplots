@@ -64,7 +64,7 @@ xvars <- c("year", "town", "driver_age", "car_weight", "car_power", "car_age")
 # 0.3s on laptop
 average_observed(df[xvars], y = df$claim_nb) |>
   update(sort_by = "y_mean") |> 
-  plot(share_y = TRUE)
+  plot(share_y = "all")
 ```
 
 ![](man/figures/avg_obs.svg)
@@ -140,7 +140,7 @@ m_test <- m_test[names(m_train)]
 # Plot combined one
 c(m_train, m_test) |> 
   plot(
-    share_y = TRUE,
+    share_y = "rows",
     ncol = 2,
     byrow = FALSE,
     subplot_titles = FALSE,
@@ -150,7 +150,7 @@ c(m_train, m_test) |>
 # Or via Plotly
 c(m_train, m_test) |> 
   plot(
-    share_y = TRUE,
+    share_y = "rows",
     ncol = 2,
     byrow = FALSE,
     subplot_titles = FALSE,

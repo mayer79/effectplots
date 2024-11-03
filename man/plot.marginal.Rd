@@ -7,7 +7,7 @@
 \method{plot}{marginal}(
   x,
   statistics = c("y_mean", "pred_mean", "pd", "ale"),
-  ncol = 2L,
+  ncol = grDevices::n2mfrow(length(x)),
   byrow = TRUE,
   share_y = c("no", "all", "rows", "cols"),
   ylim = NULL,
@@ -38,7 +38,8 @@ statistics, or to show only \code{"resid_mean"}.
 Additionally, it controls the order in which the lines are added to the plot
 (the last one is placed on top).}
 
-\item{ncol}{Number of columns of the plot layout. Only for multiple plots.}
+\item{ncol}{Number of columns of the plot layout, by default
+\code{grDevices::n2mfrow(length(x))}. Only relevant for multiple plots.}
 
 \item{byrow}{Should plots be placed by row? Default is \code{TRUE}.
 Only for multiple plots.}

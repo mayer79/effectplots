@@ -77,7 +77,9 @@
 #' xvars <- colnames(iris)[-1]
 #' M <- marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 #' M
-#' M |> update(sort = "pd") |> plot(share_y = TRUE)  # ALE only for numeric features
+#' M |>
+#'   update(sort = "pd") |>
+#'   plot(share_y = "all")
 marginal <- function(object, ...) {
   UseMethod("marginal")
 }

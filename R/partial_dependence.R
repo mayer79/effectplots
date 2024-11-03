@@ -29,7 +29,7 @@
 #' M |> plot()
 #'
 #' M2 <- partial_dependence(fit, v = colnames(iris)[-1], data = iris)
-#' plot(M2, share_y = TRUE)
+#' plot(M2, share_y = "all")
 partial_dependence <- function(object, ...) {
   UseMethod("partial_dependence")
 }

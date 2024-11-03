@@ -136,7 +136,7 @@ M <- partial_dependence(fit, v = "Species", data = iris)
 M |> plot()
 
 M2 <- partial_dependence(fit, v = colnames(iris)[-1], data = iris)
-plot(M2, share_y = TRUE)
+plot(M2, share_y = "all")
 }
 \references{
 Friedman, Jerome H. 2001, \emph{Greedy Function Approximation: A Gradient Boosting Machine.}

@@ -10,7 +10,8 @@
 #'   statistics, or to show only `"resid_mean"`.
 #'   Additionally, it controls the order in which the lines are added to the plot
 #'   (the last one is placed on top).
-#' @param ncol Number of columns of the plot layout. Only for multiple plots.
+#' @param ncol Number of columns of the plot layout, by default
+#'   `grDevices::n2mfrow(length(x))`. Only relevant for multiple plots.
 #' @param byrow Should plots be placed by row? Default is `TRUE`.
 #'   Only for multiple plots.
 #' @param share_y Should y axis be shared across subplots? The default is "no". Other
@@ -52,7 +53,7 @@
 plot.marginal <- function(
     x,
     statistics = c("y_mean", "pred_mean", "pd", "ale"),
-    ncol = 2L,
+    ncol = grDevices::n2mfrow(length(x)),
     byrow = TRUE,
     share_y = c("no", "all", "rows", "cols"),
     ylim = NULL,
