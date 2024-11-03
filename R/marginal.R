@@ -410,11 +410,11 @@ calculate_stats <- function(
 
   # Add partial dependence
   if (!is.null(pd_X)) {
-    out[["pd"]] <- .pd(
+    out$pd <- .pd(
       object = object,
       v = v,
       X = pd_X,
-      grid = out[["bin_mean"]],
+      grid = out$bin_mean,
       pred_fun = pred_fun,
       trafo = trafo,
       which_pred = which_pred,
@@ -425,9 +425,8 @@ calculate_stats <- function(
 
   # Add ALE
   if (ale_bin_size > 0L) {
-    out[["ale"]] <- NA
+    out$ale <- NA
     if (num) {
-      ok <- !is.na(out$bin_mid)
       ale <- .ale(
         object = object,
         v = v,
@@ -442,22 +441,22 @@ calculate_stats <- function(
         g = ix,
         ...
       )
+      ok <- !is.na(out$bin_mid)
+
       # Centering possible?
       cvars <- intersect(c("pd", "pred_mean", "y_mean"), colnames(out))
       if (length(cvars)) {
-        w_ok <- out[["weight"]][ok]  # when w_ok = 0, cvars[1] is NA
-        shift <- collapse::fmean(out[[cvars[1L]]][ok], na.rm = TRUE, w = w_ok) -
+        w_ok <- out$weight[ok]
+        ale <- ale + collapse::fmean(out[[cvars[1L]]][ok], na.rm = TRUE, w = w_ok) -
           collapse::fmean(ale, w = w_ok)
-      } else {
-        shift <- 0
       }
-      out[ok, "ale"] <- ale + shift
+      out$ale[ok] <- ale
     }
   }
 
   # Convert non-numeric levels *after* calculation of partial dependence and ale!
-  if (!num && !is.factor(out[["bin_mean"]])) {
-    out[["bin_mid"]] <- out[["bin_mean"]] <- factor(out[["bin_mean"]])
+  if (!num && !is.factor(out$bin_mean)) {
+    out$bin_mid <- out$bin_mean <- factor(out$bin_mean)
   }
   return(out)
 }
