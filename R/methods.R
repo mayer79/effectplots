@@ -20,3 +20,8 @@ print.marginal <- function(x, ...) {
 `c.marginal` <- function(x, ...) {
   structure(NextMethod(), class = "marginal")
 }
+
+#' @export
+`+.marginal` <- function(e1, e2) {
+  c(e1, e2)
+}
