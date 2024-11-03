@@ -1,0 +1,56 @@
+#' Average Predictions
+#'
+#' Calculates average predictions over the values of one or multiple
+#' `X` variables. Shows the combined effect of a feature and other (correlated)
+#' features.
+#'
+#' The function is a convenience wrapper around [marginal()].
+#'
+#' @param X A vector, matrix, or data.frame with variable(s) to be shown on the x axis.
+#' @param pred A numeric vector of predictions.
+#' @param w An optional numeric vector of weights.
+#' @param x_name If `X` is a vector: what is the name of the variable? By default "x".
+#' @inheritParams marginal
+#' @inherit marginal return
+#' @param ... Currently unused.
+#' @seealso [marginal()]
+#' @references
+#'   Apley, Daniel W., and Jingyu Zhu. 2016. *Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.*
+#'     Journal of the Royal Statistical Society Series B: Statistical Methodology,
+#'     82 (4): 1059–1086. doi:10.1111/rssb.12377.
+#' @export
+#' @examples
+#' fit <- lm(Sepal.Length ~ ., data = iris)
+#' M <- average_predicted(iris[2:5], pred = predict(fit, iris), breaks = 5)
+#' M
+#' M |> plot()
+average_predicted <- function(
+    X,
+    pred,
+    w = NULL,
+    x_name = "x",
+    breaks = "Sturges",
+    right = TRUE,
+    discrete_m = 5L,
+    outlier_iqr = 2,
+    ...
+) {
+  if (NCOL(X) == 1L && (is.vector(X) || is.factor(X))) {
+    X <- collapse::frename(collapse::qDF(X), x_name)
+  }
+  marginal.default(
+    object = NULL,
+    v = colnames(X),
+    data = X,
+    pred = pred,
+    w = w,
+    breaks = breaks,
+    right = right,
+    discrete_m = discrete_m,
+    outlier_iqr = outlier_iqr,
+    calc_pred = FALSE,
+    pd_n = 0L,
+    ale_bin_size = 0L
+  )
+}
+

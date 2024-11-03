@@ -7,32 +7,32 @@
 [![Codecov test coverage](https://codecov.io/gh/mayer79/effectplots/graph/badge.svg)](https://app.codecov.io/gh/mayer79/effectplots)
 <!-- badges: end -->
 
-**{effectplots}** provides high-quality plots for modeling.
+**{effectplots}** provides high-quality effect plots useful for modeling, see Molnar [1] for a fantastic overview.
 
-The main function `marginal()` calculates
+The main function `marginal()` calculates the following statistics per feature X over values/bins:
 
-- average observed response (with std),
-- average predicted values (with std),
-- average residuals (= bias, with std),
-- partial dependence,
-- counts, and
-- weight sums
-per feature and feature value.
+- "y_mean": Average observed `y` values. Used to assess descriptive associations between response and features.
+- "pred_mean": Average predictions. Corresponds to "M Plots" (Apley [3]). Shows the combined effect of X and other (correlated) features. The difference to average observed y values shows model bias.
+- "resid_mean": Average residuals. Calculated when both `y` and predictions are available. Useful to study model bias.
+- "pd": Partial dependence (Friedman [2]). How do predictions change with a feature, keeping all other features fixed?
+- "ale": Accumulated local effects (Apley [3]). Alternative to partial dependence.
 
-The workflow is as follows:
+Additionally, corresponding counts/weights are calculated, and standard deviations of observed y, predictions, and residuals.
 
-1. Crunch values via `marginal()` or the convenience wrappers `average_observed()` and `partial_dependence()`.
+**Workflow**
+
+1. Crunch values via `marginal()` or the convenience wrappers `average_observed()`, `average_predicted()`, `partial_dependence()`, and `ale()`.
 2. Post-process the results with `update()`, e.g., to collapse rare levels of categorical features or to sort the results by a simple variable importance measure.
 3. Plot the results with `plot()`.
 
 **Notes**
 
 - You can switch between {ggplot2}/{patchwork} plots and interactive {plotly} plots.
-- The implementation is optimized for large data.
+- The implementation is optimized for large data using {collapse}.
 - Most models (including DALEX explainers and meta-learners such as Tidymodels) work out-of-the box. If not, a tailored prediction function can be specified.
 - Case weights are supported via the argument `w`.
 - Binning of numeric features is done by the same options as `stats::hist()`. Additionally, outliers are capped (not removed) at +-2 IQR from the quartiles by default.
-- Computational bottlenecks: (A) calculating predictions (cannot be avoided), and (B) `findInterval()` for histogram binning (bisection algorithm implemented in C).
+- For average observed, average predictions, and average residuals, also corresponding standard deviations are calculated.
 
 ## Installation
 
@@ -48,7 +48,7 @@ pak::pak("mayer79/effectplots")
 We use synthetic data with 1 Mio rows containing information on Motor TPL insurance policies and claims.
 The aim is to model claim frequency as a function of features like "driver_age" and "car_power".
 
-Before modeling, we want to study how the average response is associated with feature values.
+Before modeling, we want to study association between features and response.
 
 ``` r
 library(OpenML)
@@ -106,7 +106,7 @@ fit <- lgb.train(
 
 ### Inspect model
 
-After modeling, we use the test (or validation) data to crunch average observed, average predicted, and partial dependence per feature values/bins to gain insights about the model. Calculations are lightning fast.
+After modeling, we use the test (or validation) data to crunch average observed, average predicted, partial dependence, and accumulated local effects per feature values/bins to gain insights about the model. Calculations are lightning fast.
 
 ```r
 # 0.4s on laptop
@@ -120,8 +120,8 @@ marginal(fit, v = xvars, data = X_test, y = test$claim_nb) |>
 **Comments**
 
 1. Comparing average predicted with average observed values gives a hint about bias. In this case, the bias on the test data seems to be small. Studying the same plot on the training data would help to assess in-sample bias.
-2. Comparing the shape of the partial dependence curve with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors "driver_age" and "car_power", the two lines are very similar. This means the marginal effects are mainly due to the feature on the x-axis (and not of some other, correlated, feature).
-3. Sorting is done by decreasing weighted variance of the partial dependence values, a measure of main-effect strength closely related (but not 100% identical) to [1].
+2. Comparing the shape of partial dependence or ALE with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors "driver_age" and "car_power", the two lines are very similar. This means the marginal effects are mainly due to the feature on the x-axis and not of some other, correlated, feature.
+3. Sorting is done by decreasing weighted variance of the partial dependence values, a measure of main-effect strength closely related (but not 100% identical) to [4].
 
 ### Flexibility
 
@@ -143,6 +143,7 @@ c(m_train, m_test) |>
     share_y = "rows",
     ncol = 2,
     byrow = FALSE,
+    statistics = c("y_mean", "pred_mean"),
     subplot_titles = FALSE,
     title = "Left: Train - Right: Test",
   )
@@ -153,15 +154,16 @@ c(m_train, m_test) |>
     share_y = "rows",
     ncol = 2,
     byrow = FALSE,
+    statistics = c("y_mean", "pred_mean"),
     subplot_titles = FALSE,
     title = "Left: Train - Right: Test",
-    backend = "plotly"
+    plotly = TRUE
   )
 ```
 
 ![](man/figures/train_test.svg)
 
-The same logic can also be used to compare different models.
+The same logic can also be used to compare models and subgroups.
 
 # References
 
@@ -170,5 +172,4 @@ Making Black Box Models Explainable*. <https://christophm.github.io/interpretabl
 2. Friedman, Jerome H. 2001. *Greedy Function Approximation: A Gradient Boosting Machine.* Annals of Statistics 29 (5): 1189–1232. doi:10.1214/aos/1013203451.
 3. Apley, Daniel W., and Jingyu Zhu. 2020. *Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.*
 Journal of the Royal Statistical Society Series B: Statistical Methodology, 82 (4): 1059–1086. doi:10.1111/rssb.12377.
-4. Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy. 2018. *A simple and effective model-based variable importance measure.* arXiv preprint. <https://arxiv.org/abs/1805.04755>.
 

@@ -84,8 +84,8 @@ of the numeric X variables as in \code{\link[graphics:hist]{graphics::hist()}}. 
 To allow varying values of \code{breaks} across variables, it can be a list of the
 same length as \code{v}, or a \emph{named} list with \code{breaks} for certain variables.}
 
-\item{right}{Should bins created via \code{\link[graphics:hist]{graphics::hist()}} be right-closed?
-The default is \code{TRUE}. Vectorized over \code{v}. Only relevant for numeric X.}
+\item{right}{Should bins be right-closed? The default is \code{TRUE}.
+Vectorized over \code{v}. Only relevant for numeric X.}
 
 \item{discrete_m}{Numeric X variables with up to this number of unique values
 should not be binned and treated as a factor (after calculating partial dependence)

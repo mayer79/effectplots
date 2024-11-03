@@ -25,8 +25,8 @@
 #' collapsing.
 #' @param na.rm Should missing bin centers be dropped? Default is `FALSE`.
 #' @seealso
-#'   [marginal()], [average_observed()], [partial_dependence()], [ale()],
-#'   [ep_importance()]
+#'   [marginal()], [average_observed()], [average_predicted()],
+#'   [partial_dependence()], [ale()], [ep_importance()]
 #' @export
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)

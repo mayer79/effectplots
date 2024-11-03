@@ -1,7 +1,7 @@
 .onLoad <- function(libname, pkgname) {
   op <- options()
   op.effectplots <- list(
-    effectplots.backend = "ggplot2",
+    effectplots.plotly = FALSE,
     effectplots.fill = "lightgrey",
     effectplots.colors = c("#CC79A7", "#009E73", "#56B4E9", "#E69F00", "#000000")
   )

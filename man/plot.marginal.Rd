@@ -2,12 +2,12 @@
 % Please edit documentation in R/plot.R
 \name{plot.marginal}
 \alias{plot.marginal}
-\title{Plots Marginal Object}
+\title{Plots "marginal" Object}
 \usage{
 \method{plot}{marginal}(
   x,
   statistics = c("y_mean", "pred_mean", "pd", "ale"),
-  ncol = grDevices::n2mfrow(length(x)),
+  ncol = grDevices::n2mfrow(length(x))[2L],
   byrow = TRUE,
   share_y = c("no", "all", "rows", "cols"),
   ylim = NULL,
@@ -25,7 +25,7 @@
   bar_measure = c("weight", "N"),
   wrap_x = 10,
   rotate_x = 0,
-  backend = getOption("effectplots.backend"),
+  plotly = getOption("effectplots.plotly"),
   ...
 )
 }
@@ -39,7 +39,7 @@ Additionally, it controls the order in which the lines are added to the plot
 (the last one is placed on top).}
 
 \item{ncol}{Number of columns of the plot layout, by default
-\code{grDevices::n2mfrow(length(x))}. Only relevant for multiple plots.}
+\code{grDevices::n2mfrow(length(x))[2L]}. Only relevant for multiple plots.}
 
 \item{byrow}{Should plots be placed by row? Default is \code{TRUE}.
 Only for multiple plots.}
@@ -48,7 +48,7 @@ Only for multiple plots.}
 choices are "all", "rows", and "cols".
 No effect if \code{ylim} is passed. Only for multiple plots.}
 
-\item{ylim}{A vector of length 2 with manual y axis limits.}
+\item{ylim}{A vector of length 2 with manual y axis limits, or a list thereof.}
 
 \item{cat_lines}{Show lines for non-numeric features. Default is \code{TRUE}.}
 
@@ -87,8 +87,8 @@ Only for "ggplot2" backend.}
 \item{rotate_x}{Should categorical xaxis labels be rotated by this angle?
 The default is 0 (no rotation). Vectorized over \code{x}. Only for "ggplot2" backend.}
 
-\item{backend}{Plotting backend, either "ggplot2" (default) or "plotly".
-To change globally, set \code{options(effectplots.backend = "plotly")}.}
+\item{plotly}{Should 'plotly' be used? The default is \code{FALSE} ('ggplot2' with
+'patchwork'). Use \code{options(effectplots.plotly = TRUE)} to change globally.}
 
 \item{...}{Passed to \code{patchwork::plot_layout()} or \code{plotly::subplot()}. Typically
 not used.}
@@ -98,9 +98,18 @@ If a single plot, an object of class  "ggplot" or "plotly".
 Otherwise, an object of class "patchwork", or a "plotly" subplot.
 }
 \description{
-Plots marginal statistics using a color blind palette from "ggthemes".
-You can switch to plotly by setting \code{backend = "plotly"}.
+Versatile plot function for a "marginal" object. Set \code{plotly = TRUE} for
+interactive plots.
+By default, a color blind palette from "ggthemes" is used.
+}
+\examples{
+fit <- lm(Sepal.Length ~ ., data = iris)
+xvars <- colnames(iris)[-1]
+M <- marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
+plot(M, share_y = "all")
+plot(M, statistics = c("pd", "ale"), legend_labels = c("PD", "ALE"))
 }
 \seealso{
-\code{\link[=marginal]{marginal()}}, \code{\link[=average_observed]{average_observed()}}, \code{\link[=partial_dependence]{partial_dependence()}}
+\code{\link[=marginal]{marginal()}}, \code{\link[=average_observed]{average_observed()}}, \code{\link[=average_predicted]{average_predicted()}},
+\code{\link[=partial_dependence]{partial_dependence()}}, \code{\link[=ale]{ale()}}
 }

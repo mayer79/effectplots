@@ -1,21 +1,34 @@
 #' Marginal Statistics
 #'
-#' This is the main function of the package. It calculates
-#' - average observed (with std),
-#' - average predicted (with std),
-#' - average residual (= bias, with std),
-#' - partial dependence,
-#' - counts, and
-#' - weights (same as counts if no weights `w` are passed)
-#' over (possibly binned) features X specified by their column names `v`.
+#' @description
+#' This is the main function of the package. By default, it calculates
+#' the following statistics per feature X over values/bins:
+#' - "y_mean": Average observed `y` values. Used to assess descriptive associations
+#'   between response and features.
+#' - "pred_mean": Average predictions. Corresponds
+#'   to "M Plots" (from  "marginal") in Apley (2020). Shows the combined effect of
+#'   X and other (correlated) features. The difference to average observed y values
+#'   shows model bias.
+#' - "resid_mean": Average residuals. Calculated when
+#'   both `y` and predictions are available. Useful to study model bias.
+#' - "pd": Partial dependence (Friedman, 2001): See [partial_dependence()].
+#'   Evaluated at bin averages, not at bin midpoints.
+#' - "ale": Accumulated local effects (Apley, 2020): See [ale()]. Only for numeric X.
 #'
-#' For numeric variables with more than `discrete_m = 2` disjoint values,
-#' the same binning options (specified by `breaks`) are available as in
-#' [graphics::hist()]. Before calculating bins, outliers are capped via modified boxplot
-#' rule using an IQR factor `outlier_iqr = 2` instead of 1.5.
+#' Additionally, corresponding counts/weights are calculated, and
+#' standard deviations of observed y, predictions, and residuals.
 #'
-#' Note that partial dependence of numeric features is evaluated at (possibly weighted)
-#' bin means, i.e., not at the bin center.
+#' Numeric X with more than `discrete_m = 5` disjoint values are binned as in
+#' [graphics::hist()] via `breaks`. Before calculating bins, outliers are capped
+#' at +-2 IQR from the quartiles.
+#'
+#' All averages and standard deviation are weighted by optional weights `w`.
+#'
+#' If you need only one specific statistic, you can use the simplified APIs of
+#' - [average_observed()],
+#' - [average_predicted()],
+#' - [partial_dependence()], and
+#' - [ale()].
 #'
 #' @param object Fitted model.
 #' @param v Vector of variable names to calculate statistics.
@@ -37,8 +50,8 @@
 #'   of the numeric X variables as in [graphics::hist()]. The default is "Sturges".
 #'   To allow varying values of `breaks` across variables, it can be a list of the
 #'   same length as `v`, or a *named* list with `breaks` for certain variables.
-#' @param right Should bins created via [graphics::hist()] be right-closed?
-#'   The default is `TRUE`. Vectorized over `v`. Only relevant for numeric X.
+#' @param right Should bins be right-closed? The default is `TRUE`.
+#'   Vectorized over `v`. Only relevant for numeric X.
 #' @param discrete_m Numeric X variables with up to this number of unique values
 #'   should not be binned and treated as a factor (after calculating partial dependence)
 #'   The default is 5. Vectorized over `v`.
@@ -62,7 +75,7 @@
 #'   A list (of class "marginal") with a data.frame of statistics per feature. Use
 #'   single bracket subsetting to select part of the output.
 #' @seealso [plot.marginal()], [update.marginal()], [partial_dependence()],
-#'   [ale()], [average_observed]
+#'   [ale()], [average_observed], [average_predicted()]
 #' @references
 #'   1. Molnar, Christoph. 2019. *Interpretable Machine Learning: A Guide for Making Black Box Models Explainable*.
 #'     <https://christophm.github.io/interpretable-ml-book>.
@@ -77,9 +90,7 @@
 #' xvars <- colnames(iris)[-1]
 #' M <- marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 #' M
-#' M |>
-#'   update(sort = "pd") |>
-#'   plot(share_y = "all")
+#' M |> update(sort = "pd") |> plot(share_y = "all")
 marginal <- function(object, ...) {
   UseMethod("marginal")
 }
@@ -111,9 +122,8 @@ marginal.default <- function(
     v %in% colnames(data),
     is.function(pred_fun),
     is.null(trafo) || is.function(trafo),
-    outlier_iqr >= 0,
-    pd_n >= 0L,
-    ale_bin_size >= 0L
+    is.numeric(pd_n) && length(pd_n) == 1L && pd_n >= 0L,
+    is.numeric(ale_bin_size) && length(ale_bin_size) == 1L && ale_bin_size >= 0L
   )
   n <- nrow(data)
   nms <- colnames(data)
@@ -438,7 +448,7 @@ calculate_stats <- function(
         pred_fun = pred_fun,
         trafo = trafo,
         which_pred = which_pred,
-        n_per_bin = ale_bin_size,
+        bin_size = ale_bin_size,
         w = w,
         g = ix,
         ...

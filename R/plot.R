@@ -1,7 +1,8 @@
-#' Plots Marginal Object
+#' Plots "marginal" Object
 #'
-#' Plots marginal statistics using a color blind palette from "ggthemes".
-#' You can switch to plotly by setting `backend = "plotly"`.
+#' Versatile plot function for a "marginal" object. Set `plotly = TRUE` for
+#' interactive plots.
+#' By default, a color blind palette from "ggthemes" is used.
 #'
 #' @importFrom ggplot2 .data
 #' @param x An object of class "marginal".
@@ -11,13 +12,13 @@
 #'   Additionally, it controls the order in which the lines are added to the plot
 #'   (the last one is placed on top).
 #' @param ncol Number of columns of the plot layout, by default
-#'   `grDevices::n2mfrow(length(x))`. Only relevant for multiple plots.
+#'   `grDevices::n2mfrow(length(x))[2L]`. Only relevant for multiple plots.
 #' @param byrow Should plots be placed by row? Default is `TRUE`.
 #'   Only for multiple plots.
 #' @param share_y Should y axis be shared across subplots? The default is "no". Other
 #'   choices are "all", "rows", and "cols".
 #'   No effect if `ylim` is passed. Only for multiple plots.
-#' @param ylim A vector of length 2 with manual y axis limits.
+#' @param ylim A vector of length 2 with manual y axis limits, or a list thereof.
 #' @param cat_lines Show lines for non-numeric features. Default is `TRUE`.
 #' @param num_points Show points for numeric features. Default is `FALSE`.
 #' @param title Overall plot title, by default `""` (no title).
@@ -41,19 +42,26 @@
 #'   Only for "ggplot2" backend.
 #' @param rotate_x Should categorical xaxis labels be rotated by this angle?
 #'   The default is 0 (no rotation). Vectorized over `x`. Only for "ggplot2" backend.
-#' @param backend Plotting backend, either "ggplot2" (default) or "plotly".
-#'   To change globally, set `options(effectplots.backend = "plotly")`.
+#' @param plotly Should 'plotly' be used? The default is `FALSE` ('ggplot2' with
+#'   'patchwork'). Use `options(effectplots.plotly = TRUE)` to change globally.
 #' @param ... Passed to `patchwork::plot_layout()` or `plotly::subplot()`. Typically
 #'   not used.
 #' @returns
 #'   If a single plot, an object of class  "ggplot" or "plotly".
 #'   Otherwise, an object of class "patchwork", or a "plotly" subplot.
-#' @seealso [marginal()], [average_observed()], [partial_dependence()]
+#' @seealso [marginal()], [average_observed()], [average_predicted()],
+#'   [partial_dependence()], [ale()]
 #' @export
+#' @examples
+#' fit <- lm(Sepal.Length ~ ., data = iris)
+#' xvars <- colnames(iris)[-1]
+#' M <- marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
+#' plot(M, share_y = "all")
+#' plot(M, statistics = c("pd", "ale"), legend_labels = c("PD", "ALE"))
 plot.marginal <- function(
     x,
     statistics = c("y_mean", "pred_mean", "pd", "ale"),
-    ncol = grDevices::n2mfrow(length(x)),
+    ncol = grDevices::n2mfrow(length(x))[2L],
     byrow = TRUE,
     share_y = c("no", "all", "rows", "cols"),
     ylim = NULL,
@@ -71,7 +79,7 @@ plot.marginal <- function(
     bar_measure = c("weight", "N"),
     wrap_x = 10,
     rotate_x = 0,
-    backend = getOption("effectplots.backend"),
+    plotly = getOption("effectplots.plotly"),
     ...
 ) {
   share_y <- match.arg(share_y)
@@ -81,12 +89,27 @@ plot.marginal <- function(
   stat_info <- c(
     obs = "y_mean", pred = "pred_mean", bias = "resid_mean", pd = "pd", ale = "ale"
   )
+
   stopifnot(
-    backend %in% c("ggplot2", "plotly"),
     length(statistics) >= 1L,
     statistics %in% stat_info,
+    is.numeric(ncol) && length(ncol) == 1L,
+    is.logical(byrow) && length(byrow) == 1L,
+    is.null(ylim) || is.list(ylim) || (is.numeric(ylim) && length(ylim) == 2L),
+    is.logical(cat_lines) && length(cat_lines) == 1L,
+    is.logical(num_points) && length(num_points) == 1L,
+    is.character(title) && length(title) == 1L,
+    is.logical(subplot_titles) && length(subplot_titles) == 1L,
+    is.null(ylab) || (is.character(ylab) && length(ylab) == 1L),
     is.null(legend_labels) || length(legend_labels) == length(statistics),
-    length(colors) >= length(statistics)
+    is.character(colors) && length(colors) >= length(statistics),
+    is.character(fill) && length(fill) == 1L,
+    is.numeric(alpha) && alpha >= 0 && alpha <= 1,
+    is.numeric(bar_height) && bar_height >= 0 && bar_height <= 1,
+    is.numeric(bar_width) && bar_width >= 0 && bar_width <= 1,
+    is.numeric(wrap_x),
+    is.numeric(rotate_x),
+    is.logical(plotly) && length(plotly) == 1L
   )
 
   # The next part looks a bit complicated. We build a vector with statistics like "pd"
@@ -131,7 +154,7 @@ plot.marginal <- function(
   nplots <- length(x)
 
   if (nplots == 1L) {
-    if (backend == "ggplot2") {
+    if (!plotly) {
       p <- plot_marginal_ggplot(
         x[[1L]],
         v = names(x),
@@ -178,14 +201,14 @@ plot.marginal <- function(
   ncol <- min(ncol, nplots)
   nrow <- ceiling(nplots / ncol)
   J <- seq_len(nplots)
-  if (backend == "plotly") {
+  if (plotly) {
     # Plotly uses nrows to set up the layout. Thus, we need to recalculated ncol
     ncol <- ceiling(nplots / nrow)
   }
 
   # Can be useful if "marginal" objects of different models/datasets are c() together
   # For patchwork, we could also use its plot_layout(byrow = FALSE) argument.
-  if (isFALSE(byrow)) {
+  if (!byrow) {
     # alternating indices, e.g., 1, 4, 2, 5, 3 with ncol = 2 and nplots 0 5
     alt <- c(t(matrix(seq_len(nrow * ncol), ncol = ncol)))[J]
     x <- x[alt]
@@ -216,9 +239,9 @@ plot.marginal <- function(
     show_legend <- seq_along(x) == order(!.num(x))[1L]
   }
 
-  titles <- if (isTRUE(subplot_titles)) names(x) else ""
+  titles <- if (subplot_titles) names(x) else ""
 
-  if (backend == "ggplot2") {
+  if (!plotly) {
     plot_list <- mapply(
       plot_marginal_ggplot,
       x,
@@ -278,7 +301,7 @@ plot.marginal <- function(
       SIMPLIFY = FALSE
     )
     # left/right - top/bottom (we use it symmetrically)
-    margins <- c(0.05 - hide_some_yticks * 0.02, 0.05 + isTRUE(subplot_titles) * 0.02)
+    margins <- c(0.05 - hide_some_yticks * 0.02, 0.05 + subplot_titles * 0.02)
     fig <- plotly::subplot(
       plot_list,
       titleX = TRUE,
@@ -293,7 +316,7 @@ plot.marginal <- function(
     # Global title (not via layout(title = ))
     if (title != "") {
       fig <- plotly::layout(
-        fig, margin = list(t = 40 + 10 * isTRUE(subplot_titles)), title = title
+        fig, margin = list(t = 40 + 10 * subplot_titles), title = title
       )
     }
 
@@ -376,7 +399,7 @@ plot_marginal_ggplot <- function(
   }
 
   # Add optional points
-  if (!num || isTRUE(num_points)) {
+  if (!num || num_points) {
     p <- p + ggplot2::geom_point(
       ggplot2::aes(color = varying_),
       size = 2,
@@ -386,7 +409,7 @@ plot_marginal_ggplot <- function(
   }
 
   # Add optional lines
-  if (num || isTRUE(cat_lines)) {
+  if (num || cat_lines) {
     p <- p + ggplot2::geom_line(
       ggplot2::aes(color = varying_, group = varying_),
       linewidth = 0.8,
@@ -449,9 +472,9 @@ plot_marginal_plotly <- function(
     colors <- colors[keep]
   }
 
-  if (num && isFALSE(num_points)) {
+  if (num && !num_points) {
     scatter_mode <- "lines"
-  } else if (!num && isFALSE(cat_lines)) {
+  } else if (!num && !cat_lines) {
     scatter_mode <- "markers"
   } else {
     scatter_mode <-  "lines+markers"

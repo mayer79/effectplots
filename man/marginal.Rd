@@ -103,8 +103,8 @@ of the numeric X variables as in \code{\link[graphics:hist]{graphics::hist()}}. 
 To allow varying values of \code{breaks} across variables, it can be a list of the
 same length as \code{v}, or a \emph{named} list with \code{breaks} for certain variables.}
 
-\item{right}{Should bins created via \code{\link[graphics:hist]{graphics::hist()}} be right-closed?
-The default is \code{TRUE}. Vectorized over \code{v}. Only relevant for numeric X.}
+\item{right}{Should bins be right-closed? The default is \code{TRUE}.
+Vectorized over \code{v}. Only relevant for numeric X.}
 
 \item{discrete_m}{Numeric X variables with up to this number of unique values
 should not be binned and treated as a factor (after calculating partial dependence)
@@ -133,25 +133,38 @@ A list (of class "marginal") with a data.frame of statistics per feature. Use
 single bracket subsetting to select part of the output.
 }
 \description{
-This is the main function of the package. It calculates
+This is the main function of the package. By default, it calculates
+the following statistics per feature X over values/bins:
 \itemize{
-\item average observed (with std),
-\item average predicted (with std),
-\item average residual (= bias, with std),
-\item partial dependence,
-\item counts, and
-\item weights (same as counts if no weights \code{w} are passed)
-over (possibly binned) features X specified by their column names \code{v}.
+\item "y_mean": Average observed \code{y} values. Used to assess descriptive associations
+between response and features.
+\item "pred_mean": Average predictions. Corresponds
+to "M Plots" (from  "marginal") in Apley (2020). Shows the combined effect of
+X and other (correlated) features. The difference to average observed y values
+shows model bias.
+\item "resid_mean": Average residuals. Calculated when
+both \code{y} and predictions are available. Useful to study model bias.
+\item "pd": Partial dependence (Friedman, 2001): See \code{\link[=partial_dependence]{partial_dependence()}}.
+Evaluated at bin averages, not at bin midpoints.
+\item "ale": Accumulated local effects (Apley, 2020): See \code{\link[=ale]{ale()}}. Only for numeric X.
 }
-}
-\details{
-For numeric variables with more than \code{discrete_m = 2} disjoint values,
-the same binning options (specified by \code{breaks}) are available as in
-\code{\link[graphics:hist]{graphics::hist()}}. Before calculating bins, outliers are capped via modified boxplot
-rule using an IQR factor \code{outlier_iqr = 2} instead of 1.5.
 
-Note that partial dependence of numeric features is evaluated at (possibly weighted)
-bin means, i.e., not at the bin center.
+Additionally, corresponding counts/weights are calculated, and
+standard deviations of observed y, predictions, and residuals.
+
+Numeric X with more than \code{discrete_m = 5} disjoint values are binned as in
+\code{\link[graphics:hist]{graphics::hist()}} via \code{breaks}. Before calculating bins, outliers are capped
+at +-2 IQR from the quartiles.
+
+All averages and standard deviation are weighted by optional weights \code{w}.
+
+If you need only one specific statistic, you can use the simplified APIs of
+\itemize{
+\item \code{\link[=average_observed]{average_observed()}},
+\item \code{\link[=average_predicted]{average_predicted()}},
+\item \code{\link[=partial_dependence]{partial_dependence()}}, and
+\item \code{\link[=ale]{ale()}}.
+}
 }
 \section{Methods (by class)}{
 \itemize{
@@ -167,9 +180,7 @@ fit <- lm(Sepal.Length ~ ., data = iris)
 xvars <- colnames(iris)[-1]
 M <- marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 M
-M |>
-  update(sort = "pd") |>
-  plot(share_y = "all")
+M |> update(sort = "pd") |> plot(share_y = "all")
 }
 \references{
 \enumerate{
@@ -184,5 +195,5 @@ Journal of the Royal Statistical Society Series B: Statistical Methodology,
 }
 \seealso{
 \code{\link[=plot.marginal]{plot.marginal()}}, \code{\link[=update.marginal]{update.marginal()}}, \code{\link[=partial_dependence]{partial_dependence()}},
-\code{\link[=ale]{ale()}}, \link{average_observed}
+\code{\link[=ale]{ale()}}, \link{average_observed}, \code{\link[=average_predicted]{average_predicted()}}
 }

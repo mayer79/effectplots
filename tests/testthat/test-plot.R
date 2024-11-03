@@ -7,11 +7,11 @@ test_that("plot() returns correct class", {
   expect_s3_class(plot(M[1L]), "ggplot")
 
   # Plotly
-  p <- plot(M, backend = "plotly")
+  p <- plot(M, plotly = TRUE)
   expect_s3_class(p, "plotly")
   expect_true("subplot" %in% names(p$x))
 
-  p <- plot(M[1L], backend = "plotly")
+  p <- plot(M[1L], plotly = TRUE)
   expect_s3_class(p, "plotly")
   expect_false("subplot" %in% names(p$x))
 })
@@ -22,8 +22,8 @@ test_that("ncols has an effect", {
 
   # Plotly
   p <- list(
-    p1 = plot(M, backend = "plotly", ncol = 1),
-    p2 = plot(M, backend = "plotly", ncol = 4)
+    p1 = plot(M, plotly = TRUE, ncol = 1),
+    p2 = plot(M, plotly = TRUE, ncol = 4)
   )
   r <- lapply(p, function(z) diff(z$x$layout$xaxis$domain))
   expect_equal(r$p1, 1)
@@ -44,25 +44,25 @@ test_that("ylim can bet set", {
   # Plotly
 
   # One x
-  p <- plotly::plotly_build(plot(M[1], backend = "plotly", ylim = ylims))
+  p <- plotly::plotly_build(plot(M[1], plotly = TRUE, ylim = ylims))
   out <- p$x$layout$yaxis$range
   expect_equal(out, ylims)
 
   # Multiple x
-  p <- plot(M, backend = "plotly", ylim = ylims)
+  p <- plot(M, plotly = TRUE, ylim = ylims)
   out <- p$x$layout$yaxis$range
   expect_equal(out, ylims)
 })
 
 test_that("y axis can be shared", {
   # Test works because the first plot does not have the widest y range
-  r1 <- diff(ggplot2::layer_scales(plot(M, share_y = FALSE))$y$range$range)
-  r2 <- diff(ggplot2::layer_scales(plot(M, share_y = TRUE))$y$range$range)
+  r1 <- diff(ggplot2::layer_scales(plot(M, share_y = "no"))$y$range$range)
+  r2 <- diff(ggplot2::layer_scales(plot(M, share_y = "all"))$y$range$range)
   expect_true(r1 < r2)
 
   # Plotly
-  p1 <- plot(M, backend = "plotly", share_y = FALSE)
-  p2 <- plot(M, backend = "plotly", share_y = TRUE)
+  p1 <- plot(M, plotly = TRUE, share_y = "no")
+  p2 <- plot(M, plotly = TRUE, share_y = "all")
 
   expect_null(p1$x$layout$yaxis$range)
   expect_equal(p2$x$layout$yaxis$range, p2$x$layout$yaxis3$range)
