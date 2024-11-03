@@ -13,7 +13,8 @@
 #' @param ncol Number of columns of the plot layout. Only for multiple plots.
 #' @param byrow Should plots be placed by row? Default is `TRUE`.
 #'   Only for multiple plots.
-#' @param share_y Should y axis be shared across all subplots?
+#' @param share_y Should y axis be shared across subplots? The default is "no". Other
+#'   choices are "all", "rows", and "cols".
 #'   No effect if `ylim` is passed. Only for multiple plots.
 #' @param ylim A vector of length 2 with manual y axis limits.
 #' @param cat_lines Show lines for non-numeric features. Default is `TRUE`.
@@ -53,7 +54,7 @@ plot.marginal <- function(
     statistics = c("y_mean", "pred_mean", "pd", "ale"),
     ncol = 2L,
     byrow = TRUE,
-    share_y = FALSE,
+    share_y = c("no", "all", "rows", "cols"),
     ylim = NULL,
     cat_lines = TRUE,
     num_points = FALSE,
@@ -72,6 +73,7 @@ plot.marginal <- function(
     backend = getOption("effectplots.backend"),
     ...
 ) {
+  share_y <- match.arg(share_y)
   bar_measure <- match.arg(bar_measure)
 
   # Info of the form c(legend label = col name, ...). The order does not matter *yet*.
@@ -126,12 +128,13 @@ plot.marginal <- function(
 
   # Finally ready to plot something
   nplots <- length(x)
+
   if (nplots == 1L) {
     if (backend == "ggplot2") {
       p <- plot_marginal_ggplot(
         x[[1L]],
         v = names(x),
-        share_y = FALSE,
+        share_y = "no",
         ylim = ylim,
         cat_lines = cat_lines,
         num_points = num_points,
@@ -151,7 +154,7 @@ plot.marginal <- function(
       p <- plot_marginal_plotly(
         x[[1L]],
         v = names(x),
-        share_y = FALSE,
+        share_y = "no",
         ylim = ylim,
         cat_lines = cat_lines,
         num_points = num_points,
@@ -173,6 +176,7 @@ plot.marginal <- function(
   # We need some additional preparation with multiple plots
   ncol <- min(ncol, nplots)
   nrow <- ceiling(nplots / ncol)
+  J <- seq_len(nplots)
   if (backend == "plotly") {
     # Plotly uses nrows to set up the layout. Thus, we need to recalculated ncol
     ncol <- ceiling(nplots / nrow)
@@ -182,16 +186,28 @@ plot.marginal <- function(
   # For patchwork, we could also use its plot_layout(byrow = FALSE) argument.
   if (isFALSE(byrow)) {
     # alternating indices, e.g., 1, 4, 2, 5, 3 with ncol = 2 and nplots 0 5
-    alt <- c(t(matrix(seq_len(nrow * ncol), ncol = ncol)))[seq_len(nplots)]
+    alt <- c(t(matrix(seq_len(nrow * ncol), ncol = ncol)))[J]
     x <- x[alt]
   }
 
-  col_i <- (seq_along(x) - 1L) %% ncol + 1L
+  # col and row per subplot
+  col_i <- (J - 1L) %% ncol + 1L
+  row_i <- rep(seq_len(nrow), each = ncol)[J]
+
+  # plotly only: Manually reduce horizontal margin and hide right ticks for equal scale
+  hide_some_yticks <- share_y %in% c("all", "rows") || !is.null(ylim)
 
   # Shared y is solved via ylim + padding
-  if (share_y && is.null(ylim)) {
-    r <- common_range(x, stat_info)
-    ylim <- grDevices::extendrange(r, f = 0.05)
+  if (share_y != "no" && is.null(ylim)) {
+    if (share_y == "all") {
+      ylim <- common_range(x, stat_info = stat_info)
+    } else {
+      ix <- switch(share_y, rows = row_i, cols = col_i)
+      ylim <- lapply(split(x, ix), common_range, stat_info = stat_info)[ix]
+    }
+  }
+  if (!is.list(ylim)) {
+    ylim <- replicate(nplots, ylim, simplify = FALSE)
   }
 
   if (show_legend) {
@@ -207,12 +223,12 @@ plot.marginal <- function(
       x,
       v = names(x),
       title = titles,
+      ylim = ylim,
       show_legend = show_legend,
       wrap_x = wrap_x,
       rotate_x = rotate_x,
       MoreArgs = list(
         share_y = share_y,
-        ylim = ylim,
         cat_lines = cat_lines,
         num_points = num_points,
         ylab = ylab,
@@ -235,21 +251,18 @@ plot.marginal <- function(
     }
     p
   } else {
-    # Manually reduce horizontal margin and hide right ticks for equal scale
-    hide_some_yticks <- isTRUE(share_y) || !is.null(ylim)
-
     plot_list <- mapply(
       plot_marginal_plotly,
       x,
       v = names(x),
       title = titles,
+      ylim = ylim,
       show_yticks = (col_i == 1L) | !hide_some_yticks,
       show_legend = show_legend,
       overlay = paste0("y", 2 * seq_along(x)),
       MoreArgs = list(
         title_as_ann = TRUE,
         share_y = share_y,
-        ylim = ylim,
         cat_lines = cat_lines,
         num_points = num_points,
         ylab = ylab,
@@ -336,7 +349,7 @@ plot_marginal_ggplot <- function(
   if (is.null(ylim)) {
     r <- grDevices::extendrange(df$value_, f = 0.02)
   } else {
-    f <- if (isTRUE(share_y)) -0.05 else -0.02
+    f <- if (share_y != "no") -0.05 else -0.02
     r <- grDevices::extendrange(ylim, f = f)
   }
 
@@ -470,7 +483,7 @@ plot_marginal_plotly <- function(
       marker = list(line = list(color = fill, width = 1))  # to remove tiny white gaps
     )
     # Fix bars slightly above observed maximum value of a line
-    f <- if (isFALSE(share_y) && !is.null(ylim)) 1.01 else 0.98
+    f <- if (share_y == "no" && !is.null(ylim)) 1.01 else 0.98
     r <- c(0, max(x[[bar_measure]]) / bar_height / f)
   }
 

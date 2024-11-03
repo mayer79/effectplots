@@ -64,5 +64,6 @@ get_ylab <- function(lines) {
 }
 
 common_range <- function(x, stat_info) {
-  range(sapply(x, function(z) range(z[stat_info], na.rm = TRUE)))
+  r <- range(sapply(x, function(z) range(z[stat_info], na.rm = TRUE)))
+  return(grDevices::extendrange(r, f = 0.05))
 }

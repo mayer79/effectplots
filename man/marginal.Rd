@@ -181,5 +181,6 @@ Journal of the Royal Statistical Society Series B: Statistical Methodology,
 }
 }
 \seealso{
-\code{\link[=update.marginal]{update.marginal()}}
+\code{\link[=plot.marginal]{plot.marginal()}}, \code{\link[=update.marginal]{update.marginal()}}, \code{\link[=partial_dependence]{partial_dependence()}},
+\code{\link[=ale]{ale()}}, \link{average_observed}
 }
