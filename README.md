@@ -7,15 +7,15 @@
 [![Codecov test coverage](https://codecov.io/gh/mayer79/effectplots/graph/badge.svg)](https://app.codecov.io/gh/mayer79/effectplots)
 <!-- badges: end -->
 
-**{effectplots}** provides high-quality effect plots useful for modeling, see the fantastic book of Christoph Molnar [1] for the background.
+**{effectplots}** provides high-quality effect plots useful for modeling, see the fantastic book of Christoph Molnar [1] for their statistical background.
 
 The main function `marginal()` calculates the following statistics per feature X over values/bins:
 
-- "y_mean": Average observed `y` values. Used to assess descriptive associations between response y and features.
-- "pred_mean": Average predictions. Corresponds to "M Plots" (Apley [3]). Shows the combined effect of X and other (correlated) features. The difference to average observed y values measures model bias.
-- "resid_mean": Average residuals. Calculated when both `y` and predictions are available. Useful to study model bias.
-- "pd": Partial dependence (Friedman [2]). How do predictions change with a feature, keeping all other features fixed?
-- "ale": Accumulated local effects (Apley [3]). Alternative to partial dependence.
+- **Average observed y values**: Used to assess descriptive associations between response y and features.
+- **Average predictions** (M Plots, Apley [3]): Shows the combined effect of X and other (correlated) features. The difference to average observed y values measures model bias.
+- **Average residuals:** Calculated when both `y` and predictions are available. Useful to study model bias.
+- **Partial dependence** (Friedman [2]): How does the average prediction changes with X, keeping other feature values fixed?
+- **Accumulated local effects** (Apley [3]): Alternative to partial dependence.
 
 Additionally, corresponding counts/weights are calculated, and standard deviations of observed y, predictions, and residuals.
 
