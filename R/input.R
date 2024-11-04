@@ -19,7 +19,7 @@ prep_pred <- function(x, trafo = NULL, which_pred = NULL) {
   if (anyNA(x)) {
     stop("Predictions can't contain NA")
   }
-  if (is.double(x)) x else as.double(x)
+  if (is.double(x)) unname(x) else as.double(unname(x))
 }
 
 basic_check <- function(z, n, nms) {

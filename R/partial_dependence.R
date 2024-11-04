@@ -143,3 +143,49 @@ partial_dependence.explainer <- function(
     ...
   )
 }
+
+#' Barebone Partial Dependence
+#'
+#' This is a barebone implementation of Friedman's partial dependence
+#' intended for developers. To get more information on partial dependence, see
+#' [partial_dependence()].
+#'
+#' @param v Variable name in `data` to calculate partial dependence.
+#' @param data Matrix or data.frame.
+#' @param grid Vector or factor of values to calculate partial dependence for.
+#' @param w Optional vector with case weights.
+#' @inheritParams marginal
+#' @returns Vector of partial dependence values in the same order as `grid`.
+#' @export
+#' @seealso [partial_dependence()]
+#' @inherit partial_dependence references
+#' @examples
+#' fit <- lm(Sepal.Length ~ ., data = iris)
+#' .pd(fit, "Sepal.Width", data = iris, grid = hist(iris$Sepal.Width)$mids)
+#' .pd(fit, "Species", data = iris, grid = levels(iris$Species))
+.pd <- function(
+    object,
+    v,
+    data,
+    grid,
+    pred_fun = stats::predict,
+    trafo = NULL,
+    which_pred = NULL,
+    w = NULL,
+    ...
+) {
+  n <- nrow(data)
+  p <- length(grid)
+  data_long <- collapse::ss(data, rep.int(seq_len(n), p))
+  grid_long <- rep(grid, each = n)
+  if (is.data.frame(data_long)) {
+    data_long[[v]] <- grid_long
+  } else {
+    data_long[, v] <- grid_long
+  }
+  pred <- prep_pred(
+    pred_fun(object, data_long, ...), trafo = trafo, which_pred = which_pred
+  )
+  dim(pred) <- c(n, p)
+  collapse::fmean.matrix(pred, w = w, use.g.names = FALSE)
+}

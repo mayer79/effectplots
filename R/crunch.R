@@ -41,191 +41,127 @@ grouped_stats <- function(x, g, w = NULL) {
   return(cbind(out, M, S))
 }
 
-#' Barebone Partial Dependence
-#'
-#' This is a barebone implementation of Friedman's partial dependence
-#' intended for developers. To get more information on partial dependence, see
-#' [partial_dependence()].
-#'
-#' @param v Variable name in `data` to calculate partial dependence.
-#' @param data Matrix or data.frame.
-#' @param grid Vector or factor of values to calculate partial dependence for.
-#' @param w Optional vector with case weights.
-#' @inheritParams marginal
-#' @returns Vector of partial dependence values in the same order as `grid`.
-#' @export
-#' @seealso [partial_dependence()]
-#' @inherit partial_dependence references
-#' @examples
-#' fit <- lm(Sepal.Length ~ ., data = iris)
-#' .pd(fit, "Sepal.Width", data = iris, grid = hist(iris$Sepal.Width)$mids)
-#' .pd(fit, "Species", data = iris, grid = levels(iris$Species))
-.pd <- function(
-    object,
+calculate_stats <- function(
     v,
-    data,
-    grid,
-    pred_fun = stats::predict,
-    trafo = NULL,
-    which_pred = NULL,
-    w = NULL,
-    ...
-) {
-  n <- nrow(data)
-  p <- length(grid)
-  data_long <- collapse::ss(data, rep.int(seq_len(n), p))
-  grid_long <- rep(grid, each = n)
-  if (is.data.frame(data_long)) {
-    data_long[[v]] <- grid_long
-  } else {
-    data_long[, v] <- grid_long
-  }
-  pred <- prep_pred(
-    pred_fun(object, data_long, ...), trafo = trafo, which_pred = which_pred
-  )
-  dim(pred) <- c(n, p)
-  collapse::fmean.matrix(pred, w = w, use.g.names = FALSE)
-}
-
-# We don't need the following function, but it is easier to read than .ale()
-# .ale_via_pd <- function(
-#     object,
-#     v,
-#     X,
-#     breaks,
-#     right = TRUE,
-#     pred_fun = stats::predict,
-#     trafo = NULL,
-#     which_pred = NULL,
-#     bin_size = 200L,
-#     w = NULL,
-#     g = NULL,
-#     ...
-# ) {
-#   if (is.null(g)) {
-#     g <- collapse::qF(
-#       findInterval(
-#         if (is.data.frame(X)) X[[v]] else X[, v],
-#         vec = breaks,
-#         rightmost.closed = TRUE,
-#         left.open = right,
-#         all.inside = TRUE
-#       ),
-#       sort = TRUE
-#     )
-#   }
-#   J <- lapply(
-#     collapse::gsplit(1:length(g), g = g, use.g.names = TRUE),
-#     function(z) if (length(z) <= bin_size) z else sample(z, size = bin_size)
-#   )
-#   if (is.na(names(J)[length(J)])) {
-#     J <- J[-length(J)]
-#   }
-#
-#   out <- numeric(length(breaks) - 1L)
-#   for (nm in names(J)) {
-#     j <- as.integer(nm)
-#     pdj <- .pd(
-#       object,
-#       v = v,
-#       X = collapse::ss(X, J[[nm]]),
-#       grid = breaks[c(j, j + 1L)],
-#       pred_fun = pred_fun,
-#       trafo = trafo,
-#       which_pred = which_pred,
-#       w = if (!is.null(w)) w[J[[nm]]],
-#       ...
-#     )
-#     out[j] <- diff(pdj)
-#   }
-#   return(cumsum(out))
-# }
-
-#' Barebone Accumulated Local Effects (ALE)
-#'
-#' This is a barebone implementation of Apley's ALE intended for developers.
-#' To get more information on ALE, see [ale()].
-#'
-#' @param v Variable name in `data` to calculate ALE.
-#' @param data Matrix or data.frame.
-#' @param breaks Breaks for ALE calculation.
-#' @param right Should bins specified via `breaks` be right-closed?
-#'   The default is `TRUE`.
-#' @param bin_size Maximal number of observations used per bin. If there are more
-#'   observations in a bin, `bin_size` indices are randomly sampled. The default is 200.
-#' @param w Optional vector with case weights.
-#' @param g For internal use. The result of `factor(findInterval(...))`.
-#'   By default `NULL`.
-#' @inheritParams marginal
-#' @returns Vector of ALE values in the same order as `breaks[-length(breaks)]`.
-#' @export
-#' @seealso [partial_dependence()]
-#' @inherit ale references
-#' @examples
-#' fit <- lm(Sepal.Length ~ ., data = iris)
-#' v <- "Sepal.Width"
-#' .ale(fit, v, data = iris, breaks = seq(2, 4, length.out = 5))
-.ale <- function(
-    object,
-    v,
+    PYR,
+    w,
     data,
     breaks,
-    right = TRUE,
-    pred_fun = stats::predict,
-    trafo = NULL,
-    which_pred = NULL,
-    bin_size = 200L,
-    w = NULL,
-    g = NULL,
+    right,
+    discrete_m,
+    outlier_iqr,
+    object,
+    pred_fun,
+    trafo,
+    which_pred,
+    pd_data,
+    pd_w,
+    ale_bin_size,
     ...
 ) {
-  if (is.null(g)) {
-    g <- collapse::qF(
+  x <- if (is.matrix(data)) data[, v] else data[[v]]
+  if (is.double(x)) {
+    # {collapse} seems to distinguish positive and negative zeros
+    # https://github.com/SebKrantz/collapse/issues/648
+    # Adding 0 to a double turns negative 0 to positive ones (ISO/IEC 60559)
+    collapse::setop(x, "+", 0.0)
+  }
+  g <- collapse::funique(x)
+  num <- is.numeric(x) && (length(g) > discrete_m)
+
+  if (is.null(PYR) && is.null(pd_data) && (!num || ale_bin_size == 0L)) {
+    return(NULL)
+  }
+
+  # DISCRETE
+  if (!num) {
+    # Ordered by sort(g) (+ NA). For factors: levels(x) (+ NA)
+    M <- grouped_stats(PYR, g = x, w = w)
+    g <- sort(g, na.last = TRUE)
+    out <- data.frame(bin_mid = g, bin_width = 0.7, bin_mean = g, M)
+    rownames(out) <- NULL
+  } else {
+    # "CONTINUOUS" case. Tricky because there can be empty bins.
+    if (outlier_iqr > 0 && is.finite(outlier_iqr)) {
+      x <- wins_iqr(x, m = outlier_iqr)
+    }
+    br <- hist2(x, breaks = breaks)
+    g <- 0.5 * (br[-1L] + br[-length(br)])  # mids
+    gix <- seq_along(g)
+    bin_width <- diff(br)
+    if (anyNA(x)) {
+      g <- c(g, NA)
+      gix <- c(gix, NA)
+      bin_width <- c(bin_width, NA)  #  Can't be plotted anyway
+    }
+    out <- data.frame(
+      bin_mid = g, bin_width = bin_width, bin_mean = g, N = 0, weight = 0
+    )
+
+    # Integer encoding
+    ix <- collapse::qF(
       findInterval(
-        if (is.data.frame(data)) data[[v]] else data[, v],
-        vec = breaks,
-        rightmost.closed = TRUE,
-        left.open = right,
-        all.inside = TRUE
+        x, vec = br, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
       ),
       sort = TRUE
     )
+    M <- cbind(
+      bin_mean = collapse::fmean.default(x, g = ix, w = w),
+      grouped_stats(PYR, g = ix, w = w)
+    )
+    reindex <- match(as.integer(rownames(M)), gix)
+    out[reindex, colnames(M)] <- M  # Fill gaps
   }
 
-  # List of bin indices. Eventual NA levels are placed at the end. We will remove it.
-  J <- lapply(
-    collapse::gsplit(1:length(g), g = g, use.g.names = TRUE),
-    function(z) if (length(z) <= bin_size) z else sample(z, size = bin_size)
-  )
-  if (is.na(names(J)[length(J)])) {
-    J <- J[-length(J)]
+  # Add partial dependence
+  if (!is.null(pd_data)) {
+    out$pd <- .pd(
+      object = object,
+      v = v,
+      data = pd_data,
+      grid = out$bin_mean,
+      pred_fun = pred_fun,
+      trafo = trafo,
+      which_pred = which_pred,
+      w = pd_w,
+      ...
+    )
   }
 
-  # Before flattening the list J, we store bin counts (with bin names)
-  bin_n <- lengths(J)
-  J <- unlist(J, recursive = FALSE, use.names = FALSE)
+  # Add ALE
+  if (ale_bin_size > 0L) {
+    out$ale <- NA
+    if (num) {
+      ale <- .ale(
+        object = object,
+        v = v,
+        data = data,
+        breaks = br,
+        right = right,  # does not matter because we pass g
+        pred_fun = pred_fun,
+        trafo = trafo,
+        which_pred = which_pred,
+        bin_size = ale_bin_size,
+        w = w,
+        g = ix,
+        ...
+      )
+      ok <- !is.na(out$bin_mid)
 
-  # Empty bins will get an incremental effect of 0
-  p <- length(breaks) - 1L
-  out <- numeric(p)
-  ok <- (1L:p) %in% as.integer(names(bin_n))
-
-  # Now we create a single prediction dataset. Lower bin edges first, then upper ones.
-  data_long <- collapse::ss(data, rep.int(J, 2L))
-  grid_long <- rep.int(
-    c(breaks[-(p + 1L)][ok], breaks[-1L][ok]), times = c(bin_n, bin_n)
-  )
-  if (is.data.frame(data_long)) {
-    data_long[[v]] <- grid_long
-  } else {
-    data_long[, v] <- grid_long
+      # Centering possible?
+      cvars <- intersect(c("pd", "pred_mean", "y_mean"), colnames(out))
+      if (length(cvars)) {
+        w_ok <- out$weight[ok]
+        ale <- ale + collapse::fmean(out[[cvars[1L]]][ok], na.rm = TRUE, w = w_ok) -
+          collapse::fmean(ale, w = w_ok)
+      }
+      out$ale[ok] <- ale
+    }
   }
-  pred <- prep_pred(
-    pred_fun(object, data_long, ...), trafo = trafo, which_pred = which_pred
-  )
-  n <- length(J)
-  out[ok] <- collapse::fmean(
-    pred[(n + 1L):(2L * n)] - pred[1L:n], g = g[J], w = if (!is.null(w)) w[J]
-  )
-  return(cumsum(out))
+
+  # Convert non-numeric levels *after* calculation of partial dependence and ale!
+  if (!num && !is.factor(out$bin_mean)) {
+    out$bin_mid <- out$bin_mean <- factor(out$bin_mean)
+  }
+  return(out)
 }

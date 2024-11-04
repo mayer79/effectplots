@@ -57,6 +57,7 @@ library(lightgbm)
 set.seed(1)
 
 df <- getOMLDataSet(data.id = 45106L)$data
+# df <- arrow::read_parquet("claims.parquet")
 
 xvars <- c("year", "town", "driver_age", "car_weight", "car_power", "car_age")
 

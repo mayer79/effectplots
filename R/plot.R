@@ -157,7 +157,7 @@ plot.marginal <- function(
 
   if (nplots == 1L) {
     if (!plotly) {
-      p <- plot_marginal_ggplot(
+      p <- one_ggplot(
         x[[1L]],
         v = names(x),
         share_y = "no",
@@ -177,7 +177,7 @@ plot.marginal <- function(
         show_legend = show_legend
       )
     } else {
-      p <- plot_marginal_plotly(
+      p <- one_plotly(
         x[[1L]],
         v = names(x),
         share_y = "no",
@@ -245,7 +245,7 @@ plot.marginal <- function(
 
   if (!plotly) {
     plot_list <- mapply(
-      plot_marginal_ggplot,
+      one_ggplot,
       x,
       v = names(x),
       title = titles,
@@ -278,7 +278,7 @@ plot.marginal <- function(
     p
   } else {
     plot_list <- mapply(
-      plot_marginal_plotly,
+      one_plotly,
       x,
       v = names(x),
       title = titles,
@@ -339,7 +339,7 @@ plot.marginal <- function(
   }
 }
 
-plot_marginal_ggplot <- function(
+one_ggplot <- function(
     x,
     v,
     share_y,
@@ -444,7 +444,7 @@ plot_marginal_ggplot <- function(
   p
 }
 
-plot_marginal_plotly <- function(
+one_plotly <- function(
     x,
     v,
     share_y,
