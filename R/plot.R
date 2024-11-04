@@ -143,7 +143,9 @@ plot.marginal <- function(
   show_legend <- length(stat_info) > 1L
 
   # Overwrite bin_width of categorical features
-  x <- lapply(x, function(z) {if (!.num(z)) z$bin_width <- bar_width; z})
+  if (bar_width != 0.7) {
+    x[] <- lapply(x, function(z) {if (!.num(z)) z$bin_width <- bar_width; z})
+  }
 
   # Derive a good ylab
   if (is.null(ylab)) {
