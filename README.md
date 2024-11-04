@@ -50,9 +50,9 @@ The aim is to model claim frequency as a function of features like "driver_age" 
 Before modeling, we want to study association between features and response.
 
 ``` r
+library(effectplots)
 library(OpenML)
 library(lightgbm)
-library(effectplots)
 
 set.seed(1)
 

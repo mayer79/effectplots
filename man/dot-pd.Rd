@@ -7,7 +7,7 @@
 .pd(
   object,
   v,
-  X,
+  data,
   grid,
   pred_fun = stats::predict,
   trafo = NULL,
@@ -21,7 +21,7 @@
 
 \item{v}{Variable name in \code{data} to calculate partial dependence.}
 
-\item{X}{Matrix or data.frame.}
+\item{data}{Matrix or data.frame.}
 
 \item{grid}{Vector or factor of values to calculate partial dependence for.}
 
@@ -50,9 +50,8 @@ intended for developers. To get more information on partial dependence, see
 }
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)
-
-.pd(fit, "Sepal.Width", X = iris, grid = hist(iris$Sepal.Width, plot = FALSE)$mids)
-.pd(fit, "Species", X = iris, grid = levels(iris$Species))
+.pd(fit, "Sepal.Width", data = iris, grid = hist(iris$Sepal.Width)$mids)
+.pd(fit, "Species", data = iris, grid = levels(iris$Species))
 }
 \references{
 Friedman, Jerome H. 2001, \emph{Greedy Function Approximation: A Gradient Boosting Machine.}

@@ -7,7 +7,7 @@
 .ale(
   object,
   v,
-  X,
+  data,
   breaks,
   right = TRUE,
   pred_fun = stats::predict,
@@ -24,7 +24,7 @@
 
 \item{v}{Variable name in \code{data} to calculate ALE.}
 
-\item{X}{Matrix or data.frame.}
+\item{data}{Matrix or data.frame.}
 
 \item{breaks}{Breaks for ALE calculation.}
 
@@ -62,7 +62,7 @@ To get more information on ALE, see \code{\link[=ale]{ale()}}.
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)
 v <- "Sepal.Width"
-.ale(fit, v, X = iris, breaks = seq(2, 4, length.out = 5))
+.ale(fit, v, data = iris, breaks = seq(2, 4, length.out = 5))
 }
 \references{
 Apley, Daniel W., and Jingyu Zhu. 2020. \emph{Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.}

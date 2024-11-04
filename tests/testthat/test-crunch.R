@@ -6,24 +6,6 @@ test_that("winsorize() works", {
   expect_equal(winsorize(x, low = 3, high = 7), pmax(3, pmin(7, x)))
 })
 
-test_that("wrowmean() works", {
-  x <- 6:1
-  out <- wrowmean(x, ngroups = 2L)
-  expect_equal(out, c(5, 2))
-  expect_equal(wrowmean(x, ngroups = 3L), c(5.5, 3.5, 1.5))
-
-  # Constant weights have no effect
-  expect_equal(wrowmean(x, ngroups = 2L, w = c(1, 1, 1)), out)
-  expect_equal(wrowmean(x, ngroups = 2L, w = c(4, 4, 4)), out)
-
-  # Non-constant weights
-  w <- 1:3
-  a <- weighted.mean(6:4, w)
-  b <- weighted.mean(3:1, w)
-  out <- wrowmean(x, ngroups = 2L, w = w)
-  expect_equal(out, c(a, b))
-})
-
 test_that("poor_man_stack() works (test could be improved)", {
   y <- c("a", "b", "c")
   z <- c("aa", "bb", "cc")

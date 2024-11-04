@@ -41,11 +41,6 @@ grouped_stats <- function(x, g, w = NULL) {
   return(cbind(out, M, S))
 }
 
-wrowmean <- function(x, ngroups = 1L, w = NULL) {
-  dim(x) <- c(length(x) %/% ngroups, ngroups)
-  if (is.null(w)) colMeans(x) else colSums(x * w) / sum(w)
-}
-
 #' Barebone Partial Dependence
 #'
 #' This is a barebone implementation of Friedman's partial dependence
@@ -53,7 +48,7 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
 #' [partial_dependence()].
 #'
 #' @param v Variable name in `data` to calculate partial dependence.
-#' @param X Matrix or data.frame.
+#' @param data Matrix or data.frame.
 #' @param grid Vector or factor of values to calculate partial dependence for.
 #' @param w Optional vector with case weights.
 #' @inheritParams marginal
@@ -63,13 +58,12 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
 #' @inherit partial_dependence references
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)
-#'
-#' .pd(fit, "Sepal.Width", X = iris, grid = hist(iris$Sepal.Width, plot = FALSE)$mids)
-#' .pd(fit, "Species", X = iris, grid = levels(iris$Species))
+#' .pd(fit, "Sepal.Width", data = iris, grid = hist(iris$Sepal.Width)$mids)
+#' .pd(fit, "Species", data = iris, grid = levels(iris$Species))
 .pd <- function(
     object,
     v,
-    X,
+    data,
     grid,
     pred_fun = stats::predict,
     trafo = NULL,
@@ -77,20 +71,75 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
     w = NULL,
     ...
 ) {
-  n <- nrow(X)
+  n <- nrow(data)
   p <- length(grid)
-  X_pred <- collapse::ss(X, rep.int(seq_len(n), p))
-  grid_pred <- rep(grid, each = n)
-  if (is.data.frame(X_pred)) {
-    X_pred[[v]] <- grid_pred
+  data_long <- collapse::ss(data, rep.int(seq_len(n), p))
+  grid_long <- rep(grid, each = n)
+  if (is.data.frame(data_long)) {
+    data_long[[v]] <- grid_long
   } else {
-    X_pred[, v] <- grid_pred
+    data_long[, v] <- grid_long
   }
   pred <- prep_pred(
-    pred_fun(object, X_pred, ...), trafo = trafo, which_pred = which_pred
+    pred_fun(object, data_long, ...), trafo = trafo, which_pred = which_pred
   )
-  return(wrowmean(pred, ngroups = p, w = w))
+  dim(pred) <- c(n, p)
+  collapse::fmean.matrix(pred, w = w, use.g.names = FALSE)
 }
+
+# We don't need the following function, but it is easier to read than .ale()
+# .ale_via_pd <- function(
+#     object,
+#     v,
+#     X,
+#     breaks,
+#     right = TRUE,
+#     pred_fun = stats::predict,
+#     trafo = NULL,
+#     which_pred = NULL,
+#     bin_size = 200L,
+#     w = NULL,
+#     g = NULL,
+#     ...
+# ) {
+#   if (is.null(g)) {
+#     g <- collapse::qF(
+#       findInterval(
+#         if (is.data.frame(X)) X[[v]] else X[, v],
+#         vec = breaks,
+#         rightmost.closed = TRUE,
+#         left.open = right,
+#         all.inside = TRUE
+#       ),
+#       sort = TRUE
+#     )
+#   }
+#   J <- lapply(
+#     collapse::gsplit(1:length(g), g = g, use.g.names = TRUE),
+#     function(z) if (length(z) <= bin_size) z else sample(z, size = bin_size)
+#   )
+#   if (is.na(names(J)[length(J)])) {
+#     J <- J[-length(J)]
+#   }
+#
+#   out <- numeric(length(breaks) - 1L)
+#   for (nm in names(J)) {
+#     j <- as.integer(nm)
+#     pdj <- .pd(
+#       object,
+#       v = v,
+#       X = collapse::ss(X, J[[nm]]),
+#       grid = breaks[c(j, j + 1L)],
+#       pred_fun = pred_fun,
+#       trafo = trafo,
+#       which_pred = which_pred,
+#       w = if (!is.null(w)) w[J[[nm]]],
+#       ...
+#     )
+#     out[j] <- diff(pdj)
+#   }
+#   return(cumsum(out))
+# }
 
 #' Barebone Accumulated Local Effects (ALE)
 #'
@@ -98,7 +147,7 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
 #' To get more information on ALE, see [ale()].
 #'
 #' @param v Variable name in `data` to calculate ALE.
-#' @param X Matrix or data.frame.
+#' @param data Matrix or data.frame.
 #' @param breaks Breaks for ALE calculation.
 #' @param right Should bins specified via `breaks` be right-closed?
 #'   The default is `TRUE`.
@@ -115,11 +164,11 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)
 #' v <- "Sepal.Width"
-#' .ale(fit, v, X = iris, breaks = seq(2, 4, length.out = 5))
+#' .ale(fit, v, data = iris, breaks = seq(2, 4, length.out = 5))
 .ale <- function(
     object,
     v,
-    X,
+    data,
     breaks,
     right = TRUE,
     pred_fun = stats::predict,
@@ -133,7 +182,7 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
   if (is.null(g)) {
     g <- collapse::qF(
       findInterval(
-        if (is.data.frame(X)) X[[v]] else X[, v],
+        if (is.data.frame(data)) data[[v]] else data[, v],
         vec = breaks,
         rightmost.closed = TRUE,
         left.open = right,
@@ -142,6 +191,8 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
       sort = TRUE
     )
   }
+
+  # List of bin indices. Eventual NA levels are placed at the end. We will remove it.
   J <- lapply(
     collapse::gsplit(1:length(g), g = g, use.g.names = TRUE),
     function(z) if (length(z) <= bin_size) z else sample(z, size = bin_size)
@@ -150,21 +201,31 @@ wrowmean <- function(x, ngroups = 1L, w = NULL) {
     J <- J[-length(J)]
   }
 
-  out <- numeric(length(breaks) - 1L)
-  for (nm in names(J)) {
-    j <- as.integer(nm)
-    pdj <- .pd(
-      object,
-      v = v,
-      X = collapse::ss(X, J[[nm]]),
-      grid = breaks[c(j, j + 1L)],
-      pred_fun = pred_fun,
-      trafo = trafo,
-      which_pred = which_pred,
-      w = if (!is.null(w)) w[J[[nm]]],
-      ...
-    )
-    out[j] <- diff(pdj)
+  # Before flattening the list J, we store bin counts (with bin names)
+  bin_n <- lengths(J)
+  J <- unlist(J, recursive = FALSE, use.names = FALSE)
+
+  # Empty bins will get an incremental effect of 0
+  p <- length(breaks) - 1L
+  out <- numeric(p)
+  ok <- (1L:p) %in% as.integer(names(bin_n))
+
+  # Now we create a single prediction dataset. Lower bin edges first, then upper ones.
+  data_long <- collapse::ss(data, rep.int(J, 2L))
+  grid_long <- rep.int(
+    c(breaks[-(p + 1L)][ok], breaks[-1L][ok]), times = c(bin_n, bin_n)
+  )
+  if (is.data.frame(data_long)) {
+    data_long[[v]] <- grid_long
+  } else {
+    data_long[, v] <- grid_long
   }
+  pred <- prep_pred(
+    pred_fun(object, data_long, ...), trafo = trafo, which_pred = which_pred
+  )
+  n <- length(J)
+  out[ok] <- collapse::fmean(
+    pred[(n + 1L):(2L * n)] - pred[1L:n], g = g[J], w = if (!is.null(w)) w[J]
+  )
   return(cumsum(out))
 }
