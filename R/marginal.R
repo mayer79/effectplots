@@ -195,18 +195,18 @@ marginal.default <- function(
   re <- !is.null(pred) && !is.null(y)
   PYR <- cbind(pred = pred, y = y, resid = if (re) y - pred) # cbind(NULL, NULL) is NULL
 
-  # Prepare pd_X and pd_w
+  # Prepare pd_data and pd_w
   if (pd_n > 0L) {
     if (n > pd_n) {
       ix <- sample(n, pd_n)
-      pd_X <- collapse::ss(data, ix)
+      pd_data <- collapse::ss(data, ix)
       pd_w <- if (!is.null(w)) w[ix]
     } else {
-      pd_X <- data
+      pd_data <- data
       pd_w <- w
     }
   } else {
-    pd_X <- pd_w <- NULL
+    pd_data <- pd_w <- NULL
   }
 
   # Prepare breaks
@@ -237,7 +237,7 @@ marginal.default <- function(
       pred_fun = pred_fun,
       trafo = trafo,
       which_pred = which_pred,
-      pd_X = pd_X,
+      pd_data = pd_data,
       pd_w = pd_w,
       ale_bin_size,
       ...
@@ -361,7 +361,7 @@ calculate_stats <- function(
     pred_fun,
     trafo,
     which_pred,
-    pd_X,
+    pd_data,
     pd_w,
     ale_bin_size,
     ...
@@ -376,7 +376,7 @@ calculate_stats <- function(
   g <- collapse::funique(x)
   num <- is.numeric(x) && (length(g) > discrete_m)
 
-  if (is.null(PYR) && is.null(pd_X) && (!num || ale_bin_size == 0L)) {
+  if (is.null(PYR) && is.null(pd_data) && (!num || ale_bin_size == 0L)) {
     return(NULL)
   }
 
@@ -421,11 +421,11 @@ calculate_stats <- function(
   }
 
   # Add partial dependence
-  if (!is.null(pd_X)) {
+  if (!is.null(pd_data)) {
     out$pd <- .pd(
       object = object,
       v = v,
-      X = pd_X,
+      data = pd_data,
       grid = out$bin_mean,
       pred_fun = pred_fun,
       trafo = trafo,
@@ -442,7 +442,7 @@ calculate_stats <- function(
       ale <- .ale(
         object = object,
         v = v,
-        X = data,
+        data = data,
         breaks = br,
         right = right,  # does not matter because we pass g
         pred_fun = pred_fun,
