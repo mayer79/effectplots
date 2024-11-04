@@ -109,7 +109,7 @@ fit <- lgb.train(
 After modeling, we use the test (or validation) data to crunch average observed, average predicted, partial dependence, and accumulated local effects per feature values/bins to gain insights about the model. Calculations are lightning fast.
 
 ```r
-# 0.5s on laptop
+# 0.3s on laptop
 marginal(fit, v = xvars, data = X_test, y = test$claim_nb) |>
   update(sort_by = "pd") |> 
   plot()
