@@ -72,11 +72,11 @@
 </h1></div>
 <!-- badges: start -->
 
-<p><strong>{effectplots}</strong> provides high-quality effect plots useful for modeling, see Molnar [1] for a fantastic overview.</p>
+<p><strong>{effectplots}</strong> provides high-quality effect plots useful for modeling, see the fantastic book of Christoph Molnar [1] for the background.</p>
 <p>The main function <code><a href="reference/marginal.html">marginal()</a></code> calculates the following statistics per feature X over values/bins:</p>
 <ul>
-<li>“y_mean”: Average observed <code>y</code> values. Used to assess descriptive associations between response and features.</li>
-<li>“pred_mean”: Average predictions. Corresponds to “M Plots” (Apley [3]). Shows the combined effect of X and other (correlated) features. The difference to average observed y values shows model bias.</li>
+<li>“y_mean”: Average observed <code>y</code> values. Used to assess descriptive associations between response y and features.</li>
+<li>“pred_mean”: Average predictions. Corresponds to “M Plots” (Apley [3]). Shows the combined effect of X and other (correlated) features. The difference to average observed y values measures model bias.</li>
 <li>“resid_mean”: Average residuals. Calculated when both <code>y</code> and predictions are available. Useful to study model bias.</li>
 <li>“pd”: Partial dependence (Friedman [2]). How do predictions change with a feature, keeping all other features fixed?</li>
 <li>“ale”: Accumulated local effects (Apley [3]). Alternative to partial dependence.</li>
@@ -88,14 +88,13 @@
 <li>Post-process the results with <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>, e.g., to collapse rare levels of categorical features or to sort the results by a simple variable importance measure.</li>
 <li>Plot the results with <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>.</li>
 </ol>
-<p><strong>Notes</strong></p>
+<p><strong>Some cool things</strong></p>
 <ul>
 <li>You can switch between {ggplot2}/{patchwork} plots and interactive {plotly} plots.</li>
 <li>The implementation is optimized for large data using {collapse}.</li>
 <li>Most models (including DALEX explainers and meta-learners such as Tidymodels) work out-of-the box. If not, a tailored prediction function can be specified.</li>
 <li>Case weights are supported via the argument <code>w</code>.</li>
 <li>Binning of numeric features is done by the same options as <code>stats::hist()</code>. Additionally, outliers are capped (not removed) at +-2 IQR from the quartiles by default.</li>
-<li>For average observed, average predictions, and average residuals, also corresponding standard deviations are calculated.</li>
 </ul>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -171,15 +170,15 @@
 <p><img src="reference/figures/marginal.svg"></p>
 <p><strong>Comments</strong></p>
 <ol style="list-style-type: decimal">
-<li>Comparing average predicted with average observed values gives a hint about bias. In this case, the bias on the test data seems to be small. Studying the same plot on the training data would help to assess in-sample bias.</li>
-<li>Comparing the shape of partial dependence or ALE with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors “driver_age” and “car_power”, the two lines are very similar. This means the marginal effects are mainly due to the feature on the x-axis and not of some other, correlated, feature.</li>
+<li>Comparing average predictions with average observed y provides a good picture of model bias. In this case, the bias on the test data seems to be small. Studying the same plot on the training data would help to assess in-sample bias.</li>
+<li>Comparing the shape of partial dependence or ALE with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors “driver_age” and “car_power”, these lines are very similar. This means the marginal effects are mainly due to the feature on the x axis and not of some other, correlated, feature.</li>
 <li>Sorting is done by decreasing weighted variance of the partial dependence values, a measure of main-effect strength closely related (but not 100% identical) to [4].</li>
 </ol>
 </div>
 <div class="section level3">
 <h3 id="flexibility">Flexibility<a class="anchor" aria-label="anchor" href="#flexibility"></a>
 </h3>
-<p>Thanks to the flexibility of the package, you can modify the results as you wish. For instance: what about putting results on training data besides those on test?</p>
+<p>Thanks to the flexibility of the package, you can modify the results as you wish. For instance: what about putting results on training data besides those on test? Or comparing different models or subgroups?</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m_train</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/marginal.html">marginal</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">X_train</span>, y <span class="op">=</span> <span class="va">train</span><span class="op">$</span><span class="va">claim_nb</span><span class="op">)</span></span>
 <span><span class="va">m_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/marginal.html">marginal</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">X_test</span>, y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">claim_nb</span><span class="op">)</span></span>
@@ -213,7 +212,6 @@
 <span>    plotly <span class="op">=</span> <span class="cn">TRUE</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/train_test.svg"></p>
-<p>The same logic can also be used to compare models and subgroups.</p>
 </div>
 </div>
 </div>
@@ -224,6 +222,7 @@
 <li>Molnar, Christoph. 2019. <em>Interpretable Machine Learning: A Guide for Making Black Box Models Explainable</em>. <a href="https://christophm.github.io/interpretable-ml-book" class="external-link uri">https://christophm.github.io/interpretable-ml-book</a>.</li>
 <li>Friedman, Jerome H. 2001. <em>Greedy Function Approximation: A Gradient Boosting Machine.</em> Annals of Statistics 29 (5): 1189–1232. <a href="doi:10.1214/aos/1013203451" class="uri">doi:10.1214/aos/1013203451</a>.</li>
 <li>Apley, Daniel W., and Jingyu Zhu. 2020. <em>Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.</em> Journal of the Royal Statistical Society Series B: Statistical Methodology, 82 (4): 1059–1086. <a href="doi:10.1111/rssb.12377" class="uri">doi:10.1111/rssb.12377</a>.</li>
+<li>Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy. 2018. <em>A Simple and Effective Model-Based Variable Importance Measure.</em> arXiv preprint. <a href="https://arxiv.org/abs/1805.04755" class="external-link uri">https://arxiv.org/abs/1805.04755</a>.</li>
 </ol>
 </div>
 
