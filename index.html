@@ -72,21 +72,21 @@
 </h1></div>
 <!-- badges: start -->
 
-<p><strong>{effectplots}</strong> provides high-quality effect plots useful for modeling, see the fantastic book of Christoph Molnar [1] for their statistical background.</p>
+<p><strong>{effectplots}</strong> is a fast R package for calculating and plotting effects of any model.</p>
 <p>The main function <code><a href="reference/marginal.html">marginal()</a></code> calculates the following statistics per feature X over values/bins:</p>
 <ul>
 <li>
 <strong>Average observed y values</strong>: Used to assess descriptive associations between response y and features.</li>
 <li>
-<strong>Average predictions</strong> (M Plots, Apley [3]): Shows the combined effect of X and other (correlated) features. The difference to average observed y values measures model bias.</li>
+<strong>Average predictions</strong> (M Plots, Apley [1]): Shows the combined effect of X and other (correlated) features. The difference to average observed y values measures model bias.</li>
 <li>
 <strong>Average residuals:</strong> Calculated when both <code>y</code> and predictions are available. Useful to study model bias.</li>
 <li>
 <strong>Partial dependence</strong> (Friedman [2]): How does the average prediction changes with X, keeping other feature values fixed?</li>
 <li>
-<strong>Accumulated local effects</strong> (Apley [3]): Alternative to partial dependence.</li>
+<strong>Accumulated local effects</strong> (Apley [1]): Alternative to partial dependence.</li>
 </ul>
-<p>Additionally, corresponding counts/weights are calculated, and standard deviations of observed y, predictions, and residuals.</p>
+<p>See the fantastic book of Christoph Molnar [3] for their background.</p>
 <p><strong>Workflow</strong></p>
 <ol style="list-style-type: decimal">
 <li>Crunch values via <code><a href="reference/marginal.html">marginal()</a></code> or the convenience wrappers <code><a href="reference/average_observed.html">average_observed()</a></code>, <code><a href="reference/average_predicted.html">average_predicted()</a></code>, <code><a href="reference/partial_dependence.html">partial_dependence()</a></code>, and <code><a href="reference/ale.html">ale()</a></code>.</li>
@@ -98,8 +98,9 @@
 <li>You can switch between {ggplot2}/{patchwork} plots and interactive {plotly} plots.</li>
 <li>The implementation is optimized for large data using {collapse}.</li>
 <li>Most models (including DALEX explainers and meta-learners such as Tidymodels) work out-of-the box. If not, a tailored prediction function can be specified.</li>
-<li>Case weights are supported via the argument <code>w</code>.</li>
 <li>Binning of numeric features is done by the same options as <code>stats::hist()</code>. Additionally, outliers are capped (not removed) at +-2 IQR from the quartiles by default.</li>
+<li>As additional statistics, per-bin counts/weights are calculated, and also standard deviations of observed y, predictions, and residuals.</li>
+<li>Case weights are supported via the argument <code>w</code>.</li>
 </ul>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -225,9 +226,9 @@
 <h1 id="references">References<a class="anchor" aria-label="anchor" href="#references"></a>
 </h1>
 <ol style="list-style-type: decimal">
-<li>Molnar, Christoph. 2019. <em>Interpretable Machine Learning: A Guide for Making Black Box Models Explainable</em>. <a href="https://christophm.github.io/interpretable-ml-book" class="external-link uri">https://christophm.github.io/interpretable-ml-book</a>.</li>
-<li>Friedman, Jerome H. 2001. <em>Greedy Function Approximation: A Gradient Boosting Machine.</em> Annals of Statistics 29 (5): 1189–1232. <a href="doi:10.1214/aos/1013203451" class="uri">doi:10.1214/aos/1013203451</a>.</li>
 <li>Apley, Daniel W., and Jingyu Zhu. 2020. <em>Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.</em> Journal of the Royal Statistical Society Series B: Statistical Methodology, 82 (4): 1059–1086. <a href="doi:10.1111/rssb.12377" class="uri">doi:10.1111/rssb.12377</a>.</li>
+<li>Friedman, Jerome H. 2001. <em>Greedy Function Approximation: A Gradient Boosting Machine.</em> Annals of Statistics 29 (5): 1189–1232. <a href="doi:10.1214/aos/1013203451" class="uri">doi:10.1214/aos/1013203451</a>.</li>
+<li>Molnar, Christoph. 2019. <em>Interpretable Machine Learning: A Guide for Making Black Box Models Explainable</em>. <a href="https://christophm.github.io/interpretable-ml-book" class="external-link uri">https://christophm.github.io/interpretable-ml-book</a>.</li>
 <li>Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy. 2018. <em>A Simple and Effective Model-Based Variable Importance Measure.</em> arXiv preprint. <a href="https://arxiv.org/abs/1805.04755" class="external-link uri">https://arxiv.org/abs/1805.04755</a>.</li>
 </ol>
 </div>
