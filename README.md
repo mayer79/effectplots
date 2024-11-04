@@ -7,12 +7,12 @@
 [![Codecov test coverage](https://codecov.io/gh/mayer79/effectplots/graph/badge.svg)](https://app.codecov.io/gh/mayer79/effectplots)
 <!-- badges: end -->
 
-**{effectplots}** provides high-quality effect plots useful for modeling, see Molnar [1] for a fantastic overview.
+**{effectplots}** provides high-quality effect plots useful for modeling, see the fantastic book of Christoph Molnar [1] for the background.
 
 The main function `marginal()` calculates the following statistics per feature X over values/bins:
 
-- "y_mean": Average observed `y` values. Used to assess descriptive associations between response and features.
-- "pred_mean": Average predictions. Corresponds to "M Plots" (Apley [3]). Shows the combined effect of X and other (correlated) features. The difference to average observed y values shows model bias.
+- "y_mean": Average observed `y` values. Used to assess descriptive associations between response y and features.
+- "pred_mean": Average predictions. Corresponds to "M Plots" (Apley [3]). Shows the combined effect of X and other (correlated) features. The difference to average observed y values measures model bias.
 - "resid_mean": Average residuals. Calculated when both `y` and predictions are available. Useful to study model bias.
 - "pd": Partial dependence (Friedman [2]). How do predictions change with a feature, keeping all other features fixed?
 - "ale": Accumulated local effects (Apley [3]). Alternative to partial dependence.
@@ -25,14 +25,13 @@ Additionally, corresponding counts/weights are calculated, and standard deviatio
 2. Post-process the results with `update()`, e.g., to collapse rare levels of categorical features or to sort the results by a simple variable importance measure.
 3. Plot the results with `plot()`.
 
-**Notes**
+**Some cool things**
 
 - You can switch between {ggplot2}/{patchwork} plots and interactive {plotly} plots.
 - The implementation is optimized for large data using {collapse}.
 - Most models (including DALEX explainers and meta-learners such as Tidymodels) work out-of-the box. If not, a tailored prediction function can be specified.
 - Case weights are supported via the argument `w`.
 - Binning of numeric features is done by the same options as `stats::hist()`. Additionally, outliers are capped (not removed) at +-2 IQR from the quartiles by default.
-- For average observed, average predictions, and average residuals, also corresponding standard deviations are calculated.
 
 ## Installation
 
@@ -119,13 +118,13 @@ marginal(fit, v = xvars, data = X_test, y = test$claim_nb) |>
 
 **Comments**
 
-1. Comparing average predicted with average observed values gives a hint about bias. In this case, the bias on the test data seems to be small. Studying the same plot on the training data would help to assess in-sample bias.
-2. Comparing the shape of partial dependence or ALE with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors "driver_age" and "car_power", the two lines are very similar. This means the marginal effects are mainly due to the feature on the x-axis and not of some other, correlated, feature.
+1. Comparing average predictions with average observed y provides a good picture of model bias. In this case, the bias on the test data seems to be small. Studying the same plot on the training data would help to assess in-sample bias.
+2. Comparing the shape of partial dependence or ALE with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors "driver_age" and "car_power", these lines are very similar. This means the marginal effects are mainly due to the feature on the x axis and not of some other, correlated, feature.
 3. Sorting is done by decreasing weighted variance of the partial dependence values, a measure of main-effect strength closely related (but not 100% identical) to [4].
 
 ### Flexibility
 
-Thanks to the flexibility of the package, you can modify the results as you wish. For instance: what about putting results on training data besides those on test?
+Thanks to the flexibility of the package, you can modify the results as you wish. For instance: what about putting results on training data besides those on test? Or comparing different models or subgroups? 
 
 ```r
 m_train <- marginal(fit, v = xvars, data = X_train, y = train$claim_nb)
@@ -163,13 +162,11 @@ c(m_train, m_test) |>
 
 ![](man/figures/train_test.svg)
 
-The same logic can also be used to compare models and subgroups.
-
 # References
 
 1. Molnar, Christoph. 2019. *Interpretable Machine Learning: A Guide for
 Making Black Box Models Explainable*. <https://christophm.github.io/interpretable-ml-book>.
 2. Friedman, Jerome H. 2001. *Greedy Function Approximation: A Gradient Boosting Machine.* Annals of Statistics 29 (5): 1189–1232. doi:10.1214/aos/1013203451.
-3. Apley, Daniel W., and Jingyu Zhu. 2020. *Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.*
-Journal of the Royal Statistical Society Series B: Statistical Methodology, 82 (4): 1059–1086. doi:10.1111/rssb.12377.
-
+3. Apley, Daniel W., and Jingyu Zhu. 2020. *Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.* Journal of the Royal Statistical Society Series B: Statistical Methodology, 82 (4): 1059–1086. doi:10.1111/rssb.12377.
+4. Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy. 2018.
+*A Simple and Effective Model-Based Variable Importance Measure.* arXiv preprint. <https://arxiv.org/abs/1805.04755>.
