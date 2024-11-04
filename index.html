@@ -72,14 +72,19 @@
 </h1></div>
 <!-- badges: start -->
 
-<p><strong>{effectplots}</strong> provides high-quality effect plots useful for modeling, see the fantastic book of Christoph Molnar [1] for the background.</p>
+<p><strong>{effectplots}</strong> provides high-quality effect plots useful for modeling, see the fantastic book of Christoph Molnar [1] for their statistical background.</p>
 <p>The main function <code><a href="reference/marginal.html">marginal()</a></code> calculates the following statistics per feature X over values/bins:</p>
 <ul>
-<li>“y_mean”: Average observed <code>y</code> values. Used to assess descriptive associations between response y and features.</li>
-<li>“pred_mean”: Average predictions. Corresponds to “M Plots” (Apley [3]). Shows the combined effect of X and other (correlated) features. The difference to average observed y values measures model bias.</li>
-<li>“resid_mean”: Average residuals. Calculated when both <code>y</code> and predictions are available. Useful to study model bias.</li>
-<li>“pd”: Partial dependence (Friedman [2]). How do predictions change with a feature, keeping all other features fixed?</li>
-<li>“ale”: Accumulated local effects (Apley [3]). Alternative to partial dependence.</li>
+<li>
+<strong>Average observed y values</strong>: Used to assess descriptive associations between response y and features.</li>
+<li>
+<strong>Average predictions</strong> (M Plots, Apley [3]): Shows the combined effect of X and other (correlated) features. The difference to average observed y values measures model bias.</li>
+<li>
+<strong>Average residuals:</strong> Calculated when both <code>y</code> and predictions are available. Useful to study model bias.</li>
+<li>
+<strong>Partial dependence</strong> (Friedman [2]): How does the average prediction changes with X, keeping other feature values fixed?</li>
+<li>
+<strong>Accumulated local effects</strong> (Apley [3]): Alternative to partial dependence.</li>
 </ul>
 <p>Additionally, corresponding counts/weights are calculated, and standard deviations of observed y, predictions, and residuals.</p>
 <p><strong>Workflow</strong></p>
