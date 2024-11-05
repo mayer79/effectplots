@@ -144,7 +144,7 @@ c(m_train, m_test) |>
     share_y = "rows",
     ncol = 2,
     byrow = FALSE,
-    statistics = c("y_mean", "pred_mean"),
+    stat = c("y_mean", "pred_mean"),
     subplot_titles = FALSE,
     title = "Left: Train - Right: Test",
   )

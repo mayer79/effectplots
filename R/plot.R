@@ -1,22 +1,21 @@
 #' Plots "marginal" Object
 #'
-#' Versatile plot function for a "marginal" object. Set `plotly = TRUE` for
-#' interactive plots.
-#' By default, a color blind palette from "ggthemes" is used.
+#' Versatile plot function for a "marginal" object. By default, all calculated
+#' statistics (except "resid_mean") are shown. To select certain statistics,
+#' use the `stat` argument. Set `plotly = TRUE` for interactive plots.
 #'
 #' @importFrom ggplot2 .data
 #' @param x An object of class "marginal".
-#' @param statistics Vector of (available) statistics to show. By default
-#'   `c("y_mean", "pred_mean", "pd", "ale")`. E.g., used to hide certain
-#'   statistics, or to show only `"resid_mean"`. Note that the `statistics` argument
-#'   is automatically set to `"resid_mean"` if the result of [bias()] is to be plotted.
-#'   Additionally, it controls the order in which lines are added to the plot.
+#' @param stat Vector of statistics to show. The default `NULL` equals either
+#'   `c("y_mean", "pred_mean", "pd", "ale")`, or `"resid_mean"`
+#'   (when `x` results from [bias()]). Only *available* statistics are shown.
+#'   Additionally, this argument controls the order used to plot the lines.
 #' @param ncol Number of columns of the plot layout, by default
 #'   `grDevices::n2mfrow(length(x))[2L]`. Only relevant for multiple plots.
 #' @param byrow Should plots be placed by row? Default is `TRUE`.
 #'   Only for multiple plots.
-#' @param share_y Should y axis be shared across subplots? The default is "no". Other
-#'   choices are "all", "rows", and "cols".
+#' @param share_y Should y axis be shared across subplots? The default is "no".
+#'   Other choices are "all", "rows", and "cols".
 #'   No effect if `ylim` is passed. Only for multiple plots.
 #' @param ylim A vector of length 2 with manual y axis limits, or a list thereof.
 #' @param cat_lines Show lines for non-numeric features. Default is `TRUE`.
@@ -26,10 +25,10 @@
 #'   Default is `TRUE`. Only for multiple plots.
 #' @param ylab Label of the y axis. The default `NULL` automatically derives
 #'   a reasonable name.
-#' @param legend_labels Vector of legend labels corresponding to `statistics`.
-#'   Either `NULL` or a vector of the same length as `statistics`.
-#' @param colors Vector of line/point colors at least as long as "statistics".
-#'   By default, a color blind friendly palette from "ggthemes" with five values.
+#' @param legend_labels Vector of legend labels in the same order as the
+#'   statistics plotted, or `NULL` (default).
+#' @param colors Vector of line/point colors of sufficient length.
+#'   By default, a color blind friendly palette from "ggthemes".
 #'   To change globally, set `options(effectplots.colors = new colors)`.
 #' @param fill Fill color of bars. The default equals "lightgrey".
 #'   To change globally, set `options(effectplots.fill = new color)`.
@@ -57,11 +56,11 @@
 #' xvars <- colnames(iris)[-1]
 #' M <- marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 #' plot(M, share_y = "all")
-#' plot(M, statistics = c("pd", "ale"), legend_labels = c("PD", "ALE"))
-#' plot(M, statistics = "resid_mean", share_y = "all")
+#' plot(M, stat = c("pd", "ale"), legend_labels = c("PD", "ALE"))
+#' plot(M, stat = "resid_mean", share_y = "all")
 plot.marginal <- function(
     x,
-    statistics = c("y_mean", "pred_mean", "pd", "ale"),
+    stat = NULL,
     ncol = grDevices::n2mfrow(length(x))[2L],
     byrow = TRUE,
     share_y = c("no", "all", "rows", "cols"),
@@ -86,52 +85,39 @@ plot.marginal <- function(
   share_y <- match.arg(share_y)
   bar_measure <- match.arg(bar_measure)
 
-  if (length(.stats(x)) == 1L && .stats(x) == "resid_mean") {
-    statistics <- "resid_mean"
-    message("Setting `statistics = 'resid_mean'`.")
+  # Initialize stat
+  available <- .stats(x)
+  if (!is.null(stat)) {
+    stat <- intersect(stat, available)
+  } else {
+    if (length(available) == 1L && available == "resid_mean") {
+      stat <- "resid_mean"
+    } else {
+      stat <- c("y_mean", "pred_mean", "pd", "ale")
+    }
   }
+  nstat <- length(stat)
 
-  # Info of the form c(legend label = col name, ...). The order does not matter *yet*.
+  stopifnot(
+    nstat >= 1L,
+    length(colors) >= nstat,
+    is.null(legend_labels) || length(legend_labels) == nstat,
+    is.null(ylim) || is.list(ylim) || (is.numeric(ylim) && length(ylim) == 2L),
+    is.null(ylab) || length(ylab) == 1L
+  )
+
+  # Info of the form c(legend label = col name, ...). We filter on "stat", and modify
+  # the names via legend_labels. Then, we don't need 'legend_labels' and 'stat' anymore.
   stat_info <- c(
     obs = "y_mean", pred = "pred_mean", bias = "resid_mean", pd = "pd", ale = "ale"
   )
-
-  stopifnot(
-    length(statistics) >= 1L,
-    statistics %in% stat_info,
-    is.numeric(ncol) && length(ncol) == 1L,
-    is.logical(byrow) && length(byrow) == 1L,
-    is.null(ylim) || is.list(ylim) || (is.numeric(ylim) && length(ylim) == 2L),
-    is.logical(cat_lines) && length(cat_lines) == 1L,
-    is.logical(num_points) && length(num_points) == 1L,
-    is.character(title) && length(title) == 1L,
-    is.logical(subplot_titles) && length(subplot_titles) == 1L,
-    is.null(ylab) || (is.character(ylab) && length(ylab) == 1L),
-    is.null(legend_labels) || length(legend_labels) == length(statistics),
-    is.character(colors) && length(colors) >= length(statistics),
-    is.character(fill) && length(fill) == 1L,
-    is.numeric(alpha) && alpha >= 0 && alpha <= 1,
-    is.numeric(bar_height) && bar_height >= 0 && bar_height <= 1,
-    is.numeric(bar_width) && bar_width >= 0 && bar_width <= 1,
-    is.numeric(wrap_x),
-    is.numeric(rotate_x),
-    is.logical(plotly) && length(plotly) == 1L
-  )
-
-  # The next part looks a bit complicated. We build a vector with statistics like "pd"
-  # (having legend_labels as names), and a corresponding vector of colors.
-  # Afterwards, we don't need legend_labels and statistics anymore.
-  stat_info <- stat_info[match(statistics, stat_info)]  # Use order of `statistics`
+  stat_info <- stat_info[match(stat, stat_info)]  # Use order of stat
   if (!is.null(legend_labels)) {
     names(stat_info) <- legend_labels
   }
-  stat_info <- stat_info[stat_info %in% .stats(x)]  # only *available* stats
-  nstat <- length(stat_info)
-  stopifnot(nstat >= 1L)
   colors <- colors[seq_len(nstat)]
-  # End of complicated part
 
-  # If user manually sets statistics = "ale", we need to drop non-numeric features.
+  # If user manually sets stat = "ale", we need to drop non-numeric features.
   if (nstat == 1L && stat_info == "ale") {
     ok <- .num(x)
     if (!all(ok)) {
@@ -412,6 +398,11 @@ one_ggplot <- function(
     )
   }
 
+  # Add zero line if average residuals are to be shown
+  if ("resid_mean" %in% stat_info) {
+    p <- p + ggplot2::geom_hline(yintercept = 0, linetype = 2, linewidth = 0.8)
+  }
+
   # Add optional points
   if (!num || num_points) {
     p <- p + ggplot2::geom_point(
@@ -572,7 +563,7 @@ one_plotly <- function(
       title = if (show_ylab) ylab else "",
       showticklabels = show_yticks,
       overlaying = overlay,
-      zeroline = FALSE
+      zeroline = ("resid_mean" %in% stat_info)
     ),
     yaxis2 = list(
       side = "right",

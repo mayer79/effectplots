@@ -57,5 +57,5 @@ marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5) |>
 }
 \seealso{
 \code{\link[=marginal]{marginal()}}, \code{\link[=average_observed]{average_observed()}}, \code{\link[=average_predicted]{average_predicted()}},
-\code{\link[=partial_dependence]{partial_dependence()}}, \code{\link[=ale]{ale()}}, , \code{\link[=bias]{bias()}}, \code{\link[=ep_importance]{ep_importance()}}
+\code{\link[=partial_dependence]{partial_dependence()}}, \code{\link[=ale]{ale()}}, \code{\link[=bias]{bias()}}, \code{\link[=ep_importance]{ep_importance()}}
 }
