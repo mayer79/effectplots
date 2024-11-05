@@ -27,7 +27,7 @@ ep_importance <- function(x, by = NULL) {
   stopifnot(inherits(x, "marginal"))
   S <- c("pd", "pred_mean", "y_mean", "resid_mean", "ale")
   if (is.null(by)) {
-    by <- intersect(S, colnames(x[[1L]]))[1L]
+    by <- intersect(S, .stats(x))[1L]
     message("Importance via weighted variance of '", by, "'")
   } else {
     stopifnot(by %in% S)

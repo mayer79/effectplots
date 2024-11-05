@@ -27,6 +27,7 @@
 #' If you need only one specific statistic, you can use the simplified APIs of
 #' - [average_observed()],
 #' - [average_predicted()],
+#' - [bias()],
 #' - [partial_dependence()], and
 #' - [ale()].
 #'
@@ -75,7 +76,7 @@
 #'   A list (of class "marginal") with a data.frame of statistics per feature. Use
 #'   single bracket subsetting to select part of the output.
 #' @seealso [plot.marginal()], [update.marginal()], [partial_dependence()],
-#'   [ale()], [average_observed], [average_predicted()]
+#'   [ale()], [average_observed], [average_predicted()], [bias()]
 #' @references
 #'   1. Molnar, Christoph. 2019. *Interpretable Machine Learning: A Guide for Making Black Box Models Explainable*.
 #'     <https://christophm.github.io/interpretable-ml-book>.

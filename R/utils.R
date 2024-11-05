@@ -6,6 +6,14 @@
   f(x)
 }
 
+.stats <- function(x) {
+  if (inherits(x, "marginal")) {
+    x <- x[[1L]]
+  }
+  statistics <- c("pred_mean", "y_mean", "resid_mean", "pd", "ale")
+  return(intersect(statistics, colnames(x)))
+}
+
 # -> plot()
 
 #' Stack some Columns (from hstats)
@@ -51,8 +59,8 @@ get_ylab <- function(lines) {
   if (length(lines) == 1L) {
     out <- switch(
       lines,
-      y_mean = "Average response",
       pred_mean = "Average prediction",
+      y_mean = "Average response",
       resid_mean = "Bias",
       pd = "Partial Dependence",
       ale = "Accumulated local effects"

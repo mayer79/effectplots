@@ -34,9 +34,9 @@
 
 \item{statistics}{Vector of (available) statistics to show. By default
 \code{c("y_mean", "pred_mean", "pd", "ale")}. E.g., used to hide certain
-statistics, or to show only \code{"resid_mean"}.
-Additionally, it controls the order in which the lines are added to the plot
-(the last one is placed on top).}
+statistics, or to show only \code{"resid_mean"}. Note that the \code{statistics} argument
+is automatically set to \code{"resid_mean"} if the result of \code{\link[=bias]{bias()}} is to be plotted.
+Additionally, it controls the order in which lines are added to the plot.}
 
 \item{ncol}{Number of columns of the plot layout, by default
 \code{grDevices::n2mfrow(length(x))[2L]}. Only relevant for multiple plots.}
@@ -108,8 +108,9 @@ xvars <- colnames(iris)[-1]
 M <- marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 plot(M, share_y = "all")
 plot(M, statistics = c("pd", "ale"), legend_labels = c("PD", "ALE"))
+plot(M, statistics = "resid_mean", share_y = "all")
 }
 \seealso{
 \code{\link[=marginal]{marginal()}}, \code{\link[=average_observed]{average_observed()}}, \code{\link[=average_predicted]{average_predicted()}},
-\code{\link[=partial_dependence]{partial_dependence()}}, \code{\link[=ale]{ale()}}
+\code{\link[=partial_dependence]{partial_dependence()}}, \code{\link[=bias]{bias()}}, \code{\link[=ale]{ale()}}
 }

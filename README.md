@@ -21,7 +21,7 @@ See the fantastic book of Christoph Molnar [3] for their background.
 
 **Workflow**
 
-1. Crunch values via `marginal()` or the convenience wrappers `average_observed()`, `average_predicted()`, `partial_dependence()`, and `ale()`.
+1. Crunch values via `marginal()` or the convenience wrappers `average_observed()`, `average_predicted()`, `bias()`, `partial_dependence()`, and `ale()`.
 2. Post-process the results with `update()`, e.g., to collapse rare levels of categorical features or to sort the results by a simple variable importance measure.
 3. Plot the results with `plot()`.
 

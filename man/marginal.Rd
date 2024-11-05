@@ -162,6 +162,7 @@ If you need only one specific statistic, you can use the simplified APIs of
 \itemize{
 \item \code{\link[=average_observed]{average_observed()}},
 \item \code{\link[=average_predicted]{average_predicted()}},
+\item \code{\link[=bias]{bias()}},
 \item \code{\link[=partial_dependence]{partial_dependence()}}, and
 \item \code{\link[=ale]{ale()}}.
 }
@@ -195,5 +196,5 @@ Journal of the Royal Statistical Society Series B: Statistical Methodology,
 }
 \seealso{
 \code{\link[=plot.marginal]{plot.marginal()}}, \code{\link[=update.marginal]{update.marginal()}}, \code{\link[=partial_dependence]{partial_dependence()}},
-\code{\link[=ale]{ale()}}, \link{average_observed}, \code{\link[=average_predicted]{average_predicted()}}
+\code{\link[=ale]{ale()}}, \link{average_observed}, \code{\link[=average_predicted]{average_predicted()}}, \code{\link[=bias]{bias()}}
 }

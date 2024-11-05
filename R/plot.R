@@ -8,9 +8,9 @@
 #' @param x An object of class "marginal".
 #' @param statistics Vector of (available) statistics to show. By default
 #'   `c("y_mean", "pred_mean", "pd", "ale")`. E.g., used to hide certain
-#'   statistics, or to show only `"resid_mean"`.
-#'   Additionally, it controls the order in which the lines are added to the plot
-#'   (the last one is placed on top).
+#'   statistics, or to show only `"resid_mean"`. Note that the `statistics` argument
+#'   is automatically set to `"resid_mean"` if the result of [bias()] is to be plotted.
+#'   Additionally, it controls the order in which lines are added to the plot.
 #' @param ncol Number of columns of the plot layout, by default
 #'   `grDevices::n2mfrow(length(x))[2L]`. Only relevant for multiple plots.
 #' @param byrow Should plots be placed by row? Default is `TRUE`.
@@ -50,7 +50,7 @@
 #'   If a single plot, an object of class  "ggplot" or "plotly".
 #'   Otherwise, an object of class "patchwork", or a "plotly" subplot.
 #' @seealso [marginal()], [average_observed()], [average_predicted()],
-#'   [partial_dependence()], [ale()]
+#'   [partial_dependence()], [bias()], [ale()]
 #' @export
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)
@@ -58,6 +58,7 @@
 #' M <- marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 #' plot(M, share_y = "all")
 #' plot(M, statistics = c("pd", "ale"), legend_labels = c("PD", "ALE"))
+#' plot(M, statistics = "resid_mean", share_y = "all")
 plot.marginal <- function(
     x,
     statistics = c("y_mean", "pred_mean", "pd", "ale"),
@@ -84,6 +85,11 @@ plot.marginal <- function(
 ) {
   share_y <- match.arg(share_y)
   bar_measure <- match.arg(bar_measure)
+
+  if (length(.stats(x)) == 1L && .stats(x) == "resid_mean") {
+    statistics <- "resid_mean"
+    message("Setting `statistics = 'resid_mean'`.")
+  }
 
   # Info of the form c(legend label = col name, ...). The order does not matter *yet*.
   stat_info <- c(
@@ -119,7 +125,7 @@ plot.marginal <- function(
   if (!is.null(legend_labels)) {
     names(stat_info) <- legend_labels
   }
-  stat_info <- stat_info[stat_info %in% colnames(x[[1L]])]  # only *available* stats
+  stat_info <- stat_info[stat_info %in% .stats(x)]  # only *available* stats
   nstat <- length(stat_info)
   stopifnot(nstat >= 1L)
   colors <- colors[seq_len(nstat)]
