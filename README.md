@@ -9,7 +9,7 @@
 
 **{effectplots}** is a fast R package for calculating and plotting effects of any model.
 
-The main function `marginal()` calculates the following statistics per feature X over values/bins:
+The main function `feature_effects()` calculates the following statistics per feature X over values/bins:
 
 - **Average observed y values**: Used to assess descriptive associations between response y and features.
 - **Average predictions** (M Plots, Apley [1]): Shows the combined effect of X and other (correlated) features. The difference to average observed y values measures model bias.
@@ -21,7 +21,7 @@ See the fantastic book of Christoph Molnar [3] for their background.
 
 **Workflow**
 
-1. Crunch values via `marginal()` or the convenience wrappers `average_observed()`, `average_predicted()`, `bias()`, `partial_dependence()`, and `ale()`.
+1. Crunch values via `feature_effects()` or the convenience wrappers `average_observed()`, `average_predicted()`, `bias()`, `partial_dependence()`, and `ale()`.
 2. Post-process the results with `update()`, e.g., to collapse rare levels of categorical features or to sort the results by a simple variable importance measure.
 3. Plot the results with `plot()`.
 
@@ -111,17 +111,17 @@ After modeling, we use the test (or validation) data to crunch average observed,
 
 ```r
 # 0.3s on laptop
-marginal(fit, v = xvars, data = X_test, y = test$claim_nb) |>
+feature_effects(fit, v = xvars, data = X_test, y = test$claim_nb) |>
   update(sort_by = "pd") |> 
   plot()
 ```
 
-![](man/figures/marginal.svg)
+![](man/figures/feature_effects.svg)
 
 **Comments**
 
 1. Comparing average predictions with average observed y provides a good picture of model bias. In this case, the bias on the test data seems to be small. Studying the same plot on the training data would help to assess in-sample bias.
-2. Comparing the shape of partial dependence or ALE with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors "driver_age" and "car_power", these lines are very similar. This means the marginal effects are mainly due to the feature on the x axis and not of some other, correlated, feature.
+2. Comparing the shape of partial dependence or ALE with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors "driver_age" and "car_power", these lines are very similar. This means the effects are mainly due to the feature on the x axis and not of some other, correlated, feature.
 3. Sorting is done by decreasing weighted variance of the partial dependence values, a measure of main-effect strength closely related (but not 100% identical) to [4].
 
 ### Flexibility
@@ -129,8 +129,8 @@ marginal(fit, v = xvars, data = X_test, y = test$claim_nb) |>
 Thanks to the flexibility of the package, you can modify the results as you wish. For instance: what about putting results on training data besides those on test? Or comparing different models or subgroups? 
 
 ```r
-m_train <- marginal(fit, v = xvars, data = X_train, y = train$claim_nb)
-m_test <- marginal(fit, v = xvars, data = X_test, y = test$claim_nb)
+m_train <- feature_effects(fit, v = xvars, data = X_train, y = train$claim_nb)
+m_test <- feature_effects(fit, v = xvars, data = X_test, y = test$claim_nb)
 
 # Pick top 3 based on train
 m_train <- m_train |> 

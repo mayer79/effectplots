@@ -102,7 +102,7 @@ If there are more observations in a bin, \code{ale_bin_size} indices are
 randomly sampled (uses random seed). The default is 200.}
 }
 \value{
-A list (of class "marginal") with a data.frame of statistics per feature. Use
+A list (of class "EffectData") with a data.frame of statistics per feature. Use
 single bracket subsetting to select part of the output.
 }
 \description{
@@ -125,9 +125,9 @@ This is repeated for all bins, and the values are \emph{accumulated}. Since the 
 sum starts at 0, one typically shifts the result vertically, e.g., to the average
 prediction. This is not done by \code{\link[=ale]{ale()}}, however.
 
-The function is a convenience wrapper around \code{\link[=marginal]{marginal()}}, which calls
+The function is a convenience wrapper around \code{\link[=feature_effects]{feature_effects()}}, which calls
 the barebone implementation \code{\link[=.ale]{.ale()}} to calculate ALE. The ALE values calculated
-by \code{\link[=marginal]{marginal()}} are vertically shifted to the same (weighted) average than the
+by \code{\link[=feature_effects]{feature_effects()}} are vertically shifted to the same (weighted) average than the
 partial dependence curve, for optimal comparability.
 }
 \section{Methods (by class)}{
@@ -153,5 +153,5 @@ Journal of the Royal Statistical Society Series B: Statistical Methodology,
 82 (4): 1059–1086. doi:10.1111/rssb.12377.
 }
 \seealso{
-\code{\link[=marginal]{marginal()}}, \code{\link[=.ale]{.ale()}}
+\code{\link[=feature_effects]{feature_effects()}}, \code{\link[=.ale]{.ale()}}
 }

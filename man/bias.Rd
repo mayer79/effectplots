@@ -46,7 +46,7 @@ to calculate quartiles (uses random seed). Vectorized over \code{v}.}
 \item{...}{Currently unused.}
 }
 \value{
-A list (of class "marginal") with a data.frame of statistics per feature. Use
+A list (of class "EffectData") with a data.frame of statistics per feature. Use
 single bracket subsetting to select part of the output.
 }
 \description{
@@ -54,7 +54,7 @@ Calculates average residuals (= bias) over the values of one or multiple
 \code{X} variables.
 }
 \details{
-The function is a convenience wrapper around \code{\link[=marginal]{marginal()}}.
+The function is a convenience wrapper around \code{\link[=feature_effects]{feature_effects()}}.
 }
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)
@@ -62,5 +62,5 @@ M <- bias(iris[2:5], resid = fit$residuals, breaks = 5)
 M |> update(sort_by = "resid_mean") |> plot(share_y = "all")
 }
 \seealso{
-\code{\link[=marginal]{marginal()}}
+\code{\link[=feature_effects]{feature_effects()}}
 }

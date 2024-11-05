@@ -11,17 +11,17 @@
 #' This is done for different g  to see how the average prediction of f changes in `X`,
 #' keeping all other feature values constant (Ceteris Paribus).
 #'
-#' This function is a convenience wrapper around [marginal()], which calls
+#' This function is a convenience wrapper around [feature_effects()], which calls
 #' the barebone implementation [.pd()] to calculate PD.
 #' As grid points, it uses the arithmetic mean of `X` per bin (specified by `breaks`),
 #' and eventually weighted by `w`.
 #'
-#' @inheritParams marginal
-#' @inherit marginal return
+#' @inheritParams feature_effects
+#' @inherit feature_effects return
 #' @references
 #'   Friedman, Jerome H. 2001, *Greedy Function Approximation: A Gradient Boosting Machine.*
 #'     Annals of Statistics 29 (5): 1189-1232. doi:10.1214/aos/1013203451.
-#' @seealso [marginal()], [.pd()], [ale()].
+#' @seealso [feature_effects()], [.pd()], [ale()].
 #' @export
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)
@@ -51,7 +51,7 @@ partial_dependence.default <- function(
     pd_n = 500L,
     ...
 ) {
-  marginal.default(
+  feature_effects.default(
     object = object,
     v = v,
     data = data,
@@ -154,7 +154,7 @@ partial_dependence.explainer <- function(
 #' @param data Matrix or data.frame.
 #' @param grid Vector or factor of values to calculate partial dependence for.
 #' @param w Optional vector with case weights.
-#' @inheritParams marginal
+#' @inheritParams feature_effects
 #' @returns Vector of partial dependence values in the same order as `grid`.
 #' @export
 #' @seealso [partial_dependence()]

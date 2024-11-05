@@ -4,16 +4,16 @@
 #' `X` variables. This describes the statistical association between `y`
 #' and potential model features.
 #'
-#' The function is a convenience wrapper around [marginal()].
+#' The function is a convenience wrapper around [feature_effects()].
 #'
 #' @param X A vector, matrix, or data.frame with variable(s) to be shown on the x axis.
 #' @param y A numeric vector of observed responses.
 #' @param w An optional numeric vector of weights.
 #' @param x_name If `X` is a vector: what is the name of the variable? By default "x".
-#' @inheritParams marginal
-#' @inherit marginal return
+#' @inheritParams feature_effects
+#' @inherit feature_effects return
 #' @param ... Currently unused.
-#' @seealso [marginal()]
+#' @seealso [feature_effects()]
 #' @export
 #' @examples
 #' M <- average_observed(iris$Species, y = iris$Sepal.Length)
@@ -37,7 +37,7 @@ average_observed <- function(
   if (NCOL(X) == 1L && (is.vector(X) || is.factor(X))) {
     X <- collapse::frename(collapse::qDF(X), x_name)
   }
-  marginal.default(
+  feature_effects.default(
     object = NULL,
     v = colnames(X),
     data = X,

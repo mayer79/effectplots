@@ -19,18 +19,18 @@
 #' sum starts at 0, one typically shifts the result vertically, e.g., to the average
 #' prediction. This is not done by [ale()], however.
 #'
-#' The function is a convenience wrapper around [marginal()], which calls
+#' The function is a convenience wrapper around [feature_effects()], which calls
 #' the barebone implementation [.ale()] to calculate ALE. The ALE values calculated
-#' by [marginal()] are vertically shifted to the same (weighted) average than the
+#' by [feature_effects()] are vertically shifted to the same (weighted) average than the
 #' partial dependence curve, for optimal comparability.
 #'
-#' @inheritParams marginal
-#' @inherit marginal return
+#' @inheritParams feature_effects
+#' @inherit feature_effects return
 #' @references
 #'   Apley, Daniel W., and Jingyu Zhu. 2020. *Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.*
 #'     Journal of the Royal Statistical Society Series B: Statistical Methodology,
 #'     82 (4): 1059–1086. doi:10.1111/rssb.12377.
-#' @seealso [marginal()], [.ale()]
+#' @seealso [feature_effects()], [.ale()]
 #' @export
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)
@@ -60,7 +60,7 @@ ale.default <- function(
     ale_bin_size = 200L,
     ...
 ) {
-  marginal.default(
+  feature_effects.default(
     object = object,
     v = v,
     data = data,
@@ -168,7 +168,7 @@ ale.explainer <- function(
 #' @param w Optional vector with case weights.
 #' @param g For internal use. The result of `factor(findInterval(...))`.
 #'   By default `NULL`.
-#' @inheritParams marginal
+#' @inheritParams feature_effects
 #' @returns Vector of ALE values in the same order as `breaks[-length(breaks)]`.
 #' @export
 #' @seealso [partial_dependence()]

@@ -1,11 +1,11 @@
-#' Plots "marginal" Object
+#' Plots "EffectData" Object
 #'
-#' Versatile plot function for a "marginal" object. By default, all calculated
+#' Versatile plot function for an "EffectData" object. By default, all calculated
 #' statistics (except "resid_mean") are shown. To select certain statistics,
 #' use the `stat` argument. Set `plotly = TRUE` for interactive plots.
 #'
 #' @importFrom ggplot2 .data
-#' @param x An object of class "marginal".
+#' @param x An object of class "EffectData".
 #' @param stat Vector of statistics to show. The default `NULL` equals either
 #'   `c("y_mean", "pred_mean", "pd", "ale")`, or `"resid_mean"`
 #'   (when `x` results from [bias()]). Only *available* statistics are shown.
@@ -48,17 +48,17 @@
 #' @returns
 #'   If a single plot, an object of class  "ggplot" or "plotly".
 #'   Otherwise, an object of class "patchwork", or a "plotly" subplot.
-#' @seealso [marginal()], [average_observed()], [average_predicted()],
+#' @seealso [feature_effects()], [average_observed()], [average_predicted()],
 #'   [partial_dependence()], [bias()], [ale()]
 #' @export
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)
 #' xvars <- colnames(iris)[-1]
-#' M <- marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
+#' M <- feature_effects(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 #' plot(M, share_y = "all")
 #' plot(M, stat = c("pd", "ale"), legend_labels = c("PD", "ALE"))
 #' plot(M, stat = "resid_mean", share_y = "all")
-plot.marginal <- function(
+plot.EffectData <- function(
     x,
     stat = NULL,
     ncol = grDevices::n2mfrow(length(x))[2L],
@@ -85,32 +85,34 @@ plot.marginal <- function(
   share_y <- match.arg(share_y)
   bar_measure <- match.arg(bar_measure)
 
+  # Info of the form c(legend label = col name, ...)
+  stat_info <- c(
+    obs = "y_mean", pred = "pred_mean", bias = "resid_mean", pd = "pd", ale = "ale"
+  )
+
   # Initialize stat
   available <- .stats(x)
-  if (!is.null(stat)) {
-    stat <- intersect(stat, available)
-  } else {
+  if (is.null(stat)) {
     if (length(available) == 1L && available == "resid_mean") {
       stat <- "resid_mean"
     } else {
       stat <- c("y_mean", "pred_mean", "pd", "ale")
     }
   }
+  stat <- intersect(stat, available)
   nstat <- length(stat)
 
   stopifnot(
     nstat >= 1L,
+    stat %in% stat_info,
     length(colors) >= nstat,
     is.null(legend_labels) || length(legend_labels) == nstat,
     is.null(ylim) || is.list(ylim) || (is.numeric(ylim) && length(ylim) == 2L),
     is.null(ylab) || length(ylab) == 1L
   )
 
-  # Info of the form c(legend label = col name, ...). We filter on "stat", and modify
-  # the names via legend_labels. Then, we don't need 'legend_labels' and 'stat' anymore.
-  stat_info <- c(
-    obs = "y_mean", pred = "pred_mean", bias = "resid_mean", pd = "pd", ale = "ale"
-  )
+  # We filter on "stat", and modify the names via legend_labels. Then, we don't
+  # need 'legend_labels' and 'stat' anymore.
   stat_info <- stat_info[match(stat, stat_info)]  # Use order of stat
   if (!is.null(legend_labels)) {
     names(stat_info) <- legend_labels
@@ -200,7 +202,7 @@ plot.marginal <- function(
     ncol <- ceiling(nplots / nrow)
   }
 
-  # Can be useful if "marginal" objects of different models/datasets are c() together
+  # Can be useful if "EffectData" objects of different models/datasets are c() together
   # For patchwork, we could also use its plot_layout(byrow = FALSE) argument.
   if (!byrow) {
     # alternating indices, e.g., 1, 4, 2, 5, 3 with ncol = 2 and nplots 0 5
@@ -400,7 +402,7 @@ one_ggplot <- function(
 
   # Add zero line if average residuals are to be shown
   if ("resid_mean" %in% stat_info) {
-    p <- p + ggplot2::geom_hline(yintercept = 0, linetype = 2, linewidth = 0.8)
+    p <- p + ggplot2::geom_hline(yintercept = 0, linetype = 2, linewidth = 0.6)
   }
 
   # Add optional points

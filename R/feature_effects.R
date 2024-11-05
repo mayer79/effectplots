@@ -1,14 +1,13 @@
-#' Marginal Statistics
+#' Feature Effects
 #'
 #' @description
 #' This is the main function of the package. By default, it calculates
 #' the following statistics per feature X over values/bins:
 #' - "y_mean": Average observed `y` values. Used to assess descriptive associations
 #'   between response and features.
-#' - "pred_mean": Average predictions. Corresponds
-#'   to "M Plots" (from  "marginal") in Apley (2020). Shows the combined effect of
-#'   X and other (correlated) features. The difference to average observed y values
-#'   shows model bias.
+#' - "pred_mean": Average predictions. Corresponds to "M Plots" (from  "marginal")
+#'   in Apley (2020). Shows the combined effect of X and other (correlated) features.
+#'   The difference to average observed y values shows model bias.
 #' - "resid_mean": Average residuals. Calculated when
 #'   both `y` and predictions are available. Useful to study model bias.
 #' - "pd": Partial dependence (Friedman, 2001): See [partial_dependence()].
@@ -37,7 +36,7 @@
 #' @param y Numeric vector with observed values of the response.
 #'   Can also be a column name in `data`. Omitted if `NULL` (default).
 #' @param pred Numeric vector with predictions. If `NULL`, it is calculated as
-#'   `pred_fun(object, data, ...)`. Used to save time if `marginal()` is to be
+#'   `pred_fun(object, data, ...)`. Used to save time if `d()` is to be
 #'   called multiple times.
 #' @param pred_fun Prediction function, by default `stats::predict`.
 #'   The function takes three arguments (names irrelevant): `object`, `data`, and `...`.
@@ -73,9 +72,9 @@
 #' @param ... Further arguments passed to `pred_fun()`, e.g., `type = "response"` in
 #'   a `glm()` or (typically) `prob = TRUE` in classification models.
 #' @returns
-#'   A list (of class "marginal") with a data.frame of statistics per feature. Use
+#'   A list (of class "EffectData") with a data.frame of statistics per feature. Use
 #'   single bracket subsetting to select part of the output.
-#' @seealso [plot.marginal()], [update.marginal()], [partial_dependence()],
+#' @seealso [plot.EffectData()], [update.EffectData()], [partial_dependence()],
 #'   [ale()], [average_observed], [average_predicted()], [bias()]
 #' @references
 #'   1. Molnar, Christoph. 2019. *Interpretable Machine Learning: A Guide for Making Black Box Models Explainable*.
@@ -89,16 +88,16 @@
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)
 #' xvars <- colnames(iris)[-1]
-#' M <- marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
+#' M <- feature_effects(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 #' M
 #' M |> update(sort = "pd") |> plot(share_y = "all")
-marginal <- function(object, ...) {
-  UseMethod("marginal")
+feature_effects <- function(object, ...) {
+  UseMethod("feature_effects")
 }
 
-#' @describeIn marginal Default method.
+#' @describeIn feature_effects Default method.
 #' @export
-marginal.default <- function(
+feature_effects.default <- function(
     object,
     v,
     data,
@@ -257,12 +256,12 @@ marginal.default <- function(
     )
     out <- out[ok]
   }
-  structure(out, class = "marginal")
+  structure(out, class = "EffectData")
 }
 
-#' @describeIn marginal Method for "ranger" models.
+#' @describeIn feature_effects Method for "ranger" models.
 #' @export
-marginal.ranger <- function(
+feature_effects.ranger <- function(
     object,
     v,
     data,
@@ -286,7 +285,7 @@ marginal.ranger <- function(
       stats::predict(model, newdata, ...)$predictions
     }
   }
-  marginal.default(
+  feature_effects.default(
     object,
     v = v,
     data = data,
@@ -307,9 +306,9 @@ marginal.ranger <- function(
   )
 }
 
-#' @describeIn marginal Method for DALEX "explainer".
+#' @describeIn feature_effects Method for DALEX "explainer".
 #' @export
-marginal.explainer <- function(
+feature_effects.explainer <- function(
   object,
   v,
   data = object[["data"]],
@@ -328,7 +327,7 @@ marginal.explainer <- function(
   ale_bin_size = 200L,
   ...
 ) {
-  marginal.default(
+  feature_effects.default(
     object,
     v = v,
     data = data,

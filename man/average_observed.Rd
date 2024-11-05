@@ -46,7 +46,7 @@ to calculate quartiles (uses random seed). Vectorized over \code{v}.}
 \item{...}{Currently unused.}
 }
 \value{
-A list (of class "marginal") with a data.frame of statistics per feature. Use
+A list (of class "EffectData") with a data.frame of statistics per feature. Use
 single bracket subsetting to select part of the output.
 }
 \description{
@@ -55,7 +55,7 @@ Calculates average observed \code{y} values over the values of one or multiple
 and potential model features.
 }
 \details{
-The function is a convenience wrapper around \code{\link[=marginal]{marginal()}}.
+The function is a convenience wrapper around \code{\link[=feature_effects]{feature_effects()}}.
 }
 \examples{
 M <- average_observed(iris$Species, y = iris$Sepal.Length)
@@ -67,5 +67,5 @@ average_observed(iris[2:5], y = iris[, 1], breaks = 5) |>
   plot()
 }
 \seealso{
-\code{\link[=marginal]{marginal()}}
+\code{\link[=feature_effects]{feature_effects()}}
 }

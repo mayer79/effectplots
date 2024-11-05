@@ -103,7 +103,7 @@ The default is 500. For larger \code{data} (and \code{w}), \code{pd_n} rows are 
 Set to 0 to omit.}
 }
 \value{
-A list (of class "marginal") with a data.frame of statistics per feature. Use
+A list (of class "EffectData") with a data.frame of statistics per feature. Use
 single bracket subsetting to select part of the output.
 }
 \description{
@@ -116,7 +116,7 @@ and then calculating the average prediction of f over this modified data.
 This is done for different g  to see how the average prediction of f changes in \code{X},
 keeping all other feature values constant (Ceteris Paribus).
 
-This function is a convenience wrapper around \code{\link[=marginal]{marginal()}}, which calls
+This function is a convenience wrapper around \code{\link[=feature_effects]{feature_effects()}}, which calls
 the barebone implementation \code{\link[=.pd]{.pd()}} to calculate PD.
 As grid points, it uses the arithmetic mean of \code{X} per bin (specified by \code{breaks}),
 and eventually weighted by \code{w}.
@@ -143,5 +143,5 @@ Friedman, Jerome H. 2001, \emph{Greedy Function Approximation: A Gradient Boosti
 Annals of Statistics 29 (5): 1189-1232. doi:10.1214/aos/1013203451.
 }
 \seealso{
-\code{\link[=marginal]{marginal()}}, \code{\link[=.pd]{.pd()}}, \code{\link[=ale]{ale()}}.
+\code{\link[=feature_effects]{feature_effects()}}, \code{\link[=.pd]{.pd()}}, \code{\link[=ale]{ale()}}.
 }

@@ -1,13 +1,13 @@
 .num <- function(x) {
   f <- function(z) is.numeric(z$bin_mean)
-  if (inherits(x, "marginal")) {
+  if (inherits(x, "EffectData")) {
     return(vapply(x, FUN = f, FUN.VALUE = logical(1L), USE.NAMES = FALSE))
   }
   f(x)
 }
 
 .stats <- function(x) {
-  if (inherits(x, "marginal")) {
+  if (inherits(x, "EffectData")) {
     x <- x[[1L]]
   }
   statistics <- c("pred_mean", "y_mean", "resid_mean", "pd", "ale")

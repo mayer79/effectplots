@@ -1,8 +1,8 @@
-#' Update Marginal Object
+#' Update "EffectData" Object
 #'
 #' @description
-#' Updates a "marginal" object by
-#' - sorting the variables by their importance, see [ep_importance()],
+#' Updates an "EffectData" object by
+#' - sorting the variables by their importance, see [effect_importance()],
 #' - collapsing levels of categorical variables with many levels,
 #' - dropping small bins, or
 #' - dropping bins with missing name.
@@ -10,7 +10,7 @@
 #' Except for `sort_by`, all arguments are vectorized, i.e., you can
 #' pass a vector or list of the same length as `object`.
 #'
-#' @param object Object of class "marginal".
+#' @param object Object of class "EffectData".
 #' @param sort_by By which statistic ("pd", "pred_mean", "y_mean", "resid_mean", "ale")
 #'   should the results be sorted? The default is "no" (no sorting). Calculated
 #'   after all other update steps, e.g., after collapsing or dropping rare levels.
@@ -25,16 +25,16 @@
 #' collapsing.
 #' @param na.rm Should missing bin centers be dropped? Default is `FALSE`.
 #' @seealso
-#'   [marginal()], [average_observed()], [average_predicted()],
-#'   [partial_dependence()], [ale()], [bias()], [ep_importance()]
+#'   [feature_effects()], [average_observed()], [average_predicted()],
+#'   [partial_dependence()], [ale()], [bias()], [effect_importance()]
 #' @export
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)
 #' xvars <- colnames(iris)[-1]
-#' marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5) |>
+#' feature_effects(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5) |>
 #'   update(sort = "pd", collapse_m = 2) |>
 #'   plot()
-update.marginal <- function(
+update.EffectData <- function(
   object,
   sort_by = c("no", "pd", "pred_mean", "y_mean", "resid_mean", "ale"),
   collapse_m = 30L,
@@ -57,9 +57,9 @@ update.marginal <- function(
     na.rm = na.rm,
     SIMPLIFY = FALSE
   )
-  class(out) <- "marginal"
+  class(out) <- "EffectData"
 
-  if (sort_by == "no") out else  out[order(-ep_importance(out, by = sort_by))]
+  if (sort_by == "no") out else  out[order(-effect_importance(out, by = sort_by))]
 }
 
 # Helper functions

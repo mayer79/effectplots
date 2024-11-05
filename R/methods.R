@@ -1,7 +1,7 @@
 #' @export
-print.marginal <- function(x, ...) {
+print.EffectData <- function(x, ...) {
   cat(
-    "'marginal' object of length ",
+    "'EffectData' object of length ",
     length(x),
     if (length(x) > 1) paste0(", starting with '", names(x)[1L], "'") else "",
     ": \n\n",
@@ -12,16 +12,16 @@ print.marginal <- function(x, ...) {
 }
 
 #' @export
-`[.marginal` <- function(x, ...) {
-  structure(NextMethod(), class = "marginal")
+`[.EffectData` <- function(x, ...) {
+  structure(NextMethod(), class = "EffectData")
 }
 
 #' @export
-`c.marginal` <- function(x, ...) {
-  structure(NextMethod(), class = "marginal")
+`c.EffectData` <- function(x, ...) {
+  structure(NextMethod(), class = "EffectData")
 }
 
 #' @export
-`+.marginal` <- function(e1, e2) {
+`+.EffectData` <- function(e1, e2) {
   c(e1, e2)
 }

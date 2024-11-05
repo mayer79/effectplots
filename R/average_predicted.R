@@ -4,16 +4,16 @@
 #' `X` variables. Shows the combined effect of a feature and other (correlated)
 #' features.
 #'
-#' The function is a convenience wrapper around [marginal()].
+#' The function is a convenience wrapper around [feature_effects()].
 #'
 #' @param X A vector, matrix, or data.frame with variable(s) to be shown on the x axis.
 #' @param pred A numeric vector of predictions.
 #' @param w An optional numeric vector of weights.
 #' @param x_name If `X` is a vector: what is the name of the variable? By default "x".
-#' @inheritParams marginal
-#' @inherit marginal return
+#' @inheritParams feature_effects
+#' @inherit feature_effects return
 #' @param ... Currently unused.
-#' @seealso [marginal()]
+#' @seealso [feature_effects()]
 #' @references
 #'   Apley, Daniel W., and Jingyu Zhu. 2016. *Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.*
 #'     Journal of the Royal Statistical Society Series B: Statistical Methodology,
@@ -38,7 +38,7 @@ average_predicted <- function(
   if (NCOL(X) == 1L && (is.vector(X) || is.factor(X))) {
     X <- collapse::frename(collapse::qDF(X), x_name)
   }
-  marginal.default(
+  feature_effects.default(
     object = NULL,
     v = colnames(X),
     data = X,

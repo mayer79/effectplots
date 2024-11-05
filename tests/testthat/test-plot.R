@@ -1,6 +1,6 @@
 fit <- lm(Sepal.Length ~ ., data = iris)
 xvars <- colnames(iris)[-1]
-M <- marginal(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
+M <- feature_effects(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 
 test_that("plot() returns correct class", {
   expect_s3_class(plot(M), "patchwork")

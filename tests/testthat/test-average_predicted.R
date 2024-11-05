@@ -1,9 +1,9 @@
 fit <- lm(Sepal.Length ~ ., data = iris)
 v <- c("Sepal.Width", "Species")
 
-test_that("average_predicted() is consistent with marginal()", {
+test_that("average_predicted() is consistent with feature_effects()", {
   avg_pred <- average_predicted(iris[v], pred = predict(fit, iris))
-  marg <- marginal(fit, v = v, data = iris, pd_n = 0, ale_bin_size = 0)
+  marg <- feature_effects(fit, v = v, data = iris, pd_n = 0, ale_bin_size = 0)
   expect_equal(avg_pred, marg)
 })
 

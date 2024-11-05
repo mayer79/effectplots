@@ -46,7 +46,7 @@ to calculate quartiles (uses random seed). Vectorized over \code{v}.}
 \item{...}{Currently unused.}
 }
 \value{
-A list (of class "marginal") with a data.frame of statistics per feature. Use
+A list (of class "EffectData") with a data.frame of statistics per feature. Use
 single bracket subsetting to select part of the output.
 }
 \description{
@@ -55,7 +55,7 @@ Calculates average predictions over the values of one or multiple
 features.
 }
 \details{
-The function is a convenience wrapper around \code{\link[=marginal]{marginal()}}.
+The function is a convenience wrapper around \code{\link[=feature_effects]{feature_effects()}}.
 }
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)
@@ -69,5 +69,5 @@ Journal of the Royal Statistical Society Series B: Statistical Methodology,
 82 (4): 1059–1086. doi:10.1111/rssb.12377.
 }
 \seealso{
-\code{\link[=marginal]{marginal()}}
+\code{\link[=feature_effects]{feature_effects()}}
 }

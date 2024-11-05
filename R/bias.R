@@ -3,16 +3,16 @@
 #' Calculates average residuals (= bias) over the values of one or multiple
 #' `X` variables.
 #'
-#' The function is a convenience wrapper around [marginal()].
+#' The function is a convenience wrapper around [feature_effects()].
 #'
 #' @param X A vector, matrix, or data.frame with variable(s) to be shown on the x axis.
 #' @param resid A numeric vector of residuals, i.e., y - pred.
 #' @param w An optional numeric vector of weights.
 #' @param x_name If `X` is a vector: what is the name of the variable? By default "x".
-#' @inheritParams marginal
-#' @inherit marginal return
+#' @inheritParams feature_effects
+#' @inherit feature_effects return
 #' @param ... Currently unused.
-#' @seealso [marginal()]
+#' @seealso [feature_effects()]
 #' @export
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)
@@ -34,7 +34,7 @@ bias <- function(
   }
 
   # We treat "resid" as "y" and then change y_mean/sd to resid_mean/sd
-  out <- marginal.default(
+  out <- feature_effects.default(
     object = NULL,
     v = colnames(X),
     data = X,
