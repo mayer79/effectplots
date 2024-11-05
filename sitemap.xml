@@ -10,11 +10,11 @@
 <url><loc>/reference/bias.html</loc></url>
 <url><loc>/reference/dot-ale.html</loc></url>
 <url><loc>/reference/dot-pd.html</loc></url>
-<url><loc>/reference/ep_importance.html</loc></url>
+<url><loc>/reference/effect_importance.html</loc></url>
+<url><loc>/reference/feature_effects.html</loc></url>
 <url><loc>/reference/index.html</loc></url>
-<url><loc>/reference/marginal.html</loc></url>
 <url><loc>/reference/partial_dependence.html</loc></url>
-<url><loc>/reference/plot.marginal.html</loc></url>
-<url><loc>/reference/update.marginal.html</loc></url>
+<url><loc>/reference/plot.EffectData.html</loc></url>
+<url><loc>/reference/update.EffectData.html</loc></url>
 </urlset>
 

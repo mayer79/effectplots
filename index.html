@@ -73,7 +73,7 @@
 <!-- badges: start -->
 
 <p><strong>{effectplots}</strong> is a fast R package for calculating and plotting effects of any model.</p>
-<p>The main function <code><a href="reference/marginal.html">marginal()</a></code> calculates the following statistics per feature X over values/bins:</p>
+<p>The main function <code><a href="reference/feature_effects.html">feature_effects()</a></code> calculates the following statistics per feature X over values/bins:</p>
 <ul>
 <li>
 <strong>Average observed y values</strong>: Used to assess descriptive associations between response y and features.</li>
@@ -89,7 +89,7 @@
 <p>See the fantastic book of Christoph Molnar [3] for their background.</p>
 <p><strong>Workflow</strong></p>
 <ol style="list-style-type: decimal">
-<li>Crunch values via <code><a href="reference/marginal.html">marginal()</a></code> or the convenience wrappers <code><a href="reference/average_observed.html">average_observed()</a></code>, <code><a href="reference/average_predicted.html">average_predicted()</a></code>, <code><a href="reference/bias.html">bias()</a></code>, <code><a href="reference/partial_dependence.html">partial_dependence()</a></code>, and <code><a href="reference/ale.html">ale()</a></code>.</li>
+<li>Crunch values via <code><a href="reference/feature_effects.html">feature_effects()</a></code> or the convenience wrappers <code><a href="reference/average_observed.html">average_observed()</a></code>, <code><a href="reference/average_predicted.html">average_predicted()</a></code>, <code><a href="reference/bias.html">bias()</a></code>, <code><a href="reference/partial_dependence.html">partial_dependence()</a></code>, and <code><a href="reference/ale.html">ale()</a></code>.</li>
 <li>Post-process the results with <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>, e.g., to collapse rare levels of categorical features or to sort the results by a simple variable importance measure.</li>
 <li>Plot the results with <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>.</li>
 </ol>
@@ -171,14 +171,14 @@
 <p>After modeling, we use the test (or validation) data to crunch average observed, average predicted, partial dependence, and accumulated local effects per feature values/bins to gain insights about the model. Calculations are lightning fast.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 0.3s on laptop</span></span>
-<span><span class="fu"><a href="reference/marginal.html">marginal</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">X_test</span>, y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">claim_nb</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span><span class="fu"><a href="reference/feature_effects.html">feature_effects</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">X_test</span>, y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">claim_nb</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span>sort_by <span class="op">=</span> <span class="st">"pd"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
-<p><img src="reference/figures/marginal.svg"></p>
+<p><img src="reference/figures/feature_effects.svg"></p>
 <p><strong>Comments</strong></p>
 <ol style="list-style-type: decimal">
 <li>Comparing average predictions with average observed y provides a good picture of model bias. In this case, the bias on the test data seems to be small. Studying the same plot on the training data would help to assess in-sample bias.</li>
-<li>Comparing the shape of partial dependence or ALE with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors “driver_age” and “car_power”, these lines are very similar. This means the marginal effects are mainly due to the feature on the x axis and not of some other, correlated, feature.</li>
+<li>Comparing the shape of partial dependence or ALE with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors “driver_age” and “car_power”, these lines are very similar. This means the effects are mainly due to the feature on the x axis and not of some other, correlated, feature.</li>
 <li>Sorting is done by decreasing weighted variance of the partial dependence values, a measure of main-effect strength closely related (but not 100% identical) to [4].</li>
 </ol>
 </div>
@@ -187,8 +187,8 @@
 </h3>
 <p>Thanks to the flexibility of the package, you can modify the results as you wish. For instance: what about putting results on training data besides those on test? Or comparing different models or subgroups?</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="va">m_train</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/marginal.html">marginal</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">X_train</span>, y <span class="op">=</span> <span class="va">train</span><span class="op">$</span><span class="va">claim_nb</span><span class="op">)</span></span>
-<span><span class="va">m_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/marginal.html">marginal</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">X_test</span>, y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">claim_nb</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">m_train</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/feature_effects.html">feature_effects</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">X_train</span>, y <span class="op">=</span> <span class="va">train</span><span class="op">$</span><span class="va">claim_nb</span><span class="op">)</span></span>
+<span><span class="va">m_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/feature_effects.html">feature_effects</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">X_test</span>, y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">claim_nb</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># Pick top 3 based on train</span></span>
 <span><span class="va">m_train</span> <span class="op">&lt;-</span> <span class="va">m_train</span> <span class="op">|&gt;</span> </span>

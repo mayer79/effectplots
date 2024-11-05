@@ -6,7 +6,7 @@ is derived by replacing the X values in a reference data by g,
 and then calculating the average prediction of f over this modified data.
 This is done for different g  to see how the average prediction of f changes in X,
 keeping all other feature values constant (Ceteris Paribus).
-This function is a convenience wrapper around marginal(), which calls
+This function is a convenience wrapper around feature_effects(), which calls
 the barebone implementation .pd() to calculate PD.
 As grid points, it uses the arithmetic mean of X per bin (specified by breaks),
 and eventually weighted by w."><meta property="og:image" content="/logo.png"><!-- mathjax --><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/MathJax.js" integrity="sha256-nvJJv9wWKEm88qvoQl9ekL2J+k/RWIsaSScxxlsrv8k=" crossorigin="anonymous"></script><script src="https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.5/config/TeX-AMS-MML_HTMLorMML.js" integrity="sha256-84DKXVJXs0/F8OTMzX4UR909+jtl4G7SPypPavF+GfA=" crossorigin="anonymous"></script><!--[if lt IE 9]>
@@ -66,7 +66,7 @@ is derived by replacing the <code>X</code> values in a reference <code>data</cod
 and then calculating the average prediction of f over this modified data.
 This is done for different g  to see how the average prediction of f changes in <code>X</code>,
 keeping all other feature values constant (Ceteris Paribus).</p>
-<p>This function is a convenience wrapper around <code><a href="marginal.html">marginal()</a></code>, which calls
+<p>This function is a convenience wrapper around <code><a href="feature_effects.html">feature_effects()</a></code>, which calls
 the barebone implementation <code><a href="dot-pd.html">.pd()</a></code> to calculate PD.
 As grid points, it uses the arithmetic mean of <code>X</code> per bin (specified by <code>breaks</code>),
 and eventually weighted by <code>w</code>.</p>
@@ -203,7 +203,7 @@ Set to 0 to omit.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A list (of class "marginal") with a data.frame of statistics per feature. Use
+    <p>A list (of class "EffectData") with a data.frame of statistics per feature. Use
 single bracket subsetting to select part of the output.</p>
     </div>
     <div id="methods-by-class-">
@@ -220,7 +220,7 @@ Annals of Statistics 29 (5): 1189-1232. doi:10.1214/aos/1013203451.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p><code><a href="marginal.html">marginal()</a></code>, <code><a href="dot-pd.html">.pd()</a></code>, <code><a href="ale.html">ale()</a></code>.</p></div>
+    <div class="dont-index"><p><code><a href="feature_effects.html">feature_effects()</a></code>, <code><a href="dot-pd.html">.pd()</a></code>, <code><a href="ale.html">ale()</a></code>.</p></div>
     </div>
 
     <div id="ref-examples">
@@ -228,11 +228,11 @@ Annals of Statistics 29 (5): 1189-1232. doi:10.1214/aos/1013203451.</p>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">Sepal.Length</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">M</span> <span class="op">&lt;-</span> <span class="fu">partial_dependence</span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="st">"Species"</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">M</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in `[.data.frame`(data, , z):</span> undefined columns selected</span>
+<span class="r-plt img"><img src="partial_dependence-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="va">M2</span> <span class="op">&lt;-</span> <span class="fu">partial_dependence</span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/colnames.html" class="external-link">colnames</a></span><span class="op">(</span><span class="va">iris</span><span class="op">)</span><span class="op">[</span><span class="op">-</span><span class="fl">1</span><span class="op">]</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">M2</span>, share_y <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in `[.data.frame`(z, stat_info):</span> undefined columns selected</span>
+<span class="r-plt img"><img src="partial_dependence-2.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </div>

@@ -122,35 +122,35 @@ to calculate quartiles (uses random seed). Vectorized over <code>v</code>.</p></
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A list (of class "marginal") with a data.frame of statistics per feature. Use
+    <p>A list (of class "EffectData") with a data.frame of statistics per feature. Use
 single bracket subsetting to select part of the output.</p>
     </div>
     <div id="details">
     <h2>Details</h2>
-    <p>The function is a convenience wrapper around <code><a href="marginal.html">marginal()</a></code>.</p>
+    <p>The function is a convenience wrapper around <code><a href="feature_effects.html">feature_effects()</a></code>.</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
-    <div class="dont-index"><p><code><a href="marginal.html">marginal()</a></code></p></div>
+    <div class="dont-index"><p><code><a href="feature_effects.html">feature_effects()</a></code></p></div>
     </div>
 
     <div id="ref-examples">
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">M</span> <span class="op">&lt;-</span> <span class="fu">average_observed</span><span class="op">(</span><span class="va">iris</span><span class="op">$</span><span class="va">Species</span>, y <span class="op">=</span> <span class="va">iris</span><span class="op">$</span><span class="va">Sepal.Length</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">M</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 'marginal' object of length 1: </span>
+<span class="r-out co"><span class="r-pr">#&gt;</span> 'EffectData' object of length 1: </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> </span>
 <span class="r-out co"><span class="r-pr">#&gt;</span>      bin_mid bin_width   bin_mean  N weight y_mean      y_sd</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 1     setosa       0.7     setosa 50     50  5.006 0.3524897</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 2 versicolor       0.7 versicolor 50     50  5.936 0.5161711</span>
 <span class="r-out co"><span class="r-pr">#&gt;</span> 3  virginica       0.7  virginica 50     50  6.588 0.6358796</span>
 <span class="r-in"><span><span class="va">M</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in `[.data.frame`(data, , z):</span> undefined columns selected</span>
+<span class="r-plt img"><img src="average_observed-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span></span></span>
 <span class="r-in"><span><span class="co"># Or multiple potential features X</span></span></span>
 <span class="r-in"><span><span class="fu">average_observed</span><span class="op">(</span><span class="va">iris</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span>, y <span class="op">=</span> <span class="va">iris</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span>, breaks <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">|&gt;</span></span></span>
 <span class="r-in"><span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in `[.data.frame`(data, , z):</span> undefined columns selected</span>
+<span class="r-plt img"><img src="average_observed-2.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </div>
