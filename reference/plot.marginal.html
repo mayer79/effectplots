@@ -95,9 +95,9 @@ By default, a color blind palette from "ggthemes" is used.</p>
 <dt id="arg-statistics">statistics<a class="anchor" aria-label="anchor" href="#arg-statistics"></a></dt>
 <dd><p>Vector of (available) statistics to show. By default
 <code>c("y_mean", "pred_mean", "pd", "ale")</code>. E.g., used to hide certain
-statistics, or to show only <code>"resid_mean"</code>.
-Additionally, it controls the order in which the lines are added to the plot
-(the last one is placed on top).</p></dd>
+statistics, or to show only <code>"resid_mean"</code>. Note that the <code>statistics</code> argument
+is automatically set to <code>"resid_mean"</code> if the result of <code><a href="bias.html">bias()</a></code> is to be plotted.
+Additionally, it controls the order in which lines are added to the plot.</p></dd>
 
 
 <dt id="arg-ncol">ncol<a class="anchor" aria-label="anchor" href="#arg-ncol"></a></dt>
@@ -203,7 +203,7 @@ Otherwise, an object of class "patchwork", or a "plotly" subplot.</p>
     <div id="see-also">
     <h2>See also</h2>
     <div class="dont-index"><p><code><a href="marginal.html">marginal()</a></code>, <code><a href="average_observed.html">average_observed()</a></code>, <code><a href="average_predicted.html">average_predicted()</a></code>,
-<code><a href="partial_dependence.html">partial_dependence()</a></code>, <code><a href="ale.html">ale()</a></code></p></div>
+<code><a href="partial_dependence.html">partial_dependence()</a></code>, <code><a href="bias.html">bias()</a></code>, <code><a href="ale.html">ale()</a></code></p></div>
     </div>
 
     <div id="ref-examples">
@@ -215,6 +215,8 @@ Otherwise, an object of class "patchwork", or a "plotly" subplot.</p>
 <span class="r-plt img"><img src="plot.marginal-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">M</span>, statistics <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pd"</span>, <span class="st">"ale"</span><span class="op">)</span>, legend_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PD"</span>, <span class="st">"ALE"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot.marginal-2.png" alt="" width="700" height="433"></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">M</span>, statistics <span class="op">=</span> <span class="st">"resid_mean"</span>, share_y <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span></span>
+<span class="r-plt img"><img src="plot.marginal-3.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
   </div>
