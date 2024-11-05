@@ -53,7 +53,6 @@ use_readme_md()
 # If you want to add unit tests
 use_testthat()
 
-
 # On top of NEWS.md, describe changes made to the package
 use_news_md()
 

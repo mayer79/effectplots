@@ -220,7 +220,7 @@ plot.marginal <- function(
   col_i <- (J - 1L) %% ncol + 1L
   row_i <- rep(seq_len(nrow), each = ncol)[J]
 
-  # plotly only: Manually reduce horizontal margin and hide right ticks for equal scale
+  # Should we hide right ticks (when scale is identical)
   hide_some_yticks <- share_y %in% c("all", "rows") || !is.null(ylim)
 
   # Shared y is solved via ylim + padding
@@ -268,7 +268,13 @@ plot.marginal <- function(
       SIMPLIFY = FALSE
     )
     p <- patchwork::wrap_plots(plot_list) +
-      patchwork::plot_layout(ncol = ncol, guides = "collect", axes = "collect", ...)
+      patchwork::plot_layout(
+        ncol = ncol,
+        guides = "collect",
+        axis_titles  = "collect",
+        axes = if (hide_some_yticks) "collect" else "collect_x",
+        ...
+      )
     if (title != "") {
       p <- p + patchwork::plot_annotation(
         title = title,

@@ -148,18 +148,6 @@ c(m_train, m_test) |>
     subplot_titles = FALSE,
     title = "Left: Train - Right: Test",
   )
-  
-# Or via Plotly
-c(m_train, m_test) |> 
-  plot(
-    share_y = "rows",
-    ncol = 2,
-    byrow = FALSE,
-    statistics = c("y_mean", "pred_mean"),
-    subplot_titles = FALSE,
-    title = "Left: Train - Right: Test",
-    plotly = TRUE
-  )
 ```
 
 ![](man/figures/train_test.svg)
