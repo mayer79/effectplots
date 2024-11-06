@@ -120,6 +120,7 @@ at +-2 IQR from the quartiles.</p>
 <span>  outlier_iqr <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  calc_pred <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  pd_n <span class="op">=</span> <span class="fl">500L</span>,</span>
+<span>  ale_n <span class="op">=</span> <span class="fl">50000L</span>,</span>
 <span>  ale_bin_size <span class="op">=</span> <span class="fl">200L</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
@@ -141,6 +142,7 @@ at +-2 IQR from the quartiles.</p>
 <span>  outlier_iqr <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  calc_pred <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  pd_n <span class="op">=</span> <span class="fl">500L</span>,</span>
+<span>  ale_n <span class="op">=</span> <span class="fl">50000L</span>,</span>
 <span>  ale_bin_size <span class="op">=</span> <span class="fl">200L</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
@@ -162,6 +164,7 @@ at +-2 IQR from the quartiles.</p>
 <span>  outlier_iqr <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  calc_pred <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  pd_n <span class="op">=</span> <span class="fl">500L</span>,</span>
+<span>  ale_n <span class="op">=</span> <span class="fl">50000L</span>,</span>
 <span>  ale_bin_size <span class="op">=</span> <span class="fl">200L</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
@@ -257,10 +260,18 @@ The default is 500. For larger <code>data</code> (and <code>w</code>), <code>pd_
 Set to 0 to omit.</p></dd>
 
 
+<dt id="arg-ale-n">ale_n<a class="anchor" aria-label="anchor" href="#arg-ale-n"></a></dt>
+<dd><p>Size of the data used for calculating ALE.
+The default is 50000. For larger <code>data</code> (and <code>w</code>), <code>ale_n</code> rows are randomly
+sampled (uses random seed). Each variable specified by <code>v</code> uses the same subsample.
+Set to 0 to omit.</p></dd>
+
+
 <dt id="arg-ale-bin-size">ale_bin_size<a class="anchor" aria-label="anchor" href="#arg-ale-bin-size"></a></dt>
 <dd><p>Maximal number of observations used per bin for ALE calculations.
 If there are more observations in a bin, <code>ale_bin_size</code> indices are
-randomly sampled (uses random seed). The default is 200.</p></dd>
+randomly sampled (uses random seed). The default is 200. Applied after subsampling
+regarding <code>ale_n</code>.</p></dd>
 
 </dl></div>
     <div id="value">

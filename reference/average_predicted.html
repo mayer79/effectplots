@@ -144,17 +144,11 @@ Journal of the Royal Statistical Society Series B: Statistical Methodology,
     <h2>Examples</h2>
     <div class="sourceCode"><pre class="sourceCode r"><code><span class="r-in"><span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/stats/lm.html" class="external-link">lm</a></span><span class="op">(</span><span class="va">Sepal.Length</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span></span>
 <span class="r-in"><span><span class="va">M</span> <span class="op">&lt;-</span> <span class="fu">average_predicted</span><span class="op">(</span><span class="va">iris</span><span class="op">[</span><span class="fl">2</span><span class="op">:</span><span class="fl">5</span><span class="op">]</span>, pred <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/stats/predict.html" class="external-link">predict</a></span><span class="op">(</span><span class="va">fit</span>, <span class="va">iris</span><span class="op">)</span>, breaks <span class="op">=</span> <span class="fl">5</span><span class="op">)</span></span></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error in UseMethod("predict"):</span> no applicable method for 'predict' applied to an object of class "NULL"</span>
 <span class="r-in"><span><span class="va">M</span></span></span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 'EffectData' object of length 4, starting with 'Sepal.Width': </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> </span>
-<span class="r-out co"><span class="r-pr">#&gt;</span>   bin_mid bin_width bin_mean  N weight pred_mean    pred_sd</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 1    2.25       0.5 2.368421 19     19  5.532860 0.53635456</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 2    2.75       0.5 2.867188 64     64  6.111200 0.66215685</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 3    3.25       0.5 3.277083 48     48  5.706627 0.82695977</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 4    3.75       0.5 3.756250 16     16  5.631317 1.00225291</span>
-<span class="r-out co"><span class="r-pr">#&gt;</span> 5    4.25       0.5 4.200000  3      3  5.413218 0.05961462</span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'M' not found</span>
 <span class="r-in"><span><span class="va">M</span> <span class="op">|&gt;</span> <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></span>
-<span class="r-plt img"><img src="average_predicted-1.png" alt="" width="700" height="433"></span>
+<span class="r-err co"><span class="r-pr">#&gt;</span> <span class="error">Error:</span> object 'M' not found</span>
 </code></pre></div>
     </div>
   </div>
