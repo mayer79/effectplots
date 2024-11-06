@@ -69,9 +69,9 @@ grouped_stats <- function(x, g, w = NULL) {
 
 calculate_stats <- function(
     v,
+    x,
     PYR,
     w,
-    data,
     breaks,
     right,
     discrete_m,
@@ -85,7 +85,6 @@ calculate_stats <- function(
     ale_bin_size,
     ...
 ) {
-  x <- if (is.matrix(data)) data[, v] else data[[v]]
   if (is.double(x)) {
     # {collapse} seems to distinguish positive and negative zeros
     # https://github.com/SebKrantz/collapse/issues/648

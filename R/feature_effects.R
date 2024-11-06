@@ -139,7 +139,20 @@ feature_effects.default <- function(
     basic_check(y, n = n, nms = nms),
     basic_check(pred, n = n, nms = nms),
     basic_check(w, n = n, nms = nms)
-  )
+  )  # We don't need n anymore
+
+  # Prepare breaks
+  nv <- length(v)
+  if (is.list(breaks)) {
+    if (length(breaks) < nv) {
+      br <- replicate(nv, "Sturges", simplify = FALSE)
+      names(br) <- v
+      br[names(breaks)] <- breaks
+      breaks <- br
+    }
+  } else {
+    breaks <- replicate(nv, breaks, simplify = FALSE)
+  }
 
   # Prepare y
   if (!is.null(y)) {
@@ -178,8 +191,7 @@ feature_effects.default <- function(
       message("Removing data with missing or non-positive weights 'w'.")
       w <- w[wpos]
       data <- collapse::ss(data, wpos)
-      n <- nrow(data)
-      stopifnot(n >= 2L)
+      stopifnot(nrow(data) >= 2L)
       if (!is.null(y)) {
         y <- y[wpos]
       }
@@ -206,22 +218,14 @@ feature_effects.default <- function(
   pd_data <- if (pd_n > 0L) .subsample(data, nmax = pd_n, w = w)
   ale_data <- if (ale_n > 0L) .subsample(data, nmax = ale_n, w = w)
 
-  # Prepare breaks
-  nv <- length(v)
-  if (is.list(breaks)) {
-    if (length(breaks) < nv) {
-      br <- replicate(nv, "Sturges", simplify = FALSE)
-      names(br) <- v
-      br[names(breaks)] <- breaks
-      breaks <- br
-    }
-  } else {
-    breaks <- replicate(nv, breaks, simplify = FALSE)
+  if (is.matrix(data)) {
+    data <- collapse::qDF(data)
   }
 
   out <- mapply(
     FUN = calculate_stats,
     v,
+    x = collapse::ss(data, , v),
     breaks = breaks,
     right = right,
     discrete_m = discrete_m,
@@ -229,7 +233,6 @@ feature_effects.default <- function(
     MoreArgs = list(
       PYR = PYR,
       w = w,
-      data = collapse::ss(data, , v),
       object = object,
       pred_fun = pred_fun,
       trafo = trafo,
