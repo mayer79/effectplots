@@ -81,7 +81,7 @@ calculate_stats <- function(
     trafo,
     which_pred,
     pd_data,
-    pd_w,
+    ale_data,
     ale_bin_size,
     ...
 ) {
@@ -95,7 +95,7 @@ calculate_stats <- function(
   g <- collapse::funique(x)
   num <- is.numeric(x) && (length(g) > discrete_m)
 
-  if (is.null(PYR) && is.null(pd_data) && (!num || ale_bin_size == 0L)) {
+  if (is.null(PYR) && is.null(pd_data) && (!num || is.null(ale_data))) {
     return(NULL)
   }
 
@@ -144,32 +144,32 @@ calculate_stats <- function(
     out$pd <- .pd(
       object = object,
       v = v,
-      data = pd_data,
+      data = pd_data$X,
       grid = out$bin_mean,
       pred_fun = pred_fun,
       trafo = trafo,
       which_pred = which_pred,
-      w = pd_w,
+      w = pd_data$w,
       ...
     )
   }
 
   # Add ALE
-  if (ale_bin_size > 0L) {
+  if (!is.null(ale_data)) {
     out$ale <- NA
     if (num) {
       ale <- .ale(
         object = object,
         v = v,
-        data = data,
+        data = ale_data$X,
         breaks = br,
         right = right,  # does not matter because we pass g
         pred_fun = pred_fun,
         trafo = trafo,
         which_pred = which_pred,
         bin_size = ale_bin_size,
-        w = w,
-        g = ix,
+        w = ale_data$w,
+        g = ix[ale_data$ix],
         ...
       )
       ok <- !is.na(out$bin_mid)

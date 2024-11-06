@@ -21,6 +21,7 @@ ale(object, ...)
   right = TRUE,
   discrete_m = 5L,
   outlier_iqr = 2,
+  ale_n = 50000L,
   ale_bin_size = 200L,
   ...
 )
@@ -37,6 +38,7 @@ ale(object, ...)
   right = TRUE,
   discrete_m = 5L,
   outlier_iqr = 2,
+  ale_n = 50000L,
   ale_bin_size = 200L,
   ...
 )
@@ -53,6 +55,7 @@ ale(object, ...)
   right = TRUE,
   discrete_m = 5L,
   outlier_iqr = 2,
+  ale_n = 50000L,
   ale_bin_size = 200L,
   ...
 )
@@ -97,9 +100,15 @@ conservative than the usual rule to account for right-skewed distributions.
 Set to 0 or \code{Inf} for no capping. Note that at most 10k observations are sampled
 to calculate quartiles (uses random seed). Vectorized over \code{v}.}
 
+\item{ale_n}{Size of the data used for calculating ALE.
+The default is 50000. For larger \code{data} (and \code{w}), \code{ale_n} rows are randomly
+sampled (uses random seed). Each variable specified by \code{v} uses the same subsample.
+Set to 0 to omit.}
+
 \item{ale_bin_size}{Maximal number of observations used per bin for ALE calculations.
 If there are more observations in a bin, \code{ale_bin_size} indices are
-randomly sampled (uses random seed). The default is 200.}
+randomly sampled (uses random seed). The default is 200. Applied after subsampling
+regarding \code{ale_n}.}
 }
 \value{
 A list (of class "EffectData") with a data.frame of statistics per feature. Use

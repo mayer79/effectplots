@@ -26,3 +26,11 @@ basic_check <- function(z, n, nms) {
   is.null(z) || (length(z) == 1L && z %in% nms) || (is.vector(z) && length(z) == n)
 }
 
+.subsample <- function(data, nmax, w = NULL) {
+  N <- nrow(data)
+  if (N <= nmax) {
+    return(list(X = data, w = w, ix = 1L:N))
+  }
+  ix <- sample.int(N, nmax)
+  return(list(X = collapse::ss(data, ix), w = if (!is.null(w)) w[ix], ix = ix))
+}

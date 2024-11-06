@@ -57,6 +57,7 @@ ale.default <- function(
     right = TRUE,
     discrete_m = 5L,
     outlier_iqr = 2,
+    ale_n = 50000L,
     ale_bin_size = 200L,
     ...
 ) {
@@ -75,6 +76,7 @@ ale.default <- function(
     outlier_iqr = outlier_iqr,
     calc_pred = FALSE,
     pd_n = 0L,
+    ale_n = ale_n,
     ale_bin_size = ale_bin_size,
     ...
   )
@@ -94,6 +96,7 @@ ale.ranger <- function(
     right = TRUE,
     discrete_m = 5L,
     outlier_iqr = 2,
+    ale_n = 50000L,
     ale_bin_size = 200L,
     ...
 ) {
@@ -114,6 +117,7 @@ ale.ranger <- function(
     right = right,
     discrete_m = discrete_m,
     outlier_iqr = outlier_iqr,
+    ale_n = ale_n,
     ale_bin_size = ale_bin_size,
     ...
   )
@@ -133,6 +137,7 @@ ale.explainer <- function(
     right = TRUE,
     discrete_m = 5L,
     outlier_iqr = 2,
+    ale_n = 50000L,
     ale_bin_size = 200L,
     ...
 ) {
@@ -148,6 +153,7 @@ ale.explainer <- function(
     right = right,
     discrete_m = discrete_m,
     outlier_iqr = outlier_iqr,
+    ale_n = ale_n,
     ale_bin_size = ale_bin_size,
     ...
   )

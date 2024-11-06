@@ -66,9 +66,14 @@
 #'   The default is 500. For larger `data` (and `w`), `pd_n` rows are randomly sampled
 #'   (uses random seed). Each variable specified by `v` uses the same subsample.
 #'   Set to 0 to omit.
+#' @param ale_n Size of the data used for calculating ALE.
+#'   The default is 50000. For larger `data` (and `w`), `ale_n` rows are randomly
+#'   sampled (uses random seed). Each variable specified by `v` uses the same subsample.
+#'   Set to 0 to omit.
 #' @param ale_bin_size Maximal number of observations used per bin for ALE calculations.
 #'   If there are more observations in a bin, `ale_bin_size` indices are
-#'   randomly sampled (uses random seed). The default is 200.
+#'   randomly sampled (uses random seed). The default is 200. Applied after subsampling
+#'   regarding `ale_n`.
 #' @param ... Further arguments passed to `pred_fun()`, e.g., `type = "response"` in
 #'   a `glm()` or (typically) `prob = TRUE` in classification models.
 #' @returns
@@ -113,6 +118,7 @@ feature_effects.default <- function(
     outlier_iqr = 2,
     calc_pred = TRUE,
     pd_n = 500L,
+    ale_n = 50000L,
     ale_bin_size = 200L,
     ...
 ) {
@@ -122,8 +128,9 @@ feature_effects.default <- function(
     v %in% colnames(data),
     is.function(pred_fun),
     is.null(trafo) || is.function(trafo),
-    is.numeric(pd_n) && length(pd_n) == 1L && pd_n >= 0L,
-    is.numeric(ale_bin_size) && length(ale_bin_size) == 1L && ale_bin_size >= 0L
+    pd_n >= 0L,
+    ale_n >= 0L,
+    ale_bin_size >= 0L
   )
   n <- nrow(data)
   nms <- colnames(data)
@@ -195,19 +202,9 @@ feature_effects.default <- function(
   re <- !is.null(pred) && !is.null(y)
   PYR <- cbind(pred = pred, y = y, resid = if (re) y - pred) # cbind(NULL, NULL) is NULL
 
-  # Prepare pd_data and pd_w
-  if (pd_n > 0L) {
-    if (n > pd_n) {
-      ix <- sample(n, pd_n)
-      pd_data <- collapse::ss(data, ix)
-      pd_w <- if (!is.null(w)) w[ix]
-    } else {
-      pd_data <- data
-      pd_w <- w
-    }
-  } else {
-    pd_data <- pd_w <- NULL
-  }
+  # Prepare pd_data and ale_data (list with data, w, ix)
+  pd_data <- if (pd_n > 0L) .subsample(data, nmax = pd_n, w = w)
+  ale_data <- if (ale_n > 0L) .subsample(data, nmax = ale_n, w = w)
 
   # Prepare breaks
   nv <- length(v)
@@ -238,7 +235,7 @@ feature_effects.default <- function(
       trafo = trafo,
       which_pred = which_pred,
       pd_data = pd_data,
-      pd_w = pd_w,
+      ale_data = ale_data,
       ale_bin_size,
       ...
     ),
@@ -277,6 +274,7 @@ feature_effects.ranger <- function(
     outlier_iqr = 2,
     calc_pred = TRUE,
     pd_n = 500L,
+    ale_n = 50000L,
     ale_bin_size = 200L,
     ...
 ) {
@@ -301,6 +299,7 @@ feature_effects.ranger <- function(
     outlier_iqr = outlier_iqr,
     calc_pred = calc_pred,
     pd_n = pd_n,
+    ale_n = ale_n,
     ale_bin_size = ale_bin_size,
     ...
   )
@@ -324,6 +323,7 @@ feature_effects.explainer <- function(
   outlier_iqr = 2,
   calc_pred = TRUE,
   pd_n = 500L,
+  ale_n = 50000L,
   ale_bin_size = 200L,
   ...
 ) {
@@ -343,6 +343,7 @@ feature_effects.explainer <- function(
     outlier_iqr = outlier_iqr,
     calc_pred = calc_pred,
     pd_n = pd_n,
+    ale_n = ale_n,
     ale_bin_size = ale_bin_size,
     ...
   )
