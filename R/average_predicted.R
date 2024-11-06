@@ -50,7 +50,7 @@ average_predicted <- function(
     outlier_iqr = outlier_iqr,
     calc_pred = FALSE,
     pd_n = 0L,
-    ale_bin_size = 0L
+    ale_n = 0L
   )
 }
 

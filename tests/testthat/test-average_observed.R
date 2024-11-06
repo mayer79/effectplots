@@ -10,7 +10,7 @@ test_that("average_observed() is consistent with feature_effects()", {
     y = iris$Sepal.Length,
     calc_pred = FALSE,
     pd_n = 0,
-    ale_bin_size = 0
+    ale_n = 0
   )
   expect_equal(avg_obs, marg)
 })

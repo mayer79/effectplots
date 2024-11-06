@@ -199,8 +199,8 @@ feature_effects.default <- function(
     )
   }
 
-  re <- !is.null(pred) && !is.null(y)
-  PYR <- cbind(pred = pred, y = y, resid = if (re) y - pred) # cbind(NULL, NULL) is NULL
+  # Combine pred, y, and resid. Note: cbind(NULL, NULL) is NULL
+  PYR <- cbind(pred = pred, y = y, resid = if (!is.null(pred) && !is.null(y)) y - pred)
 
   # Prepare pd_data and ale_data (list with data, w, ix)
   pd_data <- if (pd_n > 0L) .subsample(data, nmax = pd_n, w = w)
@@ -229,7 +229,7 @@ feature_effects.default <- function(
     MoreArgs = list(
       PYR = PYR,
       w = w,
-      data = data,
+      data = collapse::ss(data, , v),
       object = object,
       pred_fun = pred_fun,
       trafo = trafo,
