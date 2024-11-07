@@ -13,6 +13,7 @@ average_predicted(
   right = TRUE,
   discrete_m = 5L,
   outlier_iqr = 2,
+  seed = NULL,
   ...
 )
 }
@@ -41,7 +42,12 @@ The default is 5. Vectorized over \code{v}.}
 outside \code{outlier_iqr} * IQR from the quartiles. The default is 2 is more
 conservative than the usual rule to account for right-skewed distributions.
 Set to 0 or \code{Inf} for no capping. Note that at most 10k observations are sampled
-to calculate quartiles (uses random seed). Vectorized over \code{v}.}
+to calculate quartiles. Vectorized over \code{v}.}
+
+\item{seed}{Optional random seed (an integer) used for capping X based on quantiles
+calculated from a subsample of 10k observations.
+Note that the current \code{.Random.seed} is restored on function exit, i.e.,
+setting the seed does not affect the rest of your R session.}
 
 \item{...}{Currently unused.}
 }

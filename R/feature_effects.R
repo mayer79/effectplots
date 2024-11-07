@@ -59,21 +59,24 @@
 #'   outside `outlier_iqr` * IQR from the quartiles. The default is 2 is more
 #'   conservative than the usual rule to account for right-skewed distributions.
 #'   Set to 0 or `Inf` for no capping. Note that at most 10k observations are sampled
-#'   to calculate quartiles (uses random seed). Vectorized over `v`.
+#'   to calculate quartiles. Vectorized over `v`.
 #' @param calc_pred Should predictions be calculated? Default is `TRUE`. Only relevant
 #'   if `pred = NULL`.
 #' @param pd_n Size of the data used for calculating partial dependence.
-#'   The default is 500. For larger `data` (and `w`), `pd_n` rows are randomly sampled
-#'   (uses random seed). Each variable specified by `v` uses the same subsample.
-#'   Set to 0 to omit.
+#'   The default is 500. For larger `data` (and `w`), `pd_n` rows are randomly sampled.
+#'   Each variable specified by `v` uses the same subsample. Set to 0 to omit.
 #' @param ale_n Size of the data used for calculating ALE.
 #'   The default is 50000. For larger `data` (and `w`), `ale_n` rows are randomly
-#'   sampled (uses random seed). Each variable specified by `v` uses the same subsample.
-#'   Set to 0 to omit.
+#'   sampled. Each variable specified by `v` uses the same subsample. Set to 0 to omit.
 #' @param ale_bin_size Maximal number of observations used per bin for ALE calculations.
 #'   If there are more observations in a bin, `ale_bin_size` indices are
-#'   randomly sampled (uses random seed). The default is 200. Applied after subsampling
-#'   regarding `ale_n`.
+#'   randomly sampled. The default is 200. Applied after subsampling regarding `ale_n`.
+#' @param seed Optional random seed (an integer) used for:
+#'   - Partial dependence: select background data if `n > pd_n`.
+#'   - ALE: select background data if `n > ale_n` and for bins > `ale_bin_size`.
+#'   - Capping X: quartiles are selected based on 10k observations.
+#'   Note that the current `.Random.seed` is restored on function exit, i.e.,
+#'   setting the seed does not affect the rest of your R session.
 #' @param ... Further arguments passed to `pred_fun()`, e.g., `type = "response"` in
 #'   a `glm()` or (typically) `prob = TRUE` in classification models.
 #' @returns
@@ -120,6 +123,7 @@ feature_effects.default <- function(
     pd_n = 500L,
     ale_n = 50000L,
     ale_bin_size = 200L,
+    seed = NULL,
     ...
 ) {
   # Input checks
@@ -140,6 +144,12 @@ feature_effects.default <- function(
     basic_check(pred, n = n, nms = nms),
     basic_check(w, n = n, nms = nms)
   )  # We don't need n anymore
+
+  if (!is.null(seed)) {
+    old <- .Random.seed
+    on.exit({.Random.seed <<- old})
+    set.seed(seed)
+  }
 
   # Prepare breaks
   nv <- length(v)

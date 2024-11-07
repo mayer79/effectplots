@@ -17,6 +17,11 @@
 #' and eventually weighted by `w`.
 #'
 #' @inheritParams feature_effects
+#' @param seed Optional random seed (an integer) used for:
+#'   - Partial dependence: select background data if `n > pd_n`.
+#'   - Capping X: quartiles are selected based on 10k observations.
+#'   Note that the current `.Random.seed` is restored on function exit, i.e.,
+#'   setting the seed does not affect the rest of your R session.
 #' @inherit feature_effects return
 #' @references
 #'   Friedman, Jerome H. 2001, *Greedy Function Approximation: A Gradient Boosting Machine.*
@@ -49,6 +54,7 @@ partial_dependence.default <- function(
     discrete_m = 5L,
     outlier_iqr = 2,
     pd_n = 500L,
+    seed = NULL,
     ...
 ) {
   feature_effects.default(
@@ -67,6 +73,7 @@ partial_dependence.default <- function(
     calc_pred = FALSE,
     pd_n = pd_n,
     ale_n = 0L,
+    seed = seed,
     ...
   )
 }
@@ -86,6 +93,7 @@ partial_dependence.ranger <- function(
     discrete_m = 5L,
     outlier_iqr = 2,
     pd_n = 500L,
+    seed = NULL,
     ...
 ) {
   if (is.null(pred_fun)) {
@@ -106,6 +114,7 @@ partial_dependence.ranger <- function(
     discrete_m = discrete_m,
     outlier_iqr = outlier_iqr,
     pd_n = pd_n,
+    seed = seed,
     ...
   )
 }
@@ -125,6 +134,7 @@ partial_dependence.explainer <- function(
     discrete_m = 5L,
     outlier_iqr = 2,
     pd_n = 500L,
+    seed = NULL,
     ...
 ) {
   partial_dependence.default(
@@ -140,6 +150,7 @@ partial_dependence.explainer <- function(
     discrete_m = discrete_m,
     outlier_iqr = outlier_iqr,
     pd_n = pd_n,
+    seed = seed,
     ...
   )
 }

@@ -25,6 +25,11 @@
 #' partial dependence curve, for optimal comparability.
 #'
 #' @inheritParams feature_effects
+#' @param seed Optional random seed (an integer) used for:
+#'   - ALE: select background data if `n > ale_n` and for bins > `ale_bin_size`.
+#'   - Capping X: quartiles are selected based on 10k observations.
+#'   Note that the current `.Random.seed` is restored on function exit, i.e.,
+#'   setting the seed does not affect the rest of your R session.
 #' @inherit feature_effects return
 #' @references
 #'   Apley, Daniel W., and Jingyu Zhu. 2020. *Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.*
@@ -59,6 +64,7 @@ ale.default <- function(
     outlier_iqr = 2,
     ale_n = 50000L,
     ale_bin_size = 200L,
+    seed = NULL,
     ...
 ) {
   feature_effects.default(
@@ -78,6 +84,7 @@ ale.default <- function(
     pd_n = 0L,
     ale_n = ale_n,
     ale_bin_size = ale_bin_size,
+    seed = seed,
     ...
   )
 }
@@ -98,6 +105,7 @@ ale.ranger <- function(
     outlier_iqr = 2,
     ale_n = 50000L,
     ale_bin_size = 200L,
+    seed = NULL,
     ...
 ) {
   if (is.null(pred_fun)) {
@@ -119,6 +127,7 @@ ale.ranger <- function(
     outlier_iqr = outlier_iqr,
     ale_n = ale_n,
     ale_bin_size = ale_bin_size,
+    seed = seed,
     ...
   )
 }
@@ -139,6 +148,7 @@ ale.explainer <- function(
     outlier_iqr = 2,
     ale_n = 50000L,
     ale_bin_size = 200L,
+    seed = NULL,
     ...
 ) {
   ale.default(
@@ -155,6 +165,7 @@ ale.explainer <- function(
     outlier_iqr = outlier_iqr,
     ale_n = ale_n,
     ale_bin_size = ale_bin_size,
+    seed = seed,
     ...
   )
 }

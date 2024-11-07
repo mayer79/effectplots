@@ -27,6 +27,7 @@ feature_effects(object, ...)
   pd_n = 500L,
   ale_n = 50000L,
   ale_bin_size = 200L,
+  seed = NULL,
   ...
 )
 
@@ -117,25 +118,31 @@ The default is 5. Vectorized over \code{v}.}
 outside \code{outlier_iqr} * IQR from the quartiles. The default is 2 is more
 conservative than the usual rule to account for right-skewed distributions.
 Set to 0 or \code{Inf} for no capping. Note that at most 10k observations are sampled
-to calculate quartiles (uses random seed). Vectorized over \code{v}.}
+to calculate quartiles. Vectorized over \code{v}.}
 
 \item{calc_pred}{Should predictions be calculated? Default is \code{TRUE}. Only relevant
 if \code{pred = NULL}.}
 
 \item{pd_n}{Size of the data used for calculating partial dependence.
-The default is 500. For larger \code{data} (and \code{w}), \code{pd_n} rows are randomly sampled
-(uses random seed). Each variable specified by \code{v} uses the same subsample.
-Set to 0 to omit.}
+The default is 500. For larger \code{data} (and \code{w}), \code{pd_n} rows are randomly sampled.
+Each variable specified by \code{v} uses the same subsample. Set to 0 to omit.}
 
 \item{ale_n}{Size of the data used for calculating ALE.
 The default is 50000. For larger \code{data} (and \code{w}), \code{ale_n} rows are randomly
-sampled (uses random seed). Each variable specified by \code{v} uses the same subsample.
-Set to 0 to omit.}
+sampled. Each variable specified by \code{v} uses the same subsample. Set to 0 to omit.}
 
 \item{ale_bin_size}{Maximal number of observations used per bin for ALE calculations.
 If there are more observations in a bin, \code{ale_bin_size} indices are
-randomly sampled (uses random seed). The default is 200. Applied after subsampling
-regarding \code{ale_n}.}
+randomly sampled. The default is 200. Applied after subsampling regarding \code{ale_n}.}
+
+\item{seed}{Optional random seed (an integer) used for:
+\itemize{
+\item Partial dependence: select background data if \code{n > pd_n}.
+\item ALE: select background data if \code{n > ale_n} and for bins > \code{ale_bin_size}.
+\item Capping X: quartiles are selected based on 10k observations.
+Note that the current \code{.Random.seed} is restored on function exit, i.e.,
+setting the seed does not affect the rest of your R session.
+}}
 }
 \value{
 A list (of class "EffectData") with a data.frame of statistics per feature. Use

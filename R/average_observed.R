@@ -10,6 +10,10 @@
 #' @param y A numeric vector of observed responses.
 #' @param w An optional numeric vector of weights.
 #' @param x_name If `X` is a vector: what is the name of the variable? By default "x".
+#' @param seed Optional random seed (an integer) used for capping X based on quantiles
+#'   calculated from a subsample of 10k observations.
+#'   Note that the current `.Random.seed` is restored on function exit, i.e.,
+#'   setting the seed does not affect the rest of your R session.
 #' @inheritParams feature_effects
 #' @inherit feature_effects return
 #' @param ... Currently unused.
@@ -32,6 +36,7 @@ average_observed <- function(
     right = TRUE,
     discrete_m = 5L,
     outlier_iqr = 2,
+    seed = NULL,
     ...
 ) {
   if (NCOL(X) == 1L && (is.vector(X) || is.factor(X))) {
@@ -49,7 +54,8 @@ average_observed <- function(
     outlier_iqr = outlier_iqr,
     calc_pred = FALSE,
     pd_n = 0L,
-    ale_n = 0L
+    ale_n = 0L,
+    seed = seed
   )
 }
 

@@ -6,10 +6,9 @@
 #'
 #' The function is a convenience wrapper around [feature_effects()].
 #'
-#' @param X A vector, matrix, or data.frame with variable(s) to be shown on the x axis.
 #' @param pred A numeric vector of predictions.
-#' @param w An optional numeric vector of weights.
 #' @param x_name If `X` is a vector: what is the name of the variable? By default "x".
+#' @inheritParams average_observed
 #' @inheritParams feature_effects
 #' @inherit feature_effects return
 #' @param ... Currently unused.
@@ -33,6 +32,7 @@ average_predicted <- function(
     right = TRUE,
     discrete_m = 5L,
     outlier_iqr = 2,
+    seed = NULL,
     ...
 ) {
   if (NCOL(X) == 1L && (is.vector(X) || is.factor(X))) {
@@ -50,7 +50,8 @@ average_predicted <- function(
     outlier_iqr = outlier_iqr,
     calc_pred = FALSE,
     pd_n = 0L,
-    ale_n = 0L
+    ale_n = 0L,
+    seed = seed
   )
 }
 
