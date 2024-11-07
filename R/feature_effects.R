@@ -435,18 +435,16 @@ calculate_stats <- function(
     )
 
     # Integer encoding
-    ix <- collapse::qF(
-      findInterval(
-        x, vec = br, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
-      ),
-      sort = TRUE
+    ix <- findInterval(
+      x, vec = br, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
     )
+    ix <- collapse::qF(ix, sort = FALSE)  # We need to fix the order anyway due to gaps
     M <- cbind(
       bin_mean = collapse::fmean.default(x, g = ix, w = w),
       grouped_stats(PYR, g = ix, w = w)
     )
     reindex <- match(as.integer(rownames(M)), gix)
-    out[reindex, colnames(M)] <- M  # Fill gaps
+    out[reindex, colnames(M)] <- M  # Fill the gaps
   }
 
   # Add partial dependence

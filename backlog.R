@@ -11,7 +11,7 @@ feature_effects(fit, v = xvars, data = as_tibble(iris), y = "Sepal.Length", brea
 feature_effects(fit, v = xvars, data = as.data.table(iris), y = "Sepal.Length", breaks = 5)
 
 
-n <- 1e7
+n <- 1e6
 X <- qDF(matrix(runif(n * 10), ncol = 10))
 v <- colnames(X)
 X$y <- runif(n)
