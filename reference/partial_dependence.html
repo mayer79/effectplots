@@ -89,6 +89,7 @@ and eventually weighted by <code>w</code>.</p>
 <span>  discrete_m <span class="op">=</span> <span class="fl">5L</span>,</span>
 <span>  outlier_iqr <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  pd_n <span class="op">=</span> <span class="fl">500L</span>,</span>
+<span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -106,6 +107,7 @@ and eventually weighted by <code>w</code>.</p>
 <span>  discrete_m <span class="op">=</span> <span class="fl">5L</span>,</span>
 <span>  outlier_iqr <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  pd_n <span class="op">=</span> <span class="fl">500L</span>,</span>
+<span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span>
 <span></span>
@@ -123,6 +125,7 @@ and eventually weighted by <code>w</code>.</p>
 <span>  discrete_m <span class="op">=</span> <span class="fl">5L</span>,</span>
 <span>  outlier_iqr <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  pd_n <span class="op">=</span> <span class="fl">500L</span>,</span>
+<span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
@@ -191,14 +194,21 @@ The default is 5. Vectorized over <code>v</code>.</p></dd>
 outside <code>outlier_iqr</code> * IQR from the quartiles. The default is 2 is more
 conservative than the usual rule to account for right-skewed distributions.
 Set to 0 or <code>Inf</code> for no capping. Note that at most 10k observations are sampled
-to calculate quartiles (uses random seed). Vectorized over <code>v</code>.</p></dd>
+to calculate quartiles. Vectorized over <code>v</code>.</p></dd>
 
 
 <dt id="arg-pd-n">pd_n<a class="anchor" aria-label="anchor" href="#arg-pd-n"></a></dt>
 <dd><p>Size of the data used for calculating partial dependence.
-The default is 500. For larger <code>data</code> (and <code>w</code>), <code>pd_n</code> rows are randomly sampled
-(uses random seed). Each variable specified by <code>v</code> uses the same subsample.
-Set to 0 to omit.</p></dd>
+The default is 500. For larger <code>data</code> (and <code>w</code>), <code>pd_n</code> rows are randomly sampled.
+Each variable specified by <code>v</code> uses the same subsample. Set to 0 to omit.</p></dd>
+
+
+<dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
+<dd><p>Optional random seed (an integer) used for:</p><ul><li><p>Partial dependence: select background data if <code>n &gt; pd_n</code>.</p></li>
+<li><p>Capping X: quartiles are selected based on 10k observations.
+Note that the current <code>.Random.seed</code> is restored on function exit, i.e.,
+setting the seed does not affect the rest of your R session.</p></li>
+</ul></dd>
 
 </dl></div>
     <div id="value">
