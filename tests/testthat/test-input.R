@@ -40,3 +40,15 @@ test_that("basic_check() works", {
   expect_true(basic_check("a", n = n, nms = nms))
   expect_false(basic_check("a", n = n, nms = letters[4:6]))
 })
+
+test_that(".subsample() works", {
+  n <- 5
+  X <- matrix(1:(2 * n), ncol = 2)
+  w <- 1:n
+  expect_equal(.subsample(X, n + 1, w = w), list(X = X, w = w, ix = 1:n))
+
+  subs <- .subsample(X, nmax = 1)
+  expect_true(nrow(subs$X) == 1)
+  expect_null(subs$w)
+  expect_true(length(subs$ix) == 1)
+})
