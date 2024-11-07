@@ -1,3 +1,14 @@
+#' IQR-based Outlier Capping
+#'
+#' Internal function used to cap/clip/winsorize outliers via the boxplot rule.
+#'
+#' @noRd
+#' @keywords internal
+#'
+#' @param x A numeric vector.
+#' @param m How many IQRs from the quartiles do we start capping?
+#' @param nmax Maximal number of observations used to calculate capping limits.
+#' @returns Like `x`, but eventually capped.
 wins_iqr <- function(x, m = 1.5, nmax = 10000L) {
   xs <- if (length(x) > nmax) sample(x, nmax) else x
   q <- collapse::fquantile(xs, probs = c(0.25, 0.75), na.rm = TRUE, names = FALSE)
@@ -8,8 +19,18 @@ wins_iqr <- function(x, m = 1.5, nmax = 10000L) {
   winsorize(x, low = q[1L] - r, high = q[2L] + r)
 }
 
-# pmin() and pmax() are surprisingly fast for large vectors
-# and need less memory than subsetting
+#' Cap a Vector
+#'
+#' Internal function used to cap/clip/winsorize a numeric vector at low/high limits.
+#' Note: For large vectors, pmin() and pmax() are surprisingly fast.
+#'
+#' @noRd
+#' @keywords internal
+#'
+#' @param x A numeric vector to be capped.
+#' @param low Lower capping limit.
+#' @param high Upper capping limit.
+#' @returns A capped vector.
 winsorize <- function(x, low = -Inf, high = Inf) {
   r <- collapse::.range(x, na.rm = TRUE)
   if (r[1L] < low) {
@@ -18,9 +39,18 @@ winsorize <- function(x, low = -Inf, high = Inf) {
   if (r[2L] > high) pmin(x, high) else x
 }
 
-# Simplified version of hist(), returns only breaks
+#' Break Calculation like hist()
+#'
+#' Internal function used to calculate breaks with the same `breaks` as `hist()`.
+#'
+#' @noRd
+#' @keywords internal
+#'
+#' @param x A numeric vector.
+#' @param breaks An integer, a vector, a string, or a function.
+#' @returns A vector of pretty breaks.
 hist2 <- function(x, breaks = "Sturges") {
-  x <- x[is.finite(x)]
+  x <- collapse::na_rm(x)
   if (is.character(breaks)) {
     breaks <- switch(
       tolower(breaks),
@@ -44,7 +74,19 @@ hist2 <- function(x, breaks = "Sturges") {
   return(breaks)
 }
 
-# Later replace by collapse::qsu()
+#' Fast Grouped Statistics
+#'
+#' Internal function used to calculate grouped counts, exposures, means and standard
+#' deviations of a matrix `x`. Might be replaced by collapse::qsu().
+#'
+#' @noRd
+#' @keywords internal
+#'
+#' @param x A matrix.
+#' @param g A grouping vector/factor.
+#' @param w Optional vector with case weights.
+#' @returns A data.frame with Counts, weight sums, means and standard deviations of
+#'   each column in `x`.
 grouped_stats <- function(x, g, w = NULL) {
   # returns rows in order sort(unique(x)) + NA, or levels(x) + NA (if factor)
   if (!is.factor(g)) {
@@ -67,6 +109,22 @@ grouped_stats <- function(x, g, w = NULL) {
   return(cbind(out, M, S))
 }
 
+#' Workhorse of feature_effects()
+#'
+#' Internal function used to calculate the output of `feature_effects()` for one
+#' feature.
+#'
+#' @noRd
+#' @keywords internal
+#'
+#' @param v One variable name.
+#' @param x One feature vector/factor.
+#' @param pd_data The output of .subsample() or `NULL`.
+#' @param ale_data The output of .subsample() or `NULL`.
+#' @param PYR A matrix with predicted, observed, and residuals (if available). Can
+#'   be `NULL` if none of them are available.
+#' @inheritParams feature_effects
+#' @returns A data.frame with effect statistics.
 calculate_stats <- function(
     v,
     x,
