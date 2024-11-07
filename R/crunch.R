@@ -1,3 +1,24 @@
+#' Checks if many distinct
+#'
+#' Internal function used to check if a numeric variable has more than
+#' m disjoint values. The function shines for extremely long vectors (~1e7).
+#'
+#' @noRd
+#' @keywords internal
+#'
+#' @param x A numeric vector.
+#' @param m How many disjoint values will return FALSE?
+#' @returns `TRUE` (if x has more than m levels), and `FALSE` otherwise.
+more_than_m_distinct <- function(x, m = 5L) {
+  if (length(x) <= 10000L) {
+    return(collapse::fnunique(x) > m)
+  }
+  if (collapse::fnunique(x[1L:10000L]) > m) {
+    return(TRUE)
+  }
+  return(collapse::fnunique(x) > m)
+}
+
 #' IQR-based Outlier Capping
 #'
 #' Internal function used to cap/clip/winsorize outliers via the boxplot rule.
@@ -42,6 +63,8 @@ winsorize <- function(x, low = -Inf, high = Inf) {
 #' Break Calculation like hist()
 #'
 #' Internal function used to calculate breaks with the same `breaks` as `hist()`.
+#' The only difference is that when `breaks` is a string and length(x) >= 100k, the
+#' function returns 50.
 #'
 #' @noRd
 #' @keywords internal
@@ -52,14 +75,18 @@ winsorize <- function(x, low = -Inf, high = Inf) {
 hist2 <- function(x, breaks = "Sturges") {
   x <- collapse::na_rm(x)
   if (is.character(breaks)) {
-    breaks <- switch(
-      tolower(breaks),
-      sturges = grDevices::nclass.Sturges(x),
-      `freedman-diaconis` = ,
-      fd = grDevices::nclass.FD(x),
-      scott = grDevices::nclass.scott(x),
+    breaks <- tolower(breaks)
+    if (breaks == "sturges") {
+      breaks <- grDevices::nclass.Sturges(x)
+    } else if (length(x) >= 1e5) {
+      breaks <- 50L
+    } else if (breaks == "scott") {
+      breaks <- min(50L, grDevices::nclass.scott(x))
+    } else if (breaks %in% c("fd", "freedman-diaconis")) {
+      breaks <- min(50L, grDevices::nclass.FD(x))
+    } else {
       stop("unknown 'breaks' algo")
-    )
+    }
   }
   if (is.function(breaks)) {
     breaks <- breaks(x)
@@ -149,8 +176,7 @@ calculate_stats <- function(
     # Adding 0 to a double turns negative 0 to positive ones (ISO/IEC 60559)
     collapse::setop(x, "+", 0.0)
   }
-  g <- collapse::funique(x)
-  num <- is.numeric(x) && (length(g) > discrete_m)
+  num <- is.numeric(x) && more_than_m_distinct(x, m = discrete_m)
 
   if (is.null(PYR) && is.null(pd_data) && (!num || is.null(ale_data))) {
     return(NULL)
@@ -158,9 +184,10 @@ calculate_stats <- function(
 
   # DISCRETE
   if (!num) {
+    g <- sort(collapse::funique(x), na.last = TRUE)
+
     # Ordered by sort(g) (+ NA). For factors: levels(x) (+ NA)
     M <- grouped_stats(PYR, g = x, w = w)
-    g <- sort(g, na.last = TRUE)
     out <- data.frame(bin_mid = g, bin_width = 0.7, bin_mean = g, M)
     rownames(out) <- NULL
   } else {
