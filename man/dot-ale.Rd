@@ -46,7 +46,7 @@ observations in a bin, \code{bin_size} indices are randomly sampled. The default
 
 \item{w}{Optional vector with case weights.}
 
-\item{g}{For internal use. The result of \code{factor(findInterval(...))}.
+\item{g}{For internal use. The result of \code{qF(findInterval(...))}.
 By default \code{NULL}.}
 
 \item{...}{Further arguments passed to \code{pred_fun()}, e.g., \code{type = "response"} in

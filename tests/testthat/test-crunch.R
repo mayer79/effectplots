@@ -1,3 +1,11 @@
+test_that("more_than_m_distinct() works for different ranges of x", {
+  expect_false(more_than_m_distinct(1:10, m = 10))
+  expect_true(more_than_m_distinct(1:10, m = 9))
+
+  expect_true(more_than_m_distinct(1:1e5, m = 10))
+  expect_false(more_than_m_distinct(rep(1, times = 1e5), m = 1))
+})
+
 test_that("winsorize() works", {
   x <- 1:10
   expect_equal(winsorize(x), x)
@@ -59,7 +67,7 @@ test_that("Test that grouped_stats() uses sort(funique) + NA as order", {
   }
 })
 
-test_that("hist2() gives identical breaks than graphics::hist()", {
+test_that("hist2() typically gives identical breaks than graphics::hist()", {
   set.seed(1)
   x <- rnorm(1000)
 
@@ -76,7 +84,11 @@ test_that("hist2() gives identical breaks than graphics::hist()", {
   }
 })
 
+test_that("hist2() works slightly different for very large vectors", {
+  x <- 1:1e6
+  expect_equal(hist2(x, breaks = "scott"), hist(x, breaks = 50, plot = FALSE)$breaks)
+})
+
 test_that("hist2() does not like unknown strings", {
   expect_error(hist2(1:10, breaks = "hello"))
 })
-

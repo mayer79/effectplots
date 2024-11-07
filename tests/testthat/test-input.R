@@ -45,7 +45,7 @@ test_that(".subsample() works", {
   n <- 5
   X <- matrix(1:(2 * n), ncol = 2)
   w <- 1:n
-  expect_equal(.subsample(X, n + 1, w = w), list(X = X, w = w, ix = 1:n))
+  expect_equal(.subsample(X, n + 1, w = w), list(X = X, w = w))
 
   subs <- .subsample(X, nmax = 1)
   expect_true(nrow(subs$X) == 1)

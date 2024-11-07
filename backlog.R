@@ -20,18 +20,3 @@ fit <- lm(reformulate(v, "y"), data = X)
 bench::mark(
   feature_effects(fit, v = v, data = X, calc_pred = FALSE), iterations = 2
 )
-
-5.66s     0.177    4.98GB
-
-# Matrix
-298ms      3.23    75.3MB  (dev)
-299ms      3.12    90.6MB  (package)
-
-# DF
-593ms      1.68     572MB (package)
-558ms      1.74     572MB
-5.66s     0.177    4.98GB
-
-570ms      1.75     573MB (dev)
-572ms      1.73     573MB
-5.68s     0.176    4.98GB
