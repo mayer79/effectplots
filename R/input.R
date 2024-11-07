@@ -64,11 +64,11 @@ basic_check <- function(z, n, nms) {
 #' @param nmax If data is larger than `nmax`, we will subsample.
 #' @param w Optional vector with case weights.
 #' @returns A list with subsampled `data`, `w`, and the indices used to subsample data.
-#'   The indices are used to subsample other objects consistently with this function.
+#'   (The latter only if subsampling was done).
 .subsample <- function(data, nmax, w = NULL) {
   N <- nrow(data)
   if (N <= nmax) {
-    return(list(X = data, w = w, ix = 1L:N))
+    return(list(X = data, w = w))
   }
   ix <- sample.int(N, nmax)
   return(list(X = collapse::ss(data, ix), w = if (!is.null(w)) w[ix], ix = ix))

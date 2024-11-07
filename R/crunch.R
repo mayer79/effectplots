@@ -226,7 +226,7 @@ calculate_stats <- function(
         which_pred = which_pred,
         bin_size = ale_bin_size,
         w = ale_data$w,
-        g = ix[ale_data$ix],
+        g = if (is.null(ale_data$ix)) ix else ix[ale_data$ix],
         ...
       )
       ok <- !is.na(out$bin_mid)
