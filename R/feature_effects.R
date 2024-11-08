@@ -229,7 +229,8 @@ feature_effects.default <- function(
   pd_data <- if (pd_n > 0L) .subsample(data, nmax = pd_n, w = w)
   ale_data <- if (ale_n > 0L) .subsample(data, nmax = ale_n, w = w)
 
-  # We want to pass a list/data.frame to mapply()
+  # We want to pass a list/data.frame to mapply(). For high length(v)/ncol(data),
+  # the approach via qDF takes significantly less memory and time.
   if (is.matrix(data)) {
     if (length(v) <= ceiling(2 / 3 * ncol(data))) {
       data <- lapply(v, function(i) data[, i])
@@ -424,7 +425,7 @@ calculate_stats <- function(
     rownames(out) <- NULL
   } else {
     # "CONTINUOUS" case. Tricky because there can be empty bins.
-    if (outlier_iqr > 0 && is.finite(outlier_iqr)) {
+    if (outlier_iqr > 0 && is.finite(outlier_iqr)) {  # could move in front of if branch
       x <- wins_iqr(x, m = outlier_iqr)
     }
     br <- hist2(x, breaks = breaks)

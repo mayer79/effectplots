@@ -18,27 +18,22 @@ X$y <- runif(n)
 
 fit <- lm(reformulate(v, "y"), data = X)
 bench::mark(
-  feature_effects(fit, v = v[1], data = X, calc_pred = FALSE), iterations = 2
+  feature_effects(fit, v = v, data = X, calc_pred = FALSE), iterations = 2
 )
+
+# 3.04s     0.330    1.63GB
 
 # Matrix
 n <- 1e7
-X <- matrix(runif(n * 20), ncol = 20)
-colnames(X) <- v <- paste0("V", 1:20)
+X <- matrix(runif(n * 10), ncol = 10)
+colnames(X) <- v <- paste0("V", 1:10)
 y <- runif(n)
 
 fit <- lm.fit(x = X, y = y)
 pf <- function(m, x) c(tcrossprod(m$coefficients, x))
 bench::mark(
-  feature_effects(fit, v = v[1:5], data = X, calc_pred = FALSE, pred_fun = pf), iterations = 2
+  feature_effects(fit, v = v, data = X, calc_pred = FALSE, pred_fun = pf), iterations = 2
 )
 
 # New
-339ms      2.95     356M  v[1]
-1.57s     0.636    1.41GB v[1:5]
-6.16s     0.162    4.64GB v
-
-# Old
-592ms      1.69    1.73GB v[1]
-1.9s     0.527    2.34GB  v[5]
-6.02s     0.166    4.64GB v[10]
+# 3.16s     0.317    2.72GB
