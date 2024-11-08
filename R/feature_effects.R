@@ -223,6 +223,7 @@ feature_effects.default <- function(
 
   # Combine pred, y, and resid. Note: cbind(NULL, NULL) is NULL
   PYR <- cbind(pred = pred, y = y, resid = if (!is.null(pred) && !is.null(y)) y - pred)
+  rm(pred, y)
 
   # Prepare pd_data and ale_data (list with data, w, ix)
   pd_data <- if (pd_n > 0L) .subsample(data, nmax = pd_n, w = w)
@@ -402,7 +403,7 @@ calculate_stats <- function(
     # Adding 0 to a double turns negative 0 to positive ones (ISO/IEC 60559)
     collapse::setop(x, "+", 0.0)
   }
-  num <- is.numeric(x) && more_than_m_distinct(x, m = discrete_m)
+  num <- is_continuous(x, m = discrete_m)
 
   if (is.null(PYR) && is.null(pd_data) && (!num || is.null(ale_data))) {
     return(NULL)
@@ -438,13 +439,13 @@ calculate_stats <- function(
     ix <- findInterval(
       x, vec = br, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
     )
-    ix <- collapse::qF(ix, sort = FALSE)  # We need to fix the order anyway due to gaps
+    ix <- collapse::qF(ix, sort = FALSE)
     M <- cbind(
       bin_mean = collapse::fmean.default(x, g = ix, w = w),
       grouped_stats(PYR, g = ix, w = w)
     )
     reindex <- match(as.integer(rownames(M)), gix)
-    out[reindex, colnames(M)] <- M  # Fill the gaps
+    out[reindex, colnames(M)] <- M  # Fill the gaps and rearrange in right order
   }
 
   # Add partial dependence

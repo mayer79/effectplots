@@ -1,9 +1,12 @@
-test_that("more_than_m_distinct() works for different ranges of x", {
-  expect_false(more_than_m_distinct(1:10, m = 10))
-  expect_true(more_than_m_distinct(1:10, m = 9))
+test_that("is_continuous() works", {
+  expect_false(is_continuous("A", m = 2))
 
-  expect_true(more_than_m_distinct(1:1e5, m = 10))
-  expect_false(more_than_m_distinct(rep(1, times = 1e5), m = 1))
+  expect_false(is_continuous(1:10, m = 10))
+  expect_true(is_continuous(1:10, m = 9))
+
+  expect_true(is_continuous(1:1e5, m = 10))
+  expect_false(is_continuous(rep(1, times = 1e5), m = 1))
+  expect_error(is_continuous(1:1e5, m = 1:1e4))
 })
 
 test_that("winsorize() works", {

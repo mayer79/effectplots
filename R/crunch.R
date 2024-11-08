@@ -1,19 +1,26 @@
-#' Checks if many distinct
+#' Check if Vector is Numeric
 #'
-#' Internal function used to check if a numeric variable has more than
+#' Internal function used to check if a variable is numeric *and* has more than
 #' m disjoint values. The function shines for extremely long vectors (~1e7).
 #'
 #' @noRd
 #' @keywords internal
 #'
-#' @param x A numeric vector.
+#' @param x A vector or factor.
 #' @param m How many disjoint values will return FALSE?
-#' @returns `TRUE` (if x has more than m levels), and `FALSE` otherwise.
-more_than_m_distinct <- function(x, m = 5L) {
-  if (length(x) <= 10000L) {
+#' @returns `TRUE` if x is numeric with > m disjoint values, and `FALSE` otherwise.
+is_continuous <- function(x, m = 5L) {
+  M <- 10000L
+  if (!is.numeric(x)) {
+    return(FALSE)
+  }
+  if (m >= M) {
+    stop("Too large value for m")
+  }
+  if (length(x) <= M) {
     return(collapse::fnunique(x) > m)
   }
-  if (collapse::fnunique(x[1L:10000L]) > m) {
+  if (collapse::fnunique(x[1L:M]) > m) {
     return(TRUE)
   }
   return(collapse::fnunique(x) > m)
@@ -119,9 +126,9 @@ grouped_stats <- function(x, g, w = NULL) {
   if (!is.factor(g)) {
     g <- collapse::qF(g, sort = TRUE)
   }
-  N <- collapse::fsum.default(rep.int(1L, times = length(g)), g = g)
+  N <- collapse::fsum(rep.int(1L, times = length(g)), g = g)
   if (!is.null(w)) {
-    weight <- collapse::fsum.default(w, g = g)
+    weight <- collapse::fsum(w, g = g)
   } else {
     weight <- N
   }
@@ -129,8 +136,8 @@ grouped_stats <- function(x, g, w = NULL) {
   if (is.null(x)) {
     return(out)
   }
-  M <- collapse::fmean.matrix(x, g = g, w = w, use.g.names = FALSE)
-  S <- collapse::fsd.matrix(x, g = g, w = w, use.g.names = FALSE)
+  M <- collapse::fmean(x, g = g, w = w, use.g.names = FALSE)
+  S <- collapse::fsd(x, g = g, w = w, use.g.names = FALSE)
   colnames(M) <- paste0(colnames(S), "_mean")
   colnames(S) <- paste0(colnames(S), "_sd")
   return(cbind(out, M, S))
