@@ -229,14 +229,19 @@ feature_effects.default <- function(
   pd_data <- if (pd_n > 0L) .subsample(data, nmax = pd_n, w = w)
   ale_data <- if (ale_n > 0L) .subsample(data, nmax = ale_n, w = w)
 
+  # We want to pass a list/data.frame to mapply()
   if (is.matrix(data)) {
-    data <- collapse::qDF(data)
+    if (length(v) <= ceiling(2 / 3 * ncol(data))) {
+      data <- lapply(v, function(i) data[, i])
+    } else {
+      data <- collapse::qDF(data)
+    }
   }
 
   out <- mapply(
     FUN = calculate_stats,
     v,
-    x = collapse::ss(data, , v),
+    x = if (is.data.frame(data)) collapse::ss(data, , v) else data,
     breaks = breaks,
     right = right,
     discrete_m = discrete_m,
