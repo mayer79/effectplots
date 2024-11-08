@@ -48,11 +48,12 @@ poor_man_stack <- function(data, to_stack) {
 # The function assumes symmetric margin pairs ((left, right), (top, bottom))
 corr_margin <- function(m, margin) {
   if (m >= 3L) {
-    f <- 1 / m * (1 - 2 * margin)  # ok? Or rather 1 / m / (1 + 2 * margin)?
-    n_inner <- m - 2L
-    return(c(f, rep((1 - 2 * f) / n_inner, times = n_inner), f))
+    average_margin <- margin * (m - 2) / m
+    outer_size <- 1 / m - average_margin
+    inner_size <- 1 / m - average_margin + margin
+    return(c(outer_size, rep(inner_size, m - 2L), outer_size))
   }
-  return(NULL)
+  NULL
 }
 
 get_ylab <- function(lines) {
