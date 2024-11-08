@@ -256,7 +256,7 @@ feature_effects.default <- function(
       which_pred = which_pred,
       pd_data = pd_data,
       ale_data = ale_data,
-      ale_bin_size,
+      ale_bin_size = ale_bin_size,
       ...
     ),
     SIMPLIFY = FALSE

@@ -18,7 +18,8 @@ X$y <- runif(n)
 
 fit <- lm(reformulate(v, "y"), data = X)
 bench::mark(
-  feature_effects(fit, v = v, data = X, calc_pred = FALSE), iterations = 2
+  feature_effects(fit, v = v, data = X, calc_pred = FALSE, seed = 1),
+  iterations = 2
 )
 
 # 3.04s     0.330    1.63GB
@@ -32,7 +33,9 @@ y <- runif(n)
 fit <- lm.fit(x = X, y = y)
 pf <- function(m, x) c(tcrossprod(m$coefficients, x))
 bench::mark(
-  feature_effects(fit, v = v, data = X, calc_pred = FALSE, pred_fun = pf), iterations = 2
+  feature_effects(fit, v = v, data = X, calc_pred = FALSE, pred_fun = pf, seed = 1),
+  feature_effects2(fit, v = v, data = X, calc_pred = FALSE, pred_fun = pf, seed = 1),
+  iterations = 2
 )
 
 # New
