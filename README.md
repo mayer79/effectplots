@@ -12,7 +12,7 @@
 The main function `feature_effects()` crunches the following statistics per feature X over values/bins:
 
 - Average observed y values: Descriptive associations between response y and features.
-- Average predictions: Combined effect of X and other (correlated) features, see M Plots, Apley [1].
+- Average predictions: Combined effect of X and other (correlated) features, equal to M Plots (Apley [1]).
 - Partial dependence: How does the average prediction changes with X, keeping other feature values fixed, see Friedman [2].
 - Accumulated local effects: Alternative to partial dependence, see Apley [1].
 - Average residuals: Calculated when both `y` and predictions are available. Used to assess bias.
@@ -40,7 +40,7 @@ pak::pak("mayer79/effectplots")
 We use synthetic data with 1 Mio rows containing information on Motor TPL insurance policies and claims.
 The aim is to model claim frequency as a function of features like "driver_age" and "car_power".
 
-Before modeling, we want to study association between features and response.
+Before modeling, we want to study association between features and the response.
 
 ``` r
 library(effectplots)
@@ -62,7 +62,7 @@ average_observed(df[xvars], y = df$claim_nb) |>
 
 ![](man/figures/avg_obs.svg)
 
-The plots have been automatically sorted by decreasing (weighted) variance of the average observed values. A shared y axis helps to compare the strength of the association across features.
+A shared y axis helps to compare the strength of the association across features.
 
 ### Fit model
 
@@ -112,13 +112,13 @@ feature_effects(fit, v = xvars, data = X_test, y = test$claim_nb) |>
 
 **Comments**
 
-1. Comparing average predictions with average observed y provides a good overview of model bias. The bias on the test data seems to be small. Studying the same plot on the training data would help to assess in-sample bias.
-2. Comparing the shape of partial dependence or ALE with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors "driver_age" and "car_power", the lines are very similar. Thus, the effects are mainly due to the feature on the x axis and not of some other, correlated, feature.
+1. Comparing average predictions with average observed y provides a good overview of model bias. It seems to be small.
+2. Comparing the shape of partial dependence or ALE with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors "driver_age" and "car_power", the lines are similar. Thus, the effects are mainly due to the feature on the x axis and not of some other, correlated, feature.
 3. Sorting is done by decreasing weighted variance of the partial dependence values, a measure of main-effect strength closely related to [3].
 
 ### Flexibility
 
-Thanks to the flexibility of the package, you can modify the results as you wish. For instance: what about putting results on training data besides those on test? Or comparing different models or subgroups? 
+Thanks to the flexibility of the package, we can modify the results as we wish. For instance: what about putting results on training data besides those on test? Or comparing different models or subgroups? 
 
 ```r
 m_train <- feature_effects(fit, v = xvars, data = X_train, y = train$claim_nb)
