@@ -75,19 +75,14 @@
 <p><strong>{effectplots}</strong> is an R package for calculating and plotting effects of any model.</p>
 <p>The main function <code><a href="reference/feature_effects.html">feature_effects()</a></code> crunches the following statistics per feature X over values/bins:</p>
 <ul>
-<li>
-<strong>Average observed y values</strong>: Assess descriptive associations between response y and features.</li>
-<li>
-<strong>Average predictions</strong> (M Plots, Apley [1]): Combined effect of X and other (correlated) features.</li>
-<li>
-<strong>Average residuals:</strong> Calculated when both <code>y</code> and predictions are available. Useful to study model bias.</li>
-<li>
-<strong>Partial dependence</strong> (Friedman [2]): How does the average prediction changes with X, keeping other feature values fixed?</li>
-<li>
-<strong>Accumulated local effects</strong> (Apley [1]): Alternative to partial dependence.</li>
+<li>Average observed y values: Assess descriptive associations between response y and features.</li>
+<li>Average predictions (M Plots, Apley [1]): Combined effect of X and other (correlated) features.</li>
+<li>Average residuals: Calculated when both <code>y</code> and predictions are available. Useful to study model bias.</li>
+<li>Partial dependence (Friedman [2]): How does the average prediction changes with X, keeping other feature values fixed?</li>
+<li>Accumulated local effects (Apley [1]): Alternative to partial dependence.</li>
 <li>Additionally: Bin sizes, and standard deviations of observed y and residuals.</li>
 </ul>
-<p><span style="color:red">It takes 3 seconds on a laptop to get all statistics for ten features on a 10 Mio row dataset (+ prediction time).</span></p>
+<p><strong>It takes 3 seconds on a laptop to get all statistics for ten features on a 10 Mio row dataset (+ prediction time).</strong></p>
 <p><strong>Workflow</strong></p>
 <ol style="list-style-type: decimal">
 <li>
@@ -95,8 +90,7 @@
 <li>
 <strong>Post-process</strong> the results with <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>, e.g., to collapse rare levels of categorical features or to sort the results by a simple variable importance measure.</li>
 <li>
-<strong>Plot</strong> the results with <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>. <strong>Choose between {ggplot2}/{patchwork} and {plotly}.</strong>
-</li>
+<strong>Plot</strong> the results with <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>. Choose between {ggplot2}/{patchwork} and {plotly}.</li>
 </ol>
 <p><strong>Some cool things</strong></p>
 <ul>
@@ -209,6 +203,19 @@
 <span>    title <span class="op">=</span> <span class="st">"Left: Train - Right: Test"</span>,</span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/train_test.svg"></p>
+<p>In case you want to dig deeper into possible bias, we can use “resid_mean” as statistic, and show 95% Z confidence intervals for the bias.</p>
+<div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">m_train</span>, <span class="va">m_test</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
+<span>    ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.2</span>, <span class="fl">0.2</span><span class="op">)</span>,</span>
+<span>    ncol <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>    byrow <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>    stats <span class="op">=</span> <span class="st">"resid_mean"</span>,</span>
+<span>    subplot_titles <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>    title <span class="op">=</span> <span class="st">"Left: Train - Right: Test"</span>,</span>
+<span>    errors <span class="op">=</span> <span class="st">"ci"</span></span>
+<span>  <span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/bias.svg"></p>
 <p>See Christoph Molnar’s book [4] for more background on feature effects.</p>
 </div>
 </div>
