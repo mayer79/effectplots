@@ -30,9 +30,11 @@
 #' @param errors What errors (ribbons for numeric X, bars for others) should be shown
 #'   for observed y and residuals? One of
 #'   - "no" (default),
-#'   - "ci": 95% Z confidence intervals using sqrt(N) as standard error of the mean,
+#'   - "ci": Z confidence intervals using sqrt(N) as standard error of the mean,
 #'   - "ciw": Like "ci", but using sqrt(weight) as standard error of the mean and
 #'   - "sd": standard deviations.
+#' @param ci_level The nominal level of the Z confidence intervals (only when
+#'   `error` equals "ci" or "ciw"). The default is 0.95.
 #' @param colors Vector of line/point colors of sufficient length.
 #'   By default, a color blind friendly palette from "ggthemes".
 #'   To change globally, set `options(effectplots.colors = new colors)`.
@@ -78,6 +80,7 @@ plot.EffectData <- function(
     ylab = NULL,
     legend_labels = NULL,
     errors = c("no", "ci", "ciw", "sd"),
+    ci_level = 0.95,
     colors = getOption("effectplots.colors"),
     fill = getOption("effectplots.fill"),
     alpha = 1,
@@ -152,8 +155,9 @@ plot.EffectData <- function(
   # Overwrite sd columns
   sd_cols <- intersect(c("y_sd", "pred_sd", "resid_sd"), colnames(x[[1L]]))
   if (errors %in% c("ci", "ciw") && length(sd_cols)) {
+    q <- stats::qnorm(1 - (1 - ci_level) / 2)
     D <- switch(errors, ci = "N", ciw = "weight")
-    x[] <- lapply(x, function(z) {z[sd_cols] <- 1.96 * z[sd_cols] / sqrt(z[[D]]); z})
+    x[] <- lapply(x, function(z) {z[sd_cols] <- q * z[sd_cols] / sqrt(z[[D]]); z})
   }
 
   # Derive a good ylab
@@ -491,7 +495,7 @@ one_ggplot <- function(
     p <- p + ggplot2::ggtitle(title)
   }
   if (!is.null(ylim)) {
-    p <- p + ggplot2::ylim(ylim)
+    p <- p + ggplot2::coord_cartesian(ylim = ylim)
   }
   if (!num) {
     if (wrap_x > 0 && is.finite(wrap_x)) {

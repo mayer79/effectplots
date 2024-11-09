@@ -18,6 +18,7 @@
   ylab = NULL,
   legend_labels = NULL,
   errors = c("no", "ci", "ciw", "sd"),
+  ci_level = 0.95,
   colors = getOption("effectplots.colors"),
   fill = getOption("effectplots.fill"),
   alpha = 1,
@@ -69,10 +70,13 @@ statistics plotted, or \code{NULL} (default).}
 for observed y and residuals? One of
 \itemize{
 \item "no" (default),
-\item "ci": 95\% Z confidence intervals using sqrt(N) as standard error of the mean,
+\item "ci": Z confidence intervals using sqrt(N) as standard error of the mean,
 \item "ciw": Like "ci", but using sqrt(weight) as standard error of the mean and
 \item "sd": standard deviations.
 }}
+
+\item{ci_level}{The nominal level of the Z confidence intervals (only when
+\code{error} equals "ci" or "ciw"). The default is 0.95.}
 
 \item{colors}{Vector of line/point colors of sufficient length.
 By default, a color blind friendly palette from "ggthemes".
@@ -117,7 +121,7 @@ xvars <- colnames(iris)[-1]
 M <- feature_effects(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 plot(M, share_y = "all")
 plot(M, stats = c("pd", "ale"), legend_labels = c("PD", "ALE"))
-plot(M, stats = "resid_mean", share_y = "all")
+plot(M, stats = "resid_mean", share_y = "all", errors = "ci")
 }
 \seealso{
 \code{\link[=feature_effects]{feature_effects()}}, \code{\link[=average_observed]{average_observed()}}, \code{\link[=average_predicted]{average_predicted()}},
