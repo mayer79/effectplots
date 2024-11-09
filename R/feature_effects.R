@@ -156,6 +156,8 @@ feature_effects.default <- function(
   if (!is.null(y)) {
     if (length(y) == 1L) {
       y <- if (is.matrix(data)) data[, y] else data[[y]]
+    } else {
+      y <- unname(y)
     }
     if (!is.numeric(y) && !is.logical(y)) {
       stop("'y' must be numeric or logical.")

@@ -392,14 +392,18 @@ one_ggplot <- function(
     poor_man_stack(x, to_stack = stat_info),
     varying_ = factor(varying_, levels = stat_info, labels = names(stat_info))
   )
-#
-#   mean_cols <- intersect(stat_info, c("y_mean", "resid_mean"))
-#   if (errors != "no" && length(mean_cols)) {
-#     err_cols <- gsub("_mean", "_sd", mean_cols)
-#     df_err <- poor_man_stack(x[c("bin_mids", err_cols)], to_stack = err_cols)
-#     colnames(df_err)[3] <- "err_"
-#     df_err$varying_ <- mean_cols[match()]
-#   }
+
+  # This block is a bit ugly...
+  err_mean <- intersect(stat_info, c("y_mean", "resid_mean"))
+  has_errors <- errors != "no" && length(err_mean)
+  if (has_errors) {
+    err_cols <- gsub("_mean", "_sd", err_mean)
+    all_err_cols <-  paste0(gsub("_mean", "", stat_info), "_sd")
+    add_cols <- setdiff(all_err_cols, err_cols)
+    x[, add_cols] <- 0  # NA produces warnings at print time
+    # to_stack must be in the order of stat_info to match above's poor_man_stack()
+    df$err_ <- poor_man_stack(x, to_stack = all_err_cols)$value_
+  }
 
   # Calculate transformation of bars on the right y axis
   if (is.null(ylim)) {
@@ -428,6 +432,27 @@ one_ggplot <- function(
       fill = fill,
       color = fill
     )
+  }
+  if (has_errors) {
+    if (num) {
+      p <- p + ggplot2::geom_ribbon(
+        ggplot2::aes(
+          ymin = value_ - err_, ymax = value_ + err_, fill = varying_, color = varying_
+        ),
+        alpha = alpha / 2 ,
+        show.legend = FALSE
+      ) +
+        ggplot2::scale_fill_manual(values = colors)
+      } else {
+      p <- p + ggplot2::geom_errorbar(
+        data = subset(df, !is.na(err_)),
+        ggplot2::aes(ymin = value_ - err_, ymax = value_ + err_, color = varying_),
+        linewidth = 0.8,
+        alpha = alpha / 2,
+        width = 0,
+        show.legend = FALSE
+      )
+    }
   }
 
   # Add zero line if average residuals are to be shown
