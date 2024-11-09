@@ -85,7 +85,7 @@
 <p><strong>Workflow</strong></p>
 <ol style="list-style-type: decimal">
 <li>
-<strong>Crunch</strong> values via <code><a href="reference/feature_effects.html">feature_effects()</a></code> or the little helpers <code><a href="reference/average_observed.html">average_observed()</a></code>, <code><a href="reference/partial_dependence.html">partial_dependence()</a></code>, <code><a href="reference/ale.html">ale()</a></code> etc.</li>
+<strong>Crunch</strong> values via <code><a href="reference/feature_effects.html">feature_effects()</a></code> or the little helpers <code><a href="reference/average_observed.html">average_observed()</a></code>, <code><a href="reference/partial_dependence.html">partial_dependence()</a></code> etc.</li>
 <li>
 <strong>Update</strong> the results with <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>: Combine rare levels of categorical features, sort results by importance etc.</li>
 <li>
@@ -102,8 +102,7 @@
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
-<p>We use a 1 Mio row dataset about Motor TPL insurance. The aim is to model claim frequency.</p>
-<p>Before modeling, we want to study association between features and the response.</p>
+<p>We use a 1 Mio row dataset about Motor TPL insurance. The aim is to model claim frequency. Before modeling, we want to study association between features and the response.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mayer79/effectplots" class="external-link">effectplots</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/openml/openml-r" class="external-link">OpenML</a></span><span class="op">)</span></span>
