@@ -452,7 +452,7 @@ one_ggplot <- function(
         data = subset(df, !is.na(err_)),
         ggplot2::aes(ymin = value_ - err_, ymax = value_ + err_, color = varying_),
         linewidth = 0.8,
-        alpha = alpha,
+        alpha = alpha * 2 / 3,
         width = 0,
         show.legend = FALSE
       )
@@ -593,7 +593,7 @@ one_plotly <- function(
       mode = scatter_mode,
       type = "scatter",
       error_y = if (has_errors && !num)
-        list(array = x[[error_col]], opacity = alpha, width = 0),
+        list(array = x[[error_col]], opacity = alpha * 2/ 3, width = 0),
       name = names(z),
       showlegend = show_legend,
       legendgroup = z,

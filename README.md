@@ -11,20 +11,20 @@
 
 The main function `feature_effects()` crunches the following statistics per feature X over values/bins:
 
-- **Average observed y values**: Assess descriptive associations between response y and features.
-- **Average predictions** (M Plots, Apley [1]): Combined effect of X and other (correlated) features.
-- **Average residuals:** Calculated when both `y` and predictions are available. Useful to study model bias.
-- **Partial dependence** (Friedman [2]): How does the average prediction changes with X, keeping other feature values fixed?
-- **Accumulated local effects** (Apley [1]): Alternative to partial dependence.
+- Average observed y values: Assess descriptive associations between response y and features.
+- Average predictions (M Plots, Apley [1]): Combined effect of X and other (correlated) features.
+- Average residuals: Calculated when both `y` and predictions are available. Useful to study model bias.
+- Partial dependence (Friedman [2]): How does the average prediction changes with X, keeping other feature values fixed?
+- Accumulated local effects (Apley [1]): Alternative to partial dependence.
 - Additionally: Bin sizes, and standard deviations of observed y and residuals.
 
-<span style="color:red">It takes 3 seconds on a laptop to get all statistics for ten features on a 10 Mio row dataset (+ prediction time).</span>
+**It takes 3 seconds on a laptop to get all statistics for ten features on a 10 Mio row dataset (+ prediction time).**
 
 **Workflow**
 
 1. **Crunch** values via `feature_effects()` or the convenience wrappers `average_observed()`, `average_predicted()`, `bias()`, `partial_dependence()`, and `ale()`.
 2. **Post-process** the results with `update()`, e.g., to collapse rare levels of categorical features or to sort the results by a simple variable importance measure.
-3. **Plot** the results with `plot()`. **Choose between {ggplot2}/{patchwork} and {plotly}.**
+3. **Plot** the results with `plot()`. Choose between {ggplot2}/{patchwork} and {plotly}.
 
 **Some cool things**
 
@@ -149,6 +149,24 @@ c(m_train, m_test) |>
 ```
 
 ![](man/figures/train_test.svg)
+
+In case you want to dig deeper into possible bias, we can use "resid_mean" as statistic,
+and show 95% Z confidence intervals for the bias.
+
+```r
+c(m_train, m_test) |> 
+  plot(
+    ylim = c(-0.2, 0.2),
+    ncol = 2,
+    byrow = FALSE,
+    stats = "resid_mean",
+    subplot_titles = FALSE,
+    title = "Left: Train - Right: Test",
+    errors = "ci"
+  )
+```
+
+![](man/figures/bias.svg)
 
 See Christoph Molnar's book [4] for more background on feature effects.
 

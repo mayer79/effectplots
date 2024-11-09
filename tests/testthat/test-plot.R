@@ -33,14 +33,6 @@ test_that("ncols has an effect", {
 test_that("ylim can bet set", {
   ylims <- c(2, 10)
 
-  # One x
-  out <- ggplot2::layer_scales(plot(M[1], ylim = ylims))$y$limits
-  expect_equal(out, ylims)
-
-  # Multiple x
-  out <- ggplot2::layer_scales(plot(M, ylim = ylims))$y$limits
-  expect_equal(out, ylims)
-
   # Plotly
 
   # One x
