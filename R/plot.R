@@ -27,6 +27,12 @@
 #'   a reasonable name.
 #' @param legend_labels Vector of legend labels in the same order as the
 #'   statistics plotted, or `NULL` (default).
+#' @param errors What errors (ribbons for numeric X, bars for others) should be shown
+#'   for observed y and residuals? One of
+#'   - "no" (default),
+#'   - "se": standard errors using "N",
+#'   - "sew": standard errors using "weight",
+#'   - "sd": standard deviations.
 #' @param colors Vector of line/point colors of sufficient length.
 #'   By default, a color blind friendly palette from "ggthemes".
 #'   To change globally, set `options(effectplots.colors = new colors)`.
@@ -71,6 +77,7 @@ plot.EffectData <- function(
     subplot_titles = TRUE,
     ylab = NULL,
     legend_labels = NULL,
+    errors = c("no", "se", "sew", "sd"),
     colors = getOption("effectplots.colors"),
     fill = getOption("effectplots.fill"),
     alpha = 1,
@@ -83,6 +90,7 @@ plot.EffectData <- function(
     ...
 ) {
   share_y <- match.arg(share_y)
+  errors <- match.arg(errors)
   bar_measure <- match.arg(bar_measure)
 
   # Info of the form c(legend label = col name, ...)
@@ -141,6 +149,13 @@ plot.EffectData <- function(
     x[] <- lapply(x, function(z) {if (!.num(z)) z$bin_width <- bar_width; z})
   }
 
+  # Overwrite sd columns
+  sd_cols <- intersect(c("y_sd", "pred_sd", "resid_sd"), colnames(x[[1L]]))
+  if (errors %in% c("se", "sew") && length(sd_cols)) {
+    div <- switch(errors, se = "N", sew = "weight")
+    x[] <- lapply(x, function(z) {z[sd_cols] <- z[sd_cols] / sqrt(z[[div]]); z})
+  }
+
   # Derive a good ylab
   if (is.null(ylab)) {
     ylab <- get_ylab(stat_info)
@@ -161,6 +176,7 @@ plot.EffectData <- function(
         title = title,
         ylab = ylab,
         stat_info = stat_info,
+        errors = errors,
         colors = colors,
         fill = fill,
         alpha = alpha,
@@ -182,6 +198,7 @@ plot.EffectData <- function(
         title_as_ann = FALSE,
         ylab = ylab,
         stat_info = stat_info,
+        errors = errors,
         colors = colors,
         fill = fill,
         alpha = alpha,
@@ -253,6 +270,7 @@ plot.EffectData <- function(
         num_points = num_points,
         ylab = ylab,
         stat_info = stat_info,
+        errors = errors,
         colors = colors,
         fill = fill,
         alpha = alpha,
@@ -294,6 +312,7 @@ plot.EffectData <- function(
         ylab = ylab,
         show_ylab = FALSE,  # replaced by global annotation
         stat_info = stat_info,
+        errors = errors,
         colors = colors,
         fill = fill,
         alpha = alpha,
@@ -351,6 +370,7 @@ one_ggplot <- function(
     title,
     ylab,
     stat_info,
+    errors,
     colors,
     fill,
     alpha,
@@ -462,6 +482,7 @@ one_plotly <- function(
     title_as_ann = FALSE,
     ylab,
     stat_info,
+    errors,
     colors,
     fill,
     alpha,
@@ -522,6 +543,10 @@ one_plotly <- function(
 
   for (i in seq_along(stat_info)) {
     z <- stat_info[i]
+    has_errors <- errors != "no" && z %in% c("y_mean", "resid_mean")
+    if (has_errors) {
+      error_col <- gsub("_mean", "_sd", z)
+    }
     fig <- plotly::add_trace(
       fig,
       x = ~bin_mean,
@@ -530,11 +555,26 @@ one_plotly <- function(
       yaxis = "y",
       mode = scatter_mode,
       type = "scatter",
+      error_y = if (has_errors && !num)
+        list(array = x[[error_col]], opacity = alpha / 2, width = 0),
       name = names(z),
       showlegend = show_legend,
       legendgroup = z,
       color = I(colors[i]),
       opacity = alpha
+    )
+    if (has_errors && num)
+      fig <- plotly::add_ribbons(
+       fig,
+       x = ~bin_mean,
+       ymin = x[[z]] - x[[error_col]],
+       ymax = x[[z]] + x[[error_col]],
+       data = x,
+       yaxis = "y",
+       name = NULL,
+       showlegend = FALSE,
+       color = I(colors[i]),
+       opacity = alpha / 2
     )
   }
 
@@ -560,6 +600,20 @@ one_plotly <- function(
     }
   }
 
+  # Zero-line
+  if ("resid_mean" %in% stat_info) {
+    zero_line <- list(
+      type = "line",
+      x0 = 0.03,
+      x1 = 0.97,
+      xref = "paper",
+      y0 = 0,
+      y1 = 0,
+      line = list(color = "black", dash = "dash")
+    )
+    fig <- plotly::layout(fig, shapes = zero_line)
+  }
+
   plotly::layout(
     fig,
     yaxis = list(
@@ -567,7 +621,7 @@ one_plotly <- function(
       title = if (show_ylab) ylab else "",
       showticklabels = show_yticks,
       overlaying = overlay,
-      zeroline = ("resid_mean" %in% stat_info)
+      zeroline = FALSE
     ),
     yaxis2 = list(
       side = "right",

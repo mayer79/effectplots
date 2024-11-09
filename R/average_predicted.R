@@ -40,8 +40,8 @@ average_predicted <- function(
   }
   feature_effects.default(
     object = NULL,
-    v = colnames(X),
     data = X,
+    v = colnames(X),
     pred = pred,
     w = w,
     breaks = breaks,

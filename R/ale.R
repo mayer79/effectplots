@@ -70,8 +70,8 @@ ale.default <- function(
 ) {
   feature_effects.default(
     object = object,
-    v = v,
     data = data,
+    v = v,
     y = NULL,
     pred_fun = pred_fun,
     trafo = trafo,
