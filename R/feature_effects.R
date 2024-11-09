@@ -31,8 +31,9 @@
 #' - [ale()].
 #'
 #' @param object Fitted model.
-#' @param v Vector of variable names to calculate statistics.
 #' @param data Matrix or data.frame.
+#' @param v Vector of variable names to calculate statistics. By default, all column
+#'   names in `data` (minus `y` and `w` if passed as strings).
 #' @param y Numeric vector with observed values of the response.
 #'   Can also be a column name in `data`. Omitted if `NULL` (default).
 #' @param pred Numeric vector with predictions. If `NULL`, it is calculated as
@@ -95,8 +96,7 @@
 #' @export
 #' @examples
 #' fit <- lm(Sepal.Length ~ ., data = iris)
-#' xvars <- colnames(iris)[-1]
-#' M <- feature_effects(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
+#' M <- feature_effects(fit, data = iris, y = "Sepal.Length", breaks = 5)
 #' M
 #' M |> update(sort = "pd") |> plot(share_y = "all")
 feature_effects <- function(object, ...) {
@@ -107,8 +107,8 @@ feature_effects <- function(object, ...) {
 #' @export
 feature_effects.default <- function(
     object,
-    v,
     data,
+    v = colnames(data),
     y = NULL,
     pred = NULL,
     pred_fun = stats::predict,
@@ -151,22 +151,10 @@ feature_effects.default <- function(
     set.seed(seed)
   }
 
-  # Prepare breaks
-  nv <- length(v)
-  if (is.list(breaks)) {
-    if (length(breaks) < nv) {
-      br <- replicate(nv, "Sturges", simplify = FALSE)
-      names(br) <- v
-      br[names(breaks)] <- breaks
-      breaks <- br
-    }
-  } else {
-    breaks <- replicate(nv, breaks, simplify = FALSE)
-  }
-
   # Prepare y
   if (!is.null(y)) {
     if (length(y) == 1L) {
+      v <- setdiff(v, y)
       y <- if (is.matrix(data)) data[, y] else data[[y]]
     }
     if (!is.numeric(y) && !is.logical(y)) {
@@ -188,6 +176,7 @@ feature_effects.default <- function(
   # Prepare w
   if (!is.null(w)) {
     if (length(w) == 1L) {
+      v <- setdiff(v, w)
       w <- if (is.matrix(data)) data[, w] else data[[w]]
     }
     if (!is.numeric(w) && !is.logical(w)) {
@@ -228,6 +217,20 @@ feature_effects.default <- function(
   # Prepare pd_data and ale_data (list with data, w, ix)
   pd_data <- if (pd_n > 0L) .subsample(data, nmax = pd_n, w = w)
   ale_data <- if (ale_n > 0L) .subsample(data, nmax = ale_n, w = w)
+
+  # Prepare breaks
+  nv <- length(v)
+  stopifnot(nv > 0L)
+  if (is.list(breaks)) {
+    if (length(breaks) < nv) {
+      br <- replicate(nv, "Sturges", simplify = FALSE)
+      names(br) <- v
+      br[names(breaks)] <- breaks
+      breaks <- br
+    }
+  } else {
+    breaks <- replicate(nv, breaks, simplify = FALSE)
+  }
 
   # We want to pass a list/data.frame to mapply(). For high length(v)/ncol(data),
   # the approach via qDF takes significantly less memory and time.
@@ -280,8 +283,8 @@ feature_effects.default <- function(
 #' @export
 feature_effects.ranger <- function(
     object,
-    v,
     data,
+    v = colnames(data),
     y = NULL,
     pred = NULL,
     pred_fun = NULL,
@@ -305,8 +308,8 @@ feature_effects.ranger <- function(
   }
   feature_effects.default(
     object,
-    v = v,
     data = data,
+    v = v,
     y = y,
     pred = pred,
     pred_fun = pred_fun,
@@ -329,8 +332,8 @@ feature_effects.ranger <- function(
 #' @export
 feature_effects.explainer <- function(
   object,
-  v,
   data = object[["data"]],
+  v = colnames(data),
   y = NULL,
   pred = NULL,
   pred_fun = object[["predict_function"]],
@@ -349,8 +352,8 @@ feature_effects.explainer <- function(
 ) {
   feature_effects.default(
     object,
-    v = v,
     data = data,
+    v = v,
     y = y,
     pred = pred,
     pred_fun = pred_fun,

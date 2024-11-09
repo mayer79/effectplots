@@ -66,7 +66,7 @@ partial_dependence(object, ...)
 \item{...}{Further arguments passed to \code{pred_fun()}, e.g., \code{type = "response"} in
 a \code{glm()} or (typically) \code{prob = TRUE} in classification models.}
 
-\item{v}{Vector of variable names to calculate statistics.}
+\item{v}{Vector of feature names.}
 
 \item{data}{Matrix or data.frame.}
 

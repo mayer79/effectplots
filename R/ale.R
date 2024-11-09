@@ -24,6 +24,7 @@
 #' by [feature_effects()] are vertically shifted to the same (weighted) average than the
 #' partial dependence curve, for optimal comparability.
 #'
+#' @param v Vector of feature names.
 #' @inheritParams feature_effects
 #' @param seed Optional random seed (an integer) used for:
 #'   - ALE: select background data if `n > ale_n` and for bins > `ale_bin_size`.

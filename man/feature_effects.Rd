@@ -11,8 +11,8 @@ feature_effects(object, ...)
 
 \method{feature_effects}{default}(
   object,
-  v,
   data,
+  v = colnames(data),
   y = NULL,
   pred = NULL,
   pred_fun = stats::predict,
@@ -33,8 +33,8 @@ feature_effects(object, ...)
 
 \method{feature_effects}{ranger}(
   object,
-  v,
   data,
+  v = colnames(data),
   y = NULL,
   pred = NULL,
   pred_fun = NULL,
@@ -54,8 +54,8 @@ feature_effects(object, ...)
 
 \method{feature_effects}{explainer}(
   object,
-  v,
   data = object[["data"]],
+  v = colnames(data),
   y = NULL,
   pred = NULL,
   pred_fun = object[["predict_function"]],
@@ -79,9 +79,10 @@ feature_effects(object, ...)
 \item{...}{Further arguments passed to \code{pred_fun()}, e.g., \code{type = "response"} in
 a \code{glm()} or (typically) \code{prob = TRUE} in classification models.}
 
-\item{v}{Vector of variable names to calculate statistics.}
-
 \item{data}{Matrix or data.frame.}
+
+\item{v}{Vector of variable names to calculate statistics. By default, all column
+names in \code{data} (minus \code{y} and \code{w} if passed as strings).}
 
 \item{y}{Numeric vector with observed values of the response.
 Can also be a column name in \code{data}. Omitted if \code{NULL} (default).}
@@ -193,8 +194,7 @@ If you need only one specific statistic, you can use the simplified APIs of
 }}
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)
-xvars <- colnames(iris)[-1]
-M <- feature_effects(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
+M <- feature_effects(fit, data = iris, y = "Sepal.Length", breaks = 5)
 M
 M |> update(sort = "pd") |> plot(share_y = "all")
 }

@@ -17,6 +17,7 @@
 #' and eventually weighted by `w`.
 #'
 #' @inheritParams feature_effects
+#' @param v Vector of feature names.
 #' @param seed Optional random seed (an integer) used for:
 #'   - Partial dependence: select background data if `n > pd_n`.
 #'   - Capping X: quartiles are selected based on 10k observations.
