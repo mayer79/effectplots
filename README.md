@@ -13,7 +13,7 @@ The main function `feature_effects()` crunches the following statistics per feat
 
 - Average observed y values: Descriptive associations between response y and features.
 - Average predictions: Combined effect of X and other features (M Plots, Apley [1]).
-- Partial dependence (Friedman [2]): How does the average prediction changes with X, keeping other features fixed.
+- Partial dependence (Friedman [2]): How does the average prediction react on X, keeping other features fixed.
 - Accumulated local effects (Apley [1]): Alternative to partial dependence.
 
 Furthermore, it calculates counts, average residuals, and standard deviations of observed y and residuals, eventually accounting for case weights. We highly recommend Christoph Molnar's book [3] for more info on feature effects.
@@ -22,8 +22,8 @@ Furthermore, it calculates counts, average residuals, and standard deviations of
 
 **Workflow**
 
-1. **Crunch** values via `feature_effects()` or the convenience helpers `average_observed()`, `partial_dependence()`, `ale()` etc.
-2. **Update** the results with `update()`: Collapse rare levels of categorical features, sort results by variable importance etc.
+1. **Crunch** values via `feature_effects()` or the little helpers `average_observed()`, `partial_dependence()`, `ale()` etc.
+2. **Update** the results with `update()`: Combine rare levels of categorical features, sort results by importance etc.
 3. **Plot** the results with `plot()`: Choose between ggplot2/patchwork and plotly.
 
 ## Installation
@@ -37,7 +37,7 @@ pak::pak("mayer79/effectplots")
 
 ## Usage
 
-We use a 1 Mio row dataset with information on Motor TPL insurance policies and claims. The aim is to model claim frequency.
+We use a 1 Mio row dataset about Motor TPL insurance. The aim is to model claim frequency.
 
 Before modeling, we want to study association between features and the response.
 
@@ -111,7 +111,7 @@ feature_effects(fit, v = xvars, data = X_test, y = test$claim_nb) |>
 
 ### Flexibility
 
-What about putting results on training data besides those on test? Or comparing different models or subgroups? No problem:
+What about combining training and test results? Or comparing different models or subgroups? No problem:
 
 ```r
 m_train <- feature_effects(fit, v = xvars, data = X_train, y = train$claim_nb)
