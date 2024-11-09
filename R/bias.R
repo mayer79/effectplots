@@ -35,8 +35,8 @@ bias <- function(
   # We treat "resid" as "y" and then change y_mean/sd to resid_mean/sd
   out <- feature_effects.default(
     object = NULL,
-    data = X,
     v = colnames(X),
+    data = X,
     y = resid,
     w = w,
     breaks = breaks,

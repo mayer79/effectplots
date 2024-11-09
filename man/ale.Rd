@@ -47,7 +47,7 @@ ale(object, ...)
 
 \method{ale}{explainer}(
   object,
-  v,
+  v = colnames(data),
   data = object[["data"]],
   pred_fun = object[["predict_function"]],
   trafo = NULL,
@@ -69,7 +69,7 @@ ale(object, ...)
 \item{...}{Further arguments passed to \code{pred_fun()}, e.g., \code{type = "response"} in
 a \code{glm()} or (typically) \code{prob = TRUE} in classification models.}
 
-\item{v}{Vector of feature names.}
+\item{v}{Vector of variable names to calculate statistics.}
 
 \item{data}{Matrix or data.frame.}
 

@@ -17,7 +17,6 @@
 #' and eventually weighted by `w`.
 #'
 #' @inheritParams feature_effects
-#' @param v Vector of feature names.
 #' @param seed Optional random seed (an integer) used for:
 #'   - Partial dependence: select background data if `n > pd_n`.
 #'   - Capping X: quartiles are selected based on 10k observations.
@@ -60,8 +59,8 @@ partial_dependence.default <- function(
 ) {
   feature_effects.default(
     object = object,
-    data = data,
     v = v,
+    data = data,
     y = NULL,
     pred_fun = pred_fun,
     trafo = trafo,
@@ -124,7 +123,7 @@ partial_dependence.ranger <- function(
 #' @export
 partial_dependence.explainer <- function(
     object,
-    v,
+    v = colnames(data),
     data = object[["data"]],
     pred_fun = object[["predict_function"]],
     trafo = NULL,

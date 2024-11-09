@@ -24,7 +24,6 @@
 #' by [feature_effects()] are vertically shifted to the same (weighted) average than the
 #' partial dependence curve, for optimal comparability.
 #'
-#' @param v Vector of feature names.
 #' @inheritParams feature_effects
 #' @param seed Optional random seed (an integer) used for:
 #'   - ALE: select background data if `n > ale_n` and for bins > `ale_bin_size`.
@@ -70,8 +69,8 @@ ale.default <- function(
 ) {
   feature_effects.default(
     object = object,
-    data = data,
     v = v,
+    data = data,
     y = NULL,
     pred_fun = pred_fun,
     trafo = trafo,
@@ -137,7 +136,7 @@ ale.ranger <- function(
 #' @export
 ale.explainer <- function(
     object,
-    v,
+    v = colnames(data),
     data = object[["data"]],
     pred_fun = object[["predict_function"]],
     trafo = NULL,

@@ -44,8 +44,8 @@ average_observed <- function(
   }
   feature_effects.default(
     object = NULL,
-    data = X,
     v = colnames(X),
+    data = X,
     y = y,
     w = w,
     breaks = breaks,
