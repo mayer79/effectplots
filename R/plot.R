@@ -2,11 +2,11 @@
 #'
 #' Versatile plot function for an "EffectData" object. By default, all calculated
 #' statistics (except "resid_mean") are shown. To select certain statistics,
-#' use the `stat` argument. Set `plotly = TRUE` for interactive plots.
+#' use the `stats` argument. Set `plotly = TRUE` for interactive plots.
 #'
 #' @importFrom ggplot2 .data
 #' @param x An object of class "EffectData".
-#' @param stat Vector of statistics to show. The default `NULL` equals either
+#' @param stats Vector of statistics to show. The default `NULL` equals either
 #'   `c("y_mean", "pred_mean", "pd", "ale")`, or `"resid_mean"`
 #'   (when `x` results from [bias()]). Only *available* statistics are shown.
 #'   Additionally, this argument controls the order used to plot the lines.
@@ -62,11 +62,11 @@
 #' xvars <- colnames(iris)[-1]
 #' M <- feature_effects(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 #' plot(M, share_y = "all")
-#' plot(M, stat = c("pd", "ale"), legend_labels = c("PD", "ALE"))
-#' plot(M, stat = "resid_mean", share_y = "all")
+#' plot(M, stats = c("pd", "ale"), legend_labels = c("PD", "ALE"))
+#' plot(M, stats = "resid_mean", share_y = "all")
 plot.EffectData <- function(
     x,
-    stat = NULL,
+    stats = NULL,
     ncol = grDevices::n2mfrow(length(x))[2L],
     byrow = TRUE,
     share_y = c("no", "all", "rows", "cols"),
@@ -98,37 +98,37 @@ plot.EffectData <- function(
     obs = "y_mean", pred = "pred_mean", bias = "resid_mean", pd = "pd", ale = "ale"
   )
 
-  # Initialize stat
+  # Initialize stats
   available <- .stats(x)
-  if (is.null(stat)) {
+  if (is.null(stats)) {
     if (length(available) == 1L && available == "resid_mean") {
-      stat <- "resid_mean"
+      stats <- "resid_mean"
     } else {
-      stat <- c("y_mean", "pred_mean", "pd", "ale")
+      stats <- c("y_mean", "pred_mean", "pd", "ale")
     }
   }
-  stat <- intersect(stat, available)
-  nstat <- length(stat)
+  stats <- intersect(stats, available)
+  nstats <- length(stats)
 
   stopifnot(
-    nstat >= 1L,
-    stat %in% stat_info,
-    length(colors) >= nstat,
-    is.null(legend_labels) || length(legend_labels) == nstat,
+    nstats >= 1L,
+    stats %in% stat_info,
+    length(colors) >= nstats,
+    is.null(legend_labels) || length(legend_labels) == nstats,
     is.null(ylim) || is.list(ylim) || (is.numeric(ylim) && length(ylim) == 2L),
     is.null(ylab) || length(ylab) == 1L
   )
 
-  # We filter on "stat", and modify the names via legend_labels. Then, we don't
-  # need 'legend_labels' and 'stat' anymore.
-  stat_info <- stat_info[match(stat, stat_info)]  # Use order of stat
+  # We filter on "stats", and modify the names via legend_labels. Then, we don't
+  # need 'legend_labels' and 'stats' anymore.
+  stat_info <- stat_info[match(stats, stat_info)]  # Use order of stats
   if (!is.null(legend_labels)) {
     names(stat_info) <- legend_labels
   }
-  colors <- colors[seq_len(nstat)]
+  colors <- colors[seq_len(nstats)]
 
-  # If user manually sets stat = "ale", we need to drop non-numeric features.
-  if (nstat == 1L && stat_info == "ale") {
+  # If user manually sets stats = "ale", we need to drop non-numeric features.
+  if (nstats == 1L && stat_info == "ale") {
     ok <- .num(x)
     if (!all(ok)) {
       if (!any(ok)) {
@@ -389,9 +389,17 @@ one_ggplot <- function(
     colors <- colors[keep]
   }
   df <- transform(
-    poor_man_stack(x, stat_info),
+    poor_man_stack(x, to_stack = stat_info),
     varying_ = factor(varying_, levels = stat_info, labels = names(stat_info))
   )
+#
+#   mean_cols <- intersect(stat_info, c("y_mean", "resid_mean"))
+#   if (errors != "no" && length(mean_cols)) {
+#     err_cols <- gsub("_mean", "_sd", mean_cols)
+#     df_err <- poor_man_stack(x[c("bin_mids", err_cols)], to_stack = err_cols)
+#     colnames(df_err)[3] <- "err_"
+#     df_err$varying_ <- mean_cols[match()]
+#   }
 
   # Calculate transformation of bars on the right y axis
   if (is.null(ylim)) {

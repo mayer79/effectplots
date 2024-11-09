@@ -6,7 +6,7 @@
 \usage{
 \method{plot}{EffectData}(
   x,
-  stat = NULL,
+  stats = NULL,
   ncol = grDevices::n2mfrow(length(x))[2L],
   byrow = TRUE,
   share_y = c("no", "all", "rows", "cols"),
@@ -33,7 +33,7 @@
 \arguments{
 \item{x}{An object of class "EffectData".}
 
-\item{stat}{Vector of statistics to show. The default \code{NULL} equals either
+\item{stats}{Vector of statistics to show. The default \code{NULL} equals either
 \code{c("y_mean", "pred_mean", "pd", "ale")}, or \code{"resid_mean"}
 (when \code{x} results from \code{\link[=bias]{bias()}}). Only \emph{available} statistics are shown.
 Additionally, this argument controls the order used to plot the lines.}
@@ -109,15 +109,15 @@ Otherwise, an object of class "patchwork", or a "plotly" subplot.
 \description{
 Versatile plot function for an "EffectData" object. By default, all calculated
 statistics (except "resid_mean") are shown. To select certain statistics,
-use the \code{stat} argument. Set \code{plotly = TRUE} for interactive plots.
+use the \code{stats} argument. Set \code{plotly = TRUE} for interactive plots.
 }
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)
 xvars <- colnames(iris)[-1]
 M <- feature_effects(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 plot(M, share_y = "all")
-plot(M, stat = c("pd", "ale"), legend_labels = c("PD", "ALE"))
-plot(M, stat = "resid_mean", share_y = "all")
+plot(M, stats = c("pd", "ale"), legend_labels = c("PD", "ALE"))
+plot(M, stats = "resid_mean", share_y = "all")
 }
 \seealso{
 \code{\link[=feature_effects]{feature_effects()}}, \code{\link[=average_observed]{average_observed()}}, \code{\link[=average_predicted]{average_predicted()}},
