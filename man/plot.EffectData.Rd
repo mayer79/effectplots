@@ -17,7 +17,7 @@
   subplot_titles = TRUE,
   ylab = NULL,
   legend_labels = NULL,
-  errors = c("no", "se", "sew", "sd"),
+  errors = c("no", "ci", "ciw", "sd"),
   colors = getOption("effectplots.colors"),
   fill = getOption("effectplots.fill"),
   alpha = 1,
@@ -69,8 +69,8 @@ statistics plotted, or \code{NULL} (default).}
 for observed y and residuals? One of
 \itemize{
 \item "no" (default),
-\item "se": standard errors using "N",
-\item "sew": standard errors using "weight",
+\item "ci": 95\% Z confidence intervals using sqrt(N) as standard error of the mean,
+\item "ciw": Like "ci", but using sqrt(weight) as standard error of the mean and
 \item "sd": standard deviations.
 }}
 

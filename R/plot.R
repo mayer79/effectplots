@@ -30,8 +30,8 @@
 #' @param errors What errors (ribbons for numeric X, bars for others) should be shown
 #'   for observed y and residuals? One of
 #'   - "no" (default),
-#'   - "se": standard errors using "N",
-#'   - "sew": standard errors using "weight",
+#'   - "ci": 95% Z confidence intervals using sqrt(N) as standard error of the mean,
+#'   - "ciw": Like "ci", but using sqrt(weight) as standard error of the mean and
 #'   - "sd": standard deviations.
 #' @param colors Vector of line/point colors of sufficient length.
 #'   By default, a color blind friendly palette from "ggthemes".
@@ -77,7 +77,7 @@ plot.EffectData <- function(
     subplot_titles = TRUE,
     ylab = NULL,
     legend_labels = NULL,
-    errors = c("no", "se", "sew", "sd"),
+    errors = c("no", "ci", "ciw", "sd"),
     colors = getOption("effectplots.colors"),
     fill = getOption("effectplots.fill"),
     alpha = 1,
@@ -151,9 +151,9 @@ plot.EffectData <- function(
 
   # Overwrite sd columns
   sd_cols <- intersect(c("y_sd", "pred_sd", "resid_sd"), colnames(x[[1L]]))
-  if (errors %in% c("se", "sew") && length(sd_cols)) {
-    div <- switch(errors, se = "N", sew = "weight")
-    x[] <- lapply(x, function(z) {z[sd_cols] <- z[sd_cols] / sqrt(z[[div]]); z})
+  if (errors %in% c("ci", "ciw") && length(sd_cols)) {
+    D <- switch(errors, ci = "N", ciw = "weight")
+    x[] <- lapply(x, function(z) {z[sd_cols] <- 1.96 * z[sd_cols] / sqrt(z[[D]]); z})
   }
 
   # Derive a good ylab
@@ -571,7 +571,7 @@ one_plotly <- function(
        ymax = x[[z]] + x[[error_col]],
        data = x,
        yaxis = "y",
-       name = NULL,
+       name = errors,
        showlegend = FALSE,
        color = I(colors[i]),
        opacity = alpha / 2
