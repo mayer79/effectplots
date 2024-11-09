@@ -76,21 +76,20 @@
 <p>The main function <code><a href="reference/feature_effects.html">feature_effects()</a></code> crunches the following statistics per feature X over values/bins:</p>
 <ul>
 <li>Average observed y values: Descriptive associations between response y and features.</li>
-<li>Average predictions: Combined effect of X and other (correlated) features, equal to M Plots (Apley [1]).</li>
-<li>Partial dependence: How does the average prediction changes with X, keeping other feature values fixed, see Friedman [2].</li>
-<li>Accumulated local effects: Alternative to partial dependence, see Apley [1].</li>
-<li>Average residuals: Calculated when both <code>y</code> and predictions are available. Used to assess bias.</li>
-<li>Additionally: Bin sizes, and standard deviations of observed y and residuals.</li>
+<li>Average predictions: Combined effect of X and other features (M Plots, Apley [1]).</li>
+<li>Partial dependence (Friedman [2]): How does the average prediction changes with X, keeping other features fixed.</li>
+<li>Accumulated local effects (Apley [1]): Alternative to partial dependence.</li>
 </ul>
-<p><strong>It takes 3 seconds on a laptop to get all statistics for ten features on a 10 Mio row dataset (+ prediction time).</strong></p>
+<p>Furthermore, it calculates counts, average residuals, and standard deviations of observed y and residuals, eventually accounting for case weights. We highly recommend Christoph Molnar’s book [3] for more info on feature effects.</p>
+<p><strong>It takes 3 seconds on a laptop to get all statistics for ten features on a 10 Mio row data (+ prediction time).</strong></p>
 <p><strong>Workflow</strong></p>
 <ol style="list-style-type: decimal">
 <li>
-<strong>Crunch</strong> values via <code><a href="reference/feature_effects.html">feature_effects()</a></code> or the convenience wrappers <code><a href="reference/average_observed.html">average_observed()</a></code>, <code><a href="reference/average_predicted.html">average_predicted()</a></code>, <code><a href="reference/bias.html">bias()</a></code>, <code><a href="reference/partial_dependence.html">partial_dependence()</a></code>, and <code><a href="reference/ale.html">ale()</a></code>.</li>
+<strong>Crunch</strong> values via <code><a href="reference/feature_effects.html">feature_effects()</a></code> or the convenience helpers <code><a href="reference/average_observed.html">average_observed()</a></code>, <code><a href="reference/partial_dependence.html">partial_dependence()</a></code>, <code><a href="reference/ale.html">ale()</a></code> etc.</li>
 <li>
-<strong>Post-process</strong> the results with <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>, e.g., to collapse rare levels of categorical features or to sort the results by a simple variable importance measure.</li>
+<strong>Update</strong> the results with <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>: Collapse rare levels of categorical features, sort results by variable importance etc.</li>
 <li>
-<strong>Plot</strong> the results with <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>. Choose between {ggplot2}/{patchwork} and {plotly}.</li>
+<strong>Plot</strong> the results with <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>: Choose between ggplot2/patchwork and plotly.</li>
 </ol>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
@@ -103,7 +102,7 @@
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
-<p>We use synthetic data with 1 Mio rows containing information on Motor TPL insurance policies and claims. The aim is to model claim frequency as a function of features like “driver_age” and “car_power”.</p>
+<p>We use a 1 Mio row dataset with information on Motor TPL insurance policies and claims. The aim is to model claim frequency.</p>
 <p>Before modeling, we want to study association between features and the response.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mayer79/effectplots" class="external-link">effectplots</a></span><span class="op">)</span></span>
@@ -113,13 +112,11 @@
 <span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
 <span></span>
 <span><span class="va">df</span> <span class="op">&lt;-</span> <span class="fu">getOMLDataSet</span><span class="op">(</span>data.id <span class="op">=</span> <span class="fl">45106L</span><span class="op">)</span><span class="op">$</span><span class="va">data</span></span>
-<span><span class="co"># df &lt;- arrow::read_parquet("claims.parquet")</span></span>
 <span></span>
 <span><span class="va">xvars</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"year"</span>, <span class="st">"town"</span>, <span class="st">"driver_age"</span>, <span class="st">"car_weight"</span>, <span class="st">"car_power"</span>, <span class="st">"car_age"</span><span class="op">)</span></span>
 <span></span>
 <span><span class="co"># 0.2s on laptop</span></span>
 <span><span class="fu"><a href="reference/average_observed.html">average_observed</a></span><span class="op">(</span><span class="va">df</span><span class="op">[</span><span class="va">xvars</span><span class="op">]</span>, y <span class="op">=</span> <span class="va">df</span><span class="op">$</span><span class="va">claim_nb</span><span class="op">)</span> <span class="op">|&gt;</span></span>
-<span>  <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span>sort_by <span class="op">=</span> <span class="st">"y_mean"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span>share_y <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/avg_obs.svg"></p>
 <p>A shared y axis helps to compare the strength of the association across features.</p>
@@ -128,8 +125,7 @@
 </h3>
 <p>Next, let’s fit a boosted trees model.</p>
 <div class="sourceCode" id="cb3"><pre class="downlit sourceCode r">
-<code class="sourceCode R"><span><span class="co"># Data splits</span></span>
-<span><span class="va">ix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span>, <span class="fl">0.8</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span><span class="op">)</span></span>
+<code class="sourceCode R"><span><span class="va">ix</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/sample.html" class="external-link">sample</a></span><span class="op">(</span><span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span>, <span class="fl">0.8</span> <span class="op">*</span> <span class="fu"><a href="https://rdrr.io/r/base/nrow.html" class="external-link">nrow</a></span><span class="op">(</span><span class="va">df</span><span class="op">)</span><span class="op">)</span></span>
 <span><span class="va">train</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">[</span><span class="va">ix</span>, <span class="op">]</span></span>
 <span><span class="va">test</span> <span class="op">&lt;-</span> <span class="va">df</span><span class="op">[</span><span class="op">-</span><span class="va">ix</span>, <span class="op">]</span></span>
 <span><span class="va">X_train</span> <span class="op">&lt;-</span> <span class="fu"><a href="https://rdrr.io/r/base/data.matrix.html" class="external-link">data.matrix</a></span><span class="op">(</span><span class="va">train</span><span class="op">[</span><span class="va">xvars</span><span class="op">]</span><span class="op">)</span></span>
@@ -158,24 +154,19 @@
 <div class="section level3">
 <h3 id="inspect-model">Inspect model<a class="anchor" aria-label="anchor" href="#inspect-model"></a>
 </h3>
-<p>Let’s use the test data to crunch all statistics.</p>
+<p>Let’s crunch all statistics on the test data. Sorting is done by weighted variance of partial dependence, a main-effect importance measure closely related to [4].</p>
+<p>The average predictions closely follow the average observed, i.e., the model does a good job. Comparing partial dependence/ALE with average predicted gives insights on whether an effect comes from the feature on the x axis or from other, correlated, features.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 0.3s on laptop</span></span>
 <span><span class="fu"><a href="reference/feature_effects.html">feature_effects</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">X_test</span>, y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">claim_nb</span><span class="op">)</span> <span class="op">|&gt;</span></span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span>sort_by <span class="op">=</span> <span class="st">"pd"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/feature_effects.svg"></p>
-<p><strong>Comments</strong></p>
-<ol style="list-style-type: decimal">
-<li>Comparing average predictions with average observed y provides a good overview of model bias. It seems to be small.</li>
-<li>Comparing the shape of partial dependence or ALE with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors “driver_age” and “car_power”, the lines are similar. Thus, the effects are mainly due to the feature on the x axis and not of some other, correlated, feature.</li>
-<li>Sorting is done by decreasing weighted variance of the partial dependence values, a measure of main-effect strength closely related to [3].</li>
-</ol>
 </div>
 <div class="section level3">
 <h3 id="flexibility">Flexibility<a class="anchor" aria-label="anchor" href="#flexibility"></a>
 </h3>
-<p>Thanks to the flexibility of the package, we can modify the results as we wish. For instance: what about putting results on training data besides those on test? Or comparing different models or subgroups?</p>
+<p>What about putting results on training data besides those on test? Or comparing different models or subgroups? No problem:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m_train</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/feature_effects.html">feature_effects</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">X_train</span>, y <span class="op">=</span> <span class="va">train</span><span class="op">$</span><span class="va">claim_nb</span><span class="op">)</span></span>
 <span><span class="va">m_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/feature_effects.html">feature_effects</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">X_test</span>, y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">claim_nb</span><span class="op">)</span></span>
@@ -186,7 +177,7 @@
 <span>  <span class="fu"><a href="https://rdrr.io/r/utils/head.html" class="external-link">head</a></span><span class="op">(</span><span class="fl">3</span><span class="op">)</span></span>
 <span><span class="va">m_test</span> <span class="op">&lt;-</span> <span class="va">m_test</span><span class="op">[</span><span class="fu"><a href="https://rdrr.io/r/base/names.html" class="external-link">names</a></span><span class="op">(</span><span class="va">m_train</span><span class="op">)</span><span class="op">]</span></span>
 <span></span>
-<span><span class="co"># Plot combined one</span></span>
+<span><span class="co"># Concatenate train and test results and plot them</span></span>
 <span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">m_train</span>, <span class="va">m_test</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
 <span>    share_y <span class="op">=</span> <span class="st">"rows"</span>,</span>
@@ -197,7 +188,7 @@
 <span>    title <span class="op">=</span> <span class="st">"Left: Train - Right: Test"</span>,</span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/train_test.svg"></p>
-<p>In case we want to dig deeper into possible bias, we can use “resid_mean” as statistic, and show pointwise 95% Z confidence intervals for the true bias.</p>
+<p>In case we want to dig deeper into possible bias, we can use “resid_mean” as statistic, and show point-wise 95% confidence intervals for the true bias.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">m_train</span>, <span class="va">m_test</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
@@ -213,18 +204,21 @@
 </div>
 </div>
 <div class="section level2">
-<h2 id="additional-goodies">Additional goodies<a class="anchor" aria-label="anchor" href="#additional-goodies"></a>
+<h2 id="dalex-and-tidymodels-et-al">DALEX and Tidymodels et al.<a class="anchor" aria-label="anchor" href="#dalex-and-tidymodels-et-al"></a>
 </h2>
-<ul>
-<li>Most models (including DALEX explainers and meta-learners such as Tidymodels) work out-of-the box. If not, a tailored prediction function can be specified.</li>
-<li>Binning of numeric features is done by the same options as <code>stats::hist()</code>. Outliers are capped (not removed) at +-2 IQR from the quartiles by default.</li>
-<li>Case weights are supported via the argument <code>w</code>.</li>
-</ul>
-</div>
-<div class="section level2">
-<h2 id="background">Background<a class="anchor" aria-label="anchor" href="#background"></a>
-</h2>
-<p>Christoph Molnar’s excellent book [4] provides much more background on feature effects.</p>
+<p>Most models work out-of-the box. If not, a tailored prediction function can be specified.</p>
+<div class="sourceCode" id="cb7"><pre class="downlit sourceCode r">
+<code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://modeloriented.github.io/DALEX/" class="external-link">DALEX</a></span><span class="op">)</span></span>
+<span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://imbs-hl.github.io/ranger/" class="external-link">ranger</a></span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="https://rdrr.io/r/base/Random.html" class="external-link">set.seed</a></span><span class="op">(</span><span class="fl">1</span><span class="op">)</span></span>
+<span></span>
+<span><span class="va">fit</span> <span class="op">&lt;-</span> <span class="fu">ranger</span><span class="op">(</span><span class="va">Sepal.Length</span> <span class="op">~</span> <span class="va">.</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">)</span></span>
+<span><span class="va">ex</span> <span class="op">&lt;-</span> <span class="fu">DALEX</span><span class="fu">::</span><span class="fu">explain</span><span class="op">(</span><span class="va">fit</span>, data <span class="op">=</span> <span class="va">iris</span><span class="op">[</span>, <span class="op">-</span><span class="fl">1</span><span class="op">]</span>, y <span class="op">=</span> <span class="va">iris</span><span class="op">[</span>, <span class="fl">1</span><span class="op">]</span><span class="op">)</span></span>
+<span></span>
+<span><span class="fu"><a href="reference/feature_effects.html">feature_effects</a></span><span class="op">(</span><span class="va">ex</span>, breaks <span class="op">=</span> <span class="fl">5</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span>share_y <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span></code></pre></div>
+<p><img src="reference/figures/dalex.svg"></p>
 </div>
 </div>
 <div class="section level1">
@@ -233,8 +227,8 @@
 <ol style="list-style-type: decimal">
 <li>Apley, Daniel W., and Jingyu Zhu. 2020. <em>Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.</em> Journal of the Royal Statistical Society Series B: Statistical Methodology, 82 (4): 1059–1086. <a href="doi:10.1111/rssb.12377" class="uri">doi:10.1111/rssb.12377</a>.</li>
 <li>Friedman, Jerome H. 2001. <em>Greedy Function Approximation: A Gradient Boosting Machine.</em> Annals of Statistics 29 (5): 1189–1232. <a href="doi:10.1214/aos/1013203451" class="uri">doi:10.1214/aos/1013203451</a>. <a href="https://christophm.github.io/interpretable-ml-book" class="external-link uri">https://christophm.github.io/interpretable-ml-book</a>.</li>
-<li>Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy. 2018. <em>A Simple and Effective Model-Based Variable Importance Measure.</em> arXiv preprint. <a href="https://arxiv.org/abs/1805.04755" class="external-link uri">https://arxiv.org/abs/1805.04755</a>.</li>
 <li>Molnar, Christoph. 2019. <em>Interpretable Machine Learning: A Guide for Making Black Box Models Explainable</em>.</li>
+<li>Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy. 2018. <em>A Simple and Effective Model-Based Variable Importance Measure.</em> arXiv preprint. <a href="https://arxiv.org/abs/1805.04755" class="external-link uri">https://arxiv.org/abs/1805.04755</a>.</li>
 </ol>
 </div>
 
