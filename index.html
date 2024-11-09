@@ -76,7 +76,7 @@
 <p>The main function <code><a href="reference/feature_effects.html">feature_effects()</a></code> crunches the following statistics per feature X over values/bins:</p>
 <ul>
 <li>Average observed y values: Descriptive associations between response y and features.</li>
-<li>Average predictions: Combined effect of X and other (correlated) features, see M Plots, Apley [1].</li>
+<li>Average predictions: Combined effect of X and other (correlated) features, equal to M Plots (Apley [1]).</li>
 <li>Partial dependence: How does the average prediction changes with X, keeping other feature values fixed, see Friedman [2].</li>
 <li>Accumulated local effects: Alternative to partial dependence, see Apley [1].</li>
 <li>Average residuals: Calculated when both <code>y</code> and predictions are available. Used to assess bias.</li>
@@ -104,7 +104,7 @@
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
 <p>We use synthetic data with 1 Mio rows containing information on Motor TPL insurance policies and claims. The aim is to model claim frequency as a function of features like “driver_age” and “car_power”.</p>
-<p>Before modeling, we want to study association between features and response.</p>
+<p>Before modeling, we want to study association between features and the response.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mayer79/effectplots" class="external-link">effectplots</a></span><span class="op">)</span></span>
 <span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/openml/openml-r" class="external-link">OpenML</a></span><span class="op">)</span></span>
@@ -122,7 +122,7 @@
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span>sort_by <span class="op">=</span> <span class="st">"y_mean"</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span>share_y <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/avg_obs.svg"></p>
-<p>The plots have been automatically sorted by decreasing (weighted) variance of the average observed values. A shared y axis helps to compare the strength of the association across features.</p>
+<p>A shared y axis helps to compare the strength of the association across features.</p>
 <div class="section level3">
 <h3 id="fit-model">Fit model<a class="anchor" aria-label="anchor" href="#fit-model"></a>
 </h3>
@@ -167,15 +167,15 @@
 <p><img src="reference/figures/feature_effects.svg"></p>
 <p><strong>Comments</strong></p>
 <ol style="list-style-type: decimal">
-<li>Comparing average predictions with average observed y provides a good overview of model bias. The bias on the test data seems to be small. Studying the same plot on the training data would help to assess in-sample bias.</li>
-<li>Comparing the shape of partial dependence or ALE with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors “driver_age” and “car_power”, the lines are very similar. Thus, the effects are mainly due to the feature on the x axis and not of some other, correlated, feature.</li>
+<li>Comparing average predictions with average observed y provides a good overview of model bias. It seems to be small.</li>
+<li>Comparing the shape of partial dependence or ALE with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors “driver_age” and “car_power”, the lines are similar. Thus, the effects are mainly due to the feature on the x axis and not of some other, correlated, feature.</li>
 <li>Sorting is done by decreasing weighted variance of the partial dependence values, a measure of main-effect strength closely related to [3].</li>
 </ol>
 </div>
 <div class="section level3">
 <h3 id="flexibility">Flexibility<a class="anchor" aria-label="anchor" href="#flexibility"></a>
 </h3>
-<p>Thanks to the flexibility of the package, you can modify the results as you wish. For instance: what about putting results on training data besides those on test? Or comparing different models or subgroups?</p>
+<p>Thanks to the flexibility of the package, we can modify the results as we wish. For instance: what about putting results on training data besides those on test? Or comparing different models or subgroups?</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m_train</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/feature_effects.html">feature_effects</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">X_train</span>, y <span class="op">=</span> <span class="va">train</span><span class="op">$</span><span class="va">claim_nb</span><span class="op">)</span></span>
 <span><span class="va">m_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/feature_effects.html">feature_effects</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">X_test</span>, y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">claim_nb</span><span class="op">)</span></span>
