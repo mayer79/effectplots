@@ -71,7 +71,7 @@ use the <code>stat</code> argument. Set <code>plotly = TRUE</code> for interacti
 <span>  subplot_titles <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  ylab <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  legend_labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  errors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"se"</span>, <span class="st">"sew"</span>, <span class="st">"sd"</span><span class="op">)</span>,</span>
+<span>  errors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"ci"</span>, <span class="st">"ciw"</span>, <span class="st">"sd"</span><span class="op">)</span>,</span>
 <span>  colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"effectplots.colors"</span><span class="op">)</span>,</span>
 <span>  fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"effectplots.fill"</span><span class="op">)</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">1</span>,</span>
@@ -150,8 +150,8 @@ statistics plotted, or <code>NULL</code> (default).</p></dd>
 <dt id="arg-errors">errors<a class="anchor" aria-label="anchor" href="#arg-errors"></a></dt>
 <dd><p>What errors (ribbons for numeric X, bars for others) should be shown
 for observed y and residuals? One of</p><ul><li><p>"no" (default),</p></li>
-<li><p>"se": standard errors using "N",</p></li>
-<li><p>"sew": standard errors using "weight",</p></li>
+<li><p>"ci": 95% Z confidence intervals using sqrt(N) as standard error of the mean,</p></li>
+<li><p>"ciw": Like "ci", but using sqrt(weight) as standard error of the mean and</p></li>
 <li><p>"sd": standard deviations.</p></li>
 </ul></dd>
 
