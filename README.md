@@ -16,7 +16,7 @@ The main function `feature_effects()` crunches the following statistics per feat
 - **Average residuals:** Calculated when both `y` and predictions are available. Useful to study model bias.
 - **Partial dependence** (Friedman [2]): How does the average prediction changes with X, keeping other feature values fixed?
 - **Accumulated local effects** (Apley [1]): Alternative to partial dependence.
-- Additionally: Per-bin counts, weights, and standard deviations of observed y, predictions, and residuals.
+- Additionally: Bin sizes, and standard deviations of observed y and residuals.
 
 <span style="color:red">It takes 3 seconds on a laptop to get all statistics for ten features on a 10 Mio row dataset (+ prediction time).</span>
 

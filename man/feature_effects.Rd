@@ -165,7 +165,7 @@ Evaluated at bin averages, not at bin midpoints.
 }
 
 Additionally, corresponding counts/weights are calculated, and
-standard deviations of observed y, predictions, and residuals.
+standard deviations of observed y and residuals.
 
 Numeric X with more than \code{discrete_m = 5} disjoint values are binned as in
 \code{\link[graphics:hist]{graphics::hist()}} via \code{breaks}. Before calculating bins, outliers are capped

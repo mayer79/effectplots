@@ -15,7 +15,7 @@
 #' - "ale": Accumulated local effects (Apley, 2020): See [ale()]. Only for numeric X.
 #'
 #' Additionally, corresponding counts/weights are calculated, and
-#' standard deviations of observed y, predictions, and residuals.
+#' standard deviations of observed y and residuals.
 #'
 #' Numeric X with more than `discrete_m = 5` disjoint values are binned as in
 #' [graphics::hist()] via `breaks`. Before calculating bins, outliers are capped
@@ -209,9 +209,10 @@ feature_effects.default <- function(
     )
   }
 
-  # Combine pred, y, and resid. Note: cbind(NULL, NULL) is NULL
-  PYR <- cbind(pred = pred, y = y, resid = if (!is.null(pred) && !is.null(y)) y - pred)
-  rm(pred, y)
+  # Combine pred, y, and resid. If df, we can easier drop columns in grouped_stats()
+  PYR <- list(pred = pred, y = y, resid = if (!is.null(pred) && !is.null(y)) y - pred)
+  wPYR <- lengths(PYR) > 0L
+  PYR <- if (any(wPYR)) collapse::qDF(PYR[wPYR])
 
   # Prepare pd_data and ale_data (list with data, w, ix)
   pd_data <- if (pd_n > 0L) .subsample(data, nmax = pd_n, w = w)
@@ -382,7 +383,7 @@ feature_effects.explainer <- function(
 #' @param x One feature vector/factor.
 #' @param pd_data The output of .subsample() or `NULL`.
 #' @param ale_data The output of .subsample() or `NULL`.
-#' @param PYR A matrix with predicted, observed, and residuals (if available). Can
+#' @param PYR A data.frame with predicted, observed, and residuals (if available). Can
 #'   be `NULL` if none of them are available.
 #' @inheritParams feature_effects
 #' @returns A data.frame with effect statistics.
@@ -416,12 +417,14 @@ calculate_stats <- function(
     return(NULL)
   }
 
+  sd_cols <- setdiff(colnames(PYR), "pred")
+
   # DISCRETE
   if (!num) {
     g <- sort(collapse::funique(x), na.last = TRUE)
 
     # Ordered by sort(g) (+ NA). For factors: levels(x) (+ NA)
-    M <- grouped_stats(PYR, g = x, w = w)
+    M <- grouped_stats(PYR, g = x, w = w, sd_cols = sd_cols)
     out <- data.frame(bin_mid = g, bin_width = 0.7, bin_mean = g, M)
     rownames(out) <- NULL
   } else {
@@ -449,7 +452,7 @@ calculate_stats <- function(
     ix <- collapse::qF(ix, sort = FALSE)
     M <- cbind(
       bin_mean = collapse::fmean.default(x, g = ix, w = w),
-      grouped_stats(PYR, g = ix, w = w)
+      grouped_stats(PYR, g = ix, w = w, sd_cols = sd_cols)
     )
     reindex <- match(as.integer(rownames(M)), gix)
     out[reindex, colnames(M)] <- M  # Fill the gaps and rearrange in right order
