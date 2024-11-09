@@ -7,15 +7,15 @@
 [![Codecov test coverage](https://codecov.io/gh/mayer79/effectplots/graph/badge.svg)](https://app.codecov.io/gh/mayer79/effectplots)
 <!-- badges: end -->
 
-**{effectplots}** is an R package for calculating and plotting effects of any model.
+**{effectplots}** is an R package for calculating and plotting feature effects of any model.
 
 The main function `feature_effects()` crunches the following statistics per feature X over values/bins:
 
-- Average observed y values: Assess descriptive associations between response y and features.
-- Average predictions (M Plots, Apley [1]): Combined effect of X and other (correlated) features.
-- Average residuals: Calculated when both `y` and predictions are available. Useful to study model bias.
-- Partial dependence (Friedman [2]): How does the average prediction changes with X, keeping other feature values fixed?
-- Accumulated local effects (Apley [1]): Alternative to partial dependence.
+- Average observed y values: Descriptive associations between response y and features.
+- Average predictions: Combined effect of X and other (correlated) features, see M Plots, Apley [1].
+- Partial dependence: How does the average prediction changes with X, keeping other feature values fixed, see Friedman [2].
+- Accumulated local effects: Alternative to partial dependence, see Apley [1].
+- Average residuals: Calculated when both `y` and predictions are available. Used to assess bias.
 - Additionally: Bin sizes, and standard deviations of observed y and residuals.
 
 **It takes 3 seconds on a laptop to get all statistics for ten features on a 10 Mio row dataset (+ prediction time).**
@@ -25,12 +25,6 @@ The main function `feature_effects()` crunches the following statistics per feat
 1. **Crunch** values via `feature_effects()` or the convenience wrappers `average_observed()`, `average_predicted()`, `bias()`, `partial_dependence()`, and `ale()`.
 2. **Post-process** the results with `update()`, e.g., to collapse rare levels of categorical features or to sort the results by a simple variable importance measure.
 3. **Plot** the results with `plot()`. Choose between {ggplot2}/{patchwork} and {plotly}.
-
-**Some cool things**
-
-- Most models (including DALEX explainers and meta-learners such as Tidymodels) work out-of-the box. If not, a tailored prediction function can be specified.
-- Binning of numeric features is done by the same options as `stats::hist()`. Additionally, outliers are capped (not removed) at +-2 IQR from the quartiles by default.
-- Case weights are supported via the argument `w`.
 
 ## Installation
 
@@ -105,7 +99,7 @@ fit <- lgb.train(
 
 ### Inspect model
 
-After modeling, we use the test (or validation) data to crunch average observed, average predicted, partial dependence, and accumulated local effects per feature values/bins to gain insights about the model. Calculations are lightning fast.
+Let's use the test data to crunch all statistics.
 
 ```r
 # 0.3s on laptop
@@ -118,9 +112,9 @@ feature_effects(fit, v = xvars, data = X_test, y = test$claim_nb) |>
 
 **Comments**
 
-1. Comparing average predictions with average observed y provides a good picture of model bias. In this case, the bias on the test data seems to be small. Studying the same plot on the training data would help to assess in-sample bias.
-2. Comparing the shape of partial dependence or ALE with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors "driver_age" and "car_power", these lines are very similar. This means the effects are mainly due to the feature on the x axis and not of some other, correlated, feature.
-3. Sorting is done by decreasing weighted variance of the partial dependence values, a measure of main-effect strength closely related (but not 100% identical) to [3].
+1. Comparing average predictions with average observed y provides a good overview of model bias. The bias on the test data seems to be small. Studying the same plot on the training data would help to assess in-sample bias.
+2. Comparing the shape of partial dependence or ALE with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors "driver_age" and "car_power", the lines are very similar. Thus, the effects are mainly due to the feature on the x axis and not of some other, correlated, feature.
+3. Sorting is done by decreasing weighted variance of the partial dependence values, a measure of main-effect strength closely related to [3].
 
 ### Flexibility
 
@@ -150,8 +144,7 @@ c(m_train, m_test) |>
 
 ![](man/figures/train_test.svg)
 
-In case you want to dig deeper into possible bias, we can use "resid_mean" as statistic,
-and show 95% Z confidence intervals for the bias.
+In case we want to dig deeper into possible bias, we can use "resid_mean" as statistic, and show pointwise 95% Z confidence intervals for the true bias.
 
 ```r
 c(m_train, m_test) |> 
@@ -168,7 +161,15 @@ c(m_train, m_test) |>
 
 ![](man/figures/bias.svg)
 
-See Christoph Molnar's book [4] for more background on feature effects.
+## Additional goodies
+
+- Most models (including DALEX explainers and meta-learners such as Tidymodels) work out-of-the box. If not, a tailored prediction function can be specified.
+- Binning of numeric features is done by the same options as `stats::hist()`. Outliers are capped (not removed) at +-2 IQR from the quartiles by default.
+- Case weights are supported via the argument `w`.
+
+## Background 
+
+Christoph Molnar's excellent book [4] provides much more background on feature effects.
 
 # References
 
