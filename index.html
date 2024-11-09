@@ -72,14 +72,14 @@
 </h1></div>
 <!-- badges: start -->
 
-<p><strong>{effectplots}</strong> is an R package for calculating and plotting effects of any model.</p>
+<p><strong>{effectplots}</strong> is an R package for calculating and plotting feature effects of any model.</p>
 <p>The main function <code><a href="reference/feature_effects.html">feature_effects()</a></code> crunches the following statistics per feature X over values/bins:</p>
 <ul>
-<li>Average observed y values: Assess descriptive associations between response y and features.</li>
-<li>Average predictions (M Plots, Apley [1]): Combined effect of X and other (correlated) features.</li>
-<li>Average residuals: Calculated when both <code>y</code> and predictions are available. Useful to study model bias.</li>
-<li>Partial dependence (Friedman [2]): How does the average prediction changes with X, keeping other feature values fixed?</li>
-<li>Accumulated local effects (Apley [1]): Alternative to partial dependence.</li>
+<li>Average observed y values: Descriptive associations between response y and features.</li>
+<li>Average predictions: Combined effect of X and other (correlated) features, see M Plots, Apley [1].</li>
+<li>Partial dependence: How does the average prediction changes with X, keeping other feature values fixed, see Friedman [2].</li>
+<li>Accumulated local effects: Alternative to partial dependence, see Apley [1].</li>
+<li>Average residuals: Calculated when both <code>y</code> and predictions are available. Used to assess bias.</li>
 <li>Additionally: Bin sizes, and standard deviations of observed y and residuals.</li>
 </ul>
 <p><strong>It takes 3 seconds on a laptop to get all statistics for ten features on a 10 Mio row dataset (+ prediction time).</strong></p>
@@ -92,12 +92,6 @@
 <li>
 <strong>Plot</strong> the results with <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>. Choose between {ggplot2}/{patchwork} and {plotly}.</li>
 </ol>
-<p><strong>Some cool things</strong></p>
-<ul>
-<li>Most models (including DALEX explainers and meta-learners such as Tidymodels) work out-of-the box. If not, a tailored prediction function can be specified.</li>
-<li>Binning of numeric features is done by the same options as <code>stats::hist()</code>. Additionally, outliers are capped (not removed) at +-2 IQR from the quartiles by default.</li>
-<li>Case weights are supported via the argument <code>w</code>.</li>
-</ul>
 <div class="section level2">
 <h2 id="installation">Installation<a class="anchor" aria-label="anchor" href="#installation"></a>
 </h2>
@@ -164,7 +158,7 @@
 <div class="section level3">
 <h3 id="inspect-model">Inspect model<a class="anchor" aria-label="anchor" href="#inspect-model"></a>
 </h3>
-<p>After modeling, we use the test (or validation) data to crunch average observed, average predicted, partial dependence, and accumulated local effects per feature values/bins to gain insights about the model. Calculations are lightning fast.</p>
+<p>Let’s use the test data to crunch all statistics.</p>
 <div class="sourceCode" id="cb4"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="co"># 0.3s on laptop</span></span>
 <span><span class="fu"><a href="reference/feature_effects.html">feature_effects</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">X_test</span>, y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">claim_nb</span><span class="op">)</span> <span class="op">|&gt;</span></span>
@@ -173,9 +167,9 @@
 <p><img src="reference/figures/feature_effects.svg"></p>
 <p><strong>Comments</strong></p>
 <ol style="list-style-type: decimal">
-<li>Comparing average predictions with average observed y provides a good picture of model bias. In this case, the bias on the test data seems to be small. Studying the same plot on the training data would help to assess in-sample bias.</li>
-<li>Comparing the shape of partial dependence or ALE with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors “driver_age” and “car_power”, these lines are very similar. This means the effects are mainly due to the feature on the x axis and not of some other, correlated, feature.</li>
-<li>Sorting is done by decreasing weighted variance of the partial dependence values, a measure of main-effect strength closely related (but not 100% identical) to [3].</li>
+<li>Comparing average predictions with average observed y provides a good overview of model bias. The bias on the test data seems to be small. Studying the same plot on the training data would help to assess in-sample bias.</li>
+<li>Comparing the shape of partial dependence or ALE with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors “driver_age” and “car_power”, the lines are very similar. Thus, the effects are mainly due to the feature on the x axis and not of some other, correlated, feature.</li>
+<li>Sorting is done by decreasing weighted variance of the partial dependence values, a measure of main-effect strength closely related to [3].</li>
 </ol>
 </div>
 <div class="section level3">
@@ -203,7 +197,7 @@
 <span>    title <span class="op">=</span> <span class="st">"Left: Train - Right: Test"</span>,</span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/train_test.svg"></p>
-<p>In case you want to dig deeper into possible bias, we can use “resid_mean” as statistic, and show 95% Z confidence intervals for the bias.</p>
+<p>In case we want to dig deeper into possible bias, we can use “resid_mean” as statistic, and show pointwise 95% Z confidence intervals for the true bias.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">m_train</span>, <span class="va">m_test</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
@@ -216,8 +210,21 @@
 <span>    errors <span class="op">=</span> <span class="st">"ci"</span></span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/bias.svg"></p>
-<p>See Christoph Molnar’s book [4] for more background on feature effects.</p>
 </div>
+</div>
+<div class="section level2">
+<h2 id="additional-goodies">Additional goodies<a class="anchor" aria-label="anchor" href="#additional-goodies"></a>
+</h2>
+<ul>
+<li>Most models (including DALEX explainers and meta-learners such as Tidymodels) work out-of-the box. If not, a tailored prediction function can be specified.</li>
+<li>Binning of numeric features is done by the same options as <code>stats::hist()</code>. Outliers are capped (not removed) at +-2 IQR from the quartiles by default.</li>
+<li>Case weights are supported via the argument <code>w</code>.</li>
+</ul>
+</div>
+<div class="section level2">
+<h2 id="background">Background<a class="anchor" aria-label="anchor" href="#background"></a>
+</h2>
+<p>Christoph Molnar’s excellent book [4] provides much more background on feature effects.</p>
 </div>
 </div>
 <div class="section level1">
