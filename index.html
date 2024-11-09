@@ -77,7 +77,7 @@
 <ul>
 <li>Average observed y values: Descriptive associations between response y and features.</li>
 <li>Average predictions: Combined effect of X and other features (M Plots, Apley [1]).</li>
-<li>Partial dependence (Friedman [2]): How does the average prediction changes with X, keeping other features fixed.</li>
+<li>Partial dependence (Friedman [2]): How does the average prediction react on X, keeping other features fixed.</li>
 <li>Accumulated local effects (Apley [1]): Alternative to partial dependence.</li>
 </ul>
 <p>Furthermore, it calculates counts, average residuals, and standard deviations of observed y and residuals, eventually accounting for case weights. We highly recommend Christoph Molnar’s book [3] for more info on feature effects.</p>
@@ -85,9 +85,9 @@
 <p><strong>Workflow</strong></p>
 <ol style="list-style-type: decimal">
 <li>
-<strong>Crunch</strong> values via <code><a href="reference/feature_effects.html">feature_effects()</a></code> or the convenience helpers <code><a href="reference/average_observed.html">average_observed()</a></code>, <code><a href="reference/partial_dependence.html">partial_dependence()</a></code>, <code><a href="reference/ale.html">ale()</a></code> etc.</li>
+<strong>Crunch</strong> values via <code><a href="reference/feature_effects.html">feature_effects()</a></code> or the little helpers <code><a href="reference/average_observed.html">average_observed()</a></code>, <code><a href="reference/partial_dependence.html">partial_dependence()</a></code>, <code><a href="reference/ale.html">ale()</a></code> etc.</li>
 <li>
-<strong>Update</strong> the results with <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>: Collapse rare levels of categorical features, sort results by variable importance etc.</li>
+<strong>Update</strong> the results with <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>: Combine rare levels of categorical features, sort results by importance etc.</li>
 <li>
 <strong>Plot</strong> the results with <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>: Choose between ggplot2/patchwork and plotly.</li>
 </ol>
@@ -102,7 +102,7 @@
 <div class="section level2">
 <h2 id="usage">Usage<a class="anchor" aria-label="anchor" href="#usage"></a>
 </h2>
-<p>We use a 1 Mio row dataset with information on Motor TPL insurance policies and claims. The aim is to model claim frequency.</p>
+<p>We use a 1 Mio row dataset about Motor TPL insurance. The aim is to model claim frequency.</p>
 <p>Before modeling, we want to study association between features and the response.</p>
 <div class="sourceCode" id="cb2"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="kw"><a href="https://rdrr.io/r/base/library.html" class="external-link">library</a></span><span class="op">(</span><span class="va"><a href="https://github.com/mayer79/effectplots" class="external-link">effectplots</a></span><span class="op">)</span></span>
@@ -166,7 +166,7 @@
 <div class="section level3">
 <h3 id="flexibility">Flexibility<a class="anchor" aria-label="anchor" href="#flexibility"></a>
 </h3>
-<p>What about putting results on training data besides those on test? Or comparing different models or subgroups? No problem:</p>
+<p>What about combining training and test results? Or comparing different models or subgroups? No problem:</p>
 <div class="sourceCode" id="cb5"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="va">m_train</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/feature_effects.html">feature_effects</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">X_train</span>, y <span class="op">=</span> <span class="va">train</span><span class="op">$</span><span class="va">claim_nb</span><span class="op">)</span></span>
 <span><span class="va">m_test</span> <span class="op">&lt;-</span> <span class="fu"><a href="reference/feature_effects.html">feature_effects</a></span><span class="op">(</span><span class="va">fit</span>, v <span class="op">=</span> <span class="va">xvars</span>, data <span class="op">=</span> <span class="va">X_test</span>, y <span class="op">=</span> <span class="va">test</span><span class="op">$</span><span class="va">claim_nb</span><span class="op">)</span></span>
