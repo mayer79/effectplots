@@ -22,7 +22,7 @@ Furthermore, it calculates counts, average residuals, and standard deviations of
 
 **Workflow**
 
-1. **Crunch** values via `feature_effects()` or the little helpers `average_observed()`, `partial_dependence()`, `ale()` etc.
+1. **Crunch** values via `feature_effects()` or the little helpers `average_observed()`, `partial_dependence()` etc.
 2. **Update** the results with `update()`: Combine rare levels of categorical features, sort results by importance etc.
 3. **Plot** the results with `plot()`: Choose between ggplot2/patchwork and plotly.
 
@@ -37,9 +37,7 @@ pak::pak("mayer79/effectplots")
 
 ## Usage
 
-We use a 1 Mio row dataset about Motor TPL insurance. The aim is to model claim frequency.
-
-Before modeling, we want to study association between features and the response.
+We use a 1 Mio row dataset about Motor TPL insurance. The aim is to model claim frequency. Before modeling, we want to study association between features and the response.
 
 ``` r
 library(effectplots)
