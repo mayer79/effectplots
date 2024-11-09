@@ -12,19 +12,19 @@
 The main function `feature_effects()` crunches the following statistics per feature X over values/bins:
 
 - Average observed y values: Descriptive associations between response y and features.
-- Average predictions: Combined effect of X and other (correlated) features, equal to M Plots (Apley [1]).
-- Partial dependence: How does the average prediction changes with X, keeping other feature values fixed, see Friedman [2].
-- Accumulated local effects: Alternative to partial dependence, see Apley [1].
-- Average residuals: Calculated when both `y` and predictions are available. Used to assess bias.
-- Additionally: Bin sizes, and standard deviations of observed y and residuals.
+- Average predictions: Combined effect of X and other features (M Plots, Apley [1]).
+- Partial dependence (Friedman [2]): How does the average prediction changes with X, keeping other features fixed.
+- Accumulated local effects (Apley [1]): Alternative to partial dependence.
 
-**It takes 3 seconds on a laptop to get all statistics for ten features on a 10 Mio row dataset (+ prediction time).**
+Furthermore, it calculates counts, average residuals, and standard deviations of observed y and residuals, eventually accounting for case weights. We highly recommend Christoph Molnar's book [3] for more info on feature effects.
+
+**It takes 3 seconds on a laptop to get all statistics for ten features on a 10 Mio row data (+ prediction time).**
 
 **Workflow**
 
-1. **Crunch** values via `feature_effects()` or the convenience wrappers `average_observed()`, `average_predicted()`, `bias()`, `partial_dependence()`, and `ale()`.
-2. **Post-process** the results with `update()`, e.g., to collapse rare levels of categorical features or to sort the results by a simple variable importance measure.
-3. **Plot** the results with `plot()`. Choose between {ggplot2}/{patchwork} and {plotly}.
+1. **Crunch** values via `feature_effects()` or the convenience helpers `average_observed()`, `partial_dependence()`, `ale()` etc.
+2. **Update** the results with `update()`: Collapse rare levels of categorical features, sort results by variable importance etc.
+3. **Plot** the results with `plot()`: Choose between ggplot2/patchwork and plotly.
 
 ## Installation
 
@@ -37,8 +37,7 @@ pak::pak("mayer79/effectplots")
 
 ## Usage
 
-We use synthetic data with 1 Mio rows containing information on Motor TPL insurance policies and claims.
-The aim is to model claim frequency as a function of features like "driver_age" and "car_power".
+We use a 1 Mio row dataset with information on Motor TPL insurance policies and claims. The aim is to model claim frequency.
 
 Before modeling, we want to study association between features and the response.
 
@@ -50,13 +49,11 @@ library(lightgbm)
 set.seed(1)
 
 df <- getOMLDataSet(data.id = 45106L)$data
-# df <- arrow::read_parquet("claims.parquet")
 
 xvars <- c("year", "town", "driver_age", "car_weight", "car_power", "car_age")
 
 # 0.2s on laptop
 average_observed(df[xvars], y = df$claim_nb) |>
-  update(sort_by = "y_mean") |> 
   plot(share_y = "all")
 ```
 
@@ -69,7 +66,6 @@ A shared y axis helps to compare the strength of the association across features
 Next, let's fit a boosted trees model.
 
 ```r
-# Data splits
 ix <- sample(nrow(df), 0.8 * nrow(df))
 train <- df[ix, ]
 test <- df[-ix, ]
@@ -99,7 +95,9 @@ fit <- lgb.train(
 
 ### Inspect model
 
-Let's use the test data to crunch all statistics.
+Let's crunch all statistics on the test data. Sorting is done by weighted variance of partial dependence, a main-effect importance measure closely related to [4].
+
+The average predictions closely follow the average observed, i.e., the model does a good job. Comparing partial dependence/ALE with average predicted gives insights on whether an effect comes from the feature on the x axis or from other, correlated, features.
 
 ```r
 # 0.3s on laptop
@@ -110,15 +108,10 @@ feature_effects(fit, v = xvars, data = X_test, y = test$claim_nb) |>
 
 ![](man/figures/feature_effects.svg)
 
-**Comments**
-
-1. Comparing average predictions with average observed y provides a good overview of model bias. It seems to be small.
-2. Comparing the shape of partial dependence or ALE with the shape of the average predicted curve provides additional insights. E.g., for the two strong predictors "driver_age" and "car_power", the lines are similar. Thus, the effects are mainly due to the feature on the x axis and not of some other, correlated, feature.
-3. Sorting is done by decreasing weighted variance of the partial dependence values, a measure of main-effect strength closely related to [3].
 
 ### Flexibility
 
-Thanks to the flexibility of the package, we can modify the results as we wish. For instance: what about putting results on training data besides those on test? Or comparing different models or subgroups? 
+What about putting results on training data besides those on test? Or comparing different models or subgroups? No problem:
 
 ```r
 m_train <- feature_effects(fit, v = xvars, data = X_train, y = train$claim_nb)
@@ -130,7 +123,7 @@ m_train <- m_train |>
   head(3)
 m_test <- m_test[names(m_train)]
 
-# Plot combined one
+# Concatenate train and test results and plot them
 c(m_train, m_test) |> 
   plot(
     share_y = "rows",
@@ -144,7 +137,7 @@ c(m_train, m_test) |>
 
 ![](man/figures/train_test.svg)
 
-In case we want to dig deeper into possible bias, we can use "resid_mean" as statistic, and show pointwise 95% Z confidence intervals for the true bias.
+In case we want to dig deeper into possible bias, we can use "resid_mean" as statistic, and show point-wise 95% confidence intervals for the true bias.
 
 ```r
 c(m_train, m_test) |> 
@@ -161,22 +154,33 @@ c(m_train, m_test) |>
 
 ![](man/figures/bias.svg)
 
-## Additional goodies
+## DALEX and Tidymodels et al.
 
-- Most models (including DALEX explainers and meta-learners such as Tidymodels) work out-of-the box. If not, a tailored prediction function can be specified.
-- Binning of numeric features is done by the same options as `stats::hist()`. Outliers are capped (not removed) at +-2 IQR from the quartiles by default.
-- Case weights are supported via the argument `w`.
+Most models work out-of-the box. If not, a tailored prediction function can be specified.
 
-## Background 
+```r
+library(DALEX)
+library(ranger)
 
-Christoph Molnar's excellent book [4] provides much more background on feature effects.
+set.seed(1)
+
+fit <- ranger(Sepal.Length ~ ., data = iris)
+ex <- DALEX::explain(fit, data = iris[, -1], y = iris[, 1])
+
+feature_effects(ex, breaks = 5) |> 
+  plot(share_y = "all")
+```
+
+![](man/figures/dalex.svg)
+
 
 # References
 
 1. Apley, Daniel W., and Jingyu Zhu. 2020. *Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.* Journal of the Royal Statistical Society Series B: Statistical Methodology, 82 (4): 1059–1086. doi:10.1111/rssb.12377.
 2. Friedman, Jerome H. 2001. *Greedy Function Approximation: A Gradient Boosting Machine.* Annals of Statistics 29 (5): 1189–1232. doi:10.1214/aos/1013203451.
 <https://christophm.github.io/interpretable-ml-book>.
-3. Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy. 2018.
-*A Simple and Effective Model-Based Variable Importance Measure.* arXiv preprint. <https://arxiv.org/abs/1805.04755>.
-4. Molnar, Christoph. 2019. *Interpretable Machine Learning: A Guide for
+3. Molnar, Christoph. 2019. *Interpretable Machine Learning: A Guide for
 Making Black Box Models Explainable*. 
+4. Greenwell, Brandon M., Bradley C. Boehmke, and Andrew J. McCarthy. 2018.
+*A Simple and Effective Model-Based Variable Importance Measure.* arXiv preprint. <https://arxiv.org/abs/1805.04755>.
+

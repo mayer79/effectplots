@@ -326,7 +326,10 @@ plot.EffectData <- function(
       SIMPLIFY = FALSE
     )
     # left/right - top/bottom (we use it symmetrically)
-    margins <- c(0.02 + 0.04 / ncol - hide_some_yticks * 0.01, 0.03 + 0.04 / nrow + subplot_titles * 0.015)
+    margins <- c(
+      0.02 + 0.04 / ncol - hide_some_yticks * 0.01,
+      0.03 + 0.04 / nrow + subplot_titles * 0.015
+    )
     fig <- plotly::subplot(
       plot_list,
       titleX = TRUE,
