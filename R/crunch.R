@@ -116,11 +116,11 @@ hist2 <- function(x, breaks = "Sturges") {
 #' @noRd
 #' @keywords internal
 #'
-#' @param x A matrix.
+#' @param x A data.frame or matrix.
 #' @param g A grouping vector/factor.
 #' @param w Optional vector with case weights.
-#' @returns A data.frame with Counts, weight sums, means and standard deviations of
-#'   each column in `x`.
+#' @returns A matrix with counts, weight sums, means and standard deviations of
+#'   columns in `x`.
 grouped_stats <- function(x, g, w = NULL, sd_cols = colnames(x)) {
   # returns rows in order sort(unique(x)) + NA, or levels(x) + NA (if factor)
   if (!is.factor(g)) {
@@ -136,12 +136,14 @@ grouped_stats <- function(x, g, w = NULL, sd_cols = colnames(x)) {
   if (is.null(x)) {
     return(out)
   }
-  M <- collapse::fmean(x, g = g, w = w, use.g.names = FALSE)
+  M <- as.matrix(collapse::fmean(x, g = g, w = w, use.g.names = FALSE))
   colnames(M) <- paste0(colnames(M), "_mean")
 
   # Add some standard deviations
   if (length(sd_cols)) {
-    S <- collapse::fsd(collapse::ss(x, , sd_cols), g = g, w = w, use.g.names = FALSE)
+    S <- as.matrix(
+      collapse::fsd(collapse::ss(x, , sd_cols), g = g, w = w, use.g.names = FALSE)
+    )
     colnames(S) <- paste0(colnames(S), "_sd")
     return(cbind(out, M, S))
   }

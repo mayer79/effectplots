@@ -63,7 +63,7 @@
 #' M <- feature_effects(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 #' plot(M, share_y = "all")
 #' plot(M, stats = c("pd", "ale"), legend_labels = c("PD", "ALE"))
-#' plot(M, stats = "resid_mean", share_y = "all")
+#' plot(M, stats = "resid_mean", share_y = "all", errors = "ci")
 plot.EffectData <- function(
     x,
     stats = NULL,
@@ -448,7 +448,7 @@ one_ggplot <- function(
         data = subset(df, !is.na(err_)),
         ggplot2::aes(ymin = value_ - err_, ymax = value_ + err_, color = varying_),
         linewidth = 0.8,
-        alpha = alpha / 2,
+        alpha = alpha,
         width = 0,
         show.legend = FALSE
       )
@@ -589,7 +589,7 @@ one_plotly <- function(
       mode = scatter_mode,
       type = "scatter",
       error_y = if (has_errors && !num)
-        list(array = x[[error_col]], opacity = alpha / 2, width = 0),
+        list(array = x[[error_col]], opacity = alpha, width = 0),
       name = names(z),
       showlegend = show_legend,
       legendgroup = z,
