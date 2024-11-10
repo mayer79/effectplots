@@ -135,12 +135,13 @@ c(m_train, m_test) |>
 
 ![](man/figures/train_test.svg)
 
-In case we want to dig deeper into possible bias, we can use "resid_mean" as statistic, and show point-wise 95% confidence intervals for the true bias.
+In case we want to dig deeper into bias, we can use "resid_mean" as statistic, and show pointwise 95% confidence intervals for the true bias.
 
 ```r
 c(m_train, m_test) |> 
+  update(drop_below_n = 50) |> 
   plot(
-    ylim = c(-0.2, 0.2),
+    ylim = c(-0.06, 0.09),
     ncol = 2,
     byrow = FALSE,
     stats = "resid_mean",
