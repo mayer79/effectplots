@@ -9,3 +9,4 @@
 ^cran-comments\.md$
 ^claims\.parquet$
 ^backlog\.R$
+^CRAN-SUBMISSION$
