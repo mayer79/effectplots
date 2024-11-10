@@ -187,11 +187,12 @@
 <span>    title <span class="op">=</span> <span class="st">"Left: Train - Right: Test"</span>,</span>
 <span>  <span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/train_test.svg"></p>
-<p>In case we want to dig deeper into possible bias, we can use “resid_mean” as statistic, and show point-wise 95% confidence intervals for the true bias.</p>
+<p>In case we want to dig deeper into bias, we can use “resid_mean” as statistic, and show pointwise 95% confidence intervals for the true bias.</p>
 <div class="sourceCode" id="cb6"><pre class="downlit sourceCode r">
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">m_train</span>, <span class="va">m_test</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span>drop_below_n <span class="op">=</span> <span class="fl">50</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
-<span>    ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.2</span>, <span class="fl">0.2</span><span class="op">)</span>,</span>
+<span>    ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.06</span>, <span class="fl">0.09</span><span class="op">)</span>,</span>
 <span>    ncol <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>    byrow <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>    stats <span class="op">=</span> <span class="st">"resid_mean"</span>,</span>
