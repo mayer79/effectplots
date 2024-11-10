@@ -19,7 +19,7 @@ use_description(
     Description = "High-performance implementation of various effect plots
     useful for regression and probabilistic classification tasks.
     The package includes partial dependence plots
-    (Friedman, 2021, <doi:10.1214/aos/1013203451.3>), accumulated local effect plots
+    (Friedman, 2021, <doi:10.1214/aos/1013203451>), accumulated local effect plots
     and M-plots (both from Apley and Zhu, 2016, <doi:10.1111/rssb.12377>),
     as well as plots that describe the statistical associations between model
     response and features.
