@@ -71,7 +71,7 @@ use the <code>stats</code> argument. Set <code>plotly = TRUE</code> for interact
 <span>  subplot_titles <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  ylab <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  legend_labels <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  errors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"ci"</span>, <span class="st">"ciw"</span>, <span class="st">"sd"</span><span class="op">)</span>,</span>
+<span>  interval <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"ci"</span>, <span class="st">"ciw"</span>, <span class="st">"sd"</span><span class="op">)</span>,</span>
 <span>  ci_level <span class="op">=</span> <span class="fl">0.95</span>,</span>
 <span>  colors <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"effectplots.colors"</span><span class="op">)</span>,</span>
 <span>  fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"effectplots.fill"</span><span class="op">)</span>,</span>
@@ -113,8 +113,9 @@ Only for multiple plots.</p></dd>
 
 <dt id="arg-share-y">share_y<a class="anchor" aria-label="anchor" href="#arg-share-y"></a></dt>
 <dd><p>Should y axis be shared across subplots? The default is "no".
-Other choices are "all", "rows", and "cols".
-No effect if <code>ylim</code> is passed. Only for multiple plots.</p></dd>
+Other choices are "all", "rows", and "cols". Note that this currently does not
+take into account error bars/ribbons.
+Has mo effect if <code>ylim</code> is passed. Only for multiple plots.</p></dd>
 
 
 <dt id="arg-ylim">ylim<a class="anchor" aria-label="anchor" href="#arg-ylim"></a></dt>
@@ -148,12 +149,12 @@ a reasonable name.</p></dd>
 statistics plotted, or <code>NULL</code> (default).</p></dd>
 
 
-<dt id="arg-errors">errors<a class="anchor" aria-label="anchor" href="#arg-errors"></a></dt>
-<dd><p>What errors (ribbons for numeric X, bars for others) should be shown
-for observed y and residuals? One of</p><ul><li><p>"no" (default),</p></li>
+<dt id="arg-interval">interval<a class="anchor" aria-label="anchor" href="#arg-interval"></a></dt>
+<dd><p>What intervals should be shown for observed y and residuals? One of</p><ul><li><p>"no" (default),</p></li>
 <li><p>"ci": Z confidence intervals using sqrt(N) as standard error of the mean,</p></li>
-<li><p>"ciw": Like "ci", but using sqrt(weight) as standard error of the mean and</p></li>
-<li><p>"sd": standard deviations.</p></li>
+<li><p>"ciw": Like "ci", but using sqrt(weight) as standard error of the mean, or</p></li>
+<li><p>"sd": standard deviations.
+Ribbons for numeric X, error bars for categorical X.</p></li>
 </ul></dd>
 
 
@@ -230,7 +231,7 @@ Otherwise, an object of class "patchwork", or a "plotly" subplot.</p>
 <span class="r-plt img"><img src="plot.EffectData-1.png" alt="" width="700" height="433"></span>
 <span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">M</span>, stats <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"pd"</span>, <span class="st">"ale"</span><span class="op">)</span>, legend_labels <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"PD"</span>, <span class="st">"ALE"</span><span class="op">)</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot.EffectData-2.png" alt="" width="700" height="433"></span>
-<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">M</span>, stats <span class="op">=</span> <span class="st">"resid_mean"</span>, share_y <span class="op">=</span> <span class="st">"all"</span>, errors <span class="op">=</span> <span class="st">"ci"</span><span class="op">)</span></span></span>
+<span class="r-in"><span><span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span><span class="va">M</span>, stats <span class="op">=</span> <span class="st">"resid_mean"</span>, share_y <span class="op">=</span> <span class="st">"all"</span>, interval <span class="op">=</span> <span class="st">"ci"</span><span class="op">)</span></span></span>
 <span class="r-plt img"><img src="plot.EffectData-3.png" alt="" width="700" height="433"></span>
 </code></pre></div>
     </div>
