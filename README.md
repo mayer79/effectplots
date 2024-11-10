@@ -147,7 +147,7 @@ c(m_train, m_test) |>
     stats = "resid_mean",
     subplot_titles = FALSE,
     title = "Left: Train - Right: Test",
-    errors = "ci"
+    interval = "ci"
   )
 ```
 

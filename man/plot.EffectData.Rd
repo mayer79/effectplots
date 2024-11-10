@@ -17,7 +17,7 @@
   subplot_titles = TRUE,
   ylab = NULL,
   legend_labels = NULL,
-  errors = c("no", "ci", "ciw", "sd"),
+  interval = c("no", "ci", "ciw", "sd"),
   ci_level = 0.95,
   colors = getOption("effectplots.colors"),
   fill = getOption("effectplots.fill"),
@@ -46,8 +46,9 @@ Additionally, this argument controls the order used to plot the lines.}
 Only for multiple plots.}
 
 \item{share_y}{Should y axis be shared across subplots? The default is "no".
-Other choices are "all", "rows", and "cols".
-No effect if \code{ylim} is passed. Only for multiple plots.}
+Other choices are "all", "rows", and "cols". Note that this currently does not
+take into account error bars/ribbons.
+Has mo effect if \code{ylim} is passed. Only for multiple plots.}
 
 \item{ylim}{A vector of length 2 with manual y axis limits, or a list thereof.}
 
@@ -66,13 +67,13 @@ a reasonable name.}
 \item{legend_labels}{Vector of legend labels in the same order as the
 statistics plotted, or \code{NULL} (default).}
 
-\item{errors}{What errors (ribbons for numeric X, bars for others) should be shown
-for observed y and residuals? One of
+\item{interval}{What intervals should be shown for observed y and residuals? One of
 \itemize{
 \item "no" (default),
 \item "ci": Z confidence intervals using sqrt(N) as standard error of the mean,
-\item "ciw": Like "ci", but using sqrt(weight) as standard error of the mean and
+\item "ciw": Like "ci", but using sqrt(weight) as standard error of the mean, or
 \item "sd": standard deviations.
+Ribbons for numeric X, error bars for categorical X.
 }}
 
 \item{ci_level}{The nominal level of the Z confidence intervals (only when
@@ -121,7 +122,7 @@ xvars <- colnames(iris)[-1]
 M <- feature_effects(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 plot(M, share_y = "all")
 plot(M, stats = c("pd", "ale"), legend_labels = c("PD", "ALE"))
-plot(M, stats = "resid_mean", share_y = "all", errors = "ci")
+plot(M, stats = "resid_mean", share_y = "all", interval = "ci")
 }
 \seealso{
 \code{\link[=feature_effects]{feature_effects()}}, \code{\link[=average_observed]{average_observed()}}, \code{\link[=average_predicted]{average_predicted()}},

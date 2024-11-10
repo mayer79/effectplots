@@ -149,3 +149,47 @@ grouped_stats <- function(x, g, w = NULL, sd_cols = colnames(x)) {
   }
   cbind(out, M)
 }
+
+# findInterval2 <- function(x, breaks, right = TRUE) {
+#   m <- length(breaks)
+#   if (m <= 2L) {
+#     return(rep.int(1L, times = length(x)))
+#   }
+#   # from hist2.default()
+#   h <- diff(breaks)
+#   equidist <- diff(range(h)) < 1e-07 * mean(h)
+#   if (!equidist) {
+#     out <- findInterval(
+#       x, vec = breaks, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
+#     )
+#   } else {
+#     b1 <- breaks[1L]
+#     D <- (breaks[m] - b1) / (m - 1)
+#     x <- (x - b1) / D
+#     if (right) {
+#       out <- pmax(as.integer(ceiling(x)), 1)
+#     } else {
+#       out <- pmin(as.integer(x + 1L), m - 2L)
+#     }
+#   }
+#   return(out)
+# }
+
+#' #' Turn Integer Vector into Factor (not used)
+#' #'
+#' #' Internal function used to turn the result of findInterval() into a factor.
+#' #' It keeps empty levels.
+#' #'
+#' #' @noRd
+#' #' @keywords internal
+#' #'
+#' #' @param x An integer vector.
+#' #' @param m The maximal value of x
+#' #' @returns A factor with levels as.character(1:m).
+#' int2fact <- function(x, m = max(x, na.rm = TRUE)) {
+#'   if (!is.integer(x)) {
+#'     x <- as.integer(x)
+#'   }
+#'   levels(x) <- as.character(seq_len(m))
+#'   structure(x, class = "factor")
+#' }

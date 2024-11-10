@@ -15,8 +15,9 @@
 #' @param byrow Should plots be placed by row? Default is `TRUE`.
 #'   Only for multiple plots.
 #' @param share_y Should y axis be shared across subplots? The default is "no".
-#'   Other choices are "all", "rows", and "cols".
-#'   No effect if `ylim` is passed. Only for multiple plots.
+#'   Other choices are "all", "rows", and "cols". Note that this currently does not
+#'   take into account error bars/ribbons.
+#'   Has mo effect if `ylim` is passed. Only for multiple plots.
 #' @param ylim A vector of length 2 with manual y axis limits, or a list thereof.
 #' @param cat_lines Show lines for non-numeric features. Default is `TRUE`.
 #' @param num_points Show points for numeric features. Default is `FALSE`.
@@ -27,12 +28,12 @@
 #'   a reasonable name.
 #' @param legend_labels Vector of legend labels in the same order as the
 #'   statistics plotted, or `NULL` (default).
-#' @param errors What errors (ribbons for numeric X, bars for others) should be shown
-#'   for observed y and residuals? One of
+#' @param interval What intervals should be shown for observed y and residuals? One of
 #'   - "no" (default),
 #'   - "ci": Z confidence intervals using sqrt(N) as standard error of the mean,
-#'   - "ciw": Like "ci", but using sqrt(weight) as standard error of the mean and
+#'   - "ciw": Like "ci", but using sqrt(weight) as standard error of the mean, or
 #'   - "sd": standard deviations.
+#'   Ribbons for numeric X, error bars for categorical X.
 #' @param ci_level The nominal level of the Z confidence intervals (only when
 #'   `error` equals "ci" or "ciw"). The default is 0.95.
 #' @param colors Vector of line/point colors of sufficient length.
@@ -65,7 +66,7 @@
 #' M <- feature_effects(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 #' plot(M, share_y = "all")
 #' plot(M, stats = c("pd", "ale"), legend_labels = c("PD", "ALE"))
-#' plot(M, stats = "resid_mean", share_y = "all", errors = "ci")
+#' plot(M, stats = "resid_mean", share_y = "all", interval = "ci")
 plot.EffectData <- function(
     x,
     stats = NULL,
@@ -79,7 +80,7 @@ plot.EffectData <- function(
     subplot_titles = TRUE,
     ylab = NULL,
     legend_labels = NULL,
-    errors = c("no", "ci", "ciw", "sd"),
+    interval = c("no", "ci", "ciw", "sd"),
     ci_level = 0.95,
     colors = getOption("effectplots.colors"),
     fill = getOption("effectplots.fill"),
@@ -93,7 +94,7 @@ plot.EffectData <- function(
     ...
 ) {
   share_y <- match.arg(share_y)
-  errors <- match.arg(errors)
+  interval <- match.arg(interval)
   bar_measure <- match.arg(bar_measure)
 
   # Info of the form c(legend label = col name, ...)
@@ -154,9 +155,9 @@ plot.EffectData <- function(
 
   # Overwrite sd columns
   sd_cols <- intersect(c("y_sd", "pred_sd", "resid_sd"), colnames(x[[1L]]))
-  if (errors %in% c("ci", "ciw") && length(sd_cols)) {
+  if (interval %in% c("ci", "ciw") && length(sd_cols)) {
     q <- stats::qnorm(1 - (1 - ci_level) / 2)
-    D <- switch(errors, ci = "N", ciw = "weight")
+    D <- switch(interval, ci = "N", ciw = "weight")
     x[] <- lapply(x, function(z) {z[sd_cols] <- q * z[sd_cols] / sqrt(z[[D]]); z})
   }
 
@@ -180,7 +181,7 @@ plot.EffectData <- function(
         title = title,
         ylab = ylab,
         stat_info = stat_info,
-        errors = errors,
+        interval = interval,
         colors = colors,
         fill = fill,
         alpha = alpha,
@@ -202,7 +203,7 @@ plot.EffectData <- function(
         title_as_ann = FALSE,
         ylab = ylab,
         stat_info = stat_info,
-        errors = errors,
+        interval = interval,
         colors = colors,
         fill = fill,
         alpha = alpha,
@@ -274,7 +275,7 @@ plot.EffectData <- function(
         num_points = num_points,
         ylab = ylab,
         stat_info = stat_info,
-        errors = errors,
+        interval = interval,
         colors = colors,
         fill = fill,
         alpha = alpha,
@@ -316,7 +317,7 @@ plot.EffectData <- function(
         ylab = ylab,
         show_ylab = FALSE,  # replaced by global annotation
         stat_info = stat_info,
-        errors = errors,
+        interval = interval,
         colors = colors,
         fill = fill,
         alpha = alpha,
@@ -377,7 +378,7 @@ one_ggplot <- function(
     title,
     ylab,
     stat_info,
-    errors,
+    interval,
     colors,
     fill,
     alpha,
@@ -402,7 +403,7 @@ one_ggplot <- function(
 
   # This block is a bit ugly...
   err_mean <- intersect(stat_info, c("y_mean", "resid_mean"))
-  has_errors <- errors != "no" && length(err_mean)
+  has_errors <- interval != "no" && length(err_mean)
   if (has_errors) {
     err_cols <- gsub("_mean", "_sd", err_mean)
     all_err_cols <-  paste0(gsub("_mean", "", stat_info), "_sd")
@@ -499,6 +500,11 @@ one_ggplot <- function(
   }
   if (!is.null(ylim)) {
     p <- p + ggplot2::coord_cartesian(ylim = ylim)
+    if (share_y != "no") {
+      # This actually *reduces* the expansion done by coord_cartesion(expand = TRUE).
+      # (Because we have already added some expansion in the main plotting function.)
+      p <- p + ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = 0.01))
+    }
   }
   if (!num) {
     if (wrap_x > 0 && is.finite(wrap_x)) {
@@ -522,7 +528,7 @@ one_plotly <- function(
     title_as_ann = FALSE,
     ylab,
     stat_info,
-    errors,
+    interval,
     colors,
     fill,
     alpha,
@@ -583,7 +589,7 @@ one_plotly <- function(
 
   for (i in seq_along(stat_info)) {
     z <- stat_info[i]
-    has_errors <- errors != "no" && z %in% c("y_mean", "resid_mean")
+    has_errors <- interval != "no" && z %in% c("y_mean", "resid_mean")
     if (has_errors) {
       error_col <- gsub("_mean", "_sd", z)
     }
@@ -611,7 +617,7 @@ one_plotly <- function(
        ymax = x[[z]] + x[[error_col]],
        data = x,
        yaxis = "y",
-       name = errors,
+       name = interval,
        showlegend = FALSE,
        color = I(colors[i]),
        opacity = alpha / 2
