@@ -214,6 +214,8 @@ ale.explainer <- function(
       x, vec = breaks, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
     )
     g <- collapse::qF(g, sort = FALSE)
+  } else {
+    g <- collapse::fdroplevels(g)
   }
 
   # List of bin indices. Eventual NA levels are placed at the end. We will remove it.

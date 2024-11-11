@@ -95,3 +95,15 @@ test_that("hist2() works slightly different for very large vectors", {
 test_that("hist2() does not like unknown strings", {
   expect_error(hist2(1:10, breaks = "hello"))
 })
+
+test_that("int2fact() works", {
+  g <- c(4, 1, 1, NA)
+  g2 <- int2fact(g, m = 4)
+
+  expect_equal(g2, factor(g, levels = 1:4))
+
+  y <- 1:4
+  xpected <- c(2.5, NA, NA, 1, 4)
+  names(xpected) <- c("1", "2", "3", "4", NA)
+  expect_equal(collapse::fmean(y, g = g2), xpected)
+})

@@ -39,11 +39,21 @@ bench::mark(
 
 # New
 # 3.07s    2.35GB
+x <- sample(c(1:10, NA), 1e7, T)
+f1  <- function(Y, x) {
+  grouped_stats(Y, g = qF(x, sort=F), sd_cols = c("V1", "V2"))
+}
+f2 <- function(Y, x) {
+  grouped_stats(Y, g = int2fact(x, 10), sd_cols = c("V1", "V2"))
+}
 
-f1  <- function(pred, y) {
-  cbind(pred = pred, y = y, resid = if (!is.null(pred) && !is.null(y)) y - pred)
-}
-f2 <- function(pred = NULL, y = NULL) {
-  PYR <- list(pred = pred, y = y, resid = if (!is.null(pred) && !is.null(y)) y - pred)
-  qDF(PYR[lengths(PYR) > 0L])
-}
+Y <- qDF(matrix(rnorm(3e7), ncol = 3))
+grouped_stats(Y, g = qF(x, sort=F), sd_cols = c("V1", "V2"))
+grouped_stats(Y, g = int2fact(x, 10), sd_cols = c("V1", "V2"))
+bench::mark(f1(Y, x), f2(Y, x), check=F, iterations = 10)
+
+x <- runif(1e7)
+br <- seq(0, 1, by = 0.05)
+bench::mark(findInterval(x, br, T, T, left.open = T), findInterval2(x, br, right = T), iterations = 10)
+
+#, spatstat.utils::fastFindInterval(x, br))
