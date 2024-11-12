@@ -438,9 +438,10 @@ calculate_stats <- function(
       x <- wins_iqr(x, m = outlier_iqr)
     }
     br <- hist2(x, breaks = breaks)
-    ix <- findInterval(
-      x, vec = br, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
-    )
+    if (!is.double(x)) {
+      x <- as.double(x)
+    }
+    ix <- findInterval2(x, breaks = br, right = right)
     ix <- int2fact(ix, m = length(br) - 1L)  # May contain empty levels (we need them!)
     M <- grouped_stats(PYR, g = ix, w = w, sd_cols = sd_cols)
 
@@ -450,7 +451,7 @@ calculate_stats <- function(
       mids <- c(mids, NA)
       bin_width <- c(bin_width, NA)
     }
-    bin_mean <- collapse::fmean.default(x, g = ix, w = w)
+    bin_mean <- collapse::fmean(x, g = ix, w = w)
     bad <- is.na(bin_mean)  # Can have NA values from empty bins
     bin_mean[bad] <- mids[bad]
     out <- data.frame(bin_mid = mids, bin_width = bin_width, bin_mean = bin_mean, M)

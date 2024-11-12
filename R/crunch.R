@@ -146,28 +146,30 @@ grouped_stats <- function(x, g, w = NULL, sd_cols = colnames(x)) {
   cbind(out, M)
 }
 
-# Pure R implementation of spatstat.utils::fastFindInterval()
+# Fast implementation of spatstat.utils::fastFindInterval()
 findInterval2 <- function(x, breaks, right = TRUE) {
-  m <- length(breaks)
-  if (m <= 2L) {
+  nbreaks <- length(breaks)
+  if (nbreaks <= 2L) {
     return(rep.int(1L, times = length(x)))
   }
   # from hist2.default()
   h <- diff(breaks)
-  equidist <- diff(range(h)) < 1e-07 * mean(h)
-  if (!equidist) {
-    return(
-      findInterval(
-        x, vec = breaks, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
-      )
+  if (!all(h > 0)) {
+    stop("Breaks must be strictly increasing")
+  }
+  if (diff(range(h)) < 1e-07 * mean(h)) {  # equidist
+    findInterval_even(
+      as.double(x),
+      low = as.double(breaks[1L]),
+      high = as.double(breaks[nbreaks]),
+      nbin = nbreaks - 1L,
+      right = as.logical(right)
+    )
+  } else {
+    findInterval(
+      x, vec = breaks, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
     )
   }
-  D <- (breaks[m] - breaks[1L]) / (m - 1)
-  x <- (x - breaks[1L]) / D
-  x <- if (right) as.integer(ceiling(x)) else as.integer(x) + 1L
-  x[x <= 1L] <- 1L
-  x[x >= m - 1L] <- m - 1L
-  return(x)
 }
 
 #' Turn Integer Vector into Factor (not used)
