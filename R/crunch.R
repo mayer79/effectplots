@@ -169,22 +169,3 @@ findInterval2 <- function(x, breaks, right = TRUE) {
   x[x >= m - 1L] <- m - 1L
   return(x)
 }
-
-#' Turn Integer Vector into Factor (not used)
-#'
-#' Internal function used to turn the result of findInterval() into a factor.
-#' It keeps empty levels.
-#'
-#' @noRd
-#' @keywords internal
-#'
-#' @param x An integer vector.
-#' @param m The maximal value of x
-#' @returns A factor with levels as.character(1:m).
-int2fact <- function(x, m = max(x, na.rm = TRUE)) {
- if (!is.integer(x)) {
-   x <- as.integer(x)
-  }
-  levels(x) <- as.character(seq_len(m))
-  structure(x, class = "factor")
-}
