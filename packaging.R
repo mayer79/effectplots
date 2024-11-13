@@ -64,6 +64,8 @@ use_cran_comments()
 
 use_github_links() # use this if this project is on github
 
+use_rcpp()
+
 # Github actions
 # use_github_action("check-standard")
 # use_github_action("test-coverage")

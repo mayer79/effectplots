@@ -443,17 +443,15 @@ calculate_stats <- function(
     gix <- seq_along(mids)
     bin_width <- diff(br)
 
-    # Integer encoding
-    ix <- findInterval(
-      x, vec = br, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
-    )
-    ix <- collapse::qF(ix, sort = FALSE)
+    if (!is.double(x)) {  # will be converted anyway in findInterval
+      x <- as.double(x)
+    }
+    ix <- collapse::qF(findInterval2(x, breaks = br, right = right), sort = FALSE)
 
     M <- cbind(
       bin_mean = collapse::fmean.default(x, g = ix, w = w),
       grouped_stats(PYR, g = ix, w = w, sd_cols = sd_cols)
     )
-
     if (is.na(rownames(M)[nrow(M)])) {
       mids <- c(mids, NA)
       gix <- c(gix, NA)
@@ -463,7 +461,6 @@ calculate_stats <- function(
     out <- data.frame(
       bin_mid = mids, bin_width = bin_width, bin_mean = mids, N = 0, weight = 0
     )
-
     reindex <- match(as.integer(rownames(M)), gix)
     out[reindex, colnames(M)] <- M  # Fill the gaps and rearrange in right order
   }

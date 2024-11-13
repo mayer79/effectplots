@@ -59,6 +59,41 @@ bench::mark(findInterval(x, br, T, T, left.open = T), findInterval2(x, br, right
 
 #, spatstat.utils::fastFindInterval(x, br))
 
+Rcpp::cppFunction("
+IntegerVector findInterval3(
+    NumericVector x, double low, double high, int nbin, bool right = true
+) {
+  const unsigned int n = x.size();
+  IntegerVector out(n, NA_INTEGER);
+  double D = (high - low) / nbin;
+
+  for (int i = 0; i < n; i++) {
+    double z = x[i];
+    if (z <= low) {
+      out[i] = 1;
+    } else if (z >= high) {
+      out[i] = nbin;
+    } else if (!std::isnan(z)) {
+      if (right) {
+        out[i] = int(ceil((z - low) / D));
+      } else {
+        out[i] = int((z - low) / D) + 1;
+      }
+    }
+  }
+  return out;
+}
+
+            ")
+x <- runif(1e7)
+b1 <- 0
+b2 <- 1
+m <- 11L
+breaks <- seq(0, 1, by = 0.1)
+bench::mark(
+  effectplots:::findInterval_equi(x, b1, b2, m, T), findInterval3(x, b1, b2, m, T)
+)
+
 x <- sample(1:10, 1e7, T)
 X <- as.data.frame(matrix(runif(2e7), ncol=2))
 f1 <- function() {
