@@ -32,7 +32,7 @@ You can install the development version of {effectplots} from [GitHub](https://g
 
 ``` r
 # install.packages("pak")
-pak::pak("mayer79/effectplots")
+pak::pak("mayer79/effectplots", dependencies = TRUE)
 ```
 
 ## Usage

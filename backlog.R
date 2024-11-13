@@ -1,3 +1,4 @@
+install_github("mayer79/effectplots", ref = "2aac638")
 library(effectplots)
 library(dplyr)
 library(data.table)
@@ -92,3 +93,13 @@ breaks <- seq(0, 1, by = 0.1)
 bench::mark(
   effectplots:::findInterval_equi(x, b1, b2, m, T), findInterval3(x, b1, b2, m, T)
 )
+
+x <- sample(1:10, 1e7, T)
+X <- as.data.frame(matrix(runif(2e7), ncol=2))
+f1 <- function() {
+  grouped_stats(X, g = qF(x, sort = FALSE))
+}
+f2 <- function() {
+  grouped_stats(X, g = int2fact(x))
+}
+bench::mark(f1(), f2(), check=F)

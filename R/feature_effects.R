@@ -419,7 +419,7 @@ calculate_stats <- function(
     return(NULL)
   }
 
-  sd_cols <- setdiff(colnames(PYR), "pred")
+  sd_cols <- setdiff(colnames(PYR), "pred")  # Can be NULL
 
   # DISCRETE
   if (!num) {
@@ -432,31 +432,38 @@ calculate_stats <- function(
     # Ordered by levels(x) (+ NA). x has no empty levels anymore -> same order as g
     M <- grouped_stats(PYR, g = x, w = w, sd_cols = sd_cols)
     out <- data.frame(bin_mid = g, bin_width = 0.7, bin_mean = g, M)
+    rownames(out) <- NULL
   } else {
     # "CONTINUOUS" case. Tricky because there can be empty bins.
     if (outlier_iqr > 0 && is.finite(outlier_iqr)) {  # could move in front of if branch
       x <- wins_iqr(x, m = outlier_iqr)
     }
     br <- hist2(x, breaks = breaks)
-    if (!is.double(x)) {
+    mids <- 0.5 * (br[-1L] + br[-length(br)])
+    gix <- seq_along(mids)
+    bin_width <- diff(br)
+
+    if (!is.double(x)) {  # will be converted anyway in findInterval
       x <- as.double(x)
     }
-    ix <- findInterval2(x, breaks = br, right = right)
-    ix <- int2fact(ix, m = length(br) - 1L)  # May contain empty levels (we need them!)
-    M <- grouped_stats(PYR, g = ix, w = w, sd_cols = sd_cols)
+    ix <- collapse::qF(findInterval2(x, breaks = br, right = right), sort = FALSE)
 
-    mids <- 0.5 * (br[-1L] + br[-length(br)])
-    bin_width <- diff(br)
+    M <- cbind(
+      bin_mean = collapse::fmean.default(x, g = ix, w = w),
+      grouped_stats(PYR, g = ix, w = w, sd_cols = sd_cols)
+    )
     if (is.na(rownames(M)[nrow(M)])) {
       mids <- c(mids, NA)
-      bin_width <- c(bin_width, NA)
+      gix <- c(gix, NA)
+      bin_width <- c(bin_width, NA)  #  Can't be plotted anyway
     }
-    bin_mean <- collapse::fmean(x, g = ix, w = w)
-    bad <- is.na(bin_mean)  # Can have NA values from empty bins
-    bin_mean[bad] <- mids[bad]
-    out <- data.frame(bin_mid = mids, bin_width = bin_width, bin_mean = bin_mean, M)
+
+    out <- data.frame(
+      bin_mid = mids, bin_width = bin_width, bin_mean = mids, N = 0, weight = 0
+    )
+    reindex <- match(as.integer(rownames(M)), gix)
+    out[reindex, colnames(M)] <- M  # Fill the gaps and rearrange in right order
   }
-  rownames(out) <- NULL
 
   # Add partial dependence
   if (!is.null(pd_data)) {
