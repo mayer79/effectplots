@@ -443,7 +443,7 @@ calculate_stats <- function(
     gix <- seq_along(mids)
     bin_width <- diff(br)
 
-    if (!is.double(x)) {  # will be converted anyway in findInterval
+    if (!is.double(x)) {  # will be converted anyway in findInterval2()
       x <- as.double(x)
     }
     ix <- collapse::qF(findInterval2(x, breaks = br, right = right), sort = FALSE)

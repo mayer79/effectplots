@@ -1,4 +1,3 @@
-install_github("mayer79/effectplots", ref = "2aac638")
 library(effectplots)
 library(dplyr)
 library(data.table)
@@ -23,7 +22,7 @@ bench::mark(
   iterations = 2
 )
 
-# 2.87s     1.63GB
+# 1.27s     1.26GB
 
 # Matrix
 n <- 1e7
@@ -39,7 +38,7 @@ bench::mark(
 )
 
 # New
-# 3.07s    2.35GB
+# 1.33s    1.97GB
 x <- sample(c(1:10, NA), 1e7, T)
 f1  <- function(Y, x) {
   grouped_stats(Y, g = qF(x, sort=F), sd_cols = c("V1", "V2"))
