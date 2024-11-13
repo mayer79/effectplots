@@ -10,9 +10,9 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
-// findInterval_even
-IntegerVector findInterval_even(NumericVector x, double low, double high, int nbin, bool right);
-RcppExport SEXP _effectplots_findInterval_even(SEXP xSEXP, SEXP lowSEXP, SEXP highSEXP, SEXP nbinSEXP, SEXP rightSEXP) {
+// findInterval_equi
+IntegerVector findInterval_equi(NumericVector x, double low, double high, int nbin, bool right);
+RcppExport SEXP _effectplots_findInterval_equi(SEXP xSEXP, SEXP lowSEXP, SEXP highSEXP, SEXP nbinSEXP, SEXP rightSEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -21,13 +21,13 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type high(highSEXP);
     Rcpp::traits::input_parameter< int >::type nbin(nbinSEXP);
     Rcpp::traits::input_parameter< bool >::type right(rightSEXP);
-    rcpp_result_gen = Rcpp::wrap(findInterval_even(x, low, high, nbin, right));
+    rcpp_result_gen = Rcpp::wrap(findInterval_equi(x, low, high, nbin, right));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_effectplots_findInterval_even", (DL_FUNC) &_effectplots_findInterval_even, 5},
+    {"_effectplots_findInterval_equi", (DL_FUNC) &_effectplots_findInterval_equi, 5},
     {NULL, NULL, 0}
 };
 

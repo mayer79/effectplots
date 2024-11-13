@@ -2,10 +2,10 @@
 using namespace Rcpp;
 
 // [[Rcpp::export]]
-IntegerVector findInterval_even(
+IntegerVector findInterval_equi(
     NumericVector x, double low, double high, int nbin, bool right = true
 ) {
-  int n = x.size();
+  const int n = x.size();
   IntegerVector out(n, NA_INTEGER);
   double D = (high - low) / nbin;
 

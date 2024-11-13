@@ -158,7 +158,7 @@ findInterval2 <- function(x, breaks, right = TRUE) {
     stop("Breaks must be strictly increasing")
   }
   if (diff(range(h)) < 1e-07 * mean(h)) {  # equidist
-    findInterval_even(
+    findInterval_equi(
       as.double(x),
       low = as.double(breaks[1L]),
       high = as.double(breaks[nbreaks]),
