@@ -73,3 +73,27 @@ basic_check <- function(z, n, nms) {
   ix <- sample.int(N, nmax)
   return(list(X = collapse::ss(data, ix), w = if (!is.null(w)) w[ix], ix = ix))
 }
+
+#' Check Feature Type
+#'
+#' Internal function used to check if features are of acceptable type.
+#'
+#' @noRd
+#' @keywords internal
+#'
+#' @param x A matrix or data.frame.
+#' @returns An error message or `TRUE`.
+check_v_types <- function(x) {
+  .f <- function(z) is.numeric(z) || is.logical(z) || is.factor(z) || is.character(z)
+  if (is.matrix(x)) {
+    stopifnot("Matrix is of wrong type" = .f(x))
+  } else if (is.data.frame(x)) {
+    ok <- vapply(x, .f, FUN.VALUE = logical(1L))
+    if (!all(ok)) {
+      stop("Unsupported data type for ", paste(colnames(x)[!ok], collapse = ", "))
+    }
+  } else {
+    stop("Features must be organized as matrix or data.frame.")
+  }
+  return(TRUE)
+}

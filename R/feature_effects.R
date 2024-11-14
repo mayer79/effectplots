@@ -211,6 +211,9 @@ feature_effects.default <- function(
     )
   }
 
+  # Check X variables
+  check_v_types(data)
+
   # Combine pred, y, and resid. If df, we can easier drop columns in grouped_stats()
   PYR <- list(pred = pred, y = y, resid = if (!is.null(pred) && !is.null(y)) y - pred)
   wPYR <- lengths(PYR) > 0L

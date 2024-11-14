@@ -52,3 +52,25 @@ test_that(".subsample() works", {
   expect_null(subs$w)
   expect_true(length(subs$ix) == 1)
 })
+
+test_that("check_v_types() works", {
+  # Matrix
+  mat <- list(
+    int = cbind(1:10),
+    double = cbind(pi),
+    logical = cbind(c(TRUE, FALSE)),
+    char = cbind(LETTERS[1:10])
+  )
+  for (x in mat) {
+    expect_true(check_v_types(x))
+  }
+
+  # Data.frame
+  expect_true(check_v_types(iris))
+
+  # Bad input
+  expect_error(check_v_types(list(a = 1:3)))
+  ir <- iris
+  ir$date <- as.Date("2024-08-01")
+  expect_error(check_v_types(ir))
+})

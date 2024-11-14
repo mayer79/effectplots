@@ -18,7 +18,7 @@ The main function `feature_effects()` crunches the following statistics per feat
 
 Furthermore, it calculates counts, average residuals, and standard deviations of observed y and residuals, eventually accounting for case weights. We highly recommend Christoph Molnar's book [3] for more info on feature effects.
 
-**It takes 3 seconds on a laptop to get all statistics for ten features on a 10 Mio row data (+ prediction time).**
+**It takes 2 seconds on a laptop to get all statistics for ten features on a 10 Mio row data (+ prediction time).**
 
 **Workflow**
 
