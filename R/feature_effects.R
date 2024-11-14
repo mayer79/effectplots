@@ -435,6 +435,9 @@ calculate_stats <- function(
     rownames(out) <- NULL
   } else {
     # "CONTINUOUS" case. Tricky because there can be empty bins.
+    if (!is.double(x)) {
+      x <- as.double(x)
+    }
     if (outlier_iqr > 0 && is.finite(outlier_iqr)) {  # could move in front of if branch
       x <- wins_iqr(x, m = outlier_iqr)
     }
@@ -443,9 +446,6 @@ calculate_stats <- function(
     gix <- seq_along(mids)
     bin_width <- diff(br)
 
-    if (!is.double(x)) {  # will be converted anyway in findInterval2()
-      x <- as.double(x)
-    }
     ix <- collapse::qF(findInterval2(x, breaks = br, right = right), sort = FALSE)
 
     M <- cbind(

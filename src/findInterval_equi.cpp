@@ -1,6 +1,18 @@
 #include <Rcpp.h>
 using namespace Rcpp;
 
+//' findInterval() for equi-length intervals
+//'
+//' Results agree with `findInterval(..., rightmost.closed = TRUE, all.inside = TRUE)`.
+//'
+//' @noRd
+//' @keywords internal
+//' @param x Numeric vector to be binned.
+//' @param low Lowest value.
+//' @param low Highest value.
+//' @param nbin Number of bins (= length(breaks) - 1L).
+//' @param right Right-closed intervals? Default is `true`.
+//' @return Binned version of `x` (integer encoded).
 // [[Rcpp::export]]
 IntegerVector findInterval_equi(
     NumericVector x, double low, double high, int nbin, bool right = true
@@ -25,3 +37,4 @@ IntegerVector findInterval_equi(
   }
   return out;
 }
+

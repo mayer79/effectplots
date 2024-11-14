@@ -10,6 +10,19 @@ Rcpp::Rostream<true>&  Rcpp::Rcout = Rcpp::Rcpp_cout_get();
 Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
+// clamp2
+NumericVector clamp2(NumericVector x, double low, double high);
+RcppExport SEXP _effectplots_clamp2(SEXP xSEXP, SEXP lowSEXP, SEXP highSEXP) {
+BEGIN_RCPP
+    Rcpp::RObject rcpp_result_gen;
+    Rcpp::RNGScope rcpp_rngScope_gen;
+    Rcpp::traits::input_parameter< NumericVector >::type x(xSEXP);
+    Rcpp::traits::input_parameter< double >::type low(lowSEXP);
+    Rcpp::traits::input_parameter< double >::type high(highSEXP);
+    rcpp_result_gen = Rcpp::wrap(clamp2(x, low, high));
+    return rcpp_result_gen;
+END_RCPP
+}
 // findInterval_equi
 IntegerVector findInterval_equi(NumericVector x, double low, double high, int nbin, bool right);
 RcppExport SEXP _effectplots_findInterval_equi(SEXP xSEXP, SEXP lowSEXP, SEXP highSEXP, SEXP nbinSEXP, SEXP rightSEXP) {
@@ -27,6 +40,7 @@ END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
+    {"_effectplots_clamp2", (DL_FUNC) &_effectplots_clamp2, 3},
     {"_effectplots_findInterval_equi", (DL_FUNC) &_effectplots_findInterval_equi, 5},
     {NULL, NULL, 0}
 };
