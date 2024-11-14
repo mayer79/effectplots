@@ -212,7 +212,14 @@ feature_effects.default <- function(
   }
 
   # Check X variables
-  check_v_types(data)
+  if (is.matrix(data)) {
+    stopifnot("Matrix is of wrong type" = check_v_type(data))
+  } else {
+    ok <- vapply(collapse::ss(data, , v), check_v_type, FUN.VALUE = logical(1L))
+    if (!all(ok)) {
+      stop("Unsupported data type for ", paste(v, collapse = ", "))
+    }
+  }
 
   # Combine pred, y, and resid. If df, we can easier drop columns in grouped_stats()
   PYR <- list(pred = pred, y = y, resid = if (!is.null(pred) && !is.null(y)) y - pred)
