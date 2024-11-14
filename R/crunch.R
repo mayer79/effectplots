@@ -44,27 +44,7 @@ wins_iqr <- function(x, m = 1.5, nmax = 10000L) {
   if (r <= 0) {
     return(x)
   }
-  winsorize(x, low = q[1L] - r, high = q[2L] + r)
-}
-
-#' Cap a Vector
-#'
-#' Internal function used to cap/clip/winsorize a numeric vector at low/high limits.
-#' Note: For large vectors, pmin() and pmax() are surprisingly fast.
-#'
-#' @noRd
-#' @keywords internal
-#'
-#' @param x A numeric vector to be capped.
-#' @param low Lower capping limit.
-#' @param high Upper capping limit.
-#' @returns A capped vector.
-winsorize <- function(x, low = -Inf, high = Inf) {
-  r <- collapse::.range(x, na.rm = TRUE)
-  if (r[1L] < low) {
-    x <- pmax(x, low)
-  }
-  if (r[2L] > high) pmin(x, high) else x
+  clamp2(as.double(x), low = as.double(q[1L] - r), high = as.double(q[2L] + r))
 }
 
 #' Break Calculation like hist()
@@ -146,7 +126,20 @@ grouped_stats <- function(x, g, w = NULL, sd_cols = colnames(x)) {
   cbind(out, M)
 }
 
-# Fast implementation of spatstat.utils::fastFindInterval()
+#' Fast findInterval()
+#'
+#' Internal function used to bin a numeric `x`. Uses `findInterval()` when breaks are
+#' unequally long, and an algorithm adapted from `spatstat.utils::fastFindInterval()`
+#' otherwise.
+#'
+#' @noRd
+#' @keywords internal
+#'
+#' @param x A numeric vector to bin.
+#' @param br A monotonically increasing vector of breaks.
+#' @param right Right closed bins (`TRUE`, default) or not?
+#' @returns Binned version of `x`.
+# Fast implementation of
 findInterval2 <- function(x, breaks, right = TRUE) {
   nbreaks <- length(breaks)
   if (nbreaks <= 2L) {

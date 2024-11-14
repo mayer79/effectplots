@@ -9,12 +9,12 @@ test_that("is_continuous() works", {
   expect_error(is_continuous(1:1e5, m = 1:1e4))
 })
 
-test_that("winsorize() works", {
-  x <- 1:10
-  expect_equal(winsorize(x), x)
-  expect_equal(winsorize(x, low = 2), pmax(2, x))
-  expect_equal(winsorize(x, high = 8), pmin(8, x))  # not symmetric
-  expect_equal(winsorize(x, low = 3, high = 7), pmax(3, pmin(7, x)))
+test_that("clamp2() works", {
+  x <- c(1:10, NA)
+  expect_equal(clamp2(x, 0, 11), x)
+  expect_equal(clamp2(x, low = 2, high = 11), pmax(2, x))
+  expect_equal(clamp2(x, low = 0, high = 8), pmin(8, x))  # not symmetric
+  expect_equal(clamp2(x, low = 3, high = 7), pmax(3, pmin(7, x)))
 })
 
 test_that("poor_man_stack() works (test could be improved)", {
@@ -95,3 +95,33 @@ test_that("hist2() works slightly different for very large vectors", {
 test_that("hist2() does not like unknown strings", {
   expect_error(hist2(1:10, breaks = "hello"))
 })
+
+test_that("findInterval_equi() provides equal results as findInterval()", {
+  x <- c(-1, NA, 2, 1, 0.5, 0, 10)
+  br <- seq(0, 2, length.out = 5 + 1)
+  for (r in c(FALSE, TRUE)) {
+    expect_equal(
+      findInterval_equi(x, low = 0, high = 2, nbin = 5L, right = r),
+      findInterval(x, br, rightmost.closed = TRUE, all.inside = TRUE, left.open = r)
+    )
+  }
+})
+
+test_that("findInterval2() provides equal results as findInterval()", {
+  x <- c(-1, NA, 2, 1, 0.5, 0, 10)
+  br <- seq(0, 2, length.out = 6)
+  for (r in c(FALSE, TRUE)) {
+    expect_equal(
+      findInterval2(x, br, right = r),
+      findInterval(x, br, rightmost.closed = TRUE, all.inside = TRUE, left.open = r)
+    )
+  }
+
+  # Special cases
+  expect_equal(findInterval2(x, 1:2, right = r), rep(1, length = length(x)))
+  expect_equal(findInterval2(x, 1, right = r), rep(1, length = length(x)))
+
+  # Breaks increasing?
+  expect_error(findInterval2(x, breaks = c(4, 3, 1)))
+})
+
