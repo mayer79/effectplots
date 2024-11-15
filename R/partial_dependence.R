@@ -20,8 +20,6 @@
 #' @param seed Optional random seed (an integer) used for:
 #'   - Partial dependence: select background data if `n > pd_n`.
 #'   - Capping X: quartiles are selected based on 10k observations.
-#'   Note that the current `.Random.seed` is restored on function exit, i.e.,
-#'   setting the seed does not affect the rest of your R session.
 #' @inherit feature_effects return
 #' @references
 #'   Friedman, Jerome H. 2001, *Greedy Function Approximation: A Gradient Boosting Machine.*

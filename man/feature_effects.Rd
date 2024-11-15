@@ -140,8 +140,6 @@ randomly sampled. The default is 200. Applied after subsampling regarding \code{
 \item Partial dependence: select background data if \code{n > pd_n}.
 \item ALE: select background data if \code{n > ale_n} and for bins > \code{ale_bin_size}.
 \item Capping X: quartiles are selected based on 10k observations.
-Note that the current \code{.Random.seed} is restored on function exit, i.e.,
-setting the seed does not affect the rest of your R session.
 }}
 }
 \value{
@@ -201,7 +199,7 @@ M |> update(sort = "pd") |> plot(share_y = "all")
 \references{
 \enumerate{
 \item Molnar, Christoph. 2019. \emph{Interpretable Machine Learning: A Guide for Making Black Box Models Explainable}.
-\url{https://christophm.github.io/interpretable-ml-book}.
+\url{https://christophm.github.io/interpretable-ml-book/}.
 \item Friedman, Jerome H. 2001, \emph{Greedy Function Approximation: A Gradient Boosting Machine.}
 Annals of Statistics 29 (5): 1189-1232. doi:10.1214/aos/1013203451.3.
 \item Apley, Daniel W., and Jingyu Zhu. 2016. \emph{Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.}

@@ -12,8 +12,6 @@
 #' @param x_name If `X` is a vector: what is the name of the variable? By default "x".
 #' @param seed Optional random seed (an integer) used for capping X based on quantiles
 #'   calculated from a subsample of 10k observations.
-#'   Note that the current `.Random.seed` is restored on function exit, i.e.,
-#'   setting the seed does not affect the rest of your R session.
 #' @inheritParams feature_effects
 #' @inherit feature_effects return
 #' @param ... Currently unused.

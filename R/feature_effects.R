@@ -75,8 +75,6 @@
 #'   - Partial dependence: select background data if `n > pd_n`.
 #'   - ALE: select background data if `n > ale_n` and for bins > `ale_bin_size`.
 #'   - Capping X: quartiles are selected based on 10k observations.
-#'   Note that the current `.Random.seed` is restored on function exit, i.e.,
-#'   setting the seed does not affect the rest of your R session.
 #' @param ... Further arguments passed to `pred_fun()`, e.g., `type = "response"` in
 #'   a `glm()` or (typically) `prob = TRUE` in classification models.
 #' @returns
@@ -86,7 +84,7 @@
 #'   [ale()], [average_observed], [average_predicted()], [bias()]
 #' @references
 #'   1. Molnar, Christoph. 2019. *Interpretable Machine Learning: A Guide for Making Black Box Models Explainable*.
-#'     <https://christophm.github.io/interpretable-ml-book>.
+#'     <https://christophm.github.io/interpretable-ml-book/>.
 #'   2. Friedman, Jerome H. 2001, *Greedy Function Approximation: A Gradient Boosting Machine.*
 #'     Annals of Statistics 29 (5): 1189-1232. doi:10.1214/aos/1013203451.3.
 #'   3. Apley, Daniel W., and Jingyu Zhu. 2016. *Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.*
@@ -147,8 +145,8 @@ feature_effects.default <- function(
   )  # We don't need n anymore
 
   if (!is.null(seed)) {
-    old <- .Random.seed
-    on.exit({.Random.seed <<- old})
+    # old <- .Random.seed
+    # on.exit({.Random.seed <- old})
     set.seed(seed)
   }
 
@@ -435,6 +433,7 @@ calculate_stats <- function(
   if (!num) {
     # We need original unique values of g later for PDP, e.g., TRUE/FALSE.
     # For factors, the order is equal to levels(droplevels(x)) + NA
+    # Still, this part could be replaced (except for doubles) by parseing rownames(M)
     g <- sort(collapse::funique(x), na.last = TRUE)
 
     x <- if (is.factor(x)) collapse::fdroplevels(x) else collapse::qF(x, sort = TRUE)

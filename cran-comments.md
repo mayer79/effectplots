@@ -1,3 +1,12 @@
+## Resubmission
+
+Thanks for pointing out three issues in the initial submission. They are now fixed.
+
+- Two missing "returns" sections.
+- A <<- in a function that restored the global seed. This is now removed.
+
+## Initial submission
+
 ## effectplots 0.0.1
 
 Dear CRAN team

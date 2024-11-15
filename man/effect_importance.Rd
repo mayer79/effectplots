@@ -13,6 +13,9 @@ effect_importance(x, by = NULL)
 One of 'pd', 'pred_mean', 'y_mean', 'resid_mean', or 'ale' (if available).
 The default is \code{NULL}, which picks the first available statistic from above list.}
 }
+\value{
+A named vector of importance values of the same length as \code{x}.
+}
 \description{
 Extracts from an "EffectData" object a simple variable importance measure, namely
 the (bin size weighted) variance of the partial dependence values, or of any other

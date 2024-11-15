@@ -28,8 +28,6 @@
 #' @param seed Optional random seed (an integer) used for:
 #'   - ALE: select background data if `n > ale_n` and for bins > `ale_bin_size`.
 #'   - Capping X: quartiles are selected based on 10k observations.
-#'   Note that the current `.Random.seed` is restored on function exit, i.e.,
-#'   setting the seed does not affect the rest of your R session.
 #' @inherit feature_effects return
 #' @references
 #'   Apley, Daniel W., and Jingyu Zhu. 2020. *Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.*

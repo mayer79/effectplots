@@ -115,8 +115,6 @@ randomly sampled. The default is 200. Applied after subsampling regarding \code{
 \itemize{
 \item ALE: select background data if \code{n > ale_n} and for bins > \code{ale_bin_size}.
 \item Capping X: quartiles are selected based on 10k observations.
-Note that the current \code{.Random.seed} is restored on function exit, i.e.,
-setting the seed does not affect the rest of your R session.
 }}
 }
 \value{

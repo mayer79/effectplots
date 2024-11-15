@@ -24,6 +24,8 @@
 #' @param drop_below_weight Drop bins with weight below this value. Applied after
 #' collapsing.
 #' @param na.rm Should missing bin centers be dropped? Default is `FALSE`.
+#' @param ... Currently not used.
+#' @returns An object of class "EffectData".
 #' @seealso
 #'   [feature_effects()], [average_observed()], [average_predicted()],
 #'   [partial_dependence()], [ale()], [bias()], [effect_importance()]
@@ -41,7 +43,8 @@ update.EffectData <- function(
   collapse_by = c("weight", "N"),
   drop_below_n = 0,
   drop_below_weight = 0,
-  na.rm = FALSE
+  na.rm = FALSE,
+  ...
 ) {
   sort_by <- match.arg(sort_by)
   collapse_by <- match.arg(collapse_by)
