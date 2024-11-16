@@ -11,7 +11,8 @@
   collapse_by = c("weight", "N"),
   drop_below_n = 0,
   drop_below_weight = 0,
-  na.rm = FALSE
+  na.rm = FALSE,
+  ...
 )
 }
 \arguments{
@@ -35,6 +36,11 @@ Either "weight" (default) or "N". Only matters in situations with case weights \
 collapsing.}
 
 \item{na.rm}{Should missing bin centers be dropped? Default is \code{FALSE}.}
+
+\item{...}{Currently not used.}
+}
+\value{
+An object of class "EffectData".
 }
 \description{
 Updates an "EffectData" object by

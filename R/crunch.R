@@ -10,10 +10,10 @@
 #' @param m How many disjoint values will return FALSE?
 #' @returns `TRUE` if x is numeric with > m disjoint values, and `FALSE` otherwise.
 is_continuous <- function(x, m = 5L) {
-  M <- 10000L
   if (!is.numeric(x)) {
     return(FALSE)
   }
+  M <- 10000L
   if (m >= M) {
     stop("Too large value for m")
   }

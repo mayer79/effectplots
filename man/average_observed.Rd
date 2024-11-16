@@ -45,9 +45,7 @@ Set to 0 or \code{Inf} for no capping. Note that at most 10k observations are sa
 to calculate quartiles. Vectorized over \code{v}.}
 
 \item{seed}{Optional random seed (an integer) used for capping X based on quantiles
-calculated from a subsample of 10k observations.
-Note that the current \code{.Random.seed} is restored on function exit, i.e.,
-setting the seed does not affect the rest of your R session.}
+calculated from a subsample of 10k observations.}
 
 \item{...}{Currently unused.}
 }

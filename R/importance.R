@@ -13,6 +13,7 @@
 #' @param by The statistic used to calculate the variance for.
 #' One of 'pd', 'pred_mean', 'y_mean', 'resid_mean', or 'ale' (if available).
 #' The default is `NULL`, which picks the first available statistic from above list.
+#' @returns A named vector of importance values of the same length as `x`.
 #' @seealso [update.EffectData()]
 #' @export
 #' @references

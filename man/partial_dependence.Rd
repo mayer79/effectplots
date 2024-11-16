@@ -108,8 +108,6 @@ Each variable specified by \code{v} uses the same subsample. Set to 0 to omit.}
 \itemize{
 \item Partial dependence: select background data if \code{n > pd_n}.
 \item Capping X: quartiles are selected based on 10k observations.
-Note that the current \code{.Random.seed} is restored on function exit, i.e.,
-setting the seed does not affect the rest of your R session.
 }}
 }
 \value{
