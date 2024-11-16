@@ -44,7 +44,7 @@ ale().
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">effectplots</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.0.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.0</span>
       </span>
     </div>
 
@@ -275,9 +275,7 @@ randomly sampled. The default is 200. Applied after subsampling regarding <code>
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
 <dd><p>Optional random seed (an integer) used for:</p><ul><li><p>Partial dependence: select background data if <code>n &gt; pd_n</code>.</p></li>
 <li><p>ALE: select background data if <code>n &gt; ale_n</code> and for bins &gt; <code>ale_bin_size</code>.</p></li>
-<li><p>Capping X: quartiles are selected based on 10k observations.
-Note that the current <code>.Random.seed</code> is restored on function exit, i.e.,
-setting the seed does not affect the rest of your R session.</p></li>
+<li><p>Capping X: quartiles are selected based on 10k observations.</p></li>
 </ul></dd>
 
 </dl></div>
@@ -297,7 +295,7 @@ single bracket subsetting to select part of the output.</p>
     <h2>References</h2>
 
 <ol><li><p>Molnar, Christoph. 2019. <em>Interpretable Machine Learning: A Guide for Making Black Box Models Explainable</em>.
-<a href="https://christophm.github.io/interpretable-ml-book" class="external-link">https://christophm.github.io/interpretable-ml-book</a>.</p></li>
+<a href="https://christophm.github.io/interpretable-ml-book/" class="external-link">https://christophm.github.io/interpretable-ml-book/</a>.</p></li>
 <li><p>Friedman, Jerome H. 2001, <em>Greedy Function Approximation: A Gradient Boosting Machine.</em>
 Annals of Statistics 29 (5): 1189-1232. doi:10.1214/aos/1013203451.3.</p></li>
 <li><p>Apley, Daniel W., and Jingyu Zhu. 2016. <em>Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.</em>
