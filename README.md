@@ -3,11 +3,11 @@
 <!-- badges: start -->
 
 [![R-CMD-check](https://github.com/mayer79/effectplots/actions/workflows/R-CMD-check.yaml/badge.svg)](https://github.com/mayer79/effectplots/actions/workflows/R-CMD-check.yaml)
-[![Lifecycle: maturing](https://img.shields.io/badge/lifecycle-stable-green.svg)](https://lifecycle.r-lib.org/articles/stages.html#stable)
-[![Codecov test coverage](https://codecov.io/gh/mayer79/effectplots/graph/badge.svg)](https://app.codecov.io/gh/mayer79/effectplots)
+[![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/effectplots)](https://cran.r-project.org/package=effectplots)
+
 <!-- badges: end -->
 
-**{effectplots}** is an R package for calculating and plotting feature effects of any model.
+**{effectplots}** is a high-performance R package for calculating and plotting feature effects of any model.
 
 The main function `feature_effects()` crunches the following statistics per feature X over values/bins:
 
