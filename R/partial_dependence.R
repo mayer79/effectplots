@@ -196,5 +196,5 @@ partial_dependence.explainer <- function(
     pred_fun(object, data_long, ...), trafo = trafo, which_pred = which_pred
   )
   dim(pred) <- c(n, p)
-  collapse::fmean.matrix(pred, w = w, use.g.names = FALSE)
+  collapse::fmean(pred, w = w, use.g.names = FALSE)
 }

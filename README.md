@@ -98,7 +98,7 @@ Let's crunch all statistics on the test data. Sorting is done by weighted varian
 The average predictions closely follow the average observed, i.e., the model does a good job. Comparing partial dependence/ALE with average predicted gives insights on whether an effect comes from the feature on the x axis or from other, correlated, features.
 
 ```r
-# 0.3s on laptop
+# 0.1s + 0.2s prediction time
 feature_effects(fit, v = xvars, data = X_test, y = test$claim_nb) |>
   update(sort_by = "pd") |> 
   plot()

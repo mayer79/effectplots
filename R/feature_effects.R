@@ -431,16 +431,18 @@ calculate_stats <- function(
 
   # DISCRETE
   if (!num) {
-    # We need original unique values of g later for PDP, e.g., TRUE/FALSE.
-    # For factors, the order is equal to levels(droplevels(x)) + NA
-    # Still, this part could be replaced (except for doubles) by parseing rownames(M)
-    g <- sort(collapse::funique(x), na.last = TRUE)
-
-    x <- if (is.factor(x)) collapse::fdroplevels(x) else collapse::qF(x, sort = TRUE)
-
-    # Ordered by levels(x) (+ NA). x has no empty levels anymore -> same order as g
+    # "factor", "double", "integer", "logical", "character"
+    orig_type <- if (is.factor(x)) "factor" else typeof(x)
+    x <- collapse::qF(x, sort = is.factor(x), na.exclude = FALSE, drop = TRUE)
     M <- grouped_stats(PYR, g = x, w = w, sd_cols = sd_cols)
+
+    # We need original unique values of g later for PDP, e.g., TRUE/FALSE.
+    # Doubles might lose digits. This should not be a problem though.
+    g <- parse_rownames(rownames(M), orig_type)
     out <- data.frame(bin_mid = g, bin_width = 0.7, bin_mean = g, M)
+    if (orig_type != "factor") {
+      out <- out[order(g, na.last = TRUE), ]
+    }
     rownames(out) <- NULL
   } else {
     # "CONTINUOUS" case. Tricky because there can be empty bins.
@@ -455,13 +457,15 @@ calculate_stats <- function(
     gix <- seq_along(mids)
     bin_width <- diff(br)
 
-    ix <- collapse::qF(findInterval2(x, breaks = br, right = right), sort = FALSE)
+    ix <- collapse::qF(
+      findInterval2(x, breaks = br, right = right), sort = FALSE, na.exclude = FALSE
+    )
 
     M <- cbind(
-      bin_mean = collapse::fmean.default(x, g = ix, w = w),
+      bin_mean = collapse::fmean(x, g = ix, w = w),
       grouped_stats(PYR, g = ix, w = w, sd_cols = sd_cols)
     )
-    if (is.na(rownames(M)[nrow(M)])) {
+    if (anyNA(rownames(M))) {
       mids <- c(mids, NA)
       gix <- c(gix, NA)
       bin_width <- c(bin_width, NA)  #  Can't be plotted anyway

@@ -15,7 +15,7 @@ library(usethis)
 use_description(
   fields = list(
     Title = "Effect Plots",
-    Version = "0.1.0",
+    Version = "0.1.1",
     Description = "High-performance implementation of various effect plots
     useful for regression and probabilistic classification tasks.
     The package includes partial dependence plots
@@ -82,7 +82,7 @@ test()
 check(manual = TRUE, cran = TRUE)
 build()
 # build(binary = TRUE)
-install(upgrade = FALSE)
+devtools::install(upgrade = FALSE)
 
 # Run only if package is public(!) and should go to CRAN
 if (FALSE) {

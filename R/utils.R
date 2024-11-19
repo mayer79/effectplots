@@ -1,3 +1,15 @@
+#' Is "EffectData" Numeric
+#'
+#' Internal function that shows which of the list elements in an object `x` of class
+#' "EffectData" is to be considered as numeric or not.
+#'
+#' @noRd
+#' @keywords internal
+#'
+#' @param x An object of class "EffectData".
+#' @returns
+#'   A logical vector of the same length as `x` with the information whether the
+#'   feature of `x` is to be treated as numeric or not.
 .num <- function(x) {
   f <- function(z) is.numeric(z$bin_mean)
   if (inherits(x, "EffectData")) {
@@ -6,12 +18,52 @@
   f(x)
 }
 
+#' Get Statistics from "EffectData" Object
+#'
+#' Internal function that returns a character vector of statistics present in `x`.
+#' Subset of `c("pred_mean", "y_mean", "resid_mean", "pd", "ale")`.
+#'
+#' @noRd
+#' @keywords internal
+#'
+#' @param x An object of class "EffectData".
+#' @returns
+#'   A character vector of statistics names present in `x`.
 .stats <- function(x) {
   if (inherits(x, "EffectData")) {
     x <- x[[1L]]
   }
   statistics <- c("pred_mean", "y_mean", "resid_mean", "pd", "ale")
   return(intersect(statistics, colnames(x)))
+}
+
+#' Converts Rownames to Original Type
+#'
+#' Internal function used in `calculate_stats()` to turn rownames `x` of a grouped
+#' aggregation data back to the original `type`. For doubles, we can lose precision,
+#' but this should not a problem here.
+#'
+#' @noRd
+#' @keywords internal
+#'
+#' @param x A character vector of row names, may contain `NA`.
+#' @param type One of "factor", "double", "integer", "logical", and "character".
+#' @returns
+#'   A data.frame with variables not in `to_stack`, a column "varying_" with
+#'   the column name from `to_stack`, and finally a column "value_" with stacked values.
+parse_rownames <- function(x, type) {
+  if (!is.character(x)) {
+    stop("Row names must be strings")
+  }
+  switch(
+    type,
+    factor = factor(x, levels = stats::na.omit(x)),
+    double = as.double(x),
+    integer = as.integer(x),
+    logical = as.logical(x),
+    character = x,
+    stop("Can only handle features of type factor, double, integer, logical, and character.")
+  )
 }
 
 # -> plot()
