@@ -247,7 +247,10 @@ ale.explainer <- function(
   )
   n <- length(J)
   out[ix] <- collapse::fmean(
-    pred[(n + 1L):(2L * n)] - pred[1L:n], g = g[J], w = if (!is.null(w)) w[J]
+    pred[(n + 1L):(2L * n)] - pred[1L:n],
+    g = g[J],
+    w = if (!is.null(w)) w[J],
+    use.g.names = FALSE
   )
   return(cumsum(out))
 }

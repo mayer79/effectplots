@@ -4,6 +4,7 @@ library(data.table)
 library(profvis)
 library(collapse)
 
+
 fit <- lm(Sepal.Length ~ ., data = iris)
 xvars <- colnames(iris)[-1]
 
@@ -11,7 +12,12 @@ feature_effects(fit, v = xvars, data = as_tibble(iris), y = "Sepal.Length", brea
 feature_effects(fit, v = xvars, data = as.data.table(iris), y = "Sepal.Length", breaks = 5)
 
 n <- 1e7
-X <- qDF(matrix(sample(0:1, 10 * n, T), ncol = 10))
+
+X <- qDF(matrix(rexp(1e7 * 10), ncol = 10))
+X <- qDF(matrix(sample(c(0, 1), 1e7 * 10, TRUE), ncol = 10))
+# X <- qDF(matrix(sample(letters[1:4], 1e7 * 10, TRUE), ncol = 10))
+# X[] <- lapply(X, factor)
+
 v <- colnames(X)
 X$y <- runif(n)
 fit <- lm(reformulate(v, "y"), data = X)
@@ -20,10 +26,10 @@ bench::mark(
   min_iterations = 3
 )
 
-# 1.38s     1.26GB  # rexp
-# 0.7s      466 MB  # sample(c(0, 1))
+# 1.25s     1.26GB  # rexp
+# 0.6s      466 MB  # sample(c(0, 1))
 # 0.3s      464 MB  # sample(0:1)
-# 0.1s      100 MB  # factor(letters[1:4])
+# 0.2s      482 MB  # factor(letters[1:4])
 
 # Matrix
 n <- 1e7

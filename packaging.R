@@ -15,7 +15,7 @@ library(usethis)
 use_description(
   fields = list(
     Title = "Effect Plots",
-    Version = "0.1.0",
+    Version = "0.1.1",
     Description = "High-performance implementation of various effect plots
     useful for regression and probabilistic classification tasks.
     The package includes partial dependence plots

@@ -102,9 +102,9 @@ hist2 <- function(x, breaks = "Sturges") {
 #' @returns A matrix with counts, weights, means and standard deviations of
 #'   columns in `x`.
 grouped_stats <- function(x, g, w = NULL, sd_cols = colnames(x)) {
-  N <- collapse::fnobs(g, g = g)
+  N <- collapse::fnobs(g, g = g, use.g.names = TRUE)
   if (!is.null(w)) {
-    weight <- collapse::fsum(w, g = g, fill = TRUE)
+    weight <- collapse::fsum(w, g = g, fill = TRUE, use.g.names = FALSE)
   } else {
     weight <- N
   }

@@ -433,7 +433,7 @@ calculate_stats <- function(
   if (!num) {
     # "factor", "double", "integer", "logical", "character"
     orig_type <- if (is.factor(x)) "factor" else typeof(x)
-    x <- if (is.factor(x)) collapse::fdroplevels(x) else collapse::qF(x, sort = FALSE)
+    x <- collapse::qF(x, sort = is.factor(x), na.exclude = FALSE, drop = TRUE)
     M <- grouped_stats(PYR, g = x, w = w, sd_cols = sd_cols)
 
     # We need original unique values of g later for PDP, e.g., TRUE/FALSE.
@@ -457,13 +457,15 @@ calculate_stats <- function(
     gix <- seq_along(mids)
     bin_width <- diff(br)
 
-    ix <- collapse::qF(findInterval2(x, breaks = br, right = right), sort = FALSE)
+    ix <- collapse::qF(
+      findInterval2(x, breaks = br, right = right), sort = FALSE, na.exclude = FALSE
+    )
 
     M <- cbind(
-      bin_mean = collapse::fmean.default(x, g = ix, w = w),
+      bin_mean = collapse::fmean(x, g = ix, w = w),
       grouped_stats(PYR, g = ix, w = w, sd_cols = sd_cols)
     )
-    if (is.na(rownames(M)[nrow(M)])) {
+    if (anyNA(rownames(M))) {
       mids <- c(mids, NA)
       gix <- c(gix, NA)
       bin_width <- c(bin_width, NA)  #  Can't be plotted anyway
