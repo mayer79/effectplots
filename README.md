@@ -7,7 +7,9 @@
 
 <!-- badges: end -->
 
-**{effectplots}** is a high-performance R package for calculating and plotting feature effects of any model.
+**{effectplots}** is an R package for calculating and plotting feature effects of any model.
+
+It is very fast thanks to [{collapse}](https://CRAN.R-project.org/package=collapse).
 
 The main function `feature_effects()` crunches the following statistics per feature X over values/bins:
 

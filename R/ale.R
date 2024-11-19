@@ -216,7 +216,7 @@ ale.explainer <- function(
 
   # List of bin indices. Eventual NA levels are placed at the end. We will remove it.
   J <- lapply(
-    collapse::gsplit(1:length(g), g = g, use.g.names = TRUE),
+    collapse::gsplit(g = g, use.g.names = TRUE),
     function(z) if (length(z) <= bin_size) z else sample(z, size = bin_size)
   )
   if (anyNA(names(J))) {
