@@ -26,7 +26,7 @@ bench::mark(
   min_iterations = 3
 )
 
-# 1.25s     1.26GB  # rexp
+# 1.30s     1.26GB  # rexp
 # 0.6s      466 MB  # sample(c(0, 1))
 # 0.3s      464 MB  # sample(0:1)
 # 0.2s      482 MB  # factor(letters[1:4])
