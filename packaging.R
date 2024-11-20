@@ -81,7 +81,6 @@ document()
 test()
 check(manual = TRUE, cran = TRUE)
 build()
-# build(binary = TRUE)
 devtools::install(upgrade = FALSE)
 
 # Run only if package is public(!) and should go to CRAN

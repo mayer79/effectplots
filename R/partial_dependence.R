@@ -19,7 +19,7 @@
 #' @inheritParams feature_effects
 #' @param seed Optional random seed (an integer) used for:
 #'   - Partial dependence: select background data if `n > pd_n`.
-#'   - Capping X: quartiles are selected based on 10k observations.
+#'   - Capping X: quartiles are calculated based on 10k observations.
 #' @inherit feature_effects return
 #' @references
 #'   Friedman, Jerome H. 2001, *Greedy Function Approximation: A Gradient Boosting Machine.*

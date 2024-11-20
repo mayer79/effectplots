@@ -10,7 +10,7 @@
 #' @param y A numeric vector of observed responses.
 #' @param w An optional numeric vector of weights.
 #' @param x_name If `X` is a vector: what is the name of the variable? By default "x".
-#' @param seed Optional random seed (an integer) used for capping X based on quantiles
+#' @param seed Optional random seed (an integer) used for capping X based on quartiles
 #'   calculated from a subsample of 10k observations.
 #' @inheritParams feature_effects
 #' @inherit feature_effects return

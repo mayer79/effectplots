@@ -7,20 +7,20 @@
 #' @keywords internal
 #'
 #' @param x A vector or factor.
-#' @param m How many disjoint values will return FALSE?
+#' @param m How many disjoint values will return `FALSE`?
+#' @param ix_sub Subset for pre-check. Only done if not `NULL`.
 #' @returns `TRUE` if x is numeric with > m disjoint values, and `FALSE` otherwise.
-is_continuous <- function(x, m = 5L) {
+is_continuous <- function(x, m = 5L, ix_sub = NULL) {
   if (!is.numeric(x)) {
     return(FALSE)
   }
-  M <- 10000L
-  if (m >= M) {
-    stop("Too large value for m")
-  }
-  if (length(x) <= M) {
+  if (is.null(ix_sub)) {  # we have <= 10k values
     return(collapse::fnunique(x) > m)
   }
-  if (collapse::fnunique(x[1L:M]) > m) {
+  if (m >= length(ix_sub)) {
+    stop("Too large value for m")
+  }
+  if (collapse::fnunique(x[ix_sub]) > m) {
     return(TRUE)
   }
   return(collapse::fnunique(x) > m)
@@ -35,10 +35,10 @@ is_continuous <- function(x, m = 5L) {
 #'
 #' @param x A numeric vector.
 #' @param m How many IQRs from the quartiles do we start capping?
-#' @param nmax Maximal number of observations used to calculate capping limits.
+#' @param ix_sub Subset used to calculate approximate quartiles. Can be `NULL`.
 #' @returns Like `x`, but eventually capped.
-wins_iqr <- function(x, m = 1.5, nmax = 10000L) {
-  xs <- if (length(x) > nmax) sample(x, nmax) else x
+wins_iqr <- function(x, m = 1.5, ix_sub = NULL) {
+  xs <- if (is.null(ix_sub)) x else x[ix_sub]
   q <- collapse::fquantile(xs, probs = c(0.25, 0.75), na.rm = TRUE, names = FALSE)
   r <- m * diff(q)
   if (r <= 0) {

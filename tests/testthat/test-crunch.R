@@ -5,8 +5,8 @@ test_that("is_continuous() works", {
   expect_true(is_continuous(1:10, m = 9))
 
   expect_true(is_continuous(1:1e5, m = 10))
-  expect_false(is_continuous(rep(1, times = 1e5), m = 1))
-  expect_error(is_continuous(1:1e5, m = 1:1e4))
+  expect_false(is_continuous(rep(1, times = 1e3), m = 1, ix_sub = 1:100))
+  expect_error(is_continuous(1:1e5, m = 10, ix_sub = 1:9))
 })
 
 test_that("clamp2() works", {
@@ -15,20 +15,6 @@ test_that("clamp2() works", {
   expect_equal(clamp2(x, low = 2, high = 11), pmax(2, x))
   expect_equal(clamp2(x, low = 0, high = 8), pmin(8, x))  # not symmetric
   expect_equal(clamp2(x, low = 3, high = 7), pmax(3, pmin(7, x)))
-})
-
-test_that("poor_man_stack() works (test could be improved)", {
-  y <- c("a", "b", "c")
-  z <- c("aa", "bb", "cc")
-  X <- data.frame(x = 1:3, y = y, z = z)
-  out <- poor_man_stack(X, to_stack = c("y", "z"))
-  xpected <- data.frame(
-    x = rep(1:3, times = 2L),
-    varying_ = factor(rep(c("y", "z"), each = 3L)),
-    value_ = c(y, z)
-  )
-  expect_equal(out, xpected)
-  expect_error(poor_man_stack(cbind(a = 1:3, b = 2:4), to_stack = "b"))
 })
 
 test_that("grouped_stats() works", {
