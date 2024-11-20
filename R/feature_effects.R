@@ -74,7 +74,7 @@
 #' @param seed Optional random seed (an integer) used for:
 #'   - Partial dependence: select background data if `n > pd_n`.
 #'   - ALE: select background data if `n > ale_n` and for bins > `ale_bin_size`.
-#'   - Capping X: quartiles are selected based on 10k observations.
+#'   - Capping X: quartiles are calculated based on 10k observations.
 #' @param ... Further arguments passed to `pred_fun()`, e.g., `type = "response"` in
 #'   a `glm()` or (typically) `prob = TRUE` in classification models.
 #' @returns
@@ -219,6 +219,9 @@ feature_effects.default <- function(
     }
   }
 
+  # We need this subset for fast quartiles and fast check if numeric x is disrete
+  ix_sub <- if (nrow(data) > 10000L) sample.int(nrow(data), 10000L)
+
   # Combine pred, y, and resid. If df, we can easier drop columns in grouped_stats()
   PYR <- list(pred = pred, y = y, resid = if (!is.null(pred) && !is.null(y)) y - pred)
   wPYR <- lengths(PYR) > 0L
@@ -269,6 +272,7 @@ feature_effects.default <- function(
       pd_data = pd_data,
       ale_data = ale_data,
       ale_bin_size = ale_bin_size,
+      ix_sub = ix_sub,
       ...
     ),
     SIMPLIFY = FALSE
@@ -395,6 +399,7 @@ feature_effects.explainer <- function(
 #' @param ale_data The output of .subsample() or `NULL`.
 #' @param PYR A data.frame with predicted, observed, and residuals (if available). Can
 #'   be `NULL` if none of them are available.
+#' @param ix_sub Subset of 10000 indices, or `NULL` (if nrow(data) <= 10000).
 #' @inheritParams feature_effects
 #' @returns A data.frame with effect statistics.
 calculate_stats <- function(
@@ -413,6 +418,7 @@ calculate_stats <- function(
     pd_data,
     ale_data,
     ale_bin_size,
+    ix_sub,
     ...
 ) {
   if (is.double(x)) {
@@ -421,7 +427,7 @@ calculate_stats <- function(
     # Adding 0 to a double turns negative 0 to positive ones (ISO/IEC 60559)
     collapse::setop(x, "+", 0.0)
   }
-  num <- is_continuous(x, m = discrete_m)
+  num <- is_continuous(x, m = discrete_m, ix_sub = ix_sub)
 
   if (is.null(PYR) && is.null(pd_data) && (!num || is.null(ale_data))) {
     return(NULL)
@@ -450,7 +456,7 @@ calculate_stats <- function(
       x <- as.double(x)
     }
     if (outlier_iqr > 0 && is.finite(outlier_iqr)) {  # could move in front of if branch
-      x <- wins_iqr(x, m = outlier_iqr)
+      x <- wins_iqr(x, m = outlier_iqr, ix_sub = ix_sub)
     }
     br <- hist2(x, breaks = breaks)
     mids <- 0.5 * (br[-1L] + br[-length(br)])

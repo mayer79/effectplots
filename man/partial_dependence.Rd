@@ -107,7 +107,7 @@ Each variable specified by \code{v} uses the same subsample. Set to 0 to omit.}
 \item{seed}{Optional random seed (an integer) used for:
 \itemize{
 \item Partial dependence: select background data if \code{n > pd_n}.
-\item Capping X: quartiles are selected based on 10k observations.
+\item Capping X: quartiles are calculated based on 10k observations.
 }}
 }
 \value{

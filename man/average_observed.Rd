@@ -44,7 +44,7 @@ conservative than the usual rule to account for right-skewed distributions.
 Set to 0 or \code{Inf} for no capping. Note that at most 10k observations are sampled
 to calculate quartiles. Vectorized over \code{v}.}
 
-\item{seed}{Optional random seed (an integer) used for capping X based on quantiles
+\item{seed}{Optional random seed (an integer) used for capping X based on quartiles
 calculated from a subsample of 10k observations.}
 
 \item{...}{Currently unused.}

@@ -14,7 +14,7 @@ feature_effects(fit, v = xvars, data = as.data.table(iris), y = "Sepal.Length", 
 n <- 1e7
 
 X <- qDF(matrix(rexp(1e7 * 10), ncol = 10))
-X <- qDF(matrix(sample(c(0, 1), 1e7 * 10, TRUE), ncol = 10))
+# X <- qDF(matrix(sample(0:1, 1e7 * 10, TRUE), ncol = 10))
 # X <- qDF(matrix(sample(letters[1:4], 1e7 * 10, TRUE), ncol = 10))
 # X[] <- lapply(X, factor)
 
@@ -26,10 +26,10 @@ bench::mark(
   min_iterations = 3
 )
 
-# 1.30s     1.26GB  # rexp
-# 0.6s      466 MB  # sample(c(0, 1))
-# 0.3s      464 MB  # sample(0:1)
-# 0.2s      482 MB  # factor(letters[1:4])
+# 1.21s     945 MB  # rexp
+# 0.6s      504 MB  # sample(c(0, 1))
+# 0.3s      502 MB  # sample(0:1)
+# 0.2s      520 MB  # factor(letters[1:4])
 
 # Matrix
 n <- 1e7
