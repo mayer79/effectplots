@@ -9,6 +9,11 @@
 ## Bug fixes
 
 - NA values in feature columns have not been counted in the counts "N".
+- Ordered factors are now working.
+
+## Documentation
+
+- README has received examples for Tidymodels and probabilistic classification.
 
 # effectplots 0.1.0
 

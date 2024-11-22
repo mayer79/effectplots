@@ -423,6 +423,7 @@ calculate_stats <- function(
 ) {
   # "factor", "double", "integer", "logical", "character"
   orig_type <- if (is.factor(x)) "factor" else typeof(x)
+  was_ordered <- is.ordered(x)
   x <- factor_or_double(x, m = discrete_m, ix_sub = ix_sub)
   num <- is.numeric(x)
 
@@ -438,7 +439,7 @@ calculate_stats <- function(
 
     # We need original unique values of g later for PDP, e.g., TRUE/FALSE.
     # Doubles might lose digits. This should not be a problem though.
-    g <- parse_rownames(rownames(M), orig_type)
+    g <- parse_rownames(rownames(M), type = orig_type, ord = was_ordered)
     out <- data.frame(bin_mid = g, bin_width = 0.7, bin_mean = g, M)
     if (orig_type != "factor") {
       out <- out[order(g, na.last = TRUE), ]
