@@ -26,9 +26,9 @@ bench::mark(
   min_iterations = 3
 )
 
-# 1.21s     945 MB  # rexp
-# 0.6s      504 MB  # sample(c(0, 1))
-# 0.3s      502 MB  # sample(0:1)
+# 1.25s     940 MB  # rexp
+# 0.4s      504 MB  # sample(c(0, 1))
+# 0.2s      502 MB  # sample(0:1)
 # 0.2s      520 MB  # factor(letters[1:4])
 
 # Matrix

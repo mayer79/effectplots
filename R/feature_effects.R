@@ -421,13 +421,10 @@ calculate_stats <- function(
     ix_sub,
     ...
 ) {
-  if (is.double(x)) {
-    # {collapse} seems to distinguish positive and negative zeros
-    # https://github.com/SebKrantz/collapse/issues/648
-    # Adding 0 to a double turns negative 0 to positive ones (ISO/IEC 60559)
-    collapse::setop(x, "+", 0.0)
-  }
-  num <- is_continuous(x, m = discrete_m, ix_sub = ix_sub)
+  # "factor", "double", "integer", "logical", "character"
+  orig_type <- if (is.factor(x)) "factor" else typeof(x)
+  x <- factor_or_double(x, m = discrete_m, ix_sub = ix_sub)
+  num <- is.numeric(x)
 
   if (is.null(PYR) && is.null(pd_data) && (!num || is.null(ale_data))) {
     return(NULL)
@@ -437,9 +434,6 @@ calculate_stats <- function(
 
   # DISCRETE
   if (!num) {
-    # "factor", "double", "integer", "logical", "character"
-    orig_type <- if (is.factor(x)) "factor" else typeof(x)
-    x <- collapse::qF(x, sort = is.factor(x), na.exclude = FALSE, drop = TRUE)
     M <- grouped_stats(PYR, g = x, w = w, sd_cols = sd_cols)
 
     # We need original unique values of g later for PDP, e.g., TRUE/FALSE.
@@ -452,9 +446,6 @@ calculate_stats <- function(
     rownames(out) <- NULL
   } else {
     # "CONTINUOUS" case. Tricky because there can be empty bins.
-    if (!is.double(x)) {
-      x <- as.double(x)
-    }
     if (outlier_iqr > 0 && is.finite(outlier_iqr)) {  # could move in front of if branch
       x <- wins_iqr(x, m = outlier_iqr, ix_sub = ix_sub)
     }

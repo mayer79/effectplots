@@ -1,30 +1,36 @@
-#' Check if Vector is Numeric
-#'
-#' Internal function used to check if a variable is numeric *and* has more than
-#' m disjoint values. The function shines for extremely long vectors (~1e7).
+#' Turn Input either Double or Factor
 #'
 #' @noRd
 #' @keywords internal
 #'
 #' @param x A vector or factor.
-#' @param m How many disjoint values will return `FALSE`?
-#' @param ix_sub Subset for pre-check. Only done if not `NULL`.
-#' @returns `TRUE` if x is numeric with > m disjoint values, and `FALSE` otherwise.
-is_continuous <- function(x, m = 5L, ix_sub = NULL) {
+#' @param m If `x` is numeric: Up to which number of disjoint values is it a factor?
+#' @param ix_sub Subset for pre-check. If not `NULL`, length(x) > 10000.
+#' @returns
+#'   A double vector if x is numeric with > m disjoint values.
+#'   Otherwise, a factor with explicit missings.
+factor_or_double <- function(x, m = 5L, ix_sub = NULL) {
   if (!is.numeric(x)) {
-    return(FALSE)
+    return(collapse::qF(x, sort = is.factor(x), na.exclude = FALSE, drop = TRUE))
   }
-  if (is.null(ix_sub)) {  # we have <= 10k values
-    return(collapse::fnunique(x) > m)
+  if (is.double(x)) {
+    # {collapse} seems to distinguish positive and negative zeros
+    # https://github.com/SebKrantz/collapse/issues/648
+    # Adding 0 to a double turns negative 0 to positive ones (ISO/IEC 60559)
+    collapse::setop(x, "+", 0.0)
   }
-  if (m >= length(ix_sub)) {
-    stop("Too large value for m")
+  if (!is.null(ix_sub)) {  # we have >10k values
+    if (m >= length(ix_sub)) {
+      stop("Too large value for m")
+    }
+    if (collapse::fnunique(x[ix_sub]) > m) {
+      return(as.double(x))
+    }
   }
-  if (collapse::fnunique(x[ix_sub]) > m) {
-    return(TRUE)
-  }
-  return(collapse::fnunique(x) > m)
+  xf <- collapse::qF(x, sort = FALSE, na.exclude = FALSE)
+  if (collapse::fnlevels(xf) > m) as.double(x) else xf
 }
+
 
 #' IQR-based Outlier Capping
 #'
