@@ -18,8 +18,8 @@ IntegerVector findInterval_equi(
     NumericVector x, double low, double high, int nbin, bool right = true
 ) {
   const int n = x.size();
+  const double D = (high - low) / nbin;
   IntegerVector out(n, NA_INTEGER);
-  double D = (high - low) / nbin;
 
   for (int i = 0; i < n; i++) {
     double z = x[i];

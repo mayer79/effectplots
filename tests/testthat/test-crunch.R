@@ -1,12 +1,39 @@
-test_that("is_continuous() works", {
-  expect_false(is_continuous("A", m = 2))
+test_that("factor_or_double() works", {
+  # Character
+  x <- c("B", NA, "A")
+  expect_equal(factor_or_double(x), qF(x, sort = FALSE, na.exclude = FALSE))
 
-  expect_false(is_continuous(1:10, m = 10))
-  expect_true(is_continuous(1:10, m = 9))
+  # Factor
+  x <- factor(x, levels = c("A", "B", "C"))
+  expect_equal(factor_or_double(x), qF(x, sort = TRUE, na.exclude = FALSE, drop = TRUE))
 
-  expect_true(is_continuous(1:1e5, m = 10))
-  expect_false(is_continuous(rep(1, times = 1e3), m = 1, ix_sub = 1:100))
-  expect_error(is_continuous(1:1e5, m = 10, ix_sub = 1:9))
+  # Logical
+  x <- c(TRUE, FALSE)
+  expect_equal(factor_or_double(x), qF(x, sort = FALSE, na.exclude = FALSE))
+
+  # Non-discrete numeric vector (short)
+  x <- 1:10
+  res <- factor_or_double(x, m = 4)
+  expect_equal(res, x)
+  expect_true(is.double(res))
+
+  # Discrete numeric vector (short)
+  x <- rep(1:4, each = 10)
+  res <- factor_or_double(x, m = 4)
+  expect_equal(res, qF(x, na.exclude = FALSE, sort = FALSE))
+
+  # Non-discrete numeric vector (long)
+  x <- 1:10
+  res <- factor_or_double(x, m = 4, ix_sub = 1:5)
+  expect_equal(res, x)
+
+  # Discrete numeric vector (long)
+  x <- rep(1:4, each = 10)
+  res <- factor_or_double(x, m = 4, ix_sub = 1:5)
+  expect_equal(res, qF(x, na.exclude = FALSE, sort = FALSE))
+
+  # m needs to be smaller than length(ix_sub)
+  expect_error(factor_or_double(x, m = 4, ix_sub = 1:2))
 })
 
 test_that("clamp2() works", {
@@ -94,11 +121,11 @@ test_that("findInterval_equi() provides equal results as findInterval()", {
 })
 
 test_that("findInterval2() provides equal results as findInterval()", {
-  x <- c(-1, NA, 2, 1, 0.5, 0, 10)
+  x <- c(-1, NA, 2, 1, 1.2, 1.1999, 0.5, 0, 10)
   br <- seq(0, 2, length.out = 6)
   for (r in c(FALSE, TRUE)) {
     expect_equal(
-      findInterval2(x, br, right = r),
+      effectplots:::findInterval2(x, br, right = r),
       findInterval(x, br, rightmost.closed = TRUE, all.inside = TRUE, left.open = r)
     )
   }
