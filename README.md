@@ -100,7 +100,7 @@ Let's crunch all statistics on the test data. Sorting is done by weighted varian
 The average predictions closely follow the average observed, i.e., the model does a good job. Comparing partial dependence/ALE with average predicted gives insights on whether an effect comes from the feature on the x axis or from other, correlated, features.
 
 ```r
-# 0.1s + 0.2s prediction time
+# 0.1s + 0.15s prediction time
 feature_effects(fit, v = xvars, data = X_test, y = test$claim_nb) |>
   update(sort_by = "pd") |> 
   plot()
@@ -155,11 +155,14 @@ c(m_train, m_test) |>
 
 ![](man/figures/bias.svg)
 
-## DALEX and Tidymodels et al.
+## More examples
 
-Most models work out-of-the box. If not, a tailored prediction function can be specified.
+Most models work out-of-the box, including DALEX explainers and Tidymodels models. If not, a tailored prediction function can be specified.
+
+### DALEX
 
 ```r
+library(effectplots)
 library(DALEX)
 library(ranger)
 
@@ -174,6 +177,74 @@ feature_effects(ex, breaks = 5) |>
 
 ![](man/figures/dalex.svg)
 
+### Tidymodels
+
+Note that ALE plots are only available for continuous variables.
+
+```r
+library(effectplots)
+library(tidymodels)
+
+set.seed(1)
+
+xvars <- c("carat", "color", "clarity", "cut")
+
+split <- initial_split(diamonds)
+train <- training(split)
+test <- testing(split)
+
+dia_recipe <- train |> 
+  recipe(reformulate(xvars, "price"))
+
+mod <- rand_forest(trees = 100) |>
+  set_engine("ranger") |> 
+  set_mode("regression")
+  
+dia_wf <- workflow() |>
+  add_recipe(dia_recipe) |>
+  add_model(mod)
+
+fit <- dia_wf |>
+  fit(train)
+
+M_train <- feature_effects(fit, v = xvars, data = train, y = "price")
+M_test <- feature_effects(fit, v = xvars, data = test, y = "price")
+
+plot(
+  M_train + M_test,
+  byrow = FALSE,
+  ncol = 2,
+  share_y = "rows",
+  rotate_x = 45,
+  # plotly = TRUE,
+  title = "Left: train - Right: test"
+)
+```
+
+![](man/figures/tidymodels.svg)
+
+### Probabilistic classification
+
+We focus on a single class.
+
+```r
+library(effectplots)
+library(ranger)
+
+set.seed(1)
+
+fit <- ranger(Species ~ ., data = iris, probability = TRUE)
+
+M <- partial_dependence(
+  fit,
+  v = colnames(iris[1:4]), 
+  data = iris,
+  which_pred = 1  # "setosa" is the first class
+)
+plot(M, bar_height = 0.33, ylim = c(0, 0.7))
+```
+
+![](man/figures/classification.svg)
 
 # References
 

@@ -48,16 +48,17 @@
 #'
 #' @param x A character vector of row names, may contain `NA`.
 #' @param type One of "factor", "double", "integer", "logical", and "character".
+#' @param ord Is the factor ordered? By default `FALSE`. Only relevant for factors.
 #' @returns
 #'   A data.frame with variables not in `to_stack`, a column "varying_" with
 #'   the column name from `to_stack`, and finally a column "value_" with stacked values.
-parse_rownames <- function(x, type) {
+parse_rownames <- function(x, type, ord = FALSE) {
   if (!is.character(x)) {
     stop("Row names must be strings")
   }
   switch(
     type,
-    factor = factor(x, levels = stats::na.omit(x)),
+    factor = factor(x, levels = stats::na.omit(x), ordered = ord),
     double = as.double(x),
     integer = as.integer(x),
     logical = as.logical(x),

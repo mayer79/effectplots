@@ -6,6 +6,9 @@ test_that("parse_rownames() does what it should", {
   expect_equal(parse_rownames(c("3.11111", "2", NA), "double"), c(3.11111, 2, NA))
   expect_equal(parse_rownames(c("TRUE", NA), "logical"), c(TRUE, NA))
 
+  xord <- c("A", "B", NA)
+  expect_equal(parse_rownames(xord, "factor", ord = TRUE), ordered(xord))
+
   expect_error(parse_rownames(x, "date"))
   expect_error(parse_rownames(1:3, "integer"))
 })
