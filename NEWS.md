@@ -3,8 +3,8 @@
 ## Efficiency improvements
 
 - The barebone ALE function `.ale()` has become faster thanks to [issue #11](https://github.com/mayer79/effectplots/issues/11) by [@SebKrantz](https://github.com/SebKrantz).
-- Subsampling indices for outlier capping is now done only once, instead of once per feature.
-- Speed-up for discrete numeric features.
+- Subsampling indices for outlier capping is now done only once, instead of once per feature [#15](https://github.com/mayer79/effectplots/pull/15).
+- Speed-up for discrete numeric features [#16](https://github.com/mayer79/effectplots/pull/16).
 
 ## Bug fixes
 
