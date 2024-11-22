@@ -234,9 +234,7 @@ ale.explainer <- function(
 
   # Now we create a single prediction dataset. Lower bin edges first, then upper ones.
   data_long <- collapse::ss(data, rep.int(J, 2L))
-  grid_long <- rep.int(
-    c(breaks[-(p + 1L)][ix], breaks[-1L][ix]), times = c(bin_n, bin_n)
-  )
+  grid_long <- rep.int(c(breaks[ix], breaks[ix + 1L]), times = c(bin_n, bin_n))
   if (is.data.frame(data_long)) {
     data_long[[v]] <- grid_long
   } else {
