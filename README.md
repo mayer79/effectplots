@@ -215,7 +215,8 @@ plot(
   byrow = FALSE,
   ncol = 2,
   share_y = "rows",
-  rotate_x = 45,
+  rotate_x = rep(45 * xvars %in% c("clarity", "cut"), each = 2),
+  subplot_titles = FALSE,
   # plotly = TRUE,
   title = "Left: train - Right: test"
 )
