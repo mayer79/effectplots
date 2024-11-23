@@ -269,7 +269,7 @@
 <text x='334.23' y='298.26' text-anchor='middle' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Arial";' textLength='37.65px' lengthAdjust='spacingAndGlyphs'>versicolor</text>
 <text x='394.55' y='298.26' text-anchor='middle' style='font-size: 8.80px;fill: #4D4D4D; font-family: "Arial";' textLength='32.27px' lengthAdjust='spacingAndGlyphs'>virginica</text>
 <text x='334.23' y='310.72' text-anchor='middle' style='font-size: 11.00px; font-family: "Arial";' textLength='39.14px' lengthAdjust='spacingAndGlyphs'>Species</text>
-<text transform='translate(18.84,157.84) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: "Arial";' textLength='49.54px' lengthAdjust='spacingAndGlyphs'>Response</text>
+<text transform='translate(18.84,157.84) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: "Arial";' textLength='27.94px' lengthAdjust='spacingAndGlyphs'>Effect</text>
 <text x='237.71' y='176.93' style='font-size: 13.20px; font-family: "Arial";' textLength='46.93px' lengthAdjust='spacingAndGlyphs'>Species</text>
 <rect x='441.70' y='117.80' width='51.34' height='80.08' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
 <rect x='447.18' y='123.28' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />

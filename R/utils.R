@@ -121,8 +121,7 @@ get_ylab <- function(lines) {
     )
     return(out)
   }
-  # No "average" (that would be overly specific)
-  if ("y_mean" %in% lines) "Response" else "Prediction"
+  return("Effect")
 }
 
 common_range <- function(x, stat_info) {
