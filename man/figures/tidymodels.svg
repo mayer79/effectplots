@@ -682,7 +682,7 @@
 <text x='242.03' y='268.78' text-anchor='middle' style='font-size: 11.00px; font-family: "Arial";' textLength='23.85px' lengthAdjust='spacingAndGlyphs'>color</text>
 <text x='242.03' y='409.00' text-anchor='middle' style='font-size: 11.00px; font-family: "Arial";' textLength='28.73px' lengthAdjust='spacingAndGlyphs'>clarity</text>
 <text x='242.03' y='562.72' text-anchor='middle' style='font-size: 11.00px; font-family: "Arial";' textLength='14.68px' lengthAdjust='spacingAndGlyphs'>cut</text>
-<text transform='translate(18.84,270.33) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: "Arial";' textLength='49.54px' lengthAdjust='spacingAndGlyphs'>Response</text>
+<text transform='translate(18.84,270.33) rotate(-90)' text-anchor='middle' style='font-size: 11.00px; font-family: "Arial";' textLength='27.94px' lengthAdjust='spacingAndGlyphs'>Effect</text>
 <rect x='441.70' y='230.29' width='51.34' height='80.08' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
 <rect x='447.18' y='235.77' width='17.28' height='17.28' style='stroke-width: 1.07; stroke: none; fill: #FFFFFF;' />
 <line x1='448.91' y1='244.41' x2='462.74' y2='244.41' style='stroke-width: 1.71; stroke: #CC79A7; stroke-linecap: butt;' />
