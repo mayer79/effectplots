@@ -7,20 +7,20 @@
 
 <!-- badges: end -->
 
-**{effectplots}** is an R package for calculating and plotting feature effects of any model.
+**{effectplots}** is an R package for calculating and plotting feature effects of any model. It is very fast thanks to [{collapse}](https://CRAN.R-project.org/package=collapse).
 
-It is very fast thanks to [{collapse}](https://CRAN.R-project.org/package=collapse).
-
-The main function `feature_effects()` crunches the following statistics per feature X over values/bins:
+The main function `feature_effects()` crunches these statistics per feature X over values/bins:
 
 - Average observed y values: Descriptive associations between response y and features.
 - Average predictions: Combined effect of X and other features (M Plots, Apley [1]).
 - Partial dependence (Friedman [2]): How does the average prediction react on X, keeping other features fixed.
 - Accumulated local effects (Apley [1]): Alternative to partial dependence.
 
-Furthermore, it calculates counts, average residuals, and standard deviations of observed y and residuals, eventually accounting for case weights. We highly recommend Christoph Molnar's book [3] for more info on feature effects.
+Furthermore, it calculates counts, weight sums, average residuals, and standard deviations of observed y and residuals. All statistics respect optional case weights.
 
-**It takes 1 second on a laptop to get all statistics for ten features on a 10 Mio row data (+ prediction time).**
+We highly recommend Christoph Molnar's book [3] for more info on feature effects.
+
+**It takes 1 second on a normal laptop to get all statistics for 10 continuous features on 10 Mio rows (+ prediction time).**
 
 **Workflow**
 
@@ -39,7 +39,7 @@ pak::pak("mayer79/effectplots", dependencies = TRUE)
 
 ## Usage
 
-We use a 1 Mio row dataset about Motor TPL insurance. The aim is to model claim frequency. Before modeling, we want to study association between features and the response.
+We use a 1 Mio row dataset on Motor TPL insurance. The aim is to model claim frequency. Before modeling, we want to study the association between features and response.
 
 ``` r
 library(effectplots)
@@ -95,9 +95,9 @@ fit <- lgb.train(
 
 ### Inspect model
 
-Let's crunch all statistics on the test data. Sorting is done by weighted variance of partial dependence, a main-effect importance measure closely related to [4].
+Let's crunch all statistics on the test data. Sorting is done by weighted variance of partial dependence, a main-effect importance measure related to [4].
 
-The average predictions closely follow the average observed, i.e., the model does a good job. Comparing partial dependence/ALE with average predicted gives insights on whether an effect comes from the feature on the x axis or from other, correlated, features.
+The average predictions closely follow the average observed, i.e., the model seems to do a good job. Comparing partial dependence/ALE with average predicted gives insights on whether an effect mainly comes from the feature on the x axis or from other, correlated, features.
 
 ```r
 # 0.1s + 0.15s prediction time
@@ -131,13 +131,14 @@ c(m_train, m_test) |>
     byrow = FALSE,
     stats = c("y_mean", "pred_mean"),
     subplot_titles = FALSE,
+    # plotly = TRUE,
     title = "Left: Train - Right: Test",
   )
 ```
 
 ![](man/figures/train_test.svg)
 
-In case we want to dig deeper into bias, we can use "resid_mean" as statistic, and show pointwise 95% confidence intervals for the true bias.
+To look closer at bias, let's select the statistic "resid_mean" along with pointwise 95% confidence intervals for the true conditional bias.
 
 ```r
 c(m_train, m_test) |> 
@@ -149,6 +150,7 @@ c(m_train, m_test) |>
     stats = "resid_mean",
     subplot_titles = FALSE,
     title = "Left: Train - Right: Test",
+    # plotly = TRUE,
     interval = "ci"
   )
 ```
