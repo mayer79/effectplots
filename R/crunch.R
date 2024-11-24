@@ -11,7 +11,10 @@
 #'   Otherwise, a factor with explicit missings.
 factor_or_double <- function(x, m = 5L, ix_sub = NULL) {
   if (!is.numeric(x)) {
-    return(collapse::qF(x, sort = is.factor(x), na.exclude = FALSE, drop = TRUE))
+    if (is.factor(x)) {
+      return(collapse::qF(x, sort = TRUE, na.exclude = !anyNA(unclass(x)), drop = TRUE))
+    }
+    return(collapse::qF(x, sort = FALSE, na.exclude = FALSE))
   }
   if (is.double(x)) {
     # {collapse} seems to distinguish positive and negative zeros
