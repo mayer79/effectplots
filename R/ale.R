@@ -214,13 +214,14 @@ ale.explainer <- function(
     g <- collapse::qF(g, sort = FALSE)
   }
 
-  # List of bin indices. Eventual NA levels are placed at the end. We will remove it.
+  # List of bin indices. We remove empty or NA bins.
   J <- lapply(
     collapse::gsplit(g = g, use.g.names = TRUE),
     function(z) if (length(z) <= bin_size) z else sample(z, size = bin_size)
   )
-  if (anyNA(names(J))) {
-    J <- J[!is.na(names(J))]
+  ok <- !is.na(names(J)) & lengths(J, use.names = FALSE) > 0L
+  if (!all(ok)) {
+    J <- J[ok]
   }
 
   # Before flattening the list J, we store bin counts

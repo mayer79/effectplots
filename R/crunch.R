@@ -145,7 +145,6 @@ grouped_stats <- function(x, g, w = NULL, sd_cols = colnames(x)) {
 #' @param br A monotonically increasing vector of breaks.
 #' @param right Right closed bins (`TRUE`, default) or not?
 #' @returns Binned version of `x`.
-# Fast implementation of
 findInterval2 <- function(x, breaks, right = TRUE) {
   nbreaks <- length(breaks)
   if (nbreaks <= 2L) {
