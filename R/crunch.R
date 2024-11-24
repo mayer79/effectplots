@@ -42,50 +42,47 @@ factor_or_double <- function(x, m = 5L, ix_sub = NULL) {
 #' @param x A numeric vector.
 #' @param m How many IQRs from the quartiles do we start capping?
 #' @param ix_sub Subset used to calculate approximate quartiles. Can be `NULL`.
-#' @returns Like `x`, but eventually capped.
+#' @returns Lower and upper bound, or `NULL`.
 wins_iqr <- function(x, m = 1.5, ix_sub = NULL) {
-  xs <- if (is.null(ix_sub)) x else x[ix_sub]
-  q <- collapse::fquantile(xs, probs = c(0.25, 0.75), na.rm = TRUE, names = FALSE)
+  if (!is.null(ix_sub)) {
+    x <- x[ix_sub]
+  }
+  q <- collapse::fquantile(x, probs = c(0.25, 0.75), na.rm = TRUE, names = FALSE)
   r <- m * diff(q)
   if (r <= 0) {
-    return(x)
+    return(NULL)
   }
-  clamp2(as.double(x), low = as.double(q[1L] - r), high = as.double(q[2L] + r))
+  return(q + c(-r, r))
 }
 
 #' Break Calculation like hist()
 #'
-#' Internal function used to calculate breaks with the same `breaks` as `hist()`.
-#' The only difference is that when `breaks` is a string and length(x) >= 100k, the
-#' function returns 50.
+#' Internal function used to calculate breaks.
 #'
 #' @noRd
 #' @keywords internal
 #'
 #' @param x A numeric vector.
-#' @param breaks An integer, a vector, a string, or a function.
+#' @param breaks An integer, a vector, or "Sturges".
+#' @param outlier_iqr See [feature_effects()].
+#' @param ix_sub An optional subsetting vector to calculate quartiles.
 #' @returns A vector of pretty breaks.
-hist2 <- function(x, breaks = "Sturges") {
-  x <- collapse::na_rm(x)
+hist2 <- function(x, breaks = "Sturges", outlier_iqr = 0, ix_sub = NULL) {
   if (is.character(breaks)) {
-    breaks <- tolower(breaks)
-    if (breaks == "sturges") {
-      breaks <- grDevices::nclass.Sturges(x)
-    } else if (length(x) >= 1e5) {
-      breaks <- 50L
-    } else if (breaks == "scott") {
-      breaks <- min(50L, grDevices::nclass.scott(x))
-    } else if (breaks %in% c("fd", "freedman-diaconis")) {
-      breaks <- min(50L, grDevices::nclass.FD(x))
+    if (tolower(breaks) == "sturges") {
+      breaks <- ceiling(log2(length(x)) + 1)
     } else {
       stop("unknown 'breaks' algo")
     }
   }
-  if (is.function(breaks)) {
-    breaks <- breaks(x)
-  }
   if (length(breaks) == 1L) {
-    breaks <- pretty(collapse::.range(x, na.rm = TRUE), n = breaks, min.n = 1)
+    r <- collapse::.range(x, na.rm = TRUE)
+    if (outlier_iqr > 0 && is.finite(outlier_iqr)) {
+      r2 <- wins_iqr(x, m = outlier_iqr, ix_sub = ix_sub)
+      r[1L] <- max(r[1L], r2[1L])
+      r[2L] <- min(r[2L], r2[2L])
+    }
+    breaks <- pretty(r, n = breaks, min.n = 1)
   } else if (is.numeric(breaks)) {
     breaks <- sort(unique(breaks))
   } else {

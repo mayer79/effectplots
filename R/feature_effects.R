@@ -46,8 +46,7 @@
 #' @param which_pred If the predictions are multivariate: which column to pick
 #'   (integer or column name). By default `NULL` (picks last column).
 #' @param w Optional vector with case weights. Can also be a column name in `data`.
-#' @param breaks An integer, vector, string or function specifying the bins
-#'   of the numeric X variables as in [graphics::hist()]. The default is "Sturges".
+#' @param breaks An integer, vector, or "Sturges" (the default).
 #'   To allow varying values of `breaks` across variables, it can be a list of the
 #'   same length as `v`, or a *named* list with `breaks` for certain variables.
 #' @param right Should bins be right-closed? The default is `TRUE`.
@@ -59,7 +58,8 @@
 #'   outside `outlier_iqr` * IQR from the quartiles. The default is 2 is more
 #'   conservative than the usual rule to account for right-skewed distributions.
 #'   Set to 0 or `Inf` for no capping. Note that at most 10k observations are sampled
-#'   to calculate quartiles. Vectorized over `v`.
+#'   to calculate quartiles. Vectorized over `v`. This has an effect only if `breaks`
+#'   is not a vector.
 #' @param calc_pred Should predictions be calculated? Default is `TRUE`. Only relevant
 #'   if `pred = NULL`.
 #' @param pd_n Size of the data used for calculating partial dependence.
@@ -446,11 +446,7 @@ calculate_stats <- function(
     }
     rownames(out) <- NULL
   } else {
-    # "CONTINUOUS" case. Tricky because there can be empty bins.
-    if (outlier_iqr > 0 && is.finite(outlier_iqr)) {  # could move in front of if branch
-      x <- wins_iqr(x, m = outlier_iqr, ix_sub = ix_sub)
-    }
-    br <- hist2(x, breaks = breaks)
+    br <- hist2(x, breaks = breaks, outlier_iqr = outlier_iqr, ix_sub = ix_sub)
     mids <- 0.5 * (br[-1L] + br[-length(br)])
     gix <- seq_along(mids)
     bin_width <- diff(br)
