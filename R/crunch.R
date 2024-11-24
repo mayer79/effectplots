@@ -11,7 +11,10 @@
 #'   Otherwise, a factor with explicit missings.
 factor_or_double <- function(x, m = 5L, ix_sub = NULL) {
   if (!is.numeric(x)) {
-    return(collapse::qF(x, sort = is.factor(x), na.exclude = FALSE, drop = TRUE))
+    if (is.factor(x)) {
+      return(collapse::qF(x, sort = TRUE, na.exclude = !anyNA(unclass(x)), drop = TRUE))
+    }
+    return(collapse::qF(x, sort = FALSE, na.exclude = FALSE))
   }
   if (is.double(x)) {
     # {collapse} seems to distinguish positive and negative zeros
@@ -142,7 +145,6 @@ grouped_stats <- function(x, g, w = NULL, sd_cols = colnames(x)) {
 #' @param br A monotonically increasing vector of breaks.
 #' @param right Right closed bins (`TRUE`, default) or not?
 #' @returns Binned version of `x`.
-# Fast implementation of
 findInterval2 <- function(x, breaks, right = TRUE) {
   nbreaks <- length(breaks)
   if (nbreaks <= 2L) {
