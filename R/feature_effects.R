@@ -456,7 +456,7 @@ calculate_stats <- function(
     )
 
     M <- cbind(
-      bin_mean = collapse::fmean(x, g = ix, w = w),
+      bin_mean = pmax(pmin(collapse::fmean(x, g = ix, w = w), br[length(br)]), br[1L]),
       grouped_stats(PYR, g = ix, w = w, sd_cols = sd_cols)
     )
     if (anyNA(rownames(M))) {
