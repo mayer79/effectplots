@@ -4,7 +4,6 @@ library(data.table)
 library(profvis)
 library(collapse)
 
-
 fit <- lm(Sepal.Length ~ ., data = iris)
 xvars <- colnames(iris)[-1]
 
@@ -29,7 +28,7 @@ bench::mark(
 # 1.1s      975 MB  # rnorm
 # 0.4s      504 MB  # sample(c(0, 1))
 # 0.2s      502 MB  # sample(0:1)
-# 0.2s      520 MB  # factor(letters[1:4])
+# 0.2s      139 MB  # factor(letters[1:4])
 
 # Matrix
 n <- 1e7
