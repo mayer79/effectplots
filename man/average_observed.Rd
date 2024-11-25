@@ -26,8 +26,7 @@ average_observed(
 
 \item{x_name}{If \code{X} is a vector: what is the name of the variable? By default "x".}
 
-\item{breaks}{An integer, vector, string or function specifying the bins
-of the numeric X variables as in \code{\link[graphics:hist]{graphics::hist()}}. The default is "Sturges".
+\item{breaks}{An integer, vector, or "Sturges" (the default).
 To allow varying values of \code{breaks} across variables, it can be a list of the
 same length as \code{v}, or a \emph{named} list with \code{breaks} for certain variables.}
 
@@ -42,7 +41,8 @@ The default is 5. Vectorized over \code{v}.}
 outside \code{outlier_iqr} * IQR from the quartiles. The default is 2 is more
 conservative than the usual rule to account for right-skewed distributions.
 Set to 0 or \code{Inf} for no capping. Note that at most 10k observations are sampled
-to calculate quartiles. Vectorized over \code{v}.}
+to calculate quartiles. Vectorized over \code{v}. This has an effect only if \code{breaks}
+is not a vector.}
 
 \item{seed}{Optional random seed (an integer) used for capping X based on quartiles
 calculated from a subsample of 10k observations.}

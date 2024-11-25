@@ -46,8 +46,7 @@
 #' @param which_pred If the predictions are multivariate: which column to pick
 #'   (integer or column name). By default `NULL` (picks last column).
 #' @param w Optional vector with case weights. Can also be a column name in `data`.
-#' @param breaks An integer, vector, string or function specifying the bins
-#'   of the numeric X variables as in [graphics::hist()]. The default is "Sturges".
+#' @param breaks An integer, vector, or "Sturges" (the default).
 #'   To allow varying values of `breaks` across variables, it can be a list of the
 #'   same length as `v`, or a *named* list with `breaks` for certain variables.
 #' @param right Should bins be right-closed? The default is `TRUE`.
@@ -59,7 +58,8 @@
 #'   outside `outlier_iqr` * IQR from the quartiles. The default is 2 is more
 #'   conservative than the usual rule to account for right-skewed distributions.
 #'   Set to 0 or `Inf` for no capping. Note that at most 10k observations are sampled
-#'   to calculate quartiles. Vectorized over `v`.
+#'   to calculate quartiles. Vectorized over `v`. This has an effect only if `breaks`
+#'   is not a vector.
 #' @param calc_pred Should predictions be calculated? Default is `TRUE`. Only relevant
 #'   if `pred = NULL`.
 #' @param pd_n Size of the data used for calculating partial dependence.
@@ -74,7 +74,7 @@
 #' @param seed Optional random seed (an integer) used for:
 #'   - Partial dependence: select background data if `n > pd_n`.
 #'   - ALE: select background data if `n > ale_n` and for bins > `ale_bin_size`.
-#'   - Capping X: quartiles are calculated based on 10k observations.
+#'   - Capping X: quartiles are calculated based on 9997 observations.
 #' @param ... Further arguments passed to `pred_fun()`, e.g., `type = "response"` in
 #'   a `glm()` or (typically) `prob = TRUE` in classification models.
 #' @returns
@@ -220,7 +220,7 @@ feature_effects.default <- function(
   }
 
   # We need this subset for fast quartiles and fast check if numeric x is disrete
-  ix_sub <- if (nrow(data) > 10000L) sample.int(nrow(data), 10000L)
+  ix_sub <- if (nrow(data) > 9997L) sample.int(nrow(data), 9997L)
 
   # Combine pred, y, and resid. If df, we can easier drop columns in grouped_stats()
   PYR <- list(pred = pred, y = y, resid = if (!is.null(pred) && !is.null(y)) y - pred)
@@ -399,7 +399,7 @@ feature_effects.explainer <- function(
 #' @param ale_data The output of .subsample() or `NULL`.
 #' @param PYR A data.frame with predicted, observed, and residuals (if available). Can
 #'   be `NULL` if none of them are available.
-#' @param ix_sub Subset of 10000 indices, or `NULL` (if nrow(data) <= 10000).
+#' @param ix_sub Subset of 9997 indices, or `NULL` (if nrow(data) <= 9997).
 #' @inheritParams feature_effects
 #' @returns A data.frame with effect statistics.
 calculate_stats <- function(
@@ -446,11 +446,7 @@ calculate_stats <- function(
     }
     rownames(out) <- NULL
   } else {
-    # "CONTINUOUS" case. Tricky because there can be empty bins.
-    if (outlier_iqr > 0 && is.finite(outlier_iqr)) {  # could move in front of if branch
-      x <- wins_iqr(x, m = outlier_iqr, ix_sub = ix_sub)
-    }
-    br <- hist2(x, breaks = breaks)
+    br <- hist2(x, breaks = breaks, outlier_iqr = outlier_iqr, ix_sub = ix_sub)
     mids <- 0.5 * (br[-1L] + br[-length(br)])
     gix <- seq_along(mids)
     bin_width <- diff(br)
@@ -460,7 +456,7 @@ calculate_stats <- function(
     )
 
     M <- cbind(
-      bin_mean = collapse::fmean(x, g = ix, w = w),
+      bin_mean = pmax(pmin(collapse::fmean(x, g = ix, w = w), br[length(br)]), br[1L]),
       grouped_stats(PYR, g = ix, w = w, sd_cols = sd_cols)
     )
     if (anyNA(rownames(M))) {

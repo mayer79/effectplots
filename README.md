@@ -144,7 +144,7 @@ To look closer at bias, let's select the statistic "resid_mean" along with point
 c(m_train, m_test) |> 
   update(drop_below_n = 50) |> 
   plot(
-    ylim = c(-0.06, 0.09),
+    ylim = c(-0.07, 0.12),
     ncol = 2,
     byrow = FALSE,
     stats = "resid_mean",

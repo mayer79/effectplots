@@ -25,7 +25,7 @@ bench::mark(
   min_iterations = 3
 )
 
-# 1.1s      975 MB  # rnorm
+# 0.8s      975 MB  # rnorm
 # 0.4s      504 MB  # sample(c(0, 1))
 # 0.2s      502 MB  # sample(0:1)
 # 0.2s      139 MB  # factor(letters[1:4])
