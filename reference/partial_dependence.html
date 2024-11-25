@@ -172,8 +172,7 @@ or <code>exp</code> (to switch from link scale to the original scale).</p></dd>
 
 
 <dt id="arg-breaks">breaks<a class="anchor" aria-label="anchor" href="#arg-breaks"></a></dt>
-<dd><p>An integer, vector, string or function specifying the bins
-of the numeric X variables as in <code><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">graphics::hist()</a></code>. The default is "Sturges".
+<dd><p>An integer, vector, or "Sturges" (the default).
 To allow varying values of <code>breaks</code> across variables, it can be a list of the
 same length as <code>v</code>, or a <em>named</em> list with <code>breaks</code> for certain variables.</p></dd>
 
@@ -194,7 +193,8 @@ The default is 5. Vectorized over <code>v</code>.</p></dd>
 outside <code>outlier_iqr</code> * IQR from the quartiles. The default is 2 is more
 conservative than the usual rule to account for right-skewed distributions.
 Set to 0 or <code>Inf</code> for no capping. Note that at most 10k observations are sampled
-to calculate quartiles. Vectorized over <code>v</code>.</p></dd>
+to calculate quartiles. Vectorized over <code>v</code>. This has an effect only if <code>breaks</code>
+is not a vector.</p></dd>
 
 
 <dt id="arg-pd-n">pd_n<a class="anchor" aria-label="anchor" href="#arg-pd-n"></a></dt>

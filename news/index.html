@@ -50,13 +50,18 @@
     <div class="section level2">
 <h2 class="page-header" data-toc-text="0.1.1" id="effectplots-011">effectplots 0.1.1<a class="anchor" aria-label="anchor" href="#effectplots-011"></a></h2>
 <div class="section level4">
-<h4 id="efficiency-improvements-0-1-1">Efficiency improvements<a class="anchor" aria-label="anchor" href="#efficiency-improvements-0-1-1"></a></h4>
-<ul><li>The barebone ALE function <code><a href="../reference/dot-ale.html">.ale()</a></code> has become faster thanks to <a href="https://github.com/mayer79/effectplots/issues/11" class="external-link">issue </a><a href="https://github.com/mayer79/effectplots/issues/11" class="external-link">#11</a> by <a href="https://github.com/SebKrantz" class="external-link">@SebKrantz</a>.</li>
-<li>Subsampling indices for outlier capping is now done only once, instead of once per feature <a href="https://github.com/mayer79/effectplots/pull/15" class="external-link">#15</a>.</li>
-<li>Speed-up for discrete numeric features <a href="https://github.com/mayer79/effectplots/pull/16" class="external-link">#16</a>.</li>
+<h4 id="major-bug-fixes-0-1-1">Major bug fixes<a class="anchor" aria-label="anchor" href="#major-bug-fixes-0-1-1"></a></h4>
+<ul><li>The outlier clipping algorithm has unintentionally modified the values in place, i.e., also in the original dataframe. This is fixed by <a href="https://github.com/mayer79/effectplots/pull/24" class="external-link">#24</a>.</li>
 </ul></div>
 <div class="section level4">
-<h4 id="bug-fixes-0-1-1">Bug fixes<a class="anchor" aria-label="anchor" href="#bug-fixes-0-1-1"></a></h4>
+<h4 id="efficiency-improvements-0-1-1">Efficiency improvements<a class="anchor" aria-label="anchor" href="#efficiency-improvements-0-1-1"></a></h4>
+<ul><li>Significant Speed-up and memory reduction for discrete numeric features <a href="https://github.com/mayer79/effectplots/pull/16" class="external-link">#16</a>.</li>
+<li>Significant speed-up and memory reduction for continuous features by delegating outlier clipping to the binning algorithm <a href="https://github.com/mayer79/effectplots/pull/24" class="external-link">#24</a>.</li>
+<li>The barebone ALE function <code><a href="../reference/dot-ale.html">.ale()</a></code> has become faster thanks to <a href="https://github.com/mayer79/effectplots/issues/11" class="external-link">issue </a><a href="https://github.com/mayer79/effectplots/issues/11" class="external-link">#11</a> by <a href="https://github.com/SebKrantz" class="external-link">@SebKrantz</a>.</li>
+<li>Subsampling indices for outlier capping is now done only once, instead of once per feature <a href="https://github.com/mayer79/effectplots/pull/15" class="external-link">#15</a>.</li>
+</ul></div>
+<div class="section level4">
+<h4 id="minor-bug-fixes-0-1-1">Minor bug fixes<a class="anchor" aria-label="anchor" href="#minor-bug-fixes-0-1-1"></a></h4>
 <ul><li>NA values in feature columns have not been counted in the counts “N”.</li>
 <li>Ordered factors are now working.</li>
 <li>ALE correct also with empty bins at the border (could happen with user defined breaks).</li>
@@ -68,6 +73,7 @@
 <div class="section level4">
 <h4 id="other-changes-0-1-1">Other changes<a class="anchor" aria-label="anchor" href="#other-changes-0-1-1"></a></h4>
 <ul><li>Plots with more than one line now use “Effect” als default y label.</li>
+<li>Automatic break count selection via “FD”, “Scott” and via function is not possible anymore (<a href="https://github.com/mayer79/effectplots/pull/24" class="external-link">#24</a>).</li>
 </ul></div>
 </div>
     <div class="section level2">
