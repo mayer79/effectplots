@@ -5,7 +5,7 @@
 #'
 #' @param x A vector or factor.
 #' @param m If `x` is numeric: Up to which number of disjoint values is it a factor?
-#' @param ix_sub Subset for pre-check. If not `NULL`, length(x) > 10000.
+#' @param ix_sub Subset for pre-check. If not `NULL`, length(x) > 9997.
 #' @returns
 #'   A double vector if x is numeric with > m disjoint values.
 #'   Otherwise, a factor with explicit missings.
@@ -52,7 +52,7 @@ wins_iqr <- function(x, m = 1.5, ix_sub = NULL) {
   }
   q <- collapse::fquantile(x, probs = c(0.25, 0.75), na.rm = TRUE, names = FALSE)
   r <- m * diff(q)
-  if (r <= 0) {
+  if (r <= 0 || is.na(r)) {
     return(NULL)
   }
   return(q + c(-r, r))

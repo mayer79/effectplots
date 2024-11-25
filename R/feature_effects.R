@@ -74,7 +74,7 @@
 #' @param seed Optional random seed (an integer) used for:
 #'   - Partial dependence: select background data if `n > pd_n`.
 #'   - ALE: select background data if `n > ale_n` and for bins > `ale_bin_size`.
-#'   - Capping X: quartiles are calculated based on 10k observations.
+#'   - Capping X: quartiles are calculated based on 9997 observations.
 #' @param ... Further arguments passed to `pred_fun()`, e.g., `type = "response"` in
 #'   a `glm()` or (typically) `prob = TRUE` in classification models.
 #' @returns
@@ -220,7 +220,7 @@ feature_effects.default <- function(
   }
 
   # We need this subset for fast quartiles and fast check if numeric x is disrete
-  ix_sub <- if (nrow(data) > 10000L) sample.int(nrow(data), 10000L)
+  ix_sub <- if (nrow(data) > 9997L) sample.int(nrow(data), 9997L)
 
   # Combine pred, y, and resid. If df, we can easier drop columns in grouped_stats()
   PYR <- list(pred = pred, y = y, resid = if (!is.null(pred) && !is.null(y)) y - pred)
@@ -399,7 +399,7 @@ feature_effects.explainer <- function(
 #' @param ale_data The output of .subsample() or `NULL`.
 #' @param PYR A data.frame with predicted, observed, and residuals (if available). Can
 #'   be `NULL` if none of them are available.
-#' @param ix_sub Subset of 10000 indices, or `NULL` (if nrow(data) <= 10000).
+#' @param ix_sub Subset of 9997 indices, or `NULL` (if nrow(data) <= 9997).
 #' @inheritParams feature_effects
 #' @returns A data.frame with effect statistics.
 calculate_stats <- function(

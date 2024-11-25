@@ -139,7 +139,7 @@ randomly sampled. The default is 200. Applied after subsampling regarding \code{
 \itemize{
 \item Partial dependence: select background data if \code{n > pd_n}.
 \item ALE: select background data if \code{n > ale_n} and for bins > \code{ale_bin_size}.
-\item Capping X: quartiles are calculated based on 10k observations.
+\item Capping X: quartiles are calculated based on 9997 observations.
 }}
 }
 \value{

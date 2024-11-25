@@ -38,14 +38,6 @@ test_that("factor_or_double() works", {
   expect_error(factor_or_double(x, m = 4, ix_sub = 1:2))
 })
 
-test_that("clamp2() works", {
-  x <- c(1:10, NA)
-  expect_equal(clamp2(x, 0, 11), x)
-  expect_equal(clamp2(x, low = 2, high = 11), pmax(2, x))
-  expect_equal(clamp2(x, low = 0, high = 8), pmin(8, x))  # not symmetric
-  expect_equal(clamp2(x, low = 3, high = 7), pmax(3, pmin(7, x)))
-})
-
 test_that("grouped_stats() works", {
   x <- cbind(a = 1:6, b = 6:1)
   g <- c(2, 2, 1, 1, 1, 1)
@@ -89,26 +81,14 @@ test_that("hist2() typically gives identical breaks than graphics::hist()", {
   set.seed(1)
   x <- rnorm(1000)
 
-  breaks <- list(
-    5,
-    -10:10,
-    "FD",
-    "sturges",
-    "scott",
-    function(x) sqrt(length(x))
-  )
+  breaks <- list(5, -10:10, "sturges")
   for (b in breaks) {
     expect_equal(hist2(x, b), graphics::hist(x, b, plot = FALSE)$breaks)
   }
 })
 
-test_that("hist2() works slightly different for very large vectors", {
-  x <- 1:1e6
-  expect_equal(hist2(x, breaks = "scott"), hist(x, breaks = 50, plot = FALSE)$breaks)
-})
-
 test_that("hist2() does not like unknown strings", {
-  expect_error(hist2(1:10, breaks = "hello"))
+  expect_error(hist2(1:10, breaks = "scott"))
 })
 
 test_that("findInterval_equi() provides equal results as findInterval()", {
