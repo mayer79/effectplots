@@ -132,6 +132,16 @@ grouped_stats <- function(x, g, w = NULL, sd_cols = colnames(x)) {
   cbind(out, M)
 }
 
+int2f <- function(x, nlev) {
+  has_na <- anyNA(x)
+  lev <- as.character(seq_len(nlev))
+  if (has_na) {
+    x[is.na(x)] <- nlev + 1L
+    lev <- c(lev, NA)
+  }
+  structure(x, class = c("factor", "na.included"), levels = lev)
+}
+
 #' Fast findInterval()
 #'
 #' Internal function used to bin a numeric `x`. Uses `findInterval()` when breaks are
@@ -148,7 +158,9 @@ grouped_stats <- function(x, g, w = NULL, sd_cols = colnames(x)) {
 findInterval2 <- function(x, breaks, right = TRUE) {
   nbreaks <- length(breaks)
   if (nbreaks <= 2L) {
-    return(rep.int(1L, times = length(x)))
+    return(
+      collapse::qF(rep.int(1L, times = length(x)), sort = FALSE, na.exclude = FALSE)
+    )
   }
   # from hist2.default()
   h <- diff(breaks)
@@ -164,8 +176,11 @@ findInterval2 <- function(x, breaks, right = TRUE) {
       right = as.logical(right)
     )
   } else {
-    findInterval(
-      x, vec = breaks, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
+    int2f(
+      findInterval(
+        x, vec = breaks, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
+      ),
+      nlev = nbreaks - 1L
     )
   }
 }

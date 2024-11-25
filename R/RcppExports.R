@@ -3,8 +3,6 @@
 
 #' findInterval() for equi-length intervals
 #'
-#' Results agree with `findInterval(..., rightmost.closed = TRUE, all.inside = TRUE)`.
-#'
 #' @noRd
 #' @keywords internal
 #' @param x Numeric vector to be binned.
@@ -12,7 +10,9 @@
 #' @param low Highest value.
 #' @param nbin Number of bins (= length(breaks) - 1L).
 #' @param right Right-closed intervals? Default is `true`.
-#' @return Binned version of `x` (integer encoded).
+#' @return A factor representing a binned version of `x`. In line with collapse,
+#'   missing values are encoded internally by an explicit level "NA" to allow for
+#'   zero-copy grouped stats.
 findInterval_equi <- function(x, low, high, nbin, right = TRUE) {
     .Call(`_effectplots_findInterval_equi`, x, low, high, nbin, right)
 }

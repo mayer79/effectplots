@@ -451,9 +451,7 @@ calculate_stats <- function(
     gix <- seq_along(mids)
     bin_width <- diff(br)
 
-    ix <- collapse::qF(
-      findInterval2(x, breaks = br, right = right), sort = FALSE, na.exclude = FALSE
-    )
+    ix <- findInterval2(x, breaks = br, right = right)
 
     M <- cbind(
       bin_mean = pmax(pmin(collapse::fmean(x, g = ix, w = w), br[length(br)]), br[1L]),

@@ -17,6 +17,19 @@ X <- qDF(matrix(rnorm(1e7 * 10), ncol = 10))
 # X <- qDF(matrix(sample(letters[1:4], 1e7 * 10, TRUE), ncol = 10))
 # X[] <- lapply(X, factor)
 
+x <- sample(c(1:10, NA), 1e7, T)
+as_qF <- function(x, nlev) {
+  has_na <- anyNA(x)
+  lev <- as.character(seq_len(nlev))
+  if (has_na) {
+    x[is.na(x)] <- nlev + 1L
+    lev <- c(lev, NA)
+  }
+  structure(x, class = c("factor", "na.included"), levels = lev)
+}
+
+bench::mark(fmean(y, as_qF(x, 11)))
+
 v <- colnames(X)
 X$y <- runif(n)
 fit <- lm(reformulate(v, "y"), data = X)
@@ -25,7 +38,7 @@ bench::mark(
   min_iterations = 3
 )
 
-# 0.8s      975 MB  # rnorm
+# 0.7s      593 MB  # rnorm
 # 0.4s      504 MB  # sample(c(0, 1))
 # 0.2s      502 MB  # sample(0:1)
 # 0.2s      139 MB  # factor(letters[1:4])
