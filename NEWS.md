@@ -15,7 +15,7 @@
 
 - NA values in feature columns have not been counted in the counts "N".
 - Ordered factors are now working.
-- ALE correct also with empty bins at the border (could happen with user defined breaks).
+- ALE are correct also with empty bins at the border (could happen with user-defined breaks).
 
 ### Documentation
 

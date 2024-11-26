@@ -77,46 +77,64 @@ test_that("Test that grouped_stats() uses sort(funique) + NA as order", {
   }
 })
 
-test_that("hist2() typically gives identical breaks than graphics::hist()", {
+test_that("fbreaks() without outlier handling gives same breaks like hist()", {
   set.seed(1)
   x <- rnorm(1000)
 
-  breaks <- list(5, -10:10, "sturges")
+  breaks <- list(5, -10:10, "Sturges")
   for (b in breaks) {
-    expect_equal(hist2(x, b), graphics::hist(x, b, plot = FALSE)$breaks)
-  }
-})
-
-test_that("hist2() does not like unknown strings", {
-  expect_error(hist2(1:10, breaks = "scott"))
-})
-
-test_that("findInterval_equi() provides equal results as findInterval()", {
-  x <- c(-1, NA, 2, 1, 0.5, 0, 10)
-  br <- seq(0, 2, length.out = 5 + 1)
-  for (r in c(FALSE, TRUE)) {
     expect_equal(
-      findInterval_equi(x, low = 0, high = 2, nbin = 5L, right = r),
-      findInterval(x, br, rightmost.closed = TRUE, all.inside = TRUE, left.open = r)
+      fbreaks(x, b, outlier_iqr = 0),
+      graphics::hist(x, b, plot = FALSE)$breaks
     )
   }
 })
 
-test_that("findInterval2() provides equal results as findInterval()", {
-  x <- c(-1, NA, 2, 1, 1.2, 1.1999, 0.5, 0, 10)
-  br <- seq(0, 2, length.out = 6)
-  for (r in c(FALSE, TRUE)) {
+test_that("fbreaks() with outlier handling gives same breaks like hist()", {
+  set.seed(1)
+  x <- rnorm(1000)
+  q <- wins_iqr(x, m = 1.5, ix_sub = 1:100)
+  xcapped <- pmin(pmax(x, q[1L]), q[2L])
+
+  breaks <- list(5, -10:10, "Sturges")
+  for (b in breaks) {
     expect_equal(
-      effectplots:::findInterval2(x, br, right = r),
-      findInterval(x, br, rightmost.closed = TRUE, all.inside = TRUE, left.open = r)
+      fbreaks(x, b, outlier_iqr = 1.5, ix_sub = 1:100),
+      graphics::hist(xcapped, b, plot = FALSE)$breaks
     )
   }
-
-  # Special cases
-  expect_equal(findInterval2(x, 1:2, right = r), rep(1, length = length(x)))
-  expect_equal(findInterval2(x, 1, right = r), rep(1, length = length(x)))
-
-  # Breaks increasing?
-  expect_error(findInterval2(x, breaks = c(4, 3, 1)))
 })
+
+test_that("fbreaks() does not like unknown strings", {
+  expect_error(fbreaks(1:10, breaks = "scott"))
+})
+
+# test_that("findInterval_equi() provides equal results as findInterval()", {
+#   x <- c(-1, NA, 2, 1, 0.5, 0, 10)
+#   br <- seq(0, 2, length.out = 5 + 1)
+#   for (r in c(FALSE, TRUE)) {
+#     expect_equal(
+#       findInterval_equi(x, low = 0, high = 2, nbin = 5L, right = r),
+#       findInterval(x, br, rightmost.closed = TRUE, all.inside = TRUE, left.open = r)
+#     )
+#   }
+# })
+#
+# test_that("findInterval2() provides equal results as findInterval()", {
+#   x <- c(-1, NA, 2, 1, 1.2, 1.1999, 0.5, 0, 10)
+#   br <- seq(0, 2, length.out = 6)
+#   for (r in c(FALSE, TRUE)) {
+#     expect_equal(
+#       effectplots:::findInterval2(x, br, right = r),
+#       findInterval(x, br, rightmost.closed = TRUE, all.inside = TRUE, left.open = r)
+#     )
+#   }
+#
+#   # Special cases
+#   expect_equal(findInterval2(x, 1:2, right = r), rep(1, length = length(x)))
+#   expect_equal(findInterval2(x, 1, right = r), rep(1, length = length(x)))
+#
+#   # Breaks increasing?
+#   expect_error(findInterval2(x, breaks = c(4, 3, 1)))
+# })
 
