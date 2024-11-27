@@ -3,7 +3,9 @@
 
 #' findInterval() for equi-length intervals
 #'
-#' Results agree with `findInterval(..., rightmost.closed = TRUE, all.inside = TRUE)`.
+#' A fast version of collapse::qF(findInterval(, all.inside = TRUE), explicit.na = T/F)
+#' that works for equi-length intervals. Set `explicit_na = true` for maximal speed
+#' when combined with fast aggregation in "collapse".
 #'
 #' @noRd
 #' @keywords internal
@@ -11,9 +13,16 @@
 #' @param low Lowest value.
 #' @param low Highest value.
 #' @param nbin Number of bins (= length(breaks) - 1L).
+#' @param labels A string vector of labels for the bins. Must be passed even if
+#'   `codes_only = true`.
 #' @param right Right-closed intervals? Default is `true`.
-#' @return Binned version of `x` (integer encoded).
-findInterval_equi <- function(x, low, high, nbin, right = TRUE) {
-    .Call(`_effectplots_findInterval_equi`, x, low, high, nbin, right)
+#' @param explicit_na Should missing values be coded as nbin + 1? If `true`,
+#'   the resulting factor will get an explicit level `NA`, and an additional class
+#'   `"na.included"`.
+#' @param codes_only Should only integer codes be returned? Default is `false`.
+#' @return
+#'   Either an integer vector or a factor representing the bins.
+findInterval_equi <- function(x, low, high, nbin, labels, right = TRUE, explicit_na = FALSE, codes_only = FALSE) {
+    .Call(`_effectplots_findInterval_equi`, x, low, high, nbin, labels, right, explicit_na, codes_only)
 }
 

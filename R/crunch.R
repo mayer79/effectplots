@@ -58,7 +58,7 @@ wins_iqr <- function(x, m = 1.5, ix_sub = NULL) {
   return(q + c(-r, r))
 }
 
-#' Break Calculation like hist()
+#' Fast Break Calculation
 #'
 #' Internal function used to calculate breaks.
 #'
@@ -66,11 +66,11 @@ wins_iqr <- function(x, m = 1.5, ix_sub = NULL) {
 #' @keywords internal
 #'
 #' @param x A numeric vector.
-#' @param breaks An integer, a vector, or "Sturges".
+#' @param breaks An integer, a vector, or "Sturges" (the default).
 #' @param outlier_iqr See [feature_effects()].
 #' @param ix_sub An optional subsetting vector to calculate quartiles.
 #' @returns A vector of pretty breaks.
-hist2 <- function(x, breaks = "Sturges", outlier_iqr = 0, ix_sub = NULL) {
+fbreaks <- function(x, breaks = "Sturges", outlier_iqr = 0, ix_sub = NULL) {
   if (is.character(breaks)) {
     if (tolower(breaks) == "sturges") {
       breaks <- ceiling(log2(length(x)) + 1)
@@ -132,40 +132,86 @@ grouped_stats <- function(x, g, w = NULL, sd_cols = colnames(x)) {
   cbind(out, M)
 }
 
-#' Fast findInterval()
+#' Fast cut()
 #'
-#' Internal function used to bin a numeric `x`. Uses `findInterval()` when breaks are
-#' unequally long, and an algorithm adapted from `spatstat.utils::fastFindInterval()`
-#' otherwise.
+#' Bins a numeric vector `x` into bins specified by `breaks`.
+#' Values outside the range of `breaks` will be placed in the lowest or highest bin.
+#' Set `labels = FALSE` to return integer codes only, and `explicit_na = TRUE` for
+#' maximal synergy with the "collapse" package.
+#' Uses the logic of `spatstat.utils::fastFindInterval()` for equi-length bins.
 #'
-#' @noRd
-#' @keywords internal
-#'
-#' @param x A numeric vector to bin.
-#' @param br A monotonically increasing vector of breaks.
+#' @param x A numeric vector.
+#' @param breaks A monotonically increasing numeric vector of breaks.
+#' @param labels A character vector of length `length(breaks) - 1` with bin labels.
+#'   By default (`NULL`), the levels `c("1", "2", ...)` are used. Set to `FALSE`
+#'   to return raw integer codes.
 #' @param right Right closed bins (`TRUE`, default) or not?
-#' @returns Binned version of `x`.
-findInterval2 <- function(x, breaks, right = TRUE) {
-  nbreaks <- length(breaks)
-  if (nbreaks <= 2L) {
-    return(rep.int(1L, times = length(x)))
+#' @param explicit_na If `TRUE`, missing values are encoded by the bin value
+#'   `length(breaks)`, having `NA` as corresponding factor level. The factor will get
+#'   the additional class "na.included".
+#' @returns Binned version of `x`. Either a factor or integer codes.
+#' @export
+#' @examples
+#' x <- c(NA, 1:10)
+#' fcut(x, breaks = c(3, 5, 7))
+#' fcut(x, breaks = c(3, 5, 7), right = FALSE)
+#' fcut(x, breaks = c(3, 5, 7), labels = FALSE)
+#'
+fcut <- function(x, breaks, labels = NULL, right = TRUE, explicit_na = FALSE) {
+  nb <- length(breaks) - 1L
+  stopifnot(
+    is.numeric(x),
+    nb >= 1L,
+    !is.unsorted(breaks),
+    is.null(labels) || isFALSE(labels) || (is.character(labels) && length(labels) == nb)
+  )
+  codes_only <- isFALSE(labels)
+  if (!is.character(labels)) {
+    labels <- as.character(seq_len(nb))  # need for equi-length case even if codes_only
   }
-  # from hist2.default()
+
+  # From hist2.default()
   h <- diff(breaks)
   if (!all(h > 0)) {
     stop("Breaks must be strictly increasing")
   }
-  if (diff(range(h)) < 1e-07 * mean(h)) {  # equidist
-    findInterval_equi(
-      as.double(x),
-      low = as.double(breaks[1L]),
-      high = as.double(breaks[nbreaks]),
-      nbin = nbreaks - 1L,
-      right = as.logical(right)
+
+  # Three cases: one bin, equi-length bins, other
+  if (nb == 1L) {
+    out <- rep.int(1L, length(x))
+    if (anyNA(x)) {
+      if (explicit_na) {
+        out[is.na(x)] <- 2L
+        labels <- c(labels, NA_character_)
+      } else {
+        out[is.na(x)] <- NA_integer_
+      }
+    }
+  } else if (diff(range(h)) < 1e-07 * mean(h)) {  # spatstat.utils::fastFindInterval()
+    return(
+      findInterval_equi(
+        as.double(x),
+        low = as.double(breaks[1L]),
+        high = as.double(breaks[nb + 1L]),
+        nbin = nb,
+        right = as.logical(right),
+        labels = labels,
+        explicit_na = as.logical(explicit_na),
+        codes_only = as.logical(codes_only)
+      )
     )
   } else {
-    findInterval(
+    out <- findInterval(
       x, vec = breaks, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
     )
+    if (explicit_na && anyNA(x)) {
+      out[is.na(x)] <- nb + 1L
+      labels <- c(labels, NA_character_)
+    }
   }
+  if (codes_only) {
+    return(out)
+  }
+  structure(out, levels = labels, class = c("factor", if (explicit_na) "na.included"))
 }
+

@@ -446,30 +446,26 @@ calculate_stats <- function(
     }
     rownames(out) <- NULL
   } else {
-    br <- hist2(x, breaks = breaks, outlier_iqr = outlier_iqr, ix_sub = ix_sub)
-    mids <- 0.5 * (br[-1L] + br[-length(br)])
-    gix <- seq_along(mids)
-    bin_width <- diff(br)
+    breaks <- fbreaks(x, breaks = breaks, outlier_iqr = outlier_iqr, ix_sub = ix_sub)
+    mids <- 0.5 * (breaks[-1L] + breaks[-length(breaks)])
+    bin_width <- diff(breaks)
 
-    ix <- collapse::qF(
-      findInterval2(x, breaks = br, right = right), sort = FALSE, na.exclude = FALSE
-    )
+    # Grouped stats
+    ix <- fcut(x, breaks = breaks, right = right, explicit_na = TRUE)
+    M <- grouped_stats(PYR, g = ix, w = w, sd_cols = sd_cols)
 
-    M <- cbind(
-      bin_mean = pmax(pmin(collapse::fmean(x, g = ix, w = w), br[length(br)]), br[1L]),
-      grouped_stats(PYR, g = ix, w = w, sd_cols = sd_cols)
-    )
     if (anyNA(rownames(M))) {
       mids <- c(mids, NA)
-      gix <- c(gix, NA)
       bin_width <- c(bin_width, NA)  #  Can't be plotted anyway
     }
 
-    out <- data.frame(
-      bin_mid = mids, bin_width = bin_width, bin_mean = mids, N = 0, weight = 0
-    )
-    reindex <- match(as.integer(rownames(M)), gix)
-    out[reindex, colnames(M)] <- M  # Fill the gaps and rearrange in right order
+    # Calculate bin_means, clip outliers, and replace missings (where possible)
+    bin_means <- collapse::fmean(x, g = ix, w = w, use.g.names = FALSE)
+    bad <- is.na(bin_means)
+    bin_means[bad] = mids[bad]
+    bin_means <- pmax(pmin(bin_means, breaks[length(breaks)]), breaks[1L])
+
+    out <- data.frame(bin_mid = mids, bin_width = bin_width, bin_mean = bin_means, M)
   }
 
   # Add partial dependence
@@ -495,7 +491,7 @@ calculate_stats <- function(
         object = object,
         v = v,
         data = ale_data$X,
-        breaks = br,
+        breaks = breaks,
         right = right,  # does not matter because we pass g
         pred_fun = pred_fun,
         trafo = trafo,

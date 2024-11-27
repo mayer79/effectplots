@@ -25,7 +25,7 @@ bench::mark(
   min_iterations = 3
 )
 
-# 0.8s      975 MB  # rnorm
+# 0.7s      593 MB  # rnorm
 # 0.4s      504 MB  # sample(c(0, 1))
 # 0.2s      502 MB  # sample(0:1)
 # 0.2s      139 MB  # factor(letters[1:4])
@@ -44,7 +44,7 @@ bench::mark(
 )
 
 # New
-# 1.5s    1.65GB
+# 0.9s    1.27GB
 
 x <- runif(n)
 bench::mark(frange(x))  # 8 ms
@@ -82,5 +82,3 @@ x <- factor(sample(letters[1:10], n, TRUE))
 bench::mark(qF(x))                # 0 ms
 bench::mark(qF(x, sort = FALSE))  # 7 ms
 bench::mark(funique(x))           # 5 ms
-
-

@@ -11,8 +11,8 @@ Rcpp::Rostream<false>& Rcpp::Rcerr = Rcpp::Rcpp_cerr_get();
 #endif
 
 // findInterval_equi
-IntegerVector findInterval_equi(NumericVector x, double low, double high, int nbin, bool right);
-RcppExport SEXP _effectplots_findInterval_equi(SEXP xSEXP, SEXP lowSEXP, SEXP highSEXP, SEXP nbinSEXP, SEXP rightSEXP) {
+IntegerVector findInterval_equi(NumericVector x, double low, double high, int nbin, StringVector labels, bool right, bool explicit_na, bool codes_only);
+RcppExport SEXP _effectplots_findInterval_equi(SEXP xSEXP, SEXP lowSEXP, SEXP highSEXP, SEXP nbinSEXP, SEXP labelsSEXP, SEXP rightSEXP, SEXP explicit_naSEXP, SEXP codes_onlySEXP) {
 BEGIN_RCPP
     Rcpp::RObject rcpp_result_gen;
     Rcpp::RNGScope rcpp_rngScope_gen;
@@ -20,14 +20,17 @@ BEGIN_RCPP
     Rcpp::traits::input_parameter< double >::type low(lowSEXP);
     Rcpp::traits::input_parameter< double >::type high(highSEXP);
     Rcpp::traits::input_parameter< int >::type nbin(nbinSEXP);
+    Rcpp::traits::input_parameter< StringVector >::type labels(labelsSEXP);
     Rcpp::traits::input_parameter< bool >::type right(rightSEXP);
-    rcpp_result_gen = Rcpp::wrap(findInterval_equi(x, low, high, nbin, right));
+    Rcpp::traits::input_parameter< bool >::type explicit_na(explicit_naSEXP);
+    Rcpp::traits::input_parameter< bool >::type codes_only(codes_onlySEXP);
+    rcpp_result_gen = Rcpp::wrap(findInterval_equi(x, low, high, nbin, labels, right, explicit_na, codes_only));
     return rcpp_result_gen;
 END_RCPP
 }
 
 static const R_CallMethodDef CallEntries[] = {
-    {"_effectplots_findInterval_equi", (DL_FUNC) &_effectplots_findInterval_equi, 5},
+    {"_effectplots_findInterval_equi", (DL_FUNC) &_effectplots_findInterval_equi, 8},
     {NULL, NULL, 0}
 };
 
