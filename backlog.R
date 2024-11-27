@@ -82,5 +82,3 @@ x <- factor(sample(letters[1:10], n, TRUE))
 bench::mark(qF(x))                # 0 ms
 bench::mark(qF(x, sort = FALSE))  # 7 ms
 bench::mark(funique(x))           # 5 ms
-
-

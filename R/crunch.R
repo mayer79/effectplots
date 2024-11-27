@@ -167,7 +167,7 @@ fcut <- function(x, breaks, labels = NULL, right = TRUE, explicit_na = FALSE) {
   )
   codes_only <- isFALSE(labels)
   if (!is.character(labels)) {
-    labels <- as.character(seq_len(nb))
+    labels <- as.character(seq_len(nb))  # need for equi-length case even if codes_only
   }
 
   # From hist2.default()
@@ -178,30 +178,40 @@ fcut <- function(x, breaks, labels = NULL, right = TRUE, explicit_na = FALSE) {
 
   # Three cases: one bin, equi-length bins, other
   if (nb == 1L) {
-    out <- rep.int(1L, times = length(x))
+    out <- rep.int(1L, length(x))
+    if (anyNA(x)) {
+      if (explicit_na) {
+        out[is.na(x)] <- 2L
+        labels <- c(labels, NA_character_)
+      } else {
+        out[is.na(x)] <- NA_integer_
+      }
+    }
   } else if (diff(range(h)) < 1e-07 * mean(h)) {  # spatstat.utils::fastFindInterval()
-    out <- findInterval_equi(
-      as.double(x),
-      low = as.double(breaks[1L]),
-      high = as.double(breaks[nb + 1L]),
-      nbin = nb,
-      right = as.logical(right),
-      labels = labels,
-      explicit_na = as.logical(explicit_na),
-      codes_only = as.logical(codes_only)
+    return(
+      findInterval_equi(
+        as.double(x),
+        low = as.double(breaks[1L]),
+        high = as.double(breaks[nb + 1L]),
+        nbin = nb,
+        right = as.logical(right),
+        labels = labels,
+        explicit_na = as.logical(explicit_na),
+        codes_only = as.logical(codes_only)
+      )
     )
-    return(out)
   } else {
     out <- findInterval(
       x, vec = breaks, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
     )
+    if (explicit_na && anyNA(x)) {
+      out[is.na(x)] <- nb + 1L
+      labels <- c(labels, NA_character_)
+    }
   }
-
-  if (explicit_na && anyNA(x)) {
-    out[is.na(x)] <- nb + 1L  # makes a copy of out
-    labels <- c(labels, NA_character_)
+  if (codes_only) {
+    return(out)
   }
-
   structure(out, levels = labels, class = c("factor", if (explicit_na) "na.included"))
 }
 
