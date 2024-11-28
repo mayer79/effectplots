@@ -329,7 +329,7 @@ plot.EffectData <- function(
     # left/right - top/bottom (we use it symmetrically)
     margins <- c(
       0.02 + 0.04 / ncol - hide_some_yticks * 0.01,
-      0.03 + 0.04 / nrow + subplot_titles * 0.02
+      0.03 + 0.04 / nrow + subplot_titles * 0.025
     )
     fig <- plotly::subplot(
       plot_list,
@@ -346,7 +346,7 @@ plot.EffectData <- function(
     if (title != "") {
       fig <- plotly::layout(
         fig,
-        margin = list(t = 45 + 20 * subplot_titles),
+        margin = list(t = 45 + 25 * subplot_titles),
         title = list(text = title, y = 0.98)
       )
     }
@@ -634,8 +634,8 @@ one_plotly <- function(
       ann <- list(
         text = title,
         x = 0,
-        y = 1,
-        font = list(size = 15),
+        y = 1.03,
+        font = list(size = 17),
         xanchor = "left",
         yanchor = "bottom",
         xref = "paper",
