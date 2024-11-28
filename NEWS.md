@@ -31,6 +31,7 @@
 - x axes are not collected anymore by {patchwork} [#27](https://github.com/mayer79/effectplots/pull/27).
 - The default of `discrete_m = 5` has been increased to 13 [#29](https://github.com/mayer79/effectplots/pull/29).
 - Slightly different check/preparation of predictions (and the argument `pred`). Helps to simplify the use of {h2o} [#32](https://github.com/mayer79/effectplots/pull/32).
+- Plotly plots got more vertical space between subplots, and the subplot titles are a bit further away from the subplots [#33](https://github.com/mayer79/effectplots/pull/33).
 
 # effectplots 0.1.0
 
