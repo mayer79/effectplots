@@ -15,9 +15,8 @@ Evaluated at bin averages, not at bin midpoints.
 
 Additionally, corresponding counts/weights are calculated, and
 standard deviations of observed y and residuals.
-Numeric X with more than discrete_m = 5 disjoint values are binned as in
-graphics::hist() via breaks. Before calculating bins, outliers are capped
-at +-2 IQR from the quartiles.
+Numeric X with more than discrete_m = 13 disjoint values are binned via breaks.
+Outliers are cautiously capped at +-2 IQR from the quartiles.
 All averages and standard deviation are weighted by optional weights w.
 If you need only one specific statistic, you can use the simplified APIs of
 average_observed(),
@@ -89,9 +88,8 @@ Evaluated at bin averages, not at bin midpoints.</p></li>
 <li><p>"ale": Accumulated local effects (Apley, 2020): See <code><a href="ale.html">ale()</a></code>. Only for numeric X.</p></li>
 </ul><p>Additionally, corresponding counts/weights are calculated, and
 standard deviations of observed y and residuals.</p>
-<p>Numeric X with more than <code>discrete_m = 5</code> disjoint values are binned as in
-<code><a href="https://rdrr.io/r/graphics/hist.html" class="external-link">graphics::hist()</a></code> via <code>breaks</code>. Before calculating bins, outliers are capped
-at +-2 IQR from the quartiles.</p>
+<p>Numeric X with more than <code>discrete_m = 13</code> disjoint values are binned via <code>breaks</code>.
+Outliers are cautiously capped at +-2 IQR from the quartiles.</p>
 <p>All averages and standard deviation are weighted by optional weights <code>w</code>.</p>
 <p>If you need only one specific statistic, you can use the simplified APIs of</p><ul><li><p><code><a href="average_observed.html">average_observed()</a></code>,</p></li>
 <li><p><code><a href="average_predicted.html">average_predicted()</a></code>,</p></li>
@@ -116,7 +114,7 @@ at +-2 IQR from the quartiles.</p>
 <span>  w <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  breaks <span class="op">=</span> <span class="st">"Sturges"</span>,</span>
 <span>  right <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  discrete_m <span class="op">=</span> <span class="fl">5L</span>,</span>
+<span>  discrete_m <span class="op">=</span> <span class="fl">13L</span>,</span>
 <span>  outlier_iqr <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  calc_pred <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  pd_n <span class="op">=</span> <span class="fl">500L</span>,</span>
@@ -139,7 +137,7 @@ at +-2 IQR from the quartiles.</p>
 <span>  w <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  breaks <span class="op">=</span> <span class="st">"Sturges"</span>,</span>
 <span>  right <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  discrete_m <span class="op">=</span> <span class="fl">5L</span>,</span>
+<span>  discrete_m <span class="op">=</span> <span class="fl">13L</span>,</span>
 <span>  outlier_iqr <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  calc_pred <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  pd_n <span class="op">=</span> <span class="fl">500L</span>,</span>
@@ -161,7 +159,7 @@ at +-2 IQR from the quartiles.</p>
 <span>  w <span class="op">=</span> <span class="va">object</span><span class="op">$</span><span class="va">weights</span>,</span>
 <span>  breaks <span class="op">=</span> <span class="st">"Sturges"</span>,</span>
 <span>  right <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  discrete_m <span class="op">=</span> <span class="fl">5L</span>,</span>
+<span>  discrete_m <span class="op">=</span> <span class="fl">13L</span>,</span>
 <span>  outlier_iqr <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>  calc_pred <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  pd_n <span class="op">=</span> <span class="fl">500L</span>,</span>
@@ -237,7 +235,7 @@ Vectorized over <code>v</code>. Only relevant for numeric X.</p></dd>
 <dt id="arg-discrete-m">discrete_m<a class="anchor" aria-label="anchor" href="#arg-discrete-m"></a></dt>
 <dd><p>Numeric X variables with up to this number of unique values
 should not be binned and treated as a factor (after calculating partial dependence)
-The default is 5. Vectorized over <code>v</code>.</p></dd>
+The default is 13. Vectorized over <code>v</code>.</p></dd>
 
 
 <dt id="arg-outlier-iqr">outlier_iqr<a class="anchor" aria-label="anchor" href="#arg-outlier-iqr"></a></dt>
