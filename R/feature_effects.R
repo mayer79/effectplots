@@ -34,9 +34,8 @@
 #' @param data Matrix or data.frame.
 #' @param y Numeric vector with observed values of the response.
 #'   Can also be a column name in `data`. Omitted if `NULL` (default).
-#' @param pred Numeric vector with predictions. If `NULL`, it is calculated as
-#'   `pred_fun(object, data, ...)`. Used to save time if `d()` is to be
-#'   called multiple times.
+#' @param pred Pre-computed predictions (as from `predict()/pred_fun()).
+#'   If `NULL`, it is calculated as `pred_fun(object, data, ...)`.
 #' @param pred_fun Prediction function, by default `stats::predict`.
 #'   The function takes three arguments (names irrelevant): `object`, `data`, and `...`.
 #' @param trafo How should predictions be transformed?
@@ -139,9 +138,8 @@ feature_effects.default <- function(
   stopifnot(
     n >= 2L,
     basic_check(y, n = n, nms = nms),
-    basic_check(pred, n = n, nms = nms),
     basic_check(w, n = n, nms = nms)
-  )  # We don't need n anymore
+  )
 
   if (!is.null(seed)) {
     # old <- .Random.seed
@@ -169,6 +167,9 @@ feature_effects.default <- function(
 
   # Prepare pred (part 1)
   if (!is.null(pred)) {
+    if (NROW(pred) != n) {
+      stop("'pred' must have the same length as nrow(data).")
+    }
     pred <- prep_pred(pred, trafo = trafo, which_pred = which_pred)
   }
 

@@ -30,6 +30,7 @@
 - Export of `fcut()`, a fast variant of `cut()` [#25](https://github.com/mayer79/effectplots/pull/25).
 - x axes are not collected anymore by {patchwork} [#27](https://github.com/mayer79/effectplots/pull/27).
 - The default of `discrete_m = 5` has been increased to 13 [#29](https://github.com/mayer79/effectplots/pull/29).
+- Slightly different check/preparation of predictions (and the argument `pred`). Helps to simplify the use of {h2o} [#32](https://github.com/mayer79/effectplots/pull/32).
 
 # effectplots 0.1.0
 

@@ -20,7 +20,7 @@ Furthermore, it calculates counts, weight sums, average residuals, and standard 
 
 We highly recommend Christoph Molnar's book [3] for more info on feature effects.
 
-**It takes 1 second on a normal laptop to get all statistics for 10 continuous features on 10 Mio rows (+ prediction time).**
+**It takes 1 second on a normal laptop to get all statistics for 10 features on 10 Mio rows (+ prediction time).**
 
 **Workflow**
 

@@ -86,9 +86,7 @@ a \code{glm()} or (typically) \code{prob = TRUE} in classification models.}
 \item{y}{Numeric vector with observed values of the response.
 Can also be a column name in \code{data}. Omitted if \code{NULL} (default).}
 
-\item{pred}{Numeric vector with predictions. If \code{NULL}, it is calculated as
-\code{pred_fun(object, data, ...)}. Used to save time if \code{d()} is to be
-called multiple times.}
+\item{pred}{Pre-computed predictions (as from \verb{predict()/pred_fun()). If }NULL\verb{, it is calculated as }pred_fun(object, data, ...)`.}
 
 \item{pred_fun}{Prediction function, by default \code{stats::predict}.
 The function takes three arguments (names irrelevant): \code{object}, \code{data}, and \code{...}.}
