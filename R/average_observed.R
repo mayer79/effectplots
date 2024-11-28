@@ -32,7 +32,7 @@ average_observed <- function(
     x_name = "x",
     breaks = "Sturges",
     right = TRUE,
-    discrete_m = 5L,
+    discrete_m = 13L,
     outlier_iqr = 2,
     seed = NULL,
     ...

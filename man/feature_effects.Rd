@@ -21,7 +21,7 @@ feature_effects(object, ...)
   w = NULL,
   breaks = "Sturges",
   right = TRUE,
-  discrete_m = 5L,
+  discrete_m = 13L,
   outlier_iqr = 2,
   calc_pred = TRUE,
   pd_n = 500L,
@@ -43,7 +43,7 @@ feature_effects(object, ...)
   w = NULL,
   breaks = "Sturges",
   right = TRUE,
-  discrete_m = 5L,
+  discrete_m = 13L,
   outlier_iqr = 2,
   calc_pred = TRUE,
   pd_n = 500L,
@@ -64,7 +64,7 @@ feature_effects(object, ...)
   w = object$weights,
   breaks = "Sturges",
   right = TRUE,
-  discrete_m = 5L,
+  discrete_m = 13L,
   outlier_iqr = 2,
   calc_pred = TRUE,
   pd_n = 500L,
@@ -111,7 +111,7 @@ Vectorized over \code{v}. Only relevant for numeric X.}
 
 \item{discrete_m}{Numeric X variables with up to this number of unique values
 should not be binned and treated as a factor (after calculating partial dependence)
-The default is 5. Vectorized over \code{v}.}
+The default is 13. Vectorized over \code{v}.}
 
 \item{outlier_iqr}{Outliers of a numeric X are capped via the boxplot rule, i.e.,
 outside \code{outlier_iqr} * IQR from the quartiles. The default is 2 is more
@@ -165,9 +165,8 @@ Evaluated at bin averages, not at bin midpoints.
 Additionally, corresponding counts/weights are calculated, and
 standard deviations of observed y and residuals.
 
-Numeric X with more than \code{discrete_m = 5} disjoint values are binned as in
-\code{\link[graphics:hist]{graphics::hist()}} via \code{breaks}. Before calculating bins, outliers are capped
-at +-2 IQR from the quartiles.
+Numeric X with more than \code{discrete_m = 13} disjoint values are binned via \code{breaks}.
+Outliers are cautiously capped at +-2 IQR from the quartiles.
 
 All averages and standard deviation are weighted by optional weights \code{w}.
 
