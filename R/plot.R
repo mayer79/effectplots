@@ -289,7 +289,7 @@ plot.EffectData <- function(
         ncol = ncol,
         guides = "collect",
         axis_titles  = "collect",
-        axes = if (hide_some_yticks) "collect" else "collect_x",
+        axes = if (hide_some_yticks) "collect_y" else "keep",
         ...
       )
     if (title != "") {
