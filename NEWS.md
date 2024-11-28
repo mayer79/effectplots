@@ -27,6 +27,8 @@
 - Plots with more than one line now use "Effect" als default y label.
 - Automatic break count selection via "FD", "Scott" and via function is not possible anymore ([#24](https://github.com/mayer79/effectplots/pull/24)).
 - Export of `fcut()`, a fast variant of `cut()` [#25](https://github.com/mayer79/effectplots/pull/25).
+- x axes are not collected anymore by {patchwork} [#27](https://github.com/mayer79/effectplots/pull/27).
+- The default of `discrete_m = 5` has been increased to 13 [#29](https://github.com/mayer79/effectplots/pull/29).
 
 # effectplots 0.1.0
 
