@@ -85,9 +85,10 @@ update_one <- function(
 }
 
 .collapse_m <- function(x, m, by) {
-  x_list <- split(x, order(x[[by]], decreasing = TRUE) < m)
-  x_keep <- x_list$`TRUE`
-  x_agg <- x_list$`FALSE`
+  # m is guaranteed to be between 2 and nrow(x) - 1
+  ind <- order(x[[by]], decreasing = TRUE)
+  x_keep <- x[ind[1:(m - 1L)], ]  # largest m - 1 categories
+  x_agg <- x[m:nrow(x), ]         # the rest
 
   # Prepare new factors
   x_keep <- droplevels(x_keep)

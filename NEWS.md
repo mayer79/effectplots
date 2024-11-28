@@ -17,6 +17,7 @@
 - NA values in feature columns have not been counted in the counts "N".
 - Ordered factors are now working.
 - ALE are correct also with empty bins at the border (could happen with user-defined breaks).
+- `update(collapse_m = ...)` has collapsed wrong categories [#31](https://github.com/mayer79/effectplots/pull/31).
 
 ### Documentation
 
