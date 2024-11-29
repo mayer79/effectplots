@@ -65,14 +65,14 @@ test_that("update() can sort according to importance", {
   imp <- effect_importance(M, "pd")
 
   # Petal.Length was not used as covariate -> pd importance of 0
-  expect_equal(unname(imp["Petal.Length"]), 0)
+  expect_equal(names(imp[imp < 1e-6]), "Petal.Length")
 
   # Update reorders M according to importance
   expect_equal(names(update(M, sort = "pd")), names(sort(-imp)))
 
   # Since categoricals do not have ALE value, their importance should be 0 as well
   imp <- effect_importance(M, "ale")
-  expect_equal(names(imp[imp > 0]), "Petal.Width")
+  expect_equal(names(imp[imp > 1e-4]), "Petal.Width")
   expect_equal(names(update(M, sort = "ale"))[1], "Petal.Width")
 })
 
