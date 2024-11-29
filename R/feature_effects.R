@@ -485,7 +485,7 @@ calculate_stats <- function(
 
   # Add ALE
   if (!is.null(ale_data)) {
-    out$ale <- NA
+    out$ale <- NA_real_
     if (num) {
       ale <- .ale(
         object = object,
