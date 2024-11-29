@@ -88,7 +88,7 @@ update_one <- function(
   # m is guaranteed to be between 2 and nrow(x) - 1
   ind <- order(x[[by]], decreasing = TRUE)
   x_keep <- x[ind[1:(m - 1L)], ]  # largest m - 1 categories
-  x_agg <- x[m:nrow(x), ]         # the rest
+  x_agg <- x[ind[m:nrow(x)], ]    # the rest
 
   # Prepare new factors
   x_keep <- droplevels(x_keep)
