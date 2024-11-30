@@ -145,6 +145,25 @@ partial dependence curve, for optimal comparability.</p>
 <span>  ale_bin_size <span class="op">=</span> <span class="fl">200L</span>,</span>
 <span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
 <span>  <span class="va">...</span></span>
+<span><span class="op">)</span></span>
+<span></span>
+<span><span class="co"># S3 method for class 'H2OModel'</span></span>
+<span><span class="fu">ale</span><span class="op">(</span></span>
+<span>  <span class="va">object</span>,</span>
+<span>  <span class="va">data</span>,</span>
+<span>  v <span class="op">=</span> <span class="va">object</span><span class="op">@</span><span class="va">parameters</span><span class="op">$</span><span class="va">x</span>,</span>
+<span>  pred_fun <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  trafo <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  which_pred <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  w <span class="op">=</span> <span class="va">object</span><span class="op">@</span><span class="va">parameters</span><span class="op">$</span><span class="va">weights_column</span><span class="op">$</span><span class="va">column_name</span>,</span>
+<span>  breaks <span class="op">=</span> <span class="st">"Sturges"</span>,</span>
+<span>  right <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  discrete_m <span class="op">=</span> <span class="fl">13L</span>,</span>
+<span>  outlier_iqr <span class="op">=</span> <span class="fl">2</span>,</span>
+<span>  ale_n <span class="op">=</span> <span class="fl">50000L</span>,</span>
+<span>  ale_bin_size <span class="op">=</span> <span class="fl">200L</span>,</span>
+<span>  seed <span class="op">=</span> <span class="cn">NULL</span>,</span>
+<span>  <span class="va">...</span></span>
 <span><span class="op">)</span></span></code></pre></div>
     </div>
 
@@ -242,8 +261,9 @@ single bracket subsetting to select part of the output.</p>
     <h2>Methods (by class)</h2>
 
 <ul><li><p><code>ale(default)</code>: Default method.</p></li>
-<li><p><code>ale(ranger)</code>: Default method.</p></li>
-<li><p><code>ale(explainer)</code>: Default method.</p></li>
+<li><p><code>ale(ranger)</code>: Method for ranger models.</p></li>
+<li><p><code>ale(explainer)</code>: Method for DALEX explainers</p></li>
+<li><p><code>ale(H2OModel)</code>: Method for H2O models</p></li>
 </ul></div>
     <div id="references">
     <h2>References</h2>
