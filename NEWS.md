@@ -33,7 +33,8 @@
 - Slightly different check/preparation of predictions (and the argument `pred`). Helps to simplify the use of {h2o} [#32](https://github.com/mayer79/effectplots/pull/32).
 - Plotly plots got more vertical space between subplots, and the subplot titles are a bit further away from the subplots [#33](https://github.com/mayer79/effectplots/pull/33).
 - Better test coverage, e.g., [#34](https://github.com/mayer79/effectplots/pull/34).
-- (Slow) support for h2o models [#35](https://github.com/mayer79/effectplots/pull/35).
+- (Slowish) support for h2o models [#35](https://github.com/mayer79/effectplots/pull/35).
+- Row names of statistics of numeric features are now removed [#36](https://github.com/mayer79/effectplots/pull/36).
 
 # effectplots 0.1.0
 

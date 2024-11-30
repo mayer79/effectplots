@@ -44,6 +44,7 @@
 #' @param which_pred If the predictions are multivariate: which column to pick
 #'   (integer or column name). By default `NULL` (picks last column).
 #' @param w Optional vector with case weights. Can also be a column name in `data`.
+#'   Having observations with non-positive weight is equivalent to excluding them.
 #' @param breaks An integer, vector, or "Sturges" (the default).
 #'   To allow varying values of `breaks` across variables, it can be a list of the
 #'   same length as `v`, or a *named* list with `breaks` for certain variables.
@@ -529,7 +530,9 @@ calculate_stats <- function(
     bin_means[bad] = mids[bad]
     bin_means <- pmax(pmin(bin_means, breaks[length(breaks)]), breaks[1L])
 
-    out <- data.frame(bin_mid = mids, bin_width = bin_width, bin_mean = bin_means, M)
+    out <- data.frame(
+      bin_mid = mids, bin_width = bin_width, bin_mean = bin_means, M, row.names = NULL
+    )
   }
 
   # Add partial dependence

@@ -120,7 +120,8 @@ or \code{exp} (to switch from link scale to the original scale).}
 \item{which_pred}{If the predictions are multivariate: which column to pick
 (integer or column name). By default \code{NULL} (picks last column).}
 
-\item{w}{Optional vector with case weights. Can also be a column name in \code{data}.}
+\item{w}{Optional vector with case weights. Can also be a column name in \code{data}.
+Having observations with non-positive weight is equivalent to excluding them.}
 
 \item{breaks}{An integer, vector, or "Sturges" (the default).
 To allow varying values of \code{breaks} across variables, it can be a list of the
