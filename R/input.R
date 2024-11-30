@@ -18,7 +18,7 @@ prep_pred <- function(x, trafo = NULL, which_pred = NULL) {
     which_pred <- p
   }
   if (is.data.frame(x)) {
-    x <- x[[if (p == 1L) 1L else which_pred]]
+    x <- x[[which_pred]]
   } else if (p > 1L) {
     x <- x[, which_pred]
   }

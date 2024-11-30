@@ -5,6 +5,7 @@
 \alias{partial_dependence.default}
 \alias{partial_dependence.ranger}
 \alias{partial_dependence.explainer}
+\alias{partial_dependence.H2OModel}
 \title{Partial Dependence}
 \usage{
 partial_dependence(object, ...)
@@ -51,6 +52,23 @@ partial_dependence(object, ...)
   trafo = NULL,
   which_pred = NULL,
   w = object$weights,
+  breaks = "Sturges",
+  right = TRUE,
+  discrete_m = 13L,
+  outlier_iqr = 2,
+  pd_n = 500L,
+  seed = NULL,
+  ...
+)
+
+\method{partial_dependence}{H2OModel}(
+  object,
+  data,
+  v = object@parameters$x,
+  pred_fun = NULL,
+  trafo = NULL,
+  which_pred = NULL,
+  w = object@parameters$weights_column$column_name,
   breaks = "Sturges",
   right = TRUE,
   discrete_m = 13L,
@@ -133,9 +151,11 @@ and eventually weighted by \code{w}.
 \itemize{
 \item \code{partial_dependence(default)}: Default method.
 
-\item \code{partial_dependence(ranger)}: Default method.
+\item \code{partial_dependence(ranger)}: Method for ranger models.
 
-\item \code{partial_dependence(explainer)}: Default method.
+\item \code{partial_dependence(explainer)}: Method for DALEX explainers.
+
+\item \code{partial_dependence(H2OModel)}: Method for H2O models.
 
 }}
 \examples{
