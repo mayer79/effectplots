@@ -76,7 +76,7 @@ partial_dependence.default <- function(
   )
 }
 
-#' @describeIn partial_dependence Default method.
+#' @describeIn partial_dependence Method for ranger models.
 #' @export
 partial_dependence.ranger <- function(
     object,
@@ -117,7 +117,7 @@ partial_dependence.ranger <- function(
   )
 }
 
-#' @describeIn partial_dependence Default method.
+#' @describeIn partial_dependence Method for DALEX explainers.
 #' @export
 partial_dependence.explainer <- function(
     object,
@@ -137,6 +137,56 @@ partial_dependence.explainer <- function(
 ) {
   partial_dependence.default(
     object = object[["model"]],
+    v = v,
+    data = data,
+    pred_fun = pred_fun,
+    trafo = trafo,
+    which_pred = which_pred,
+    w = w,
+    breaks = breaks,
+    right = right,
+    discrete_m = discrete_m,
+    outlier_iqr = outlier_iqr,
+    pd_n = pd_n,
+    seed = seed,
+    ...
+  )
+}
+
+#' @describeIn partial_dependence Method for H2O models.
+#' @export
+partial_dependence.H2OModel <- function(
+    object,
+    data,
+    v = object@parameters$x,
+    pred_fun = NULL,
+    trafo = NULL,
+    which_pred = NULL,
+    w = object@parameters$weights_column$column_name,
+    breaks = "Sturges",
+    right = TRUE,
+    discrete_m = 13L,
+    outlier_iqr = 2,
+    pd_n = 500L,
+    seed = NULL,
+    ...
+) {
+  if (!requireNamespace("h2o", quietly = TRUE)) {
+    stop("Package 'h2o' not installed")
+  }
+  stopifnot(is.data.frame(data) || inherits(data, "H2OFrame"))
+  if (inherits(data, "H2OFrame")) {
+    data <- as.data.frame(data)
+  }
+  if (is.null(pred_fun)) {
+    pred_fun <- function(model, data, ...) {
+      xvars <- model@parameters$x
+      stats::predict(model, h2o::as.h2o(collapse::ss(data, , xvars)), ...)
+    }
+  }
+
+  partial_dependence.default(
+    object = object,
     v = v,
     data = data,
     pred_fun = pred_fun,

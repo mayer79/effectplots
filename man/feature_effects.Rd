@@ -5,6 +5,7 @@
 \alias{feature_effects.default}
 \alias{feature_effects.ranger}
 \alias{feature_effects.explainer}
+\alias{feature_effects.H2OModel}
 \title{Feature Effects}
 \usage{
 feature_effects(object, ...)
@@ -62,6 +63,27 @@ feature_effects(object, ...)
   trafo = NULL,
   which_pred = NULL,
   w = object$weights,
+  breaks = "Sturges",
+  right = TRUE,
+  discrete_m = 13L,
+  outlier_iqr = 2,
+  calc_pred = TRUE,
+  pd_n = 500L,
+  ale_n = 50000L,
+  ale_bin_size = 200L,
+  ...
+)
+
+\method{feature_effects}{H2OModel}(
+  object,
+  data,
+  v = object@parameters$x,
+  y = NULL,
+  pred = NULL,
+  pred_fun = NULL,
+  trafo = NULL,
+  which_pred = NULL,
+  w = object@parameters$weights_column$column_name,
   breaks = "Sturges",
   right = TRUE,
   discrete_m = 13L,
@@ -181,9 +203,11 @@ If you need only one specific statistic, you can use the simplified APIs of
 \itemize{
 \item \code{feature_effects(default)}: Default method.
 
-\item \code{feature_effects(ranger)}: Method for "ranger" models.
+\item \code{feature_effects(ranger)}: Method for ranger models.
 
-\item \code{feature_effects(explainer)}: Method for DALEX "explainer".
+\item \code{feature_effects(explainer)}: Method for DALEX explainer.
+
+\item \code{feature_effects(H2OModel)}: Method for H2O models.
 
 }}
 \examples{

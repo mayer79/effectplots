@@ -292,7 +292,7 @@ feature_effects.default <- function(
   structure(out, class = "EffectData")
 }
 
-#' @describeIn feature_effects Method for "ranger" models.
+#' @describeIn feature_effects Method for ranger models.
 #' @export
 feature_effects.ranger <- function(
     object,
@@ -341,7 +341,7 @@ feature_effects.ranger <- function(
   )
 }
 
-#' @describeIn feature_effects Method for DALEX "explainer".
+#' @describeIn feature_effects Method for DALEX explainer.
 #' @export
 feature_effects.explainer <- function(
   object,
@@ -363,6 +363,70 @@ feature_effects.explainer <- function(
   ale_bin_size = 200L,
   ...
 ) {
+  feature_effects.default(
+    object,
+    v = v,
+    data = data,
+    y = y,
+    pred = pred,
+    pred_fun = pred_fun,
+    trafo = trafo,
+    which_pred = which_pred,
+    w = w,
+    breaks = breaks,
+    right = right,
+    discrete_m = discrete_m,
+    outlier_iqr = outlier_iqr,
+    calc_pred = calc_pred,
+    pd_n = pd_n,
+    ale_n = ale_n,
+    ale_bin_size = ale_bin_size,
+    ...
+  )
+}
+
+#' @describeIn feature_effects Method for H2O models.
+#' @export
+feature_effects.H2OModel <- function(
+    object,
+    data,
+    v = object@parameters$x,
+    y = NULL,                   #  object@parameters$y does not work for multi-outputs
+    pred = NULL,
+    pred_fun = NULL,
+    trafo = NULL,
+    which_pred = NULL,
+    w = object@parameters$weights_column$column_name,
+    breaks = "Sturges",
+    right = TRUE,
+    discrete_m = 13L,
+    outlier_iqr = 2,
+    calc_pred = TRUE,
+    pd_n = 500L,
+    ale_n = 50000L,
+    ale_bin_size = 200L,
+    ...
+) {
+  if (!requireNamespace("h2o", quietly = TRUE)) {
+    stop("Package 'h2o' not installed")
+  }
+  stopifnot(is.data.frame(data) || inherits(data, "H2OFrame"))
+  if (inherits(data, "H2OFrame")) {
+    if (is.null(pred) && calc_pred) {
+      pred <- prep_pred(
+        predict(object, data, ...), trafo = trafo, which_pred = which_pred
+      )
+    }
+    data <- as.data.frame(data)
+  }
+
+  if (is.null(pred_fun)) {
+    pred_fun <- function(model, data, ...) {
+      xvars <- model@parameters$x
+      stats::predict(model, h2o::as.h2o(collapse::ss(data, , xvars)), ...)
+    }
+  }
+
   feature_effects.default(
     object,
     v = v,

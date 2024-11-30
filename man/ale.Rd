@@ -5,6 +5,7 @@
 \alias{ale.default}
 \alias{ale.ranger}
 \alias{ale.explainer}
+\alias{ale.H2OModel}
 \title{Accumulated Local Effects (ALE)}
 \usage{
 ale(object, ...)
@@ -53,6 +54,24 @@ ale(object, ...)
   trafo = NULL,
   which_pred = NULL,
   w = object$weights,
+  breaks = "Sturges",
+  right = TRUE,
+  discrete_m = 13L,
+  outlier_iqr = 2,
+  ale_n = 50000L,
+  ale_bin_size = 200L,
+  seed = NULL,
+  ...
+)
+
+\method{ale}{H2OModel}(
+  object,
+  data,
+  v = object@parameters$x,
+  pred_fun = NULL,
+  trafo = NULL,
+  which_pred = NULL,
+  w = object@parameters$weights_column$column_name,
   breaks = "Sturges",
   right = TRUE,
   discrete_m = 13L,
@@ -150,9 +169,11 @@ partial dependence curve, for optimal comparability.
 \itemize{
 \item \code{ale(default)}: Default method.
 
-\item \code{ale(ranger)}: Default method.
+\item \code{ale(ranger)}: Method for ranger models.
 
-\item \code{ale(explainer)}: Default method.
+\item \code{ale(explainer)}: Method for DALEX explainers
+
+\item \code{ale(H2OModel)}: Method for H2O models
 
 }}
 \examples{

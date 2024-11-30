@@ -39,6 +39,7 @@ use_package("grDevices", "Imports")
 use_package("patchwork", "Imports")
 use_package("plotly", "Imports")
 use_package("stats", "Imports")
+use_package("h2o", "Enhances")
 
 use_gpl_license()
 

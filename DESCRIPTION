@@ -34,3 +34,5 @@ URL: https://github.com/mayer79/effectplots
 BugReports: https://github.com/mayer79/effectplots/issues
 LinkingTo: 
     Rcpp
+Enhances: 
+    h2o
