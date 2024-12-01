@@ -574,8 +574,9 @@ calculate_stats <- function(
       cvars <- intersect(c("pd", "pred_mean", "y_mean"), colnames(out))
       if (length(cvars)) {
         w_ok <- out$weight[ok]
+        ale_mids <- 0.5 * (ale + c(0, ale[-length(ale)]))  # average ALE per bin
         ale <- ale + collapse::fmean(out[[cvars[1L]]][ok], na.rm = TRUE, w = w_ok) -
-          collapse::fmean(ale, w = w_ok)
+          collapse::fmean(ale_mids, w = w_ok)
       }
       out$ale[ok] <- ale
     }

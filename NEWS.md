@@ -35,6 +35,7 @@
 - Better test coverage, e.g., [#34](https://github.com/mayer79/effectplots/pull/34).
 - (Slowish) support for h2o models [#35](https://github.com/mayer79/effectplots/pull/35).
 - Row names of statistics of numeric features are now removed [#36](https://github.com/mayer79/effectplots/pull/36).
+- ALE values are now plotted at the right bin break (instead of bin mean). [#37](https://github.com/mayer79/effectplots/pull/37).
 
 # effectplots 0.1.0
 

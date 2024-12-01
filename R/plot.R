@@ -2,7 +2,8 @@
 #'
 #' Versatile plot function for an "EffectData" object. By default, all calculated
 #' statistics (except "resid_mean") are shown. To select certain statistics,
-#' use the `stats` argument. Set `plotly = TRUE` for interactive plots.
+#' use the `stats` argument. Set `plotly = TRUE` for interactive plots. Note that
+#' all statistics are plotted at bin means, except for ALE (right bin breaks).
 #'
 #' @importFrom ggplot2 .data
 #' @param x An object of class "EffectData".
@@ -391,14 +392,23 @@ one_ggplot <- function(
   num <- .num(x)
   if (!num && ("ale" %in% stat_info)) {
     # We don't have ALE for discrete variables. To avoid warnings, we drop it from
-    # stat_info and colors. Dito in plotly
+    # stat_info and colors.
     keep <- stat_info != "ale"
     stat_info <- stat_info[keep]
     colors <- colors[keep]
   }
+  df <- poor_man_stack(x, to_stack = stat_info)
+
+  # We plot ALE at the right bin breaks
+  if (num && ("ale" %in% stat_info)) {
+    df <- transform(
+      df, bin_mean = ifelse(varying_ == "ale", bin_mid + bin_width / 2, bin_mean)
+    )
+  }
+
+  # Recode for sort order and legend labels
   df <- transform(
-    poor_man_stack(x, to_stack = stat_info),
-    varying_ = factor(varying_, levels = stat_info, labels = names(stat_info))
+    df, varying_ = factor(varying_, levels = stat_info, labels = names(stat_info))
   )
 
   # This block is a bit ugly...
@@ -540,14 +550,6 @@ one_plotly <- function(
     overlay = "y2"
 ) {
   num <- .num(x)
-  if (!num && ("ale" %in% stat_info)) {
-    # We don't have ALE for discrete variables. To avoid warnings, we drop it from
-    # stat_info and colors. Same solution as with ggplot.
-    keep <- stat_info != "ale"
-    stat_info <- stat_info[keep]
-    colors <- colors[keep]
-  }
-
   if (num && !num_points) {
     scatter_mode <- "lines"
   } else if (!num && !cat_lines) {
@@ -589,13 +591,17 @@ one_plotly <- function(
 
   for (i in seq_along(stat_info)) {
     z <- stat_info[i]
+    if (!num && z == "ale") {
+      next
+    }
     has_errors <- interval != "no" && z %in% c("y_mean", "resid_mean")
     if (has_errors) {
       error_col <- gsub("_mean", "_sd", z)
     }
     fig <- plotly::add_trace(
       fig,
-      x = ~bin_mean,
+      # ALE values shown at right bin breaks
+      x = if (z == "ale") ~bin_mid + bin_width / 2 else ~bin_mean,
       y = x[[z]],
       data = x,
       yaxis = "y",
