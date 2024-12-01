@@ -12,17 +12,16 @@
 #' - Curse: The model is applied to very unlikely or even impossible feature
 #'   combinations, especially with strongly dependent features.
 #'
-#' ALE fixes the curse as follows: Partial dependence is calculated for the lower and
-#' upper endpoint of a bin, using all (or a sample) of observations falling into this
-#' bin. Its slope provides the *local effect* over the bin.
-#' This is repeated for all bins, and the values are *accumulated*. Since the resulting
-#' sum starts at 0, one typically shifts the result vertically, e.g., to the average
-#' prediction. This is not done by [ale()], however.
+#' ALE fixes the curse as follows: Per bin, the local effect is calculated as the
+#' partial dependence difference between lower and upper bin break, using only
+#' observations falling into this bin. This is repeated for all bins,
+#' and the values are *accumulated*.
 #'
+#' When we `plot()` the result, ALE values are plotted against right bin breaks.
+#'
+#' @details
 #' The function is a convenience wrapper around [feature_effects()], which calls
-#' the barebone implementation [.ale()] to calculate ALE. The ALE values calculated
-#' by [feature_effects()] are vertically shifted to the same (weighted) average than the
-#' partial dependence curve, for optimal comparability.
+#' the barebone implementation [.ale()] to calculate ALE.
 #'
 #' @inheritParams feature_effects
 #' @param seed Optional random seed (an integer) used for:
@@ -221,21 +220,26 @@ ale.H2OModel <- function(
 
 #' Barebone Accumulated Local Effects (ALE)
 #'
-#' This is a barebone implementation of Apley's ALE intended for developers.
-#' To get more information on ALE, see [ale()].
+#' This is a barebone implementation of Apley's ALE.
+#' Per bin, the local effect \eqn{D_j} is calculated, and then accumulated over bins.
+#' \eqn{D_j} equals the difference between the partial dependence at the
+#' lower and upper bin breaks using only observations within bin.
+#' To plot the values, we can make a line plot of the resulting vector against
+#' upper bin breaks. Alternatively, the vector can be extended
+#' from the left by the value 0, and then plotted against *all* breaks.
 #'
 #' @param v Variable name in `data` to calculate ALE.
 #' @param data Matrix or data.frame.
-#' @param breaks Breaks for ALE calculation.
-#' @param right Should bins specified via `breaks` be right-closed?
-#'   The default is `TRUE`.
+#' @param breaks Bin breaks.
+#' @param right Should bins be right-closed?
+#'   The default is `TRUE`. (No effect if `g` is provided.)
 #' @param bin_size Maximal number of observations used per bin. If there are more
 #'   observations in a bin, `bin_size` indices are randomly sampled. The default is 200.
 #' @param w Optional vector with case weights.
-#' @param g For internal use. The result of `qF(findInterval(...))`.
+#' @param g For internal use. The result of `as.factor(findInterval(...))`.
 #'   By default `NULL`.
 #' @inheritParams feature_effects
-#' @returns Vector of ALE values in the same order as `breaks[-length(breaks)]`.
+#' @returns Vector representing one ALE per bin.
 #' @export
 #' @seealso [partial_dependence()]
 #' @inherit ale references
@@ -281,8 +285,7 @@ ale.H2OModel <- function(
   J <- unlist(J, recursive = FALSE, use.names = FALSE)
 
   # Empty bins will get an incremental effect of 0
-  p <- length(breaks) - 1L
-  out <- numeric(p)
+  out <- numeric(length(breaks) - 1L)
 
   # Now we create a single prediction dataset. Lower bin edges first, then upper ones.
   data_long <- collapse::ss(data, rep.int(J, 2L))

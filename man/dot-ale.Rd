@@ -26,10 +26,10 @@
 
 \item{data}{Matrix or data.frame.}
 
-\item{breaks}{Breaks for ALE calculation.}
+\item{breaks}{Bin breaks.}
 
-\item{right}{Should bins specified via \code{breaks} be right-closed?
-The default is \code{TRUE}.}
+\item{right}{Should bins be right-closed?
+The default is \code{TRUE}. (No effect if \code{g} is provided.)}
 
 \item{pred_fun}{Prediction function, by default \code{stats::predict}.
 The function takes three arguments (names irrelevant): \code{object}, \code{data}, and \code{...}.}
@@ -46,18 +46,23 @@ observations in a bin, \code{bin_size} indices are randomly sampled. The default
 
 \item{w}{Optional vector with case weights.}
 
-\item{g}{For internal use. The result of \code{qF(findInterval(...))}.
+\item{g}{For internal use. The result of \code{as.factor(findInterval(...))}.
 By default \code{NULL}.}
 
 \item{...}{Further arguments passed to \code{pred_fun()}, e.g., \code{type = "response"} in
 a \code{glm()} or (typically) \code{prob = TRUE} in classification models.}
 }
 \value{
-Vector of ALE values in the same order as \code{breaks[-length(breaks)]}.
+Vector representing one ALE per bin.
 }
 \description{
-This is a barebone implementation of Apley's ALE intended for developers.
-To get more information on ALE, see \code{\link[=ale]{ale()}}.
+This is a barebone implementation of Apley's ALE.
+Per bin, the local effect \eqn{D_j} is calculated, and then accumulated over bins.
+\eqn{D_j} equals the difference between the partial dependence at the
+lower and upper bin breaks using only observations within bin.
+To plot the values, we can make a line plot of the resulting vector against
+upper bin breaks. Alternatively, the vector can be extended
+from the left by the value 0, and then plotted against \emph{all} breaks.
 }
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)

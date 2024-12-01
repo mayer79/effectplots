@@ -154,17 +154,16 @@ regression  (just averaging out interaction effects).
 combinations, especially with strongly dependent features.
 }
 
-ALE fixes the curse as follows: Partial dependence is calculated for the lower and
-upper endpoint of a bin, using all (or a sample) of observations falling into this
-bin. Its slope provides the \emph{local effect} over the bin.
-This is repeated for all bins, and the values are \emph{accumulated}. Since the resulting
-sum starts at 0, one typically shifts the result vertically, e.g., to the average
-prediction. This is not done by \code{\link[=ale]{ale()}}, however.
+ALE fixes the curse as follows: Per bin, the local effect is calculated as the
+partial dependence difference between lower and upper bin break, using only
+observations falling into this bin. This is repeated for all bins,
+and the values are \emph{accumulated}.
 
+When we \code{plot()} the result, ALE values are plotted against right bin breaks.
+}
+\details{
 The function is a convenience wrapper around \code{\link[=feature_effects]{feature_effects()}}, which calls
-the barebone implementation \code{\link[=.ale]{.ale()}} to calculate ALE. The ALE values calculated
-by \code{\link[=feature_effects]{feature_effects()}} are vertically shifted to the same (weighted) average than the
-partial dependence curve, for optimal comparability.
+the barebone implementation \code{\link[=.ale]{.ale()}} to calculate ALE.
 }
 \section{Methods (by class)}{
 \itemize{

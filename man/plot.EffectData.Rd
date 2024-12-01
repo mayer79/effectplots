@@ -114,7 +114,8 @@ Otherwise, an object of class "patchwork", or a "plotly" subplot.
 \description{
 Versatile plot function for an "EffectData" object. By default, all calculated
 statistics (except "resid_mean") are shown. To select certain statistics,
-use the \code{stats} argument. Set \code{plotly = TRUE} for interactive plots.
+use the \code{stats} argument. Set \code{plotly = TRUE} for interactive plots. Note that
+all statistics are plotted at bin means, except for ALE (right bin breaks).
 }
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)
