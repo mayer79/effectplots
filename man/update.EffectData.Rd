@@ -9,6 +9,7 @@
   sort_by = c("no", "pd", "pred_mean", "y_mean", "resid_mean", "ale"),
   collapse_m = 30L,
   collapse_by = c("weight", "N"),
+  drop_empty = FALSE,
   drop_below_n = 0,
   drop_below_weight = 0,
   na.rm = FALSE,
@@ -30,6 +31,8 @@ Set to \code{Inf} for no collapsing.}
 \item{collapse_by}{How to determine "rare" levels in \code{collapse_m}?
 Either "weight" (default) or "N". Only matters in situations with case weights \code{w}.}
 
+\item{drop_empty}{Drop empty bins. Equivalent to \code{drop_below_n = 1}.}
+
 \item{drop_below_n}{Drop bins with N below this value. Applied after collapsing.}
 
 \item{drop_below_weight}{Drop bins with weight below this value. Applied after
@@ -47,6 +50,7 @@ Updates an "EffectData" object by
 \itemize{
 \item sorting the variables by their importance, see \code{\link[=effect_importance]{effect_importance()}},
 \item collapsing levels of categorical variables with many levels,
+\item dropping empty bins,
 \item dropping small bins, or
 \item dropping bins with missing name.
 }

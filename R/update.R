@@ -4,6 +4,7 @@
 #' Updates an "EffectData" object by
 #' - sorting the variables by their importance, see [effect_importance()],
 #' - collapsing levels of categorical variables with many levels,
+#' - dropping empty bins,
 #' - dropping small bins, or
 #' - dropping bins with missing name.
 #'
@@ -20,6 +21,7 @@
 #'   Set to `Inf` for no collapsing.
 #' @param collapse_by How to determine "rare" levels in `collapse_m`?
 #'   Either "weight" (default) or "N". Only matters in situations with case weights `w`.
+#' @param drop_empty Drop empty bins. Equivalent to `drop_below_n = 1`.
 #' @param drop_below_n Drop bins with N below this value. Applied after collapsing.
 #' @param drop_below_weight Drop bins with weight below this value. Applied after
 #' collapsing.
@@ -41,6 +43,7 @@ update.EffectData <- function(
   sort_by = c("no", "pd", "pred_mean", "y_mean", "resid_mean", "ale"),
   collapse_m = 30L,
   collapse_by = c("weight", "N"),
+  drop_empty = FALSE,
   drop_below_n = 0,
   drop_below_weight = 0,
   na.rm = FALSE,
@@ -55,6 +58,7 @@ update.EffectData <- function(
     x = object,
     collapse_m = collapse_m,
     collapse_by = collapse_by,
+    drop_empty = drop_empty,
     drop_below_n = drop_below_n,
     drop_below_weight = drop_below_weight,
     na.rm = na.rm,
@@ -67,21 +71,24 @@ update.EffectData <- function(
 
 # Helper functions
 update_one <- function(
-    x, collapse_m, collapse_by, drop_below_n, drop_below_weight, na.rm
+    x, collapse_m, collapse_by, drop_empty, drop_below_n, drop_below_weight, na.rm
 ) {
+  if (drop_empty) {
+    x <- droplevels(subset(x, N > 0L))
+  }
   if (!.num(x) && collapse_m < nrow(x)) {
     x <- .collapse_m(x, m = collapse_m, by = collapse_by)
   }
   if (drop_below_n > 0) {
-    x <- subset(x, N >= drop_below_n)
+    x <- droplevels(subset(x, N >= drop_below_n))
   }
   if (drop_below_weight > 0) {
-    x <- subset(x, weight >= drop_below_weight)
+    x <- droplevels(subset(x, weight >= drop_below_weight))
   }
   if (isTRUE(na.rm)) {
     x <- subset(x, !is.na(bin_mid))
   }
-  return(droplevels(x))
+  return(x)
 }
 
 .collapse_m <- function(x, m, by) {
@@ -104,12 +111,11 @@ update_one <- function(
 
   m_cols <- intersect(colnames(x), c("pred_mean", "y_mean", "resid_mean", "pd", "ale"))
   if (length(m_cols)) {
-    x_new[, m_cols] <- collapse::fmean(x_agg[m_cols], w = w, drop = FALSE)
+    x_new[, m_cols] <- collapse::fmean(x_agg[m_cols], w = w, drop = FALSE, na.rm = TRUE)
   }
 
   s_cols <- intersect(colnames(x), c("pred_sd", "y_sd", "resid_sd"))
   if (length(s_cols)) {
-    # Bins with N = 1 can be NA, therefore na.rm = TRUE
     x_new[, s_cols] <- sqrt(
       collapse::fmean(x_agg[s_cols]^2, w = w, drop = FALSE, na.rm = TRUE)
     )
