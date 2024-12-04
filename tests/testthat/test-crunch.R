@@ -6,7 +6,7 @@ test_that("factor_or_double() works", {
   # Factor
   x <- factor(x, levels = c("A", "B", "C"))
   expect_equal(
-    factor_or_double(x), collapse::qF(x, sort = TRUE, na.exclude = FALSE, drop = TRUE)
+    factor_or_double(x), collapse::qF(x, sort = TRUE, na.exclude = FALSE)
   )
 
   # Logical

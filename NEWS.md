@@ -17,7 +17,7 @@
 - NA values in feature columns have not been counted in the counts "N".
 - Ordered factors are now working.
 - ALE are correct also with empty bins at the border (could happen with user-defined breaks).
-- `update(collapse_m = ...)` has collapsed wrong categories [#31](https://github.com/mayer79/effectplots/pull/31), [#34](https://github.com/mayer79/effectplots/pull/34), and [#35](https://github.com/mayer79/effectplots/pull/35).
+- `update(collapse_m = ...)` has collapsed wrong categories [#31](https://github.com/mayer79/effectplots/pull/31), [#34](https://github.com/mayer79/effectplots/pull/34), and [#35](https://github.com/mayer79/effectplots/pull/36).
 
 ### Documentation
 
@@ -36,6 +36,7 @@
 - (Slowish) support for h2o models [#36](https://github.com/mayer79/effectplots/pull/36).
 - Row names of statistics of numeric features are now removed [#37](https://github.com/mayer79/effectplots/pull/37).
 - ALE values are now plotted at the right bin break (instead of bin mean) [#38](https://github.com/mayer79/effectplots/pull/38).
+- Empty factor levels in features are not anymore dropped. However, you can use `update(..., drop_empty = TRUE)` to drop them after calculations [#39](https://github.com/mayer79/effectplots/pull/39).
 
 # effectplots 0.1.0
 

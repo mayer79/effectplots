@@ -12,7 +12,7 @@
 factor_or_double <- function(x, m = 5L, ix_sub = NULL) {
   if (!is.numeric(x)) {
     if (is.factor(x)) {
-      return(collapse::qF(x, sort = TRUE, na.exclude = !anyNA(unclass(x)), drop = TRUE))
+      return(collapse::qF(x, sort = TRUE, na.exclude = !anyNA(unclass(x))))
     }
     return(collapse::qF(x, sort = FALSE, na.exclude = FALSE))
   }
