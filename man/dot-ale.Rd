@@ -36,10 +36,12 @@ The function takes three arguments (names irrelevant): \code{object}, \code{data
 
 \item{trafo}{How should predictions be transformed?
 A function or \code{NULL} (default). Examples are \code{log} (to switch to link scale)
-or \code{exp} (to switch from link scale to the original scale).}
+or \code{exp} (to switch from link scale to the original scale).
+Applied after \code{which_pred}.}
 
 \item{which_pred}{If the predictions are multivariate: which column to pick
-(integer or column name). By default \code{NULL} (picks last column).}
+(integer or column name). By default \code{NULL} (picks last column). Applied before
+\code{trafo}.}
 
 \item{bin_size}{Maximal number of observations used per bin. If there are more
 observations in a bin, \code{bin_size} indices are randomly sampled. The default is 200.}

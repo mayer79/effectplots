@@ -149,7 +149,7 @@ grouped_stats <- function(x, g, w = NULL, sd_cols = colnames(x)) {
 #' @param explicit_na If `TRUE`, missing values are encoded by the bin value
 #'   `length(breaks)`, having `NA` as corresponding factor level. The factor will get
 #'   the additional class "na.included".
-#' @returns Binned version of `x`. Either a factor or integer codes.
+#' @returns Binned version of `x`. Either a factor, or integer codes.
 #' @export
 #' @examples
 #' x <- c(NA, 1:10)

@@ -1,17 +1,19 @@
 #' Average Observed
 #'
-#' Calculates average observed `y` values over the values of one or multiple
-#' `X` variables. This describes the statistical association between `y`
-#' and potential model features.
+#' Calculates average observed response over the values of one or multiple
+#' variables specified by `X`. This describes the statistical association between the
+#' response `y` and potential model features.
 #'
 #' The function is a convenience wrapper around [feature_effects()].
 #'
-#' @param X A vector, matrix, or data.frame with variable(s) to be shown on the x axis.
-#' @param y A numeric vector of observed responses.
-#' @param w An optional numeric vector of weights.
+#' @param X A vector, matrix, or data.frame with features.
+#' @param y A numeric vector representing observed response values.
+#' @param w An optional numeric vector of weights. Having observations with
+#'   non-positive weight is equivalent to excluding them.
 #' @param x_name If `X` is a vector: what is the name of the variable? By default "x".
-#' @param seed Optional random seed (an integer) used for capping X based on quartiles
-#'   calculated from a subsample of 10k observations.
+#' @param seed Optional integer random seed used for calculating breaks:
+#'   The bin range is determined without values outside quartiles +- 2 IQR
+#'   using a sample of <= 9997 observations to calculate quartiles.
 #' @inheritParams feature_effects
 #' @inherit feature_effects return
 #' @param ... Currently unused.
@@ -40,6 +42,11 @@ average_observed <- function(
   if (NCOL(X) == 1L && (is.vector(X) || is.factor(X))) {
     X <- collapse::frename(collapse::qDF(X), x_name)
   }
+  stopifnot(
+    is.matrix(X) || is.data.frame(X),
+    length(y) == nrow(X),
+    is.null(w) || length(w) == nrow(X)
+  )
   feature_effects.default(
     object = NULL,
     v = colnames(X),

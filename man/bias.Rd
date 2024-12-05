@@ -18,34 +18,36 @@ bias(
 )
 }
 \arguments{
-\item{X}{A vector, matrix, or data.frame with variable(s) to be shown on the x axis.}
+\item{X}{A vector, matrix, or data.frame with features.}
 
 \item{resid}{A numeric vector of residuals, i.e., y - pred.}
 
-\item{w}{An optional numeric vector of weights.}
+\item{w}{An optional numeric vector of weights. Having observations with
+non-positive weight is equivalent to excluding them.}
 
 \item{x_name}{If \code{X} is a vector: what is the name of the variable? By default "x".}
 
-\item{breaks}{An integer, vector, or "Sturges" (the default).
-To allow varying values of \code{breaks} across variables, it can be a list of the
-same length as \code{v}, or a \emph{named} list with \code{breaks} for certain variables.}
+\item{breaks}{An integer, vector, or "Sturges" (the default) used to determine
+bin breaks of continuous features. Values outside the total bin range are placed
+in the outmost bins. To allow varying values of \code{breaks} across features,
+\code{breaks} can be a list of the same length as \code{v}, or a \emph{named} list with breaks
+for certain variables.}
 
 \item{right}{Should bins be right-closed? The default is \code{TRUE}.
-Vectorized over \code{v}. Only relevant for numeric X.}
+Vectorized over \code{v}. Only relevant for continuous features.}
 
-\item{discrete_m}{Numeric X variables with up to this number of unique values
-should not be binned and treated as a factor (after calculating partial dependence)
-The default is 13. Vectorized over \code{v}.}
+\item{discrete_m}{Numeric features with up to this number of unique values should not
+be binned but rather treated as discrete. The default is 13. Vectorized over \code{v}.}
 
-\item{outlier_iqr}{Outliers of a numeric X are capped via the boxplot rule, i.e.,
-outside \code{outlier_iqr} * IQR from the quartiles. The default is 2 is more
-conservative than the usual rule to account for right-skewed distributions.
-Set to 0 or \code{Inf} for no capping. Note that at most 10k observations are sampled
-to calculate quartiles. Vectorized over \code{v}. This has an effect only if \code{breaks}
-is not a vector.}
+\item{outlier_iqr}{If \code{breaks} is an integer or "Sturges", the breaks of a continuous
+feature are calculated without taking into account feature values outside
+quartiles +- \code{outlier_iqr} * IQR (where <= 9997 values are used to calculate the
+quartiles). To let the breaks cover the full data range, set \code{outlier_iqr} to
+0 or \code{Inf}. Vectorized over \code{v}.}
 
-\item{seed}{Optional random seed (an integer) used for capping X based on quartiles
-calculated from a subsample of 10k observations.}
+\item{seed}{Optional integer random seed used for calculating breaks:
+The bin range is determined without values outside quartiles +- 2 IQR
+using a sample of <= 9997 observations to calculate quartiles.}
 
 \item{...}{Currently unused.}
 }
@@ -55,7 +57,7 @@ single bracket subsetting to select part of the output.
 }
 \description{
 Calculates average residuals (= bias) over the values of one or multiple
-\code{X} variables.
+features specified by \code{X}.
 }
 \details{
 The function is a convenience wrapper around \code{\link[=feature_effects]{feature_effects()}}.

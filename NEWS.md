@@ -22,6 +22,7 @@
 ### Documentation
 
 - README has received examples for Tidymodels and probabilistic classification.
+- Updated function documentation [#41](https://github.com/mayer79/effectplots/pull/41).
 
 ### Other changes
 
@@ -36,7 +37,8 @@
 - (Slowish) support for h2o models [#36](https://github.com/mayer79/effectplots/pull/36).
 - Row names of statistics of numeric features are now removed [#37](https://github.com/mayer79/effectplots/pull/37).
 - ALE values are now plotted at the right bin break (instead of bin mean) [#38](https://github.com/mayer79/effectplots/pull/38).
-- Empty factor levels in features are not anymore dropped. However, you can use `update(..., drop_empty = TRUE)` to drop them after calculations [#39](https://github.com/mayer79/effectplots/pull/39).
+- Empty factor levels in features are not anymore dropped. However, you can use `update(..., drop_empty = TRUE)` to drop them after calculations [#40](https://github.com/mayer79/effectplots/pull/40).
+- Better input checks for `average_observed()`, `average_predicted()`, and `bias()` [#41](https://github.com/mayer79/effectplots/pull/41).
 
 # effectplots 0.1.0
 

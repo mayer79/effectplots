@@ -15,7 +15,7 @@
 #' @param sort_by By which statistic ("pd", "pred_mean", "y_mean", "resid_mean", "ale")
 #'   should the results be sorted? The default is "no" (no sorting). Calculated
 #'   after all other update steps, e.g., after collapsing or dropping rare levels.
-#' @param collapse_m If a categorical X has more than `collapse_m` levels,
+#' @param collapse_m If a categorical feature has more than `collapse_m` levels,
 #'   rare levels are collapsed into a new level "Other". Standard deviations are
 #'   collapsed via root of the weighted average variances. The default is 30.
 #'   Set to `Inf` for no collapsing.
@@ -27,7 +27,7 @@
 #' collapsing.
 #' @param na.rm Should missing bin centers be dropped? Default is `FALSE`.
 #' @param ... Currently not used.
-#' @returns An object of class "EffectData".
+#' @returns A modified object of class "EffectData".
 #' @seealso
 #'   [feature_effects()], [average_observed()], [average_predicted()],
 #'   [partial_dependence()], [ale()], [bias()], [effect_importance()]
