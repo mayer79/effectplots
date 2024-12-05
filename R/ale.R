@@ -1,7 +1,7 @@
 #' Accumulated Local Effects (ALE)
 #'
 #' @description
-#' Calculates ALE for one or multiple `X` variables.
+#' Calculates ALE for one or multiple continuous features specified by `X`.
 #'
 #' The concept of ALE was introduced in Apley et al. (2020) as an alternative to
 #' partial dependence (PD). The Ceteris Paribus clause behind PD is a blessing and
@@ -17,16 +17,19 @@
 #' observations falling into this bin. This is repeated for all bins,
 #' and the values are *accumulated*.
 #'
-#' When we `plot()` the result, ALE values are plotted against right bin breaks.
+#' ALE values are plotted against right bin breaks.
 #'
 #' @details
 #' The function is a convenience wrapper around [feature_effects()], which calls
 #' the barebone implementation [.ale()] to calculate ALE.
 #'
 #' @inheritParams feature_effects
-#' @param seed Optional random seed (an integer) used for:
-#'   - ALE: select background data if `n > ale_n` and for bins > `ale_bin_size`.
-#'   - Capping X: quartiles are calculated based on 10k observations.
+#' @param discrete_m Numeric features with up to this number of unique values are
+#'   treated as discrete and are therefore dropped from the calculations.
+#' @param seed Optional integer random seed used for:
+#'   - *ALE:* select background data if `n > ale_n`, and for bins > `ale_bin_size`.
+#'   - *Calculating breaks:* The bin range is determined without values outside
+#'     quartiles +- 2 IQR using a sample of <= 9997 observations to calculate quartiles.
 #' @inherit feature_effects return
 #' @references
 #'   Apley, Daniel W., and Jingyu Zhu. 2020. *Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.*

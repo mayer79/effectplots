@@ -1,7 +1,7 @@
 #' Bias / Average Residuals
 #'
 #' Calculates average residuals (= bias) over the values of one or multiple
-#' `X` variables.
+#' features specified by `X`.
 #'
 #' The function is a convenience wrapper around [feature_effects()].
 #'
@@ -31,6 +31,11 @@ bias <- function(
   if (NCOL(X) == 1L && (is.vector(X) || is.factor(X))) {
     X <- collapse::frename(collapse::qDF(X), x_name)
   }
+  stopifnot(
+    is.matrix(X) || is.data.frame(X),
+    length(resid) == nrow(X),
+    is.null(w) || length(w) == nrow(X)
+  )
 
   # We treat "resid" as "y" and then change y_mean/sd to resid_mean/sd
   out <- feature_effects.default(

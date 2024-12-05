@@ -88,7 +88,7 @@ ale(object, ...)
 \item{...}{Further arguments passed to \code{pred_fun()}, e.g., \code{type = "response"} in
 a \code{glm()} or (typically) \code{prob = TRUE} in classification models.}
 
-\item{v}{Vector of variable names to calculate statistics.}
+\item{v}{Variable names to calculate statistics for.}
 
 \item{data}{Matrix or data.frame.}
 
@@ -97,44 +97,48 @@ The function takes three arguments (names irrelevant): \code{object}, \code{data
 
 \item{trafo}{How should predictions be transformed?
 A function or \code{NULL} (default). Examples are \code{log} (to switch to link scale)
-or \code{exp} (to switch from link scale to the original scale).}
+or \code{exp} (to switch from link scale to the original scale).
+Applied after \code{which_pred}.}
 
 \item{which_pred}{If the predictions are multivariate: which column to pick
-(integer or column name). By default \code{NULL} (picks last column).}
+(integer or column name). By default \code{NULL} (picks last column). Applied before
+\code{trafo}.}
 
 \item{w}{Optional vector with case weights. Can also be a column name in \code{data}.
 Having observations with non-positive weight is equivalent to excluding them.}
 
-\item{breaks}{An integer, vector, or "Sturges" (the default).
-To allow varying values of \code{breaks} across variables, it can be a list of the
-same length as \code{v}, or a \emph{named} list with \code{breaks} for certain variables.}
+\item{breaks}{An integer, vector, or "Sturges" (the default) used to determine
+bin breaks of continuous features. Values outside the total bin range are placed
+in the outmost bins. To allow varying values of \code{breaks} across features,
+\code{breaks} can be a list of the same length as \code{v}, or a \emph{named} list with breaks
+for certain variables.}
 
 \item{right}{Should bins be right-closed? The default is \code{TRUE}.
-Vectorized over \code{v}. Only relevant for numeric X.}
+Vectorized over \code{v}. Only relevant for continuous features.}
 
-\item{discrete_m}{Numeric X variables with up to this number of unique values
-should not be binned and treated as a factor (after calculating partial dependence)
-The default is 13. Vectorized over \code{v}.}
+\item{discrete_m}{Numeric features with up to this number of unique values are
+treated as discrete and are therefore dropped from the calculations.}
 
-\item{outlier_iqr}{Outliers of a numeric X are capped via the boxplot rule, i.e.,
-outside \code{outlier_iqr} * IQR from the quartiles. The default is 2 is more
-conservative than the usual rule to account for right-skewed distributions.
-Set to 0 or \code{Inf} for no capping. Note that at most 10k observations are sampled
-to calculate quartiles. Vectorized over \code{v}. This has an effect only if \code{breaks}
-is not a vector.}
+\item{outlier_iqr}{If \code{breaks} is an integer or "Sturges", the breaks of a continuous
+feature are calculated without taking into account feature values outside
+quartiles +- \code{outlier_iqr} * IQR (where <= 9997 values are used to calculate the
+quartiles). To let the breaks cover the full data range, set \code{outlier_iqr} to
+0 or \code{Inf}. Vectorized over \code{v}.}
 
 \item{ale_n}{Size of the data used for calculating ALE.
 The default is 50000. For larger \code{data} (and \code{w}), \code{ale_n} rows are randomly
-sampled. Each variable specified by \code{v} uses the same subsample. Set to 0 to omit.}
+sampled. Each variable specified by \code{v} uses the same sample.
+Set to 0 to omit ALE calculations.}
 
 \item{ale_bin_size}{Maximal number of observations used per bin for ALE calculations.
 If there are more observations in a bin, \code{ale_bin_size} indices are
-randomly sampled. The default is 200. Applied after subsampling regarding \code{ale_n}.}
+randomly sampled. The default is 200. Applied after sampling regarding \code{ale_n}.}
 
-\item{seed}{Optional random seed (an integer) used for:
+\item{seed}{Optional integer random seed used for:
 \itemize{
-\item ALE: select background data if \code{n > ale_n} and for bins > \code{ale_bin_size}.
-\item Capping X: quartiles are calculated based on 10k observations.
+\item \emph{ALE:} select background data if \code{n > ale_n}, and for bins > \code{ale_bin_size}.
+\item \emph{Calculating breaks:} The bin range is determined without values outside
+quartiles +- 2 IQR using a sample of <= 9997 observations to calculate quartiles.
 }}
 }
 \value{
@@ -142,7 +146,7 @@ A list (of class "EffectData") with a data.frame of statistics per feature. Use
 single bracket subsetting to select part of the output.
 }
 \description{
-Calculates ALE for one or multiple \code{X} variables.
+Calculates ALE for one or multiple continuous features specified by \code{X}.
 
 The concept of ALE was introduced in Apley et al. (2020) as an alternative to
 partial dependence (PD). The Ceteris Paribus clause behind PD is a blessing and
@@ -159,7 +163,7 @@ partial dependence difference between lower and upper bin break, using only
 observations falling into this bin. This is repeated for all bins,
 and the values are \emph{accumulated}.
 
-When we \code{plot()} the result, ALE values are plotted against right bin breaks.
+ALE values are plotted against right bin breaks.
 }
 \details{
 The function is a convenience wrapper around \code{\link[=feature_effects]{feature_effects()}}, which calls

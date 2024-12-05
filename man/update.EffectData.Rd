@@ -23,7 +23,7 @@
 should the results be sorted? The default is "no" (no sorting). Calculated
 after all other update steps, e.g., after collapsing or dropping rare levels.}
 
-\item{collapse_m}{If a categorical X has more than \code{collapse_m} levels,
+\item{collapse_m}{If a categorical feature has more than \code{collapse_m} levels,
 rare levels are collapsed into a new level "Other". Standard deviations are
 collapsed via root of the weighted average variances. The default is 30.
 Set to \code{Inf} for no collapsing.}
@@ -43,7 +43,7 @@ collapsing.}
 \item{...}{Currently not used.}
 }
 \value{
-An object of class "EffectData".
+A modified object of class "EffectData".
 }
 \description{
 Updates an "EffectData" object by

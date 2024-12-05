@@ -18,7 +18,10 @@
 #' standard deviations of observed y and residuals.
 #'
 #' Numeric X with more than `discrete_m = 13` disjoint values are binned via `breaks`.
-#' Outliers are cautiously capped at +-2 IQR from the quartiles.
+#' If `breaks` is a single integer or "Sturges", the total bin range is calculated
+#' without values outside +-2 IQR from the quartiles.
+#' Values outside the bin range are placed in the outermost bins. Note that
+#' at most 9997 observations are used to calculate quartiles and IQR.
 #'
 #' All averages and standard deviation are weighted by optional weights `w`.
 #'
@@ -30,7 +33,7 @@
 #' - [ale()].
 #'
 #' @param object Fitted model.
-#' @param v Vector of variable names to calculate statistics.
+#' @param v Variable names to calculate statistics for.
 #' @param data Matrix or data.frame.
 #' @param y Numeric vector with observed values of the response.
 #'   Can also be a column name in `data`. Omitted if `NULL` (default).
@@ -41,39 +44,44 @@
 #' @param trafo How should predictions be transformed?
 #'   A function or `NULL` (default). Examples are `log` (to switch to link scale)
 #'   or `exp` (to switch from link scale to the original scale).
+#'   Applied after `which_pred`.
 #' @param which_pred If the predictions are multivariate: which column to pick
-#'   (integer or column name). By default `NULL` (picks last column).
+#'   (integer or column name). By default `NULL` (picks last column). Applied before
+#'   `trafo`.
 #' @param w Optional vector with case weights. Can also be a column name in `data`.
 #'   Having observations with non-positive weight is equivalent to excluding them.
-#' @param breaks An integer, vector, or "Sturges" (the default).
-#'   To allow varying values of `breaks` across variables, it can be a list of the
-#'   same length as `v`, or a *named* list with `breaks` for certain variables.
+#' @param breaks An integer, vector, or "Sturges" (the default) used to determine
+#'   bin breaks of continuous features. Values outside the total bin range are placed
+#'   in the outmost bins. To allow varying values of `breaks` across features,
+#'   `breaks` can be a list of the same length as `v`, or a *named* list with breaks
+#'   for certain variables.
 #' @param right Should bins be right-closed? The default is `TRUE`.
-#'   Vectorized over `v`. Only relevant for numeric X.
-#' @param discrete_m Numeric X variables with up to this number of unique values
-#'   should not be binned and treated as a factor (after calculating partial dependence)
-#'   The default is 13. Vectorized over `v`.
-#' @param outlier_iqr Outliers of a numeric X are capped via the boxplot rule, i.e.,
-#'   outside `outlier_iqr` * IQR from the quartiles. The default is 2 is more
-#'   conservative than the usual rule to account for right-skewed distributions.
-#'   Set to 0 or `Inf` for no capping. Note that at most 10k observations are sampled
-#'   to calculate quartiles. Vectorized over `v`. This has an effect only if `breaks`
-#'   is not a vector.
+#'   Vectorized over `v`. Only relevant for continuous features.
+#' @param discrete_m Numeric features with up to this number of unique values should not
+#'   be binned but rather treated as discrete. The default is 13. Vectorized over `v`.
+#' @param outlier_iqr If `breaks` is an integer or "Sturges", the breaks of a continuous
+#'   feature are calculated without taking into account feature values outside
+#'   quartiles +- `outlier_iqr` * IQR (where <= 9997 values are used to calculate the
+#'   quartiles). To let the breaks cover the full data range, set `outlier_iqr` to
+#'   0 or `Inf`. Vectorized over `v`.
 #' @param calc_pred Should predictions be calculated? Default is `TRUE`. Only relevant
 #'   if `pred = NULL`.
 #' @param pd_n Size of the data used for calculating partial dependence.
 #'   The default is 500. For larger `data` (and `w`), `pd_n` rows are randomly sampled.
-#'   Each variable specified by `v` uses the same subsample. Set to 0 to omit.
+#'   Each variable specified by `v` uses the same sample.
+#'   Set to 0 to omit PD calculations.
 #' @param ale_n Size of the data used for calculating ALE.
 #'   The default is 50000. For larger `data` (and `w`), `ale_n` rows are randomly
-#'   sampled. Each variable specified by `v` uses the same subsample. Set to 0 to omit.
+#'   sampled. Each variable specified by `v` uses the same sample.
+#'   Set to 0 to omit ALE calculations.
 #' @param ale_bin_size Maximal number of observations used per bin for ALE calculations.
 #'   If there are more observations in a bin, `ale_bin_size` indices are
-#'   randomly sampled. The default is 200. Applied after subsampling regarding `ale_n`.
-#' @param seed Optional random seed (an integer) used for:
-#'   - Partial dependence: select background data if `n > pd_n`.
-#'   - ALE: select background data if `n > ale_n` and for bins > `ale_bin_size`.
-#'   - Capping X: quartiles are calculated based on 9997 observations.
+#'   randomly sampled. The default is 200. Applied after sampling regarding `ale_n`.
+#' @param seed Optional integer random seed used for:
+#'   - *Partial dependence:* select background data if `n > pd_n`.
+#'   - *ALE:* select background data if `n > ale_n`, and for bins > `ale_bin_size`.
+#'   - *Calculating breaks:* The bin range is determined without values outside
+#'     quartiles +- 2 IQR using a sample of <= 9997 observations to calculate quartiles.
 #' @param ... Further arguments passed to `pred_fun()`, e.g., `type = "response"` in
 #'   a `glm()` or (typically) `prob = TRUE` in classification models.
 #' @returns

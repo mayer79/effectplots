@@ -3,7 +3,8 @@
 #' Versatile plot function for an "EffectData" object. By default, all calculated
 #' statistics (except "resid_mean") are shown. To select certain statistics,
 #' use the `stats` argument. Set `plotly = TRUE` for interactive plots. Note that
-#' all statistics are plotted at bin means, except for ALE (right bin breaks).
+#' all statistics are plotted at bin means, except for ALE
+#' (shown at right bin breaks).
 #'
 #' @importFrom ggplot2 .data
 #' @param x An object of class "EffectData".
@@ -18,7 +19,7 @@
 #' @param share_y Should y axis be shared across subplots? The default is "no".
 #'   Other choices are "all", "rows", and "cols". Note that this currently does not
 #'   take into account error bars/ribbons.
-#'   Has mo effect if `ylim` is passed. Only for multiple plots.
+#'   Has no effect if `ylim` is passed. Only for multiple plots.
 #' @param ylim A vector of length 2 with manual y axis limits, or a list thereof.
 #' @param cat_lines Show lines for non-numeric features. Default is `TRUE`.
 #' @param num_points Show points for numeric features. Default is `FALSE`.
@@ -34,7 +35,7 @@
 #'   - "ci": Z confidence intervals using sqrt(N) as standard error of the mean,
 #'   - "ciw": Like "ci", but using sqrt(weight) as standard error of the mean, or
 #'   - "sd": standard deviations.
-#'   Ribbons for numeric X, error bars for categorical X.
+#'   Ribbons for continuous features, and error bars otherwise.
 #' @param ci_level The nominal level of the Z confidence intervals (only when
 #'   `error` equals "ci" or "ciw"). The default is 0.95.
 #' @param colors Vector of line/point colors of sufficient length.

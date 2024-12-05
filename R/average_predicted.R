@@ -1,13 +1,11 @@
 #' Average Predictions
 #'
-#' Calculates average predictions over the values of one or multiple
-#' `X` variables. Shows the combined effect of a feature and other (correlated)
-#' features.
+#' Calculates average predictions over the values of one or multiple features specified
+#' by `X`. Shows the combined effect of a feature and other (correlated) features.
 #'
 #' The function is a convenience wrapper around [feature_effects()].
 #'
 #' @param pred A numeric vector of predictions.
-#' @param x_name If `X` is a vector: what is the name of the variable? By default "x".
 #' @inheritParams average_observed
 #' @inheritParams feature_effects
 #' @inherit feature_effects return
@@ -38,6 +36,11 @@ average_predicted <- function(
   if (NCOL(X) == 1L && (is.vector(X) || is.factor(X))) {
     X <- collapse::frename(collapse::qDF(X), x_name)
   }
+  stopifnot(
+    is.matrix(X) || is.data.frame(X),
+    NROW(pred) == nrow(X),
+    is.null(w) || length(w) == nrow(X)
+  )
   feature_effects.default(
     object = NULL,
     v = colnames(X),

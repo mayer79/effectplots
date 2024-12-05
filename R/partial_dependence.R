@@ -2,7 +2,7 @@
 #'
 #' @description
 #'
-#' Calculates PD for one or multiple `X` variables.
+#' Calculates PD for one or multiple features.
 #'
 #' PD was introduced by Friedman (2001) to study the (main) effects
 #' of a ML model. PD of a model f and variable `X` at a certain value g
@@ -17,9 +17,10 @@
 #' and eventually weighted by `w`.
 #'
 #' @inheritParams feature_effects
-#' @param seed Optional random seed (an integer) used for:
-#'   - Partial dependence: select background data if `n > pd_n`.
-#'   - Capping X: quartiles are calculated based on 10k observations.
+#' @param seed Optional integer random seed used for:
+#'   - *Partial dependence:* select background data if `n > pd_n`.
+#'   - *Calculating breaks:* The bin range is determined without values outside
+#'     quartiles +- 2 IQR using a sample of <= 9997 observations to calculate quartiles.
 #' @inherit feature_effects return
 #' @references
 #'   Friedman, Jerome H. 2001, *Greedy Function Approximation: A Gradient Boosting Machine.*

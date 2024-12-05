@@ -48,7 +48,7 @@ Only for multiple plots.}
 \item{share_y}{Should y axis be shared across subplots? The default is "no".
 Other choices are "all", "rows", and "cols". Note that this currently does not
 take into account error bars/ribbons.
-Has mo effect if \code{ylim} is passed. Only for multiple plots.}
+Has no effect if \code{ylim} is passed. Only for multiple plots.}
 
 \item{ylim}{A vector of length 2 with manual y axis limits, or a list thereof.}
 
@@ -73,7 +73,7 @@ statistics plotted, or \code{NULL} (default).}
 \item "ci": Z confidence intervals using sqrt(N) as standard error of the mean,
 \item "ciw": Like "ci", but using sqrt(weight) as standard error of the mean, or
 \item "sd": standard deviations.
-Ribbons for numeric X, error bars for categorical X.
+Ribbons for continuous features, and error bars otherwise.
 }}
 
 \item{ci_level}{The nominal level of the Z confidence intervals (only when
@@ -115,7 +115,8 @@ Otherwise, an object of class "patchwork", or a "plotly" subplot.
 Versatile plot function for an "EffectData" object. By default, all calculated
 statistics (except "resid_mean") are shown. To select certain statistics,
 use the \code{stats} argument. Set \code{plotly = TRUE} for interactive plots. Note that
-all statistics are plotted at bin means, except for ALE (right bin breaks).
+all statistics are plotted at bin means, except for ALE
+(shown at right bin breaks).
 }
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)

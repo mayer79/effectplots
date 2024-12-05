@@ -22,7 +22,7 @@ to return raw integer codes.}
 the additional class "na.included".}
 }
 \value{
-Binned version of \code{x}. Either a factor or integer codes.
+Binned version of \code{x}. Either a factor, or integer codes.
 }
 \description{
 Bins a numeric vector \code{x} into bins specified by \code{breaks}.
