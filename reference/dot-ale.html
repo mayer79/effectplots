@@ -114,12 +114,14 @@ The function takes three arguments (names irrelevant): <code>object</code>, <cod
 <dt id="arg-trafo">trafo<a class="anchor" aria-label="anchor" href="#arg-trafo"></a></dt>
 <dd><p>How should predictions be transformed?
 A function or <code>NULL</code> (default). Examples are <code>log</code> (to switch to link scale)
-or <code>exp</code> (to switch from link scale to the original scale).</p></dd>
+or <code>exp</code> (to switch from link scale to the original scale).
+Applied after <code>which_pred</code>.</p></dd>
 
 
 <dt id="arg-which-pred">which_pred<a class="anchor" aria-label="anchor" href="#arg-which-pred"></a></dt>
 <dd><p>If the predictions are multivariate: which column to pick
-(integer or column name). By default <code>NULL</code> (picks last column).</p></dd>
+(integer or column name). By default <code>NULL</code> (picks last column). Applied before
+<code>trafo</code>.</p></dd>
 
 
 <dt id="arg-bin-size">bin_size<a class="anchor" aria-label="anchor" href="#arg-bin-size"></a></dt>

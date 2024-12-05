@@ -16,7 +16,10 @@ Evaluated at bin averages, not at bin midpoints.
 Additionally, corresponding counts/weights are calculated, and
 standard deviations of observed y and residuals.
 Numeric X with more than discrete_m = 13 disjoint values are binned via breaks.
-Outliers are cautiously capped at +-2 IQR from the quartiles.
+If breaks is a single integer or "Sturges", the total bin range is calculated
+without values outside +-2 IQR from the quartiles.
+Values outside the bin range are placed in the outermost bins. Note that
+at most 9997 observations are used to calculate quartiles and IQR.
 All averages and standard deviation are weighted by optional weights w.
 If you need only one specific statistic, you can use the simplified APIs of
 average_observed(),
@@ -89,7 +92,10 @@ Evaluated at bin averages, not at bin midpoints.</p></li>
 </ul><p>Additionally, corresponding counts/weights are calculated, and
 standard deviations of observed y and residuals.</p>
 <p>Numeric X with more than <code>discrete_m = 13</code> disjoint values are binned via <code>breaks</code>.
-Outliers are cautiously capped at +-2 IQR from the quartiles.</p>
+If <code>breaks</code> is a single integer or "Sturges", the total bin range is calculated
+without values outside +-2 IQR from the quartiles.
+Values outside the bin range are placed in the outermost bins. Note that
+at most 9997 observations are used to calculate quartiles and IQR.</p>
 <p>All averages and standard deviation are weighted by optional weights <code>w</code>.</p>
 <p>If you need only one specific statistic, you can use the simplified APIs of</p><ul><li><p><code><a href="average_observed.html">average_observed()</a></code>,</p></li>
 <li><p><code><a href="average_predicted.html">average_predicted()</a></code>,</p></li>
@@ -205,7 +211,7 @@ a <code><a href="https://rdrr.io/r/stats/glm.html" class="external-link">glm()</
 
 
 <dt id="arg-v">v<a class="anchor" aria-label="anchor" href="#arg-v"></a></dt>
-<dd><p>Vector of variable names to calculate statistics.</p></dd>
+<dd><p>Variable names to calculate statistics for.</p></dd>
 
 
 <dt id="arg-data">data<a class="anchor" aria-label="anchor" href="#arg-data"></a></dt>
@@ -229,12 +235,14 @@ The function takes three arguments (names irrelevant): <code>object</code>, <cod
 <dt id="arg-trafo">trafo<a class="anchor" aria-label="anchor" href="#arg-trafo"></a></dt>
 <dd><p>How should predictions be transformed?
 A function or <code>NULL</code> (default). Examples are <code>log</code> (to switch to link scale)
-or <code>exp</code> (to switch from link scale to the original scale).</p></dd>
+or <code>exp</code> (to switch from link scale to the original scale).
+Applied after <code>which_pred</code>.</p></dd>
 
 
 <dt id="arg-which-pred">which_pred<a class="anchor" aria-label="anchor" href="#arg-which-pred"></a></dt>
 <dd><p>If the predictions are multivariate: which column to pick
-(integer or column name). By default <code>NULL</code> (picks last column).</p></dd>
+(integer or column name). By default <code>NULL</code> (picks last column). Applied before
+<code>trafo</code>.</p></dd>
 
 
 <dt id="arg-w">w<a class="anchor" aria-label="anchor" href="#arg-w"></a></dt>
@@ -243,29 +251,29 @@ Having observations with non-positive weight is equivalent to excluding them.</p
 
 
 <dt id="arg-breaks">breaks<a class="anchor" aria-label="anchor" href="#arg-breaks"></a></dt>
-<dd><p>An integer, vector, or "Sturges" (the default).
-To allow varying values of <code>breaks</code> across variables, it can be a list of the
-same length as <code>v</code>, or a <em>named</em> list with <code>breaks</code> for certain variables.</p></dd>
+<dd><p>An integer, vector, or "Sturges" (the default) used to determine
+bin breaks of continuous features. Values outside the total bin range are placed
+in the outmost bins. To allow varying values of <code>breaks</code> across features,
+<code>breaks</code> can be a list of the same length as <code>v</code>, or a <em>named</em> list with breaks
+for certain variables.</p></dd>
 
 
 <dt id="arg-right">right<a class="anchor" aria-label="anchor" href="#arg-right"></a></dt>
 <dd><p>Should bins be right-closed? The default is <code>TRUE</code>.
-Vectorized over <code>v</code>. Only relevant for numeric X.</p></dd>
+Vectorized over <code>v</code>. Only relevant for continuous features.</p></dd>
 
 
 <dt id="arg-discrete-m">discrete_m<a class="anchor" aria-label="anchor" href="#arg-discrete-m"></a></dt>
-<dd><p>Numeric X variables with up to this number of unique values
-should not be binned and treated as a factor (after calculating partial dependence)
-The default is 13. Vectorized over <code>v</code>.</p></dd>
+<dd><p>Numeric features with up to this number of unique values should not
+be binned but rather treated as discrete. The default is 13. Vectorized over <code>v</code>.</p></dd>
 
 
 <dt id="arg-outlier-iqr">outlier_iqr<a class="anchor" aria-label="anchor" href="#arg-outlier-iqr"></a></dt>
-<dd><p>Outliers of a numeric X are capped via the boxplot rule, i.e.,
-outside <code>outlier_iqr</code> * IQR from the quartiles. The default is 2 is more
-conservative than the usual rule to account for right-skewed distributions.
-Set to 0 or <code>Inf</code> for no capping. Note that at most 10k observations are sampled
-to calculate quartiles. Vectorized over <code>v</code>. This has an effect only if <code>breaks</code>
-is not a vector.</p></dd>
+<dd><p>If <code>breaks</code> is an integer or "Sturges", the breaks of a continuous
+feature are calculated without taking into account feature values outside
+quartiles +- <code>outlier_iqr</code> * IQR (where &lt;= 9997 values are used to calculate the
+quartiles). To let the breaks cover the full data range, set <code>outlier_iqr</code> to
+0 or <code>Inf</code>. Vectorized over <code>v</code>.</p></dd>
 
 
 <dt id="arg-calc-pred">calc_pred<a class="anchor" aria-label="anchor" href="#arg-calc-pred"></a></dt>
@@ -276,25 +284,28 @@ if <code>pred = NULL</code>.</p></dd>
 <dt id="arg-pd-n">pd_n<a class="anchor" aria-label="anchor" href="#arg-pd-n"></a></dt>
 <dd><p>Size of the data used for calculating partial dependence.
 The default is 500. For larger <code>data</code> (and <code>w</code>), <code>pd_n</code> rows are randomly sampled.
-Each variable specified by <code>v</code> uses the same subsample. Set to 0 to omit.</p></dd>
+Each variable specified by <code>v</code> uses the same sample.
+Set to 0 to omit PD calculations.</p></dd>
 
 
 <dt id="arg-ale-n">ale_n<a class="anchor" aria-label="anchor" href="#arg-ale-n"></a></dt>
 <dd><p>Size of the data used for calculating ALE.
 The default is 50000. For larger <code>data</code> (and <code>w</code>), <code>ale_n</code> rows are randomly
-sampled. Each variable specified by <code>v</code> uses the same subsample. Set to 0 to omit.</p></dd>
+sampled. Each variable specified by <code>v</code> uses the same sample.
+Set to 0 to omit ALE calculations.</p></dd>
 
 
 <dt id="arg-ale-bin-size">ale_bin_size<a class="anchor" aria-label="anchor" href="#arg-ale-bin-size"></a></dt>
 <dd><p>Maximal number of observations used per bin for ALE calculations.
 If there are more observations in a bin, <code>ale_bin_size</code> indices are
-randomly sampled. The default is 200. Applied after subsampling regarding <code>ale_n</code>.</p></dd>
+randomly sampled. The default is 200. Applied after sampling regarding <code>ale_n</code>.</p></dd>
 
 
 <dt id="arg-seed">seed<a class="anchor" aria-label="anchor" href="#arg-seed"></a></dt>
-<dd><p>Optional random seed (an integer) used for:</p><ul><li><p>Partial dependence: select background data if <code>n &gt; pd_n</code>.</p></li>
-<li><p>ALE: select background data if <code>n &gt; ale_n</code> and for bins &gt; <code>ale_bin_size</code>.</p></li>
-<li><p>Capping X: quartiles are calculated based on 9997 observations.</p></li>
+<dd><p>Optional integer random seed used for:</p><ul><li><p><em>Partial dependence:</em> select background data if <code>n &gt; pd_n</code>.</p></li>
+<li><p><em>ALE:</em> select background data if <code>n &gt; ale_n</code>, and for bins &gt; <code>ale_bin_size</code>.</p></li>
+<li><p><em>Calculating breaks:</em> The bin range is determined without values outside
+quartiles +- 2 IQR using a sample of &lt;= 9997 observations to calculate quartiles.</p></li>
 </ul></dd>
 
 </dl></div>

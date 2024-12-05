@@ -97,7 +97,7 @@ after all other update steps, e.g., after collapsing or dropping rare levels.</p
 
 
 <dt id="arg-collapse-m">collapse_m<a class="anchor" aria-label="anchor" href="#arg-collapse-m"></a></dt>
-<dd><p>If a categorical X has more than <code>collapse_m</code> levels,
+<dd><p>If a categorical feature has more than <code>collapse_m</code> levels,
 rare levels are collapsed into a new level "Other". Standard deviations are
 collapsed via root of the weighted average variances. The default is 30.
 Set to <code>Inf</code> for no collapsing.</p></dd>
@@ -131,7 +131,7 @@ collapsing.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>An object of class "EffectData".</p>
+    <p>A modified object of class "EffectData".</p>
     </div>
     <div id="see-also">
     <h2>See also</h2>
