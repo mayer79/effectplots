@@ -12,14 +12,15 @@
 #'   both `y` and predictions are available. Useful to study model bias.
 #' - "pd": Partial dependence (Friedman, 2001): See [partial_dependence()].
 #'   Evaluated at bin averages, not at bin midpoints.
-#' - "ale": Accumulated local effects (Apley, 2020): See [ale()]. Only for numeric X.
+#' - "ale": Accumulated local effects (Apley, 2020): See [ale()].
+#'   Only for continuous features.
 #'
 #' Additionally, corresponding counts/weights are calculated, and
 #' standard deviations of observed y and residuals.
 #'
-#' Numeric X with more than `discrete_m = 13` disjoint values are binned via `breaks`.
-#' If `breaks` is a single integer or "Sturges", the total bin range is calculated
-#' without values outside +-2 IQR from the quartiles.
+#' Numeric features with more than `discrete_m = 13` disjoint values are binned via
+#' `breaks`. If `breaks` is a single integer or "Sturges", the total bin range is
+#' calculated without values outside +-2 IQR from the quartiles.
 #' Values outside the bin range are placed in the outermost bins. Note that
 #' at most 9997 observations are used to calculate quartiles and IQR.
 #'
@@ -228,7 +229,7 @@ feature_effects.default <- function(
     }
   }
 
-  # We need this subset for fast quartiles and fast check if numeric x is disrete
+  # We need this subset for fast quartiles and fast check if numeric x is discrete
   ix_sub <- if (nrow(data) > 9997L) sample.int(nrow(data), 9997L)
 
   # Combine pred, y, and resid. If df, we can easier drop columns in grouped_stats()
@@ -500,16 +501,16 @@ calculate_stats <- function(
   lev <- if (is.factor(x)) levels(x)
 
   x <- factor_or_double(x, m = discrete_m, ix_sub = ix_sub)
-  num <- is.numeric(x)
+  discrete <- !is.numeric(x)
 
-  if (is.null(PYR) && is.null(pd_data) && (!num || is.null(ale_data))) {
+  if (is.null(PYR) && is.null(pd_data) && (discrete || is.null(ale_data))) {
     return(NULL)
   }
 
   sd_cols <- setdiff(colnames(PYR), "pred")  # Can be NULL
 
   # DISCRETE
-  if (!num) {
+  if (discrete) {
     M <- grouped_stats(PYR, g = x, w = w, sd_cols = sd_cols)
 
     # We need original unique values of g later for PDP, e.g., TRUE/FALSE.
@@ -519,7 +520,9 @@ calculate_stats <- function(
     if (orig_type != "factor") {
       out <- out[order(g, na.last = TRUE), ]
     }
-    rownames(out) <- NULL
+    if (orig_type %in% c("integer", "double") && length(stats::na.omit(g)) > 1L) {
+      out$bin_width <- min(diff(out$bin_mid), na.rm = TRUE) * 0.7
+    }
   } else {
     breaks <- fbreaks(x, breaks = breaks, outlier_iqr = outlier_iqr, ix_sub = ix_sub)
     mids <- 0.5 * (breaks[-1L] + breaks[-length(breaks)])
@@ -540,10 +543,10 @@ calculate_stats <- function(
     bin_means[bad] = mids[bad]
     bin_means <- pmax(pmin(bin_means, breaks[length(breaks)]), breaks[1L])
 
-    out <- data.frame(
-      bin_mid = mids, bin_width = bin_width, bin_mean = bin_means, M, row.names = NULL
-    )
+    out <- data.frame(bin_mid = mids, bin_width = bin_width, bin_mean = bin_means, M)
   }
+  rownames(out) <- NULL
+  attr(out, "discrete") <- discrete
 
   # Add partial dependence
   if (!is.null(pd_data)) {
@@ -563,7 +566,7 @@ calculate_stats <- function(
   # Add ALE
   if (!is.null(ale_data)) {
     out$ale <- NA_real_
-    if (num) {
+    if (!discrete) {
       ale <- .ale(
         object = object,
         v = v,
@@ -593,8 +596,8 @@ calculate_stats <- function(
   }
 
   # Convert non-numeric levels *after* calculation of partial dependence and ale!
-  if (!num && !is.factor(out$bin_mean)) {
-    out$bin_mid <- out$bin_mean <- factor(out$bin_mean)
-  }
+  # if (!num && !is.factor(out$bin_mean)) {
+  #   out$bin_mid <- out$bin_mean <- factor(out$bin_mean)
+  # }
   return(out)
 }

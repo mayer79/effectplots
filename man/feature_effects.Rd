@@ -185,15 +185,16 @@ The difference to average observed y values shows model bias.
 both \code{y} and predictions are available. Useful to study model bias.
 \item "pd": Partial dependence (Friedman, 2001): See \code{\link[=partial_dependence]{partial_dependence()}}.
 Evaluated at bin averages, not at bin midpoints.
-\item "ale": Accumulated local effects (Apley, 2020): See \code{\link[=ale]{ale()}}. Only for numeric X.
+\item "ale": Accumulated local effects (Apley, 2020): See \code{\link[=ale]{ale()}}.
+Only for continuous features.
 }
 
 Additionally, corresponding counts/weights are calculated, and
 standard deviations of observed y and residuals.
 
-Numeric X with more than \code{discrete_m = 13} disjoint values are binned via \code{breaks}.
-If \code{breaks} is a single integer or "Sturges", the total bin range is calculated
-without values outside +-2 IQR from the quartiles.
+Numeric features with more than \code{discrete_m = 13} disjoint values are binned via
+\code{breaks}. If \code{breaks} is a single integer or "Sturges", the total bin range is
+calculated without values outside +-2 IQR from the quartiles.
 Values outside the bin range are placed in the outermost bins. Note that
 at most 9997 observations are used to calculate quartiles and IQR.
 

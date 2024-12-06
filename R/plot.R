@@ -21,8 +21,8 @@
 #'   take into account error bars/ribbons.
 #'   Has no effect if `ylim` is passed. Only for multiple plots.
 #' @param ylim A vector of length 2 with manual y axis limits, or a list thereof.
-#' @param cat_lines Show lines for non-numeric features. Default is `TRUE`.
-#' @param num_points Show points for numeric features. Default is `FALSE`.
+#' @param cat_lines Show lines for discrete features. Default is `TRUE`.
+#' @param num_points Show points for continuous features. Default is `FALSE`.
 #' @param title Overall plot title, by default `""` (no title).
 #' @param subplot_titles Should variable names be shown as subplot titles?
 #'   Default is `TRUE`. Only for multiple plots.
@@ -45,7 +45,7 @@
 #'   To change globally, set `options(effectplots.fill = new color)`.
 #' @param alpha Alpha transparency of lines and points. Default is 1.
 #' @param bar_height Relative bar height (default 1). Set to 0 for no bars.
-#' @param bar_width Relative bar width of non-numeric features, by default 0.7.
+#' @param bar_width Bar width multiplier (for discrete features). By default 1.
 #' @param bar_measure What should bars represent? Either "weight" (default) or "N".
 #' @param wrap_x Should categorical x axis labels be wrapped after this length?
 #'   The default is 10. Set to 0 for no wrapping. Vectorized over `x`.
@@ -88,7 +88,7 @@ plot.EffectData <- function(
     fill = getOption("effectplots.fill"),
     alpha = 1,
     bar_height = 1,
-    bar_width = 0.7,
+    bar_width = 1,
     bar_measure = c("weight", "N"),
     wrap_x = 10,
     rotate_x = 0,
@@ -133,9 +133,9 @@ plot.EffectData <- function(
   }
   colors <- colors[seq_len(nstats)]
 
-  # If user manually sets stats = "ale", we need to drop non-numeric features.
+  # If user manually sets stats = "ale", we need to drop discrete features.
   if (nstats == 1L && stat_info == "ale") {
-    ok <- .num(x)
+    ok <- !is_discrete(x)
     if (!all(ok)) {
       if (!any(ok)) {
         stop("Nothing to plot!")
@@ -150,9 +150,11 @@ plot.EffectData <- function(
   # No legend for single lines
   show_legend <- length(stat_info) > 1L
 
-  # Overwrite bin_width of categorical features
-  if (bar_width != 0.7) {
-    x[] <- lapply(x, function(z) {if (!.num(z)) z$bin_width <- bar_width; z})
+  # Overwrite bin_width of discrete features
+  if (bar_width != 1) {
+    x[] <- lapply(
+      x, function(z) {if (is_discrete(z)) z$bin_width <- z$bin_width * bar_width; z}
+    )
   }
 
   # Overwrite sd columns
@@ -255,8 +257,9 @@ plot.EffectData <- function(
   }
 
   if (show_legend) {
-    # We prefer a numeric subplot as reference. Placement is done at the right center.
-    show_legend <- seq_along(x) == order(!.num(x))[1L]
+    # We prefer a subplot of a continuous feature as reference.
+    # Placement is done at the right center.
+    show_legend <- seq_along(x) == order(is_discrete(x))[1L]
   }
 
   titles <- if (subplot_titles) names(x) else ""
@@ -390,8 +393,8 @@ one_ggplot <- function(
     rotate_x,
     show_legend = TRUE
 ) {
-  num <- .num(x)
-  if (!num && ("ale" %in% stat_info)) {
+  discrete <- is_discrete(x)
+  if (discrete && ("ale" %in% stat_info)) {
     # We don't have ALE for discrete variables. To avoid warnings, we drop it from
     # stat_info and colors.
     keep <- stat_info != "ale"
@@ -401,7 +404,7 @@ one_ggplot <- function(
   df <- poor_man_stack(x, to_stack = stat_info)
 
   # We plot ALE at the right bin breaks
-  if (num && ("ale" %in% stat_info)) {
+  if (!discrete && ("ale" %in% stat_info)) {
     df <- transform(
       df, bin_mean = ifelse(varying_ == "ale", bin_mid + bin_width / 2, bin_mean)
     )
@@ -453,7 +456,7 @@ one_ggplot <- function(
     )
   }
   if (has_errors) {
-    if (num) {
+    if (!discrete) {
       p <- p + ggplot2::geom_ribbon(
         ggplot2::aes(
           ymin = value_ - err_, ymax = value_ + err_, fill = varying_, color = varying_
@@ -480,7 +483,7 @@ one_ggplot <- function(
   }
 
   # Add optional points
-  if (!num || num_points) {
+  if (discrete || num_points) {
     p <- p + ggplot2::geom_point(
       ggplot2::aes(color = varying_),
       size = 2,
@@ -490,7 +493,7 @@ one_ggplot <- function(
   }
 
   # Add optional lines
-  if (num || cat_lines) {
+  if (!discrete || cat_lines) {
     p <- p + ggplot2::geom_line(
       ggplot2::aes(color = varying_, group = varying_),
       linewidth = 0.8,
@@ -517,7 +520,7 @@ one_ggplot <- function(
       p <- p + ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = 0.01))
     }
   }
-  if (!num) {
+  if (discrete) {
     if (wrap_x > 0 && is.finite(wrap_x)) {
       p <- p + ggplot2::scale_x_discrete(labels = ggplot2::label_wrap_gen(wrap_x))
     }
@@ -550,17 +553,17 @@ one_plotly <- function(
     show_legend = TRUE,
     overlay = "y2"
 ) {
-  num <- .num(x)
-  if (num && !num_points) {
+  discrete <- is_discrete(x)
+  if (!discrete && !num_points) {
     scatter_mode <- "lines"
-  } else if (!num && !cat_lines) {
+  } else if (discrete && !cat_lines) {
     scatter_mode <- "markers"
   } else {
     scatter_mode <-  "lines+markers"
   }
 
   # Deal with NAs in categorical X
-  if (!num && anyNA(x$bin_mid)) {
+  if (discrete && anyNA(x$bin_mid)) {
     lvl <- levels(x$bin_mid)
     if ("NA" %in% lvl) {
       warning("Can't show NA level on x axis because there is already a level 'NA'")
@@ -592,7 +595,7 @@ one_plotly <- function(
 
   for (i in seq_along(stat_info)) {
     z <- stat_info[i]
-    if (!num && z == "ale") {
+    if (discrete && z == "ale") {
       next
     }
     has_errors <- interval != "no" && z %in% c("y_mean", "resid_mean")
@@ -608,15 +611,15 @@ one_plotly <- function(
       yaxis = "y",
       mode = scatter_mode,
       type = "scatter",
-      error_y = if (has_errors && !num)
-        list(array = x[[error_col]], opacity = alpha * 2/ 3, width = 0),
+      error_y = if (has_errors && discrete)
+        list(array = x[[error_col]], opacity = alpha * 2 / 3, width = 0),
       name = names(z),
       showlegend = show_legend,
       legendgroup = z,
       color = I(colors[i]),
       opacity = alpha
     )
-    if (has_errors && num)
+    if (has_errors && !discrete)
       fig <- plotly::add_ribbons(
        fig,
        x = ~bin_mean,

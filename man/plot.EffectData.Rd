@@ -23,7 +23,7 @@
   fill = getOption("effectplots.fill"),
   alpha = 1,
   bar_height = 1,
-  bar_width = 0.7,
+  bar_width = 1,
   bar_measure = c("weight", "N"),
   wrap_x = 10,
   rotate_x = 0,
@@ -52,9 +52,9 @@ Has no effect if \code{ylim} is passed. Only for multiple plots.}
 
 \item{ylim}{A vector of length 2 with manual y axis limits, or a list thereof.}
 
-\item{cat_lines}{Show lines for non-numeric features. Default is \code{TRUE}.}
+\item{cat_lines}{Show lines for discrete features. Default is \code{TRUE}.}
 
-\item{num_points}{Show points for numeric features. Default is \code{FALSE}.}
+\item{num_points}{Show points for continuous features. Default is \code{FALSE}.}
 
 \item{title}{Overall plot title, by default \code{""} (no title).}
 
@@ -90,7 +90,7 @@ To change globally, set \verb{options(effectplots.fill = new color)}.}
 
 \item{bar_height}{Relative bar height (default 1). Set to 0 for no bars.}
 
-\item{bar_width}{Relative bar width of non-numeric features, by default 0.7.}
+\item{bar_width}{Bar width multiplier (for discrete features). By default 1.}
 
 \item{bar_measure}{What should bars represent? Either "weight" (default) or "N".}
 

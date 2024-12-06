@@ -43,7 +43,7 @@
 #' M |> plot()
 #'
 #' M2 <- ale(fit, v = colnames(iris)[-1], data = iris, breaks = 5)
-#' plot(M2, share_y = "all")  # Only numeric variables shown
+#' plot(M2, share_y = "all")  # Only continuous variables shown
 ale <- function(object, ...) {
   UseMethod("ale")
 }

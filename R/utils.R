@@ -1,4 +1,4 @@
-#' Is "EffectData" Numeric
+#' Is "EffectData" Discrete
 #'
 #' Internal function that shows which of the list elements in an object `x` of class
 #' "EffectData" is to be considered as numeric or not.
@@ -10,8 +10,8 @@
 #' @returns
 #'   A logical vector of the same length as `x` with the information whether the
 #'   feature of `x` is to be treated as numeric or not.
-.num <- function(x) {
-  f <- function(z) is.numeric(z$bin_mean)
+is_discrete <- function(x) {
+  f <- function(z) attr(z, "discrete")
   if (inherits(x, "EffectData")) {
     return(vapply(x, FUN = f, FUN.VALUE = logical(1L), USE.NAMES = FALSE))
   }
