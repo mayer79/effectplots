@@ -21,8 +21,8 @@
 #'   take into account error bars/ribbons.
 #'   Has no effect if `ylim` is passed. Only for multiple plots.
 #' @param ylim A vector of length 2 with manual y axis limits, or a list thereof.
-#' @param cat_lines Show lines for discrete features. Default is `TRUE`.
-#' @param num_points Show points for continuous features. Default is `FALSE`.
+#' @param discrete_lines Show lines for discrete features. Default is `TRUE`.
+#' @param continuous_points Show points for continuous features. Default is `FALSE`.
 #' @param title Overall plot title, by default `""` (no title).
 #' @param subplot_titles Should variable names be shown as subplot titles?
 #'   Default is `TRUE`. Only for multiple plots.
@@ -76,8 +76,8 @@ plot.EffectData <- function(
     byrow = TRUE,
     share_y = c("no", "all", "rows", "cols"),
     ylim = NULL,
-    cat_lines = TRUE,
-    num_points = FALSE,
+    discrete_lines = TRUE,
+    continuous_points = FALSE,
     title = "",
     subplot_titles = TRUE,
     ylab = NULL,
@@ -180,8 +180,8 @@ plot.EffectData <- function(
         v = names(x),
         share_y = "no",
         ylim = ylim,
-        cat_lines = cat_lines,
-        num_points = num_points,
+        discrete_lines = discrete_lines,
+        continuous_points = continuous_points,
         title = title,
         ylab = ylab,
         stat_info = stat_info,
@@ -201,8 +201,8 @@ plot.EffectData <- function(
         v = names(x),
         share_y = "no",
         ylim = ylim,
-        cat_lines = cat_lines,
-        num_points = num_points,
+        discrete_lines = discrete_lines,
+        continuous_points = continuous_points,
         title = title,
         title_as_ann = FALSE,
         ylab = ylab,
@@ -276,8 +276,8 @@ plot.EffectData <- function(
       rotate_x = rotate_x,
       MoreArgs = list(
         share_y = share_y,
-        cat_lines = cat_lines,
-        num_points = num_points,
+        discrete_lines = discrete_lines,
+        continuous_points = continuous_points,
         ylab = ylab,
         stat_info = stat_info,
         interval = interval,
@@ -317,8 +317,8 @@ plot.EffectData <- function(
       MoreArgs = list(
         title_as_ann = TRUE,
         share_y = share_y,
-        cat_lines = cat_lines,
-        num_points = num_points,
+        discrete_lines = discrete_lines,
+        continuous_points = continuous_points,
         ylab = ylab,
         show_ylab = FALSE,  # replaced by global annotation
         stat_info = stat_info,
@@ -378,8 +378,8 @@ one_ggplot <- function(
     v,
     share_y,
     ylim,
-    num_points,
-    cat_lines,
+    continuous_points,
+    discrete_lines,
     title,
     ylab,
     stat_info,
@@ -483,7 +483,7 @@ one_ggplot <- function(
   }
 
   # Add optional points
-  if (discrete || num_points) {
+  if (discrete || continuous_points) {
     p <- p + ggplot2::geom_point(
       ggplot2::aes(color = varying_),
       size = 2,
@@ -493,7 +493,7 @@ one_ggplot <- function(
   }
 
   # Add optional lines
-  if (!discrete || cat_lines) {
+  if (!discrete || discrete_lines) {
     p <- p + ggplot2::geom_line(
       ggplot2::aes(color = varying_, group = varying_),
       linewidth = 0.8,
@@ -536,8 +536,8 @@ one_plotly <- function(
     v,
     share_y,
     ylim,
-    cat_lines,
-    num_points,
+    discrete_lines,
+    continuous_points,
     title,
     title_as_ann = FALSE,
     ylab,
@@ -554,9 +554,9 @@ one_plotly <- function(
     overlay = "y2"
 ) {
   discrete <- is_discrete(x)
-  if (!discrete && !num_points) {
+  if (!discrete && !continuous_points) {
     scatter_mode <- "lines"
-  } else if (discrete && !cat_lines) {
+  } else if (discrete && !discrete_lines) {
     scatter_mode <- "markers"
   } else {
     scatter_mode <-  "lines+markers"

@@ -11,8 +11,8 @@
   byrow = TRUE,
   share_y = c("no", "all", "rows", "cols"),
   ylim = NULL,
-  cat_lines = TRUE,
-  num_points = FALSE,
+  discrete_lines = TRUE,
+  continuous_points = FALSE,
   title = "",
   subplot_titles = TRUE,
   ylab = NULL,
@@ -52,9 +52,9 @@ Has no effect if \code{ylim} is passed. Only for multiple plots.}
 
 \item{ylim}{A vector of length 2 with manual y axis limits, or a list thereof.}
 
-\item{cat_lines}{Show lines for discrete features. Default is \code{TRUE}.}
+\item{discrete_lines}{Show lines for discrete features. Default is \code{TRUE}.}
 
-\item{num_points}{Show points for continuous features. Default is \code{FALSE}.}
+\item{continuous_points}{Show points for continuous features. Default is \code{FALSE}.}
 
 \item{title}{Overall plot title, by default \code{""} (no title).}
 
