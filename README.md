@@ -25,7 +25,7 @@ We highly recommend Christoph Molnar's book [3] for more info on feature effects
 **Workflow**
 
 1. **Crunch** values via `feature_effects()` or the little helpers `average_observed()`, `partial_dependence()` etc.
-2. **Update** the results with `update()`: Combine rare levels of categorical features, sort results by importance etc.
+2. **Update** the results with `update()`: Combine rare levels of categorical features, sort results by importance, turn values of discrete features to factor etc.
 3. **Plot** the results with `plot()`: Choose between ggplot2/patchwork and plotly.
 
 ## Installation
@@ -54,6 +54,7 @@ xvars <- c("year", "town", "driver_age", "car_weight", "car_power", "car_age")
 
 # 0.1s on laptop
 average_observed(df[xvars], y = df$claim_nb) |>
+  update(to_factor = TRUE) |> 
   plot(share_y = "all")
 ```
 
@@ -144,7 +145,7 @@ To look closer at bias, let's select the statistic "resid_mean" along with point
 c(m_train, m_test) |> 
   update(drop_below_n = 50) |> 
   plot(
-    ylim = c(-0.07, 0.12),
+    ylim = c(-0.07, 0.08),
     ncol = 2,
     byrow = FALSE,
     stats = "resid_mean",

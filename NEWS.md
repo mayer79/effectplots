@@ -6,16 +6,14 @@
 
 ### Efficiency improvements
 
-- Significant speed-up and memory reduction for discrete numeric features [#16](https://github.com/mayer79/effectplots/pull/16).
-- Significant speed-up and memory reduction for continuous features by delegating outlier clipping to the binning algorithm [#24](https://github.com/mayer79/effectplots/pull/24).
-- Significant speed-up and memory reduction for regular breaks [#25](https://github.com/mayer79/effectplots/pull/25).
+- Significant speed-up and memory reduction for numeric features [#16](https://github.com/mayer79/effectplots/pull/16), [#24](https://github.com/mayer79/effectplots/pull/24), [#25](https://github.com/mayer79/effectplots/pull/25).
 - The barebone ALE function `.ale()` has become faster thanks to [issue #11](https://github.com/mayer79/effectplots/issues/11) by [@SebKrantz](https://github.com/SebKrantz).
 - Subsampling indices for outlier capping is now done only once, instead of once per feature [#15](https://github.com/mayer79/effectplots/pull/15).
 
 ### Minor bug fixes
 
 - NA values in feature columns have not been counted in the counts "N".
-- Ordered factors are now working.
+- Ordered factors are now working properly.
 - ALE are correct also with empty bins at the border (could happen with user-defined breaks).
 - `update(collapse_m = ...)` has collapsed wrong categories [#31](https://github.com/mayer79/effectplots/pull/31), [#34](https://github.com/mayer79/effectplots/pull/34), and [#35](https://github.com/mayer79/effectplots/pull/36).
 
@@ -27,7 +25,7 @@
 ### Other changes
 
 - Plots with more than one line now use "Effect" als default y label.
-- Automatic break count selection via "FD", "Scott" and via function is not possible anymore ([#24](https://github.com/mayer79/effectplots/pull/24)).
+- Automatic break count selection via "FD", "Scott" and via function is not possible anymore [#24](https://github.com/mayer79/effectplots/pull/24).
 - Export of `fcut()`, a fast variant of `cut()` [#25](https://github.com/mayer79/effectplots/pull/25).
 - x axes are not collected anymore by {patchwork} [#27](https://github.com/mayer79/effectplots/pull/27).
 - The default of `discrete_m = 5` has been increased to 13 [#29](https://github.com/mayer79/effectplots/pull/29).
@@ -39,6 +37,10 @@
 - ALE values are now plotted at the right bin break (instead of bin mean) [#38](https://github.com/mayer79/effectplots/pull/38).
 - Empty factor levels in features are not anymore dropped. However, you can use `update(..., drop_empty = TRUE)` to drop them after calculations [#40](https://github.com/mayer79/effectplots/pull/40).
 - Better input checks for `average_observed()`, `average_predicted()`, and `bias()` [#41](https://github.com/mayer79/effectplots/pull/41).
+- `plot()`: Renamed argument `num_points` to `continuous_points` and `cat_lines` to `discrete_lines`  [#42](https://github.com/mayer79/effectplots/pull/42).
+- `update()`: New argument `to_factor` to turn discrete non-factors to factors [#42](https://github.com/mayer79/effectplots/pull/42).
+- EffectData class: Discrete feature values in the output class are represented by their original data types instead of converting them to factors [#42](https://github.com/mayer79/effectplots/pull/42).
+- EffectData class: The data.frames in the output now contain an attributes `discrete` to distinguish continuous from discrete features [#42](https://github.com/mayer79/effectplots/pull/42).
 
 # effectplots 0.1.0
 

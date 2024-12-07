@@ -169,8 +169,21 @@ quartiles +- 2 IQR using a sample of <= 9997 observations to calculate quartiles
 }}
 }
 \value{
-A list (of class "EffectData") with a data.frame of statistics per feature. Use
-single bracket subsetting to select part of the output.
+A list (of class "EffectData") with a data.frame per feature having columns:
+\itemize{
+\item \code{bin_mid}: Bin mid points. In the plots, the bars are centered around these.
+\item \code{bin_width}: Absolute width of the bin. In the plots, these equal the bar widths.
+\item \code{bin_mean}: For continuous features, the (possibly weighted) average feature
+value within bin. For discrete features equivalent to \code{bin_mid}.
+\item \code{N}: The number of observations within bin.
+\item \code{weight}: The weight sum within bin. When \code{w = NULL}, equivalent to \code{N}.
+\item Different statistics, depending on the function call.
+}
+
+Use single bracket subsetting to select part of the output. Note that each
+data.frame contains an attribute "discrete" with the information whether the
+feature is discrete or continuous. This attribute might be lost when you manually
+modify the data.frames.
 }
 \description{
 This is the main function of the package. By default, it calculates
@@ -185,15 +198,16 @@ The difference to average observed y values shows model bias.
 both \code{y} and predictions are available. Useful to study model bias.
 \item "pd": Partial dependence (Friedman, 2001): See \code{\link[=partial_dependence]{partial_dependence()}}.
 Evaluated at bin averages, not at bin midpoints.
-\item "ale": Accumulated local effects (Apley, 2020): See \code{\link[=ale]{ale()}}. Only for numeric X.
+\item "ale": Accumulated local effects (Apley, 2020): See \code{\link[=ale]{ale()}}.
+Only for continuous features.
 }
 
 Additionally, corresponding counts/weights are calculated, and
 standard deviations of observed y and residuals.
 
-Numeric X with more than \code{discrete_m = 13} disjoint values are binned via \code{breaks}.
-If \code{breaks} is a single integer or "Sturges", the total bin range is calculated
-without values outside +-2 IQR from the quartiles.
+Numeric features with more than \code{discrete_m = 13} disjoint values are binned via
+\code{breaks}. If \code{breaks} is a single integer or "Sturges", the total bin range is
+calculated without values outside +-2 IQR from the quartiles.
 Values outside the bin range are placed in the outermost bins. Note that
 at most 9997 observations are used to calculate quartiles and IQR.
 
