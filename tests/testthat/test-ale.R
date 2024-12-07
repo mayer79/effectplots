@@ -11,3 +11,4 @@ test_that("ale() is consistent with feature_effects()", {
   )
   expect_equal(ale, marg)
 })
+
