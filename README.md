@@ -25,7 +25,7 @@ We highly recommend Christoph Molnar's book [3] for more info on feature effects
 **Workflow**
 
 1. **Crunch** values via `feature_effects()` or the little helpers `average_observed()`, `partial_dependence()` etc.
-2. **Update** the results with `update()`: Combine rare levels of categorical features, sort results by importance etc.
+2. **Update** the results with `update()`: Combine rare levels of categorical features, sort results by importance, turn values of discrete features to factor etc.
 3. **Plot** the results with `plot()`: Choose between ggplot2/patchwork and plotly.
 
 ## Installation

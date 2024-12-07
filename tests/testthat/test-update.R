@@ -26,7 +26,7 @@ test_that("update() can drop small levels", {
   expect_equal(nrow(res$Species), 1L)
 })
 
-test_that("update() can collapse levels", {
+test_that("update() can collapse levels of a factor", {
   res <- update(M, collapse_m = 2)
 
   # No effect on numeric features
@@ -54,6 +54,26 @@ test_that("update() can collapse levels", {
     weighted.mean(M$Species$y_sd[s1]^2, M$Species$weight[s1]),
     res$Species$y_sd[s2]^2
   )
+})
+
+test_that("update() can collapse levels of a character", {
+  ir <- transform(iris, Species = as.character(Species))
+  fit2 <- lm(Sepal.Length ~ Species + Petal.Width, data = ir)
+  M2 <- feature_effects(
+    fit2,
+    v = c("Petal.Length", "Petal.Width", "Species"),
+    data = ir[c(11:50, 61:100, 101:150), ],
+    y = "Sepal.Length",
+    breaks = 5
+  )
+
+  res <- update(M2, collapse_m = 2)
+
+  # No effect on numeric features
+  expect_equal(M2$Petal.Width, res$Petal.Width)
+
+  # The result has the right levels (we kept all rows of virginica)
+  expect_equal(res$Species$bin_mid, c("virginica", "other"))
 })
 
 test_that("update() can remove NA levels", {

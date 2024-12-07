@@ -7,7 +7,9 @@ test_that("bias() is consistent with feature_effects()", {
     fit, v = v, data = iris, y = iris$Sepal.Length, pd_n = 0, ale_n = 0
   )
   for (z in v) {
-    expect_equal(b[[z]], marg[[z]][, names(marg[[z]]) %in% colnames(b[[z]])])
+    out <- b[[z]]
+    attr(out, "discrete") <- NULL
+    expect_equal(out, marg[[z]][names(marg[[z]]) %in% colnames(b[[z]])])
   }
 })
 

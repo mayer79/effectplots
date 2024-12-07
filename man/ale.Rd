@@ -142,8 +142,21 @@ quartiles +- 2 IQR using a sample of <= 9997 observations to calculate quartiles
 }}
 }
 \value{
-A list (of class "EffectData") with a data.frame of statistics per feature. Use
-single bracket subsetting to select part of the output.
+A list (of class "EffectData") with a data.frame per feature having columns:
+\itemize{
+\item \code{bin_mid}: Bin mid points. In the plots, the bars are centered around these.
+\item \code{bin_width}: Absolute width of the bin. In the plots, these equal the bar widths.
+\item \code{bin_mean}: For continuous features, the (possibly weighted) average feature
+value within bin. For discrete features equivalent to \code{bin_mid}.
+\item \code{N}: The number of observations within bin.
+\item \code{weight}: The weight sum within bin. When \code{w = NULL}, equivalent to \code{N}.
+\item Different statistics, depending on the function call.
+}
+
+Use single bracket subsetting to select part of the output. Note that each
+data.frame contains an attribute "discrete" with the information whether the
+feature is discrete or continuous. This attribute might be lost when you manually
+modify the data.frames.
 }
 \description{
 Calculates ALE for one or multiple continuous features specified by \code{X}.

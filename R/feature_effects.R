@@ -86,8 +86,20 @@
 #' @param ... Further arguments passed to `pred_fun()`, e.g., `type = "response"` in
 #'   a `glm()` or (typically) `prob = TRUE` in classification models.
 #' @returns
-#'   A list (of class "EffectData") with a data.frame of statistics per feature. Use
-#'   single bracket subsetting to select part of the output.
+#'   A list (of class "EffectData") with a data.frame per feature having columns:
+#'
+#'   - `bin_mid`: Bin mid points. In the plots, the bars are centered around these.
+#'   - `bin_width`: Absolute width of the bin. In the plots, these equal the bar widths.
+#'   - `bin_mean`: For continuous features, the (possibly weighted) average feature
+#'     value within bin. For discrete features equivalent to `bin_mid`.
+#'   - `N`: The number of observations within bin.
+#'   - `weight`: The weight sum within bin. When `w = NULL`, equivalent to `N`.
+#'   - Different statistics, depending on the function call.
+#'
+#'   Use single bracket subsetting to select part of the output. Note that each
+#'   data.frame contains an attribute "discrete" with the information whether the
+#'   feature is discrete or continuous. This attribute might be lost when you manually
+#'   modify the data.frames.
 #' @seealso [plot.EffectData()], [update.EffectData()], [partial_dependence()],
 #'   [ale()], [average_observed], [average_predicted()], [bias()]
 #' @references

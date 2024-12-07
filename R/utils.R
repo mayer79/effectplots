@@ -11,7 +11,13 @@
 #'   A logical vector of the same length as `x` with the information whether the
 #'   feature of `x` is to be treated as numeric or not.
 is_discrete <- function(x) {
-  f <- function(z) attr(z, "discrete")
+  f <- function(z) {
+    out <- attr(z, "discrete")
+    if (is.null(out)) {
+      stop("Attribute 'discrete' not found.")
+    }
+    return(out)
+  }
   if (inherits(x, "EffectData")) {
     return(vapply(x, FUN = f, FUN.VALUE = logical(1L), USE.NAMES = FALSE))
   }
