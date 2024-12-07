@@ -648,7 +648,7 @@ one_plotly <- function(
       ann <- list(
         text = title,
         x = 0,
-        y = 1.05,
+        y = 1.02,
         font = list(size = 17),
         xanchor = "left",
         yanchor = "bottom",
@@ -657,7 +657,7 @@ one_plotly <- function(
         yshift = 3,
         showarrow = FALSE
       )
-      fig <- plotly::layout(fig, annotations = ann, margin = list(t = 60))
+      fig <- plotly::layout(fig, annotations = ann)
     }
   }
 
