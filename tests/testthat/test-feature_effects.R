@@ -23,5 +23,6 @@ test_that("discrete output keeps its type", {
     vapply(M, function(z) typeof(z$bin_mid), FUN.VALUE = character(1), USE.NAMES = F),
     c("integer", "double", "character", "logical", "integer")
   )
-})
 
+  expect_no_error(plot(M))
+})

@@ -520,7 +520,7 @@ one_ggplot <- function(
       p <- p + ggplot2::scale_y_continuous(expand = ggplot2::expansion(mult = 0.01))
     }
   }
-  if (discrete) {
+  if (is.factor(x$bin_mid) || is.character(x$bin_mid)) {
     if (wrap_x > 0 && is.finite(wrap_x)) {
       p <- p + ggplot2::scale_x_discrete(labels = ggplot2::label_wrap_gen(wrap_x))
     }
@@ -562,15 +562,19 @@ one_plotly <- function(
     scatter_mode <-  "lines+markers"
   }
 
-  # Deal with NAs in categorical X
-  if (discrete && anyNA(x$bin_mid)) {
-    lvl <- levels(x$bin_mid)
-    if ("NA" %in% lvl) {
-      warning("Can't show NA level on x axis because there is already a level 'NA'")
+  # Deal with NAs in categorical x. Only works because NA would be last category
+  fact <- is.factor(x$bin_mid)
+  if ((fact || is.character(x$bin_mid)) && anyNA(x$bin_mid)) {
+    # In this part, we lose the attribute "discrete". But we don't need it anymore.
+    if (fact) {
+      x <- droplevels(x)
     } else {
-      levels(x$bin_mid) <- levels(x$bin_mean) <- c(lvl, "NA")
-      x[is.na(x$bin_mid), c("bin_mid", "bin_mean")] <- "NA"
+      x$bin_mid <- x$bin_mean <- as.factor(x$bin_mid)
     }
+    lvl <- levels(x$bin_mid)
+    oth <- make.names(c(lvl, "NA"), unique = TRUE)[length(lvl) + 1L]
+    levels(x$bin_mid) <- levels(x$bin_mean) <- c(lvl, oth)
+    x[is.na(x$bin_mid), c("bin_mid", "bin_mean")] <- oth
   }
 
   fig <- plotly::plot_ly()

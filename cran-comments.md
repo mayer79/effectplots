@@ -1,18 +1,9 @@
-## Resubmission
-
-Thanks for pointing out three issues in the initial submission. They are now fixed.
-
-- Two missing "returns" sections.
-- A <<- in a function that restored the global seed. This is now removed.
-
-## Initial submission
-
-## effectplots 0.0.1
+## effectplots 0.2.0
 
 Dear CRAN team
 
-This is a brand new package dedicated to inspecting statistical and ML models. It
-is intended to work also on very large data.
+This is the second release of the package. This update fixes a major bug, and comes
+with many improvements and speed-ups.
 
 ## R CMD check results
 

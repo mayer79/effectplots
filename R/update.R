@@ -87,7 +87,8 @@ update_one <- function(
     drop_below_weight,
     na.rm
 ) {
-  if (to_factor && is_discrete(x) && !is.factor(x$bin_mid)) {
+  discrete <- is_discrete(x)
+  if (to_factor && discrete && !is.factor(x$bin_mid)) {
     x$bin_mid <- x$bin_mean <- factor(x$bin_mean)
   }
   if (drop_empty) {
@@ -105,6 +106,7 @@ update_one <- function(
   if (isTRUE(na.rm)) {
     x <- subset(x, !is.na(bin_mid))
   }
+  attr(x, "discrete") <- discrete
   return(x)
 }
 
@@ -119,9 +121,6 @@ update_one <- function(
   ind <- order(x[[by]], decreasing = TRUE)
   x_keep <- x[sort(ind[1:(m - 1L)]), ]  # largest m - 1 categories in original order
   x_agg <- x[ind[m:nrow(x)], ]          # the rest
-
-  # Lost during subsetting
-  attr(x_keep, "discrete") <- attr(x, "discrete")  # TRUE
 
   # Derive name of new value: "other" or "other1" etc.
   fact <- is.factor(x_keep$bin_mid)

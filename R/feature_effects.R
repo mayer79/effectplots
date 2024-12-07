@@ -436,7 +436,7 @@ feature_effects.H2OModel <- function(
   if (inherits(data, "H2OFrame")) {
     if (is.null(pred) && calc_pred) {
       pred <- prep_pred(
-        predict(object, data, ...), trafo = trafo, which_pred = which_pred
+        stats::predict(object, data, ...), trafo = trafo, which_pred = which_pred
       )
     }
     data <- as.data.frame(data)
@@ -606,10 +606,5 @@ calculate_stats <- function(
       out$ale[ok] <- ale
     }
   }
-
-  # Convert non-numeric levels *after* calculation of partial dependence and ale!
-  # if (!num && !is.factor(out$bin_mean)) {
-  #   out$bin_mid <- out$bin_mean <- factor(out$bin_mean)
-  # }
   return(out)
 }
