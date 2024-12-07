@@ -18,7 +18,7 @@ features specified by X."><meta property="og:image" content="/logo.png"><!-- mat
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">effectplots</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0</span>
       </span>
     </div>
 
@@ -128,8 +128,17 @@ using a sample of &lt;= 9997 observations to calculate quartiles.</p></dd>
 </dl></div>
     <div id="value">
     <h2>Value</h2>
-    <p>A list (of class "EffectData") with a data.frame of statistics per feature. Use
-single bracket subsetting to select part of the output.</p>
+    <p>A list (of class "EffectData") with a data.frame per feature having columns:</p><ul><li><p><code>bin_mid</code>: Bin mid points. In the plots, the bars are centered around these.</p></li>
+<li><p><code>bin_width</code>: Absolute width of the bin. In the plots, these equal the bar widths.</p></li>
+<li><p><code>bin_mean</code>: For continuous features, the (possibly weighted) average feature
+value within bin. For discrete features equivalent to <code>bin_mid</code>.</p></li>
+<li><p><code>N</code>: The number of observations within bin.</p></li>
+<li><p><code>weight</code>: The weight sum within bin. When <code>w = NULL</code>, equivalent to <code>N</code>.</p></li>
+<li><p>Different statistics, depending on the function call.</p></li>
+</ul><p>Use single bracket subsetting to select part of the output. Note that each
+data.frame contains an attribute "discrete" with the information whether the
+feature is discrete or continuous. This attribute might be lost when you manually
+modify the data.frames.</p>
     </div>
     <div id="details">
     <h2>Details</h2>

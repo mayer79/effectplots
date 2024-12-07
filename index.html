@@ -34,7 +34,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="index.html">effectplots</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0</span>
       </span>
     </div>
 
@@ -89,7 +89,7 @@
 <li>
 <strong>Crunch</strong> values via <code><a href="reference/feature_effects.html">feature_effects()</a></code> or the little helpers <code><a href="reference/average_observed.html">average_observed()</a></code>, <code><a href="reference/partial_dependence.html">partial_dependence()</a></code> etc.</li>
 <li>
-<strong>Update</strong> the results with <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>: Combine rare levels of categorical features, sort results by importance etc.</li>
+<strong>Update</strong> the results with <code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>: Combine rare levels of categorical features, sort results by importance, turn values of discrete features to factor etc.</li>
 <li>
 <strong>Plot</strong> the results with <code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>: Choose between ggplot2/patchwork and plotly.</li>
 </ol>
@@ -118,6 +118,7 @@
 <span></span>
 <span><span class="co"># 0.1s on laptop</span></span>
 <span><span class="fu"><a href="reference/average_observed.html">average_observed</a></span><span class="op">(</span><span class="va">df</span><span class="op">[</span><span class="va">xvars</span><span class="op">]</span>, y <span class="op">=</span> <span class="va">df</span><span class="op">$</span><span class="va">claim_nb</span><span class="op">)</span> <span class="op">|&gt;</span></span>
+<span>  <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span>to_factor <span class="op">=</span> <span class="cn">TRUE</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span>share_y <span class="op">=</span> <span class="st">"all"</span><span class="op">)</span></span></code></pre></div>
 <p><img src="reference/figures/avg_obs.svg"></p>
 <p>A shared y axis helps to compare the strength of the association across features.</p>
@@ -195,7 +196,7 @@
 <code class="sourceCode R"><span><span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="va">m_train</span>, <span class="va">m_test</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/stats/update.html" class="external-link">update</a></span><span class="op">(</span>drop_below_n <span class="op">=</span> <span class="fl">50</span><span class="op">)</span> <span class="op">|&gt;</span> </span>
 <span>  <span class="fu"><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot</a></span><span class="op">(</span></span>
-<span>    ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.07</span>, <span class="fl">0.12</span><span class="op">)</span>,</span>
+<span>    ylim <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="op">-</span><span class="fl">0.07</span>, <span class="fl">0.08</span><span class="op">)</span>,</span>
 <span>    ncol <span class="op">=</span> <span class="fl">2</span>,</span>
 <span>    byrow <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>    stats <span class="op">=</span> <span class="st">"resid_mean"</span>,</span>

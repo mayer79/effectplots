@@ -17,7 +17,7 @@
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">effectplots</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0</span>
       </span>
     </div>
 
@@ -55,16 +55,14 @@
 </ul></div>
 <div class="section level4">
 <h4 id="efficiency-improvements-0-1-1">Efficiency improvements<a class="anchor" aria-label="anchor" href="#efficiency-improvements-0-1-1"></a></h4>
-<ul><li>Significant speed-up and memory reduction for discrete numeric features <a href="https://github.com/mayer79/effectplots/pull/16" class="external-link">#16</a>.</li>
-<li>Significant speed-up and memory reduction for continuous features by delegating outlier clipping to the binning algorithm <a href="https://github.com/mayer79/effectplots/pull/24" class="external-link">#24</a>.</li>
-<li>Significant speed-up and memory reduction for regular breaks <a href="https://github.com/mayer79/effectplots/pull/25" class="external-link">#25</a>.</li>
+<ul><li>Significant speed-up and memory reduction for numeric features <a href="https://github.com/mayer79/effectplots/pull/16" class="external-link">#16</a>, <a href="https://github.com/mayer79/effectplots/pull/24" class="external-link">#24</a>, <a href="https://github.com/mayer79/effectplots/pull/25" class="external-link">#25</a>.</li>
 <li>The barebone ALE function <code><a href="../reference/dot-ale.html">.ale()</a></code> has become faster thanks to <a href="https://github.com/mayer79/effectplots/issues/11" class="external-link">issue </a><a href="https://github.com/mayer79/effectplots/issues/11" class="external-link">#11</a> by <a href="https://github.com/SebKrantz" class="external-link">@SebKrantz</a>.</li>
 <li>Subsampling indices for outlier capping is now done only once, instead of once per feature <a href="https://github.com/mayer79/effectplots/pull/15" class="external-link">#15</a>.</li>
 </ul></div>
 <div class="section level4">
 <h4 id="minor-bug-fixes-0-1-1">Minor bug fixes<a class="anchor" aria-label="anchor" href="#minor-bug-fixes-0-1-1"></a></h4>
 <ul><li>NA values in feature columns have not been counted in the counts “N”.</li>
-<li>Ordered factors are now working.</li>
+<li>Ordered factors are now working properly.</li>
 <li>ALE are correct also with empty bins at the border (could happen with user-defined breaks).</li>
 <li>
 <code>update(collapse_m = ...)</code> has collapsed wrong categories <a href="https://github.com/mayer79/effectplots/pull/31" class="external-link">#31</a>, <a href="https://github.com/mayer79/effectplots/pull/34" class="external-link">#34</a>, and <a href="https://github.com/mayer79/effectplots/pull/36" class="external-link">#35</a>.</li>
@@ -77,7 +75,7 @@
 <div class="section level4">
 <h4 id="other-changes-0-1-1">Other changes<a class="anchor" aria-label="anchor" href="#other-changes-0-1-1"></a></h4>
 <ul><li>Plots with more than one line now use “Effect” als default y label.</li>
-<li>Automatic break count selection via “FD”, “Scott” and via function is not possible anymore (<a href="https://github.com/mayer79/effectplots/pull/24" class="external-link">#24</a>).</li>
+<li>Automatic break count selection via “FD”, “Scott” and via function is not possible anymore <a href="https://github.com/mayer79/effectplots/pull/24" class="external-link">#24</a>.</li>
 <li>Export of <code><a href="../reference/fcut.html">fcut()</a></code>, a fast variant of <code><a href="https://rdrr.io/r/base/cut.html" class="external-link">cut()</a></code> <a href="https://github.com/mayer79/effectplots/pull/25" class="external-link">#25</a>.</li>
 <li>x axes are not collected anymore by {patchwork} <a href="https://github.com/mayer79/effectplots/pull/27" class="external-link">#27</a>.</li>
 <li>The default of <code>discrete_m = 5</code> has been increased to 13 <a href="https://github.com/mayer79/effectplots/pull/29" class="external-link">#29</a>.</li>
@@ -89,6 +87,12 @@
 <li>ALE values are now plotted at the right bin break (instead of bin mean) <a href="https://github.com/mayer79/effectplots/pull/38" class="external-link">#38</a>.</li>
 <li>Empty factor levels in features are not anymore dropped. However, you can use <code>update(..., drop_empty = TRUE)</code> to drop them after calculations <a href="https://github.com/mayer79/effectplots/pull/40" class="external-link">#40</a>.</li>
 <li>Better input checks for <code><a href="../reference/average_observed.html">average_observed()</a></code>, <code><a href="../reference/average_predicted.html">average_predicted()</a></code>, and <code><a href="../reference/bias.html">bias()</a></code> <a href="https://github.com/mayer79/effectplots/pull/41" class="external-link">#41</a>.</li>
+<li>
+<code><a href="https://rdrr.io/r/graphics/plot.default.html" class="external-link">plot()</a></code>: Renamed argument <code>num_points</code> to <code>continuous_points</code> and <code>cat_lines</code> to <code>discrete_lines</code> <a href="https://github.com/mayer79/effectplots/pull/42" class="external-link">#42</a>.</li>
+<li>
+<code><a href="https://rdrr.io/r/stats/update.html" class="external-link">update()</a></code>: New argument <code>to_factor</code> to turn discrete non-factors to factors <a href="https://github.com/mayer79/effectplots/pull/42" class="external-link">#42</a>.</li>
+<li>EffectData class: Discrete feature values in the output class are represented by their original data types instead of converting them to factors <a href="https://github.com/mayer79/effectplots/pull/42" class="external-link">#42</a>.</li>
+<li>EffectData class: The data.frames in the output now contain an attributes <code>discrete</code> to distinguish continuous from discrete features <a href="https://github.com/mayer79/effectplots/pull/42" class="external-link">#42</a>.</li>
 </ul></div>
 </div>
     <div class="section level2">

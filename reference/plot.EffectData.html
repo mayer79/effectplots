@@ -21,7 +21,7 @@ all statistics are plotted at bin means, except for ALE
       </button>
       <span class="navbar-brand">
         <a class="navbar-link" href="../index.html">effectplots</a>
-        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.1.1</span>
+        <span class="version label label-default" data-toggle="tooltip" data-placement="bottom" title="">0.2.0</span>
       </span>
     </div>
 
@@ -69,8 +69,8 @@ all statistics are plotted at bin means, except for ALE
 <span>  byrow <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  share_y <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"all"</span>, <span class="st">"rows"</span>, <span class="st">"cols"</span><span class="op">)</span>,</span>
 <span>  ylim <span class="op">=</span> <span class="cn">NULL</span>,</span>
-<span>  cat_lines <span class="op">=</span> <span class="cn">TRUE</span>,</span>
-<span>  num_points <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  discrete_lines <span class="op">=</span> <span class="cn">TRUE</span>,</span>
+<span>  continuous_points <span class="op">=</span> <span class="cn">FALSE</span>,</span>
 <span>  title <span class="op">=</span> <span class="st">""</span>,</span>
 <span>  subplot_titles <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  ylab <span class="op">=</span> <span class="cn">NULL</span>,</span>
@@ -81,7 +81,7 @@ all statistics are plotted at bin means, except for ALE
 <span>  fill <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/options.html" class="external-link">getOption</a></span><span class="op">(</span><span class="st">"effectplots.fill"</span><span class="op">)</span>,</span>
 <span>  alpha <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  bar_height <span class="op">=</span> <span class="fl">1</span>,</span>
-<span>  bar_width <span class="op">=</span> <span class="fl">0.7</span>,</span>
+<span>  bar_width <span class="op">=</span> <span class="fl">1</span>,</span>
 <span>  bar_measure <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weight"</span>, <span class="st">"N"</span><span class="op">)</span>,</span>
 <span>  wrap_x <span class="op">=</span> <span class="fl">10</span>,</span>
 <span>  rotate_x <span class="op">=</span> <span class="fl">0</span>,</span>
@@ -126,12 +126,12 @@ Has no effect if <code>ylim</code> is passed. Only for multiple plots.</p></dd>
 <dd><p>A vector of length 2 with manual y axis limits, or a list thereof.</p></dd>
 
 
-<dt id="arg-cat-lines">cat_lines<a class="anchor" aria-label="anchor" href="#arg-cat-lines"></a></dt>
-<dd><p>Show lines for non-numeric features. Default is <code>TRUE</code>.</p></dd>
+<dt id="arg-discrete-lines">discrete_lines<a class="anchor" aria-label="anchor" href="#arg-discrete-lines"></a></dt>
+<dd><p>Show lines for discrete features. Default is <code>TRUE</code>.</p></dd>
 
 
-<dt id="arg-num-points">num_points<a class="anchor" aria-label="anchor" href="#arg-num-points"></a></dt>
-<dd><p>Show points for numeric features. Default is <code>FALSE</code>.</p></dd>
+<dt id="arg-continuous-points">continuous_points<a class="anchor" aria-label="anchor" href="#arg-continuous-points"></a></dt>
+<dd><p>Show points for continuous features. Default is <code>FALSE</code>.</p></dd>
 
 
 <dt id="arg-title">title<a class="anchor" aria-label="anchor" href="#arg-title"></a></dt>
@@ -187,7 +187,7 @@ To change globally, set <code>options(effectplots.fill = new color)</code>.</p><
 
 
 <dt id="arg-bar-width">bar_width<a class="anchor" aria-label="anchor" href="#arg-bar-width"></a></dt>
-<dd><p>Relative bar width of non-numeric features, by default 0.7.</p></dd>
+<dd><p>Bar width multiplier (for discrete features). By default 1.</p></dd>
 
 
 <dt id="arg-bar-measure">bar_measure<a class="anchor" aria-label="anchor" href="#arg-bar-measure"></a></dt>
