@@ -352,7 +352,7 @@ plot.EffectData <- function(
       fig <- plotly::layout(
         fig,
         margin = list(t = 45 + 25 * subplot_titles),
-        title = list(text = title, y = 0.98)
+        title = list(text = title, y = 0.99)
       )
     }
 
@@ -648,8 +648,8 @@ one_plotly <- function(
       ann <- list(
         text = title,
         x = 0,
-        y = 1.02,
-        font = list(size = 17),
+        y = 1,
+        font = list(size = 16),
         xanchor = "left",
         yanchor = "bottom",
         xref = "paper",

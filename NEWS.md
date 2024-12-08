@@ -30,7 +30,7 @@
 - x axes are not collected anymore by {patchwork} [#27](https://github.com/mayer79/effectplots/pull/27).
 - The default of `discrete_m = 5` has been increased to 13 [#29](https://github.com/mayer79/effectplots/pull/29).
 - Slightly different check/preparation of predictions (and the argument `pred`). Helps to simplify the use of {h2o} [#32](https://github.com/mayer79/effectplots/pull/32).
-- Plotly plots got more vertical space between subplots, and the subplot titles are a bit further away from the subplots [#33](https://github.com/mayer79/effectplots/pull/33), [#43](https://github.com/mayer79/effectplots/pull/43).
+- Updated Plotly subplots layout [#33](https://github.com/mayer79/effectplots/pull/33), [#43](https://github.com/mayer79/effectplots/pull/43), [#44](https://github.com/mayer79/effectplots/pull/44), [#45](https://github.com/mayer79/effectplots/pull/45).
 - Better test coverage, e.g., [#34](https://github.com/mayer79/effectplots/pull/34).
 - (Slowish) support for h2o models [#36](https://github.com/mayer79/effectplots/pull/36).
 - Row names of statistics of numeric features are now removed [#37](https://github.com/mayer79/effectplots/pull/37).
@@ -41,6 +41,7 @@
 - `update()`: New argument `to_factor` to turn discrete non-factors to factors [#42](https://github.com/mayer79/effectplots/pull/42).
 - EffectData class: Discrete feature values in the output class are represented by their original data types instead of converting them to factors [#42](https://github.com/mayer79/effectplots/pull/42).
 - EffectData class: The data.frames in the output now contain an attributes `discrete` to distinguish continuous from discrete features [#42](https://github.com/mayer79/effectplots/pull/42).
+- `effect_importance()` will produce an error when sorting on non-existent statistic [#45](https://github.com/mayer79/effectplots/pull/45).
 
 # effectplots 0.1.0
 
