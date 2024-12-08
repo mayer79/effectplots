@@ -90,6 +90,14 @@ test_that("fbreaks() without outlier handling gives same breaks like hist()", {
   }
 })
 
+test_that("fbreaks() without outliers gives same breaks like hist()", {
+  x <- rep(0:1, times = c(90, 10))  # IQR is 0
+  expect_equal(
+    fbreaks(x, breaks = 5, outlier_iqr = 1.5),
+    graphics::hist(x, breaks = 5, plot = FALSE)$breaks
+  )
+})
+
 test_that("fbreaks() with outlier handling gives same breaks like hist()", {
   set.seed(1)
   x <- rnorm(1000)
