@@ -82,8 +82,10 @@ fbreaks <- function(x, breaks = "Sturges", outlier_iqr = 0, ix_sub = NULL) {
     r <- collapse::.range(x, na.rm = TRUE)
     if (outlier_iqr > 0 && is.finite(outlier_iqr)) {
       r2 <- wins_iqr(x, m = outlier_iqr, ix_sub = ix_sub)
-      r[1L] <- max(r[1L], r2[1L])
-      r[2L] <- min(r[2L], r2[2L])
+      if (!is.null(r2)) {
+        r[1L] <- max(r[1L], r2[1L])
+        r[2L] <- min(r[2L], r2[2L])
+      }
     }
     breaks <- pretty(r, n = breaks, min.n = 1)
   } else if (is.numeric(breaks)) {
