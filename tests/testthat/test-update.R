@@ -95,6 +95,8 @@ test_that("update() can sort according to importance", {
   imp <- effect_importance(M, "ale")
   expect_equal(names(imp[imp > 1e-4]), "Petal.Width")
   expect_equal(names(update(M, sort = "ale"))[1], "Petal.Width")
+
+  expect_error(effect_importance(M, by = "something"))
 })
 
 test_that("update() can drop empty levels", {

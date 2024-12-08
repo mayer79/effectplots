@@ -26,12 +26,14 @@
 #' effect_importance(M)
 effect_importance <- function(x, by = NULL) {
   stopifnot(inherits(x, "EffectData"))
-  S <- c("pd", "pred_mean", "y_mean", "resid_mean", "ale")
+
+  # Different order as .stats(x)
+  S <- intersect(c("pd", "pred_mean", "y_mean", "resid_mean", "ale"), .stats(x))
   if (is.null(by)) {
-    by <- intersect(S, .stats(x))[1L]
+    by <- S[1L]
     message("Importance via weighted variance of '", by, "'")
-  } else {
-    stopifnot(by %in% S)
+  } else if (!(by %in% S)) {
+    stop(paste("'by' must be in", paste(sQuote(S), collapse = ", ")))
   }
   return(vapply(x, FUN = .one_imp, by = by, FUN.VALUE = numeric(1L)))
 }
