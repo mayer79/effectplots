@@ -1,4 +1,4 @@
-# effectplots 0.1.1
+# effectplots 0.2.0
 
 ### Major bug fixes
 
