@@ -48,19 +48,19 @@
     </div>
 
     <div class="section level2">
-<h2 class="page-header" data-toc-text="0.1.1" id="effectplots-011">effectplots 0.1.1<a class="anchor" aria-label="anchor" href="#effectplots-011"></a></h2>
+<h2 class="page-header" data-toc-text="0.2.0" id="effectplots-020">effectplots 0.2.0<small>2024-12-11</small><a class="anchor" aria-label="anchor" href="#effectplots-020"></a></h2>
 <div class="section level4">
-<h4 id="major-bug-fixes-0-1-1">Major bug fixes<a class="anchor" aria-label="anchor" href="#major-bug-fixes-0-1-1"></a></h4>
+<h4 id="major-bug-fixes-0-2-0">Major bug fixes<a class="anchor" aria-label="anchor" href="#major-bug-fixes-0-2-0"></a></h4>
 <ul><li>The outlier clipping algorithm has unintentionally modified the values in place, i.e., also in the original dataframe. This is fixed by <a href="https://github.com/mayer79/effectplots/pull/24" class="external-link">#24</a>.</li>
 </ul></div>
 <div class="section level4">
-<h4 id="efficiency-improvements-0-1-1">Efficiency improvements<a class="anchor" aria-label="anchor" href="#efficiency-improvements-0-1-1"></a></h4>
+<h4 id="efficiency-improvements-0-2-0">Efficiency improvements<a class="anchor" aria-label="anchor" href="#efficiency-improvements-0-2-0"></a></h4>
 <ul><li>Significant speed-up and memory reduction for numeric features <a href="https://github.com/mayer79/effectplots/pull/16" class="external-link">#16</a>, <a href="https://github.com/mayer79/effectplots/pull/24" class="external-link">#24</a>, <a href="https://github.com/mayer79/effectplots/pull/25" class="external-link">#25</a>.</li>
 <li>The barebone ALE function <code><a href="../reference/dot-ale.html">.ale()</a></code> has become faster thanks to <a href="https://github.com/mayer79/effectplots/issues/11" class="external-link">issue </a><a href="https://github.com/mayer79/effectplots/issues/11" class="external-link">#11</a> by <a href="https://github.com/SebKrantz" class="external-link">@SebKrantz</a>.</li>
 <li>Subsampling indices for outlier capping is now done only once, instead of once per feature <a href="https://github.com/mayer79/effectplots/pull/15" class="external-link">#15</a>.</li>
 </ul></div>
 <div class="section level4">
-<h4 id="minor-bug-fixes-0-1-1">Minor bug fixes<a class="anchor" aria-label="anchor" href="#minor-bug-fixes-0-1-1"></a></h4>
+<h4 id="minor-bug-fixes-0-2-0">Minor bug fixes<a class="anchor" aria-label="anchor" href="#minor-bug-fixes-0-2-0"></a></h4>
 <ul><li>NA values in feature columns have not been counted in the counts “N”.</li>
 <li>Ordered factors are now working properly.</li>
 <li>ALE are correct also with empty bins at the border (could happen with user-defined breaks).</li>
@@ -68,12 +68,12 @@
 <code>update(collapse_m = ...)</code> has collapsed wrong categories <a href="https://github.com/mayer79/effectplots/pull/31" class="external-link">#31</a>, <a href="https://github.com/mayer79/effectplots/pull/34" class="external-link">#34</a>, and <a href="https://github.com/mayer79/effectplots/pull/36" class="external-link">#35</a>.</li>
 </ul></div>
 <div class="section level4">
-<h4 id="documentation-0-1-1">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-1-1"></a></h4>
+<h4 id="documentation-0-2-0">Documentation<a class="anchor" aria-label="anchor" href="#documentation-0-2-0"></a></h4>
 <ul><li>README has received examples for Tidymodels and probabilistic classification.</li>
 <li>Updated function documentation <a href="https://github.com/mayer79/effectplots/pull/41" class="external-link">#41</a>.</li>
 </ul></div>
 <div class="section level4">
-<h4 id="other-changes-0-1-1">Other changes<a class="anchor" aria-label="anchor" href="#other-changes-0-1-1"></a></h4>
+<h4 id="other-changes-0-2-0">Other changes<a class="anchor" aria-label="anchor" href="#other-changes-0-2-0"></a></h4>
 <ul><li>Plots with more than one line now use “Effect” als default y label.</li>
 <li>Automatic break count selection via “FD”, “Scott” and via function is not possible anymore <a href="https://github.com/mayer79/effectplots/pull/24" class="external-link">#24</a>.</li>
 <li>Export of <code><a href="../reference/fcut.html">fcut()</a></code>, a fast variant of <code><a href="https://rdrr.io/r/base/cut.html" class="external-link">cut()</a></code> <a href="https://github.com/mayer79/effectplots/pull/25" class="external-link">#25</a>.</li>
