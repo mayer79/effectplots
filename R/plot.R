@@ -562,17 +562,20 @@ one_plotly <- function(
     scatter_mode <-  "lines+markers"
   }
 
-  # Deal with NAs in categorical x. Only works because NA would be last category
-  fact <- is.factor(x$bin_mid)
-  if ((fact || is.character(x$bin_mid)) && anyNA(x$bin_mid)) {
+  # Deal with NAs in categorical x
+  if (anyNA(x$bin_mid) && !is.numeric(x$bin_mid)) {
     # In this part, we lose the attribute "discrete". But we don't need it anymore.
-    if (fact) {
+    if (is.factor(x$bin_mid)) {
       x <- droplevels(x)
     } else {
-      x$bin_mid <- x$bin_mean <- as.factor(x$bin_mid)
+      x$bin_mid <- x$bin_mean <- factor(x$bin_mid)
     }
     lvl <- levels(x$bin_mid)
-    oth <- make.names(c(lvl, "NA"), unique = TRUE)[length(lvl) + 1L]
+    if (!("NA" %in% lvl)) {
+      oth <- "NA"
+    } else {
+      oth <- make.names(c(lvl, "NA"), unique = TRUE)[length(lvl) + 1L]
+    }
     levels(x$bin_mid) <- levels(x$bin_mean) <- c(lvl, oth)
     x[is.na(x$bin_mid), c("bin_mid", "bin_mean")] <- oth
   }
