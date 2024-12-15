@@ -18,6 +18,9 @@ test_that("discrete output keeps its type", {
   M <- feature_effects(
     fit, v = c("Species", "Petal.Length", "char", "logical", "int"), data = X
   )
+  # M$Species[3, c("bin_mid", "bin_mean")] <- NA
+  # M$char[3, c("bin_mid", "bin_mean")] <- NA
+  # M$logical[2, c("bin_mid", "bin_mean")] <- NA
   expect_equal(is_discrete(M), c(TRUE, FALSE, TRUE, TRUE, TRUE))
   expect_equal(
     vapply(M, function(z) typeof(z$bin_mid), FUN.VALUE = character(1), USE.NAMES = F),
@@ -25,4 +28,51 @@ test_that("discrete output keeps its type", {
   )
 
   expect_no_error(plot(M))
+  expect_no_error(plot(M, plotly = TRUE))
+})
+
+test_that("constant columns work", {
+  n <- 100
+  X <- data.frame(
+    double = 1,
+    int = 1L,
+    logical = TRUE,
+    char = "A",
+    factor = factor("A"),
+    na = NA_real_
+  )[rep(1, n), ]
+
+  M <- feature_effects(
+    object = NULL,
+    v = colnames(X),
+    data = X,
+    pred_fun = function(m, x) rep(1, nrow(x)),
+    y = 1:n
+  )
+
+  xp_stats <- data.frame(
+    N = n,
+    weight = n,
+    pred_mean = 1,
+    y_mean = mean(1:n),
+    resid_mean = mean(1:n) - 1,
+    y_sd = sd(1:n),
+    resid_sd = sd(1:n - 1),
+    pd = 1,
+    ale = NA_real_  # is discrete
+  )
+
+  for (v in colnames(X)) {
+    xp_pos <- data.frame(bin_mid = X[1, v], bin_width = 0.7, bin_mean = X[1, v])
+    if (v == "na") {
+      # This is modified in calculate_stats() to treat that case non-numeric
+      xp_pos$bin_mid <- xp_pos$bin_mean <- NA_character_
+    }
+    xp <- cbind(xp_pos, xp_stats)
+    attr(xp, "discrete") <- TRUE
+    expect_equal(M[[v]], xp)
+  }
+
+  expect_no_error(plot(M))
+  expect_no_error(plot(M, plotly = TRUE))
 })

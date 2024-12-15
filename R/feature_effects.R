@@ -546,7 +546,8 @@ calculate_stats <- function(
 
     if (anyNA(rownames(M))) {
       mids <- c(mids, NA)
-      bin_width <- c(bin_width, NA)  #  Can't be plotted anyway
+      # We use the last bin width to fill the gap
+      bin_width <- c(bin_width, bin_width[length(bin_width)])
     }
 
     # Calculate bin_means, clip outliers, and replace missings (where possible)
@@ -559,6 +560,11 @@ calculate_stats <- function(
   }
   rownames(out) <- NULL
   attr(out, "discrete") <- discrete
+
+  # Turn numeric single-row NA into character for easier plotting
+  if (nrow(out) == 1L && is.na(out$bin_mid) && is.numeric(out$bin_mid)) {
+    out$bin_mid <- out$bin_mean <- NA_character_
+  }
 
   # Add partial dependence
   if (!is.null(pd_data)) {
