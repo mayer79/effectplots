@@ -76,3 +76,28 @@ test_that("constant columns work", {
   expect_no_error(plot(M))
   expect_no_error(plot(M, plotly = TRUE))
 })
+
+test_that("breaks can be specified, and bins have correct width", {
+  X <- data.frame(
+    a = c(NA, 1:10),
+    b = c(rep("A", 10), NA),
+    c = c(1:11)
+  )
+
+  M <- feature_effects(
+    object = NULL,
+    v = colnames(X),
+    data = X,
+    pred_fun = function(m, x) rep(1, nrow(x)),
+    breaks = list(a = c(0, 11), c = c(2, 3, 10)),
+    discrete_m = 2L
+  )
+
+  expect_equal(sapply(M, nrow), c(a = 2, b = 2, c = 2))
+  expect_equal(M$a$bin_width, c(11, 11 / 2))
+  expect_equal(M$b$bin_width, c(0.7, 0.7))
+  expect_equal(M$c$bin_width, c(1, 7))
+
+  expect_no_error(plot(M))
+  expect_no_error(plot(M, plotly = TRUE))
+})

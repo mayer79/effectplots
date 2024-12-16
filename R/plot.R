@@ -430,6 +430,9 @@ one_ggplot <- function(
   # Calculate transformation of bars on the right y axis
   if (is.null(ylim)) {
     r <- grDevices::extendrange(df$value_, f = 0.02)
+    if (r[1L] == r[2L]) {
+      r <- r + c(-1, 1)
+    }
   } else {
     f <- if (share_y != "no") -0.05 else -0.02
     r <- grDevices::extendrange(ylim, f = f)
@@ -528,6 +531,12 @@ one_ggplot <- function(
       p <- p + ggplot2::guides(x = ggplot2::guide_axis(angle = rotate_x))
     }
   }
+
+  # Show NAs on numeric x scale
+  if (anyNA(x$bin_mid) && is.numeric(x$bin_mid)) {
+    nsc <- numeric_scale_with_na(x, plotly = FALSE)
+    p <- p + do.call(ggplot2::scale_x_continuous, nsc)
+  }
   p
 }
 
@@ -578,6 +587,14 @@ one_plotly <- function(
     }
     levels(x$bin_mid) <- levels(x$bin_mean) <- c(lvl, oth)
     x[is.na(x$bin_mid), c("bin_mid", "bin_mean")] <- oth
+  }
+
+  # Deal with NAs in numeric x
+  if (anyNA(x$bin_mid) && is.numeric(x$bin_mid)) {
+    nsc <- numeric_scale_with_na(x, plotly = TRUE)
+    x[nrow(x), c("bin_mid", "bin_mean")] <- nsc$na.value
+  } else {
+    nsc <- NULL
   }
 
   fig <- plotly::plot_ly()
@@ -676,6 +693,14 @@ one_plotly <- function(
       line = list(color = "black", dash = "dash")
     )
     fig <- plotly::layout(fig, shapes = zero_line)
+  }
+
+  # Modify numeric x axis with special NA tick
+  if (!is.null(nsc)) {
+    fig <- plotly::layout(
+      fig,
+      xaxis = list(tickmode = "array", tickvals = nsc$breaks, ticktext = nsc$labels)
+    )
   }
 
   plotly::layout(

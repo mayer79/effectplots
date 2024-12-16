@@ -15,7 +15,7 @@ library(usethis)
 use_description(
   fields = list(
     Title = "Effect Plots",
-    Version = "0.2.0",
+    Version = "0.2.1",
     Description = "High-performance implementation of various effect plots
     useful for regression and probabilistic classification tasks.
     The package includes partial dependence plots
@@ -35,6 +35,8 @@ use_description(
 
 use_package("collapse", "Imports")
 use_package("ggplot2", "Imports")
+use_package("labeling", "Imports")
+use_package("scales", "Imports")
 use_package("grDevices", "Imports")
 use_package("patchwork", "Imports")
 use_package("plotly", "Imports")

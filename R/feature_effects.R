@@ -546,8 +546,9 @@ calculate_stats <- function(
 
     if (anyNA(rownames(M))) {
       mids <- c(mids, NA)
-      # We use the last bin width to fill the gap
-      bin_width <- c(bin_width, bin_width[length(bin_width)])
+      # We use half of the last bin width to fill the gap (NA value ~ discrete)
+      na_bin_width <- bin_width[length(bin_width)] / 2
+      bin_width <- c(bin_width, na_bin_width)
     }
 
     # Calculate bin_means, clip outliers, and replace missings (where possible)
