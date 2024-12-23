@@ -2,12 +2,12 @@
 
 ### Major improvement
 
-- NA values on x axis are always plotted, even for numeric features.
+- NA values on x axis are always plotted, even for numeric features [#49](https://github.com/mayer79/effectplots/pull/49).
 
 ### Minor changes
 
-- ggplot plots with no y variation would not show the exposure bars. This has been fixed.
-- Added {labeling} and {scales} explicitly to list of dependencies. Both are required by {ggplot2} anyway.
+- ggplot plots with no y variation would not show the exposure bars. This has been fixed in [#49](https://github.com/mayer79/effectplots/pull/49).
+- Added {labeling} and {scales} explicitly to list of dependencies. Both are required by {ggplot2} anyway [#49](https://github.com/mayer79/effectplots/pull/49). 
 
 # effectplots 0.2.0
 
