@@ -54,7 +54,7 @@ xvars <- c("year", "town", "driver_age", "car_weight", "car_power", "car_age")
 
 # 0.1s on laptop
 average_observed(df[xvars], y = df$claim_nb) |>
-  update(to_factor = TRUE) |> 
+  update(to_factor = TRUE) |>  # turn discrete numerics to factors
   plot(share_y = "all")
 ```
 
