@@ -534,7 +534,7 @@ one_ggplot <- function(
 
   # Show NAs on numeric x scale
   if (anyNA(x$bin_mid) && is.numeric(x$bin_mid)) {
-    nsc <- numeric_scale_with_na(x, plotly = FALSE)
+    nsc <- numeric_scale_with_na(x$bin_mid, widths = x$bin_width, plotly = FALSE)
     p <- p + do.call(ggplot2::scale_x_continuous, nsc)
   }
   p
@@ -591,7 +591,7 @@ one_plotly <- function(
 
   # Deal with NAs in numeric x
   if (anyNA(x$bin_mid) && is.numeric(x$bin_mid)) {
-    nsc <- numeric_scale_with_na(x, plotly = TRUE)
+    nsc <- numeric_scale_with_na(x$bin_mid, widths = x$bin_width, plotly = TRUE)
     x[nrow(x), c("bin_mid", "bin_mean")] <- nsc$na.value
   } else {
     nsc <- NULL

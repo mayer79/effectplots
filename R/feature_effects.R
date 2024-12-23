@@ -546,8 +546,8 @@ calculate_stats <- function(
 
     if (anyNA(rownames(M))) {
       mids <- c(mids, NA)
-      # We use half of the last bin width to fill the gap (NA value ~ discrete)
-      na_bin_width <- bin_width[length(bin_width)] / 2
+      # We use 0.75 of the last bin width to fill the gap (NA value ~ discrete)
+      na_bin_width <- bin_width[length(bin_width)] * 0.75
       bin_width <- c(bin_width, na_bin_width)
     }
 
@@ -561,11 +561,6 @@ calculate_stats <- function(
   }
   rownames(out) <- NULL
   attr(out, "discrete") <- discrete
-
-  # Turn numeric single-row NA into character for easier plotting
-  if (nrow(out) == 1L && is.na(out$bin_mid) && is.numeric(out$bin_mid)) {
-    out$bin_mid <- out$bin_mean <- NA_character_
-  }
 
   # Add partial dependence
   if (!is.null(pd_data)) {

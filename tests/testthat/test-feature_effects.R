@@ -39,7 +39,8 @@ test_that("constant columns work", {
     logical = TRUE,
     char = "A",
     factor = factor("A"),
-    na = NA_real_
+    na_num = NA_real_,
+    na_char = NA_character_
   )[rep(1, n), ]
 
   M <- feature_effects(
@@ -64,10 +65,6 @@ test_that("constant columns work", {
 
   for (v in colnames(X)) {
     xp_pos <- data.frame(bin_mid = X[1, v], bin_width = 0.7, bin_mean = X[1, v])
-    if (v == "na") {
-      # This is modified in calculate_stats() to treat that case non-numeric
-      xp_pos$bin_mid <- xp_pos$bin_mean <- NA_character_
-    }
     xp <- cbind(xp_pos, xp_stats)
     attr(xp, "discrete") <- TRUE
     expect_equal(M[[v]], xp)
@@ -94,7 +91,7 @@ test_that("breaks can be specified, and bins have correct width", {
   )
 
   expect_equal(sapply(M, nrow), c(a = 2, b = 2, c = 2))
-  expect_equal(M$a$bin_width, c(11, 11 / 2))
+  expect_equal(M$a$bin_width, c(11, 11 * 0.75))
   expect_equal(M$b$bin_width, c(0.7, 0.7))
   expect_equal(M$c$bin_width, c(1, 7))
 
