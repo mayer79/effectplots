@@ -1,9 +1,8 @@
-## effectplots 0.2.0
+## effectplots 0.2.1
 
 Dear CRAN team
 
-This is the second release of the package. This update fixes a major bug, and comes
-with many improvements and speed-ups.
+This is a small update which mainly brings the plotting of NA values on the x axis.
 
 ## R CMD check results
 
