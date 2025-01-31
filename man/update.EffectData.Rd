@@ -8,9 +8,9 @@
   object,
   sort_by = c("no", "pd", "pred_mean", "y_mean", "resid_mean", "ale"),
   to_factor = FALSE,
-  collapse_m = 30L,
+  collapse_m = 15L,
   collapse_by = c("weight", "N"),
-  drop_empty = FALSE,
+  drop_empty = TRUE,
   drop_below_n = 0,
   drop_below_weight = 0,
   na.rm = FALSE,
@@ -29,19 +29,21 @@ In combination with \code{collapse_m}, this can be used to collapse rare values 
 discrete numeric features.}
 
 \item{collapse_m}{If a factor or character feature has more than \code{collapse_m} levels,
-rare levels are collapsed into a new level "other". Standard deviations are
-collapsed via root of the weighted average variances. The default is 30.
+rare levels are collapsed into a new level "other p". Standard deviations are
+collapsed via root of the weighted average variances. The default is 15.
 Set to \code{Inf} for no collapsing.}
 
 \item{collapse_by}{How to determine "rare" levels in \code{collapse_m}?
 Either "weight" (default) or "N". Only matters in situations with case weights \code{w}.}
 
-\item{drop_empty}{Drop empty bins. Equivalent to \code{drop_below_n = 1}.}
+\item{drop_empty}{Drop empty bins. Equivalent to \code{drop_below_n = 1}.
+The default is \code{TRUE}.}
 
-\item{drop_below_n}{Drop bins with N below this value. Applied after collapsing.}
+\item{drop_below_n}{Drop bins with N below this value. Applied after collapsing.
+The default is 0.}
 
 \item{drop_below_weight}{Drop bins with weight below this value. Applied after
-collapsing.}
+collapsing. The default is 0.}
 
 \item{na.rm}{Should missing bin centers be dropped? Default is \code{FALSE}.}
 
