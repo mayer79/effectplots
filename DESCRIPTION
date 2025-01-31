@@ -1,6 +1,6 @@
 Package: effectplots
 Title: Effect Plots
-Version: 0.2.1
+Version: 0.2.2
 Authors@R: 
     person("Michael", "Mayer", , "mayermichael79@gmail.com", role = c("aut", "cre"))
 Description: High-performance implementation of various effect plots
