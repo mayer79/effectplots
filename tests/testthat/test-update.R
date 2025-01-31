@@ -111,7 +111,7 @@ test_that("update() can drop empty levels", {
 
   # setosa is here and stays with a normal update
   expect_equal(M2$Species[1L, "N"], 0)
-  expect_equal(update(M2)$Species[1L, "N"], 0)
+  expect_equal(update(M2, drop_empty = FALSE)$Species[1L, "N"], 0)
 
   # Not anymore
   expect_false("setosa" %in% levels(update(M2, drop_empty = TRUE)$Species$bin_mid))
