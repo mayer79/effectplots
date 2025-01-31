@@ -75,9 +75,9 @@ pass a vector or list of the same length as <code>object</code>.</p>
 <span>  <span class="va">object</span>,</span>
 <span>  sort_by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"no"</span>, <span class="st">"pd"</span>, <span class="st">"pred_mean"</span>, <span class="st">"y_mean"</span>, <span class="st">"resid_mean"</span>, <span class="st">"ale"</span><span class="op">)</span>,</span>
 <span>  to_factor <span class="op">=</span> <span class="cn">FALSE</span>,</span>
-<span>  collapse_m <span class="op">=</span> <span class="fl">30L</span>,</span>
+<span>  collapse_m <span class="op">=</span> <span class="fl">15L</span>,</span>
 <span>  collapse_by <span class="op">=</span> <span class="fu"><a href="https://rdrr.io/r/base/c.html" class="external-link">c</a></span><span class="op">(</span><span class="st">"weight"</span>, <span class="st">"N"</span><span class="op">)</span>,</span>
-<span>  drop_empty <span class="op">=</span> <span class="cn">FALSE</span>,</span>
+<span>  drop_empty <span class="op">=</span> <span class="cn">TRUE</span>,</span>
 <span>  drop_below_n <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  drop_below_weight <span class="op">=</span> <span class="fl">0</span>,</span>
 <span>  na.rm <span class="op">=</span> <span class="cn">FALSE</span>,</span>
@@ -107,8 +107,8 @@ discrete numeric features.</p></dd>
 
 <dt id="arg-collapse-m">collapse_m<a class="anchor" aria-label="anchor" href="#arg-collapse-m"></a></dt>
 <dd><p>If a factor or character feature has more than <code>collapse_m</code> levels,
-rare levels are collapsed into a new level "other". Standard deviations are
-collapsed via root of the weighted average variances. The default is 30.
+rare levels are collapsed into a new level "other p". Standard deviations are
+collapsed via root of the weighted average variances. The default is 15.
 Set to <code>Inf</code> for no collapsing.</p></dd>
 
 
@@ -118,16 +118,18 @@ Either "weight" (default) or "N". Only matters in situations with case weights <
 
 
 <dt id="arg-drop-empty">drop_empty<a class="anchor" aria-label="anchor" href="#arg-drop-empty"></a></dt>
-<dd><p>Drop empty bins. Equivalent to <code>drop_below_n = 1</code>.</p></dd>
+<dd><p>Drop empty bins. Equivalent to <code>drop_below_n = 1</code>.
+The default is <code>TRUE</code>.</p></dd>
 
 
 <dt id="arg-drop-below-n">drop_below_n<a class="anchor" aria-label="anchor" href="#arg-drop-below-n"></a></dt>
-<dd><p>Drop bins with N below this value. Applied after collapsing.</p></dd>
+<dd><p>Drop bins with N below this value. Applied after collapsing.
+The default is 0.</p></dd>
 
 
 <dt id="arg-drop-below-weight">drop_below_weight<a class="anchor" aria-label="anchor" href="#arg-drop-below-weight"></a></dt>
 <dd><p>Drop bins with weight below this value. Applied after
-collapsing.</p></dd>
+collapsing. The default is 0.</p></dd>
 
 
 <dt id="arg-na-rm">na.rm<a class="anchor" aria-label="anchor" href="#arg-na-rm"></a></dt>
