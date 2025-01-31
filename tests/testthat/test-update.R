@@ -33,7 +33,7 @@ test_that("update() can collapse levels of a factor", {
   expect_equal(M$Petal.Width, res$Petal.Width)
 
   # The result has the right levels (we kept all rows of virginica)
-  expect_equal(levels(res$Species$bin_mid), c("virginica", "other"))
+  expect_equal(levels(res$Species$bin_mid), c("virginica", "other 2"))
 
   # The virginica row remained the same
   expect_equal(
@@ -43,7 +43,7 @@ test_that("update() can collapse levels of a factor", {
 
   # The other two rows have been collapsed
   s1 <- M$Species$bin_mid != "virginica"
-  s2 <- res$Species$bin_mid == "other"
+  s2 <- res$Species$bin_mid == "other 2"
   expect_equal(sum(M$Species$N[s1]), sum(res$Species$N[s2]))
   expect_equal(sum(M$Species$weight[s1]), sum(res$Species$weight[s2]))
   expect_equal(
@@ -73,7 +73,7 @@ test_that("update() can collapse levels of a character", {
   expect_equal(M2$Petal.Width, res$Petal.Width)
 
   # The result has the right levels (we kept all rows of virginica)
-  expect_equal(res$Species$bin_mid, c("virginica", "other"))
+  expect_equal(res$Species$bin_mid, c("virginica", "other 2"))
 })
 
 test_that("update() can remove NA levels", {

@@ -128,7 +128,7 @@ update_one <- function(
     x_keep <- droplevels(x_keep)
   }
   lvl <- stats::na.omit(as.character(x_keep$bin_mid))
-  oth <- make.names(c(lvl, "other"), unique = TRUE)[length(lvl) + 1L]
+  oth <- paste("other", nrow(x_agg))
   if (fact) {
     levels(x_keep$bin_mid) <- levels(x_keep$bin_mean) <- c(lvl, oth)
   }

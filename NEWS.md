@@ -1,3 +1,11 @@
+# effectplots 0.2.2
+
+### Minor improvement
+
+- `update(, collapse_m = m)` will now produce a level "other p" for the p least frequent categories [#52](https://github.com/mayer79/effectplots/pull/52).
+
+### Minor changes
+
 # effectplots 0.2.1
 
 ### Major improvement
