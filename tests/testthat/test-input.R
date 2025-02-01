@@ -65,3 +65,36 @@ test_that("check_v_type() works", {
   }
   expect_false(check_v_type(as.Date("2024-08-01")))
 })
+
+test_that("feature_effects() tolerates missing y when weights are non-positive", {
+  X = cbind(a = 1:4, b = 2:5)
+  suppressMessages(
+    eff <- feature_effects(
+      NULL,
+      v = "a",
+      y = c(NA, NA, 1, 2),
+      w = c(0, NA, 1, 1),
+      data = X,
+      calc_pred = FALSE,
+      pd_n = 0,
+      ale_n = 0,
+      breaks = c(0, 4),
+      discrete_m = 1
+    )
+  )
+  expect_equal(eff$a$y_mean, 1.5)
+
+  # NA in y is not allowed when weights are positive
+  expect_error(
+    feature_effects(
+      NULL,
+      v = "a",
+      y = c(NA, NA, 1, 2),
+      w = c(1, 1, 1, 1),
+      data = X,
+      calc_pred = FALSE,
+      pd_n = 0,
+      ale_n = 0
+    )
+  )
+})
