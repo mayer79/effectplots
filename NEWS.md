@@ -4,6 +4,7 @@
 
 - `update(, collapse_m = m)` will now produce a level "other p" for the p least frequent categories [#52](https://github.com/mayer79/effectplots/pull/52).
 - `update()` has received new defaults: `collapse_m = 15` (was 30), `drop_empty = TRUE` (was `FALSE`) [#54](https://github.com/mayer79/effectplots/pull/54).
+- Missing values in `y` are now checked *after* removing observations without positive weights [#56](https://github.com/mayer79/effectplots/pull/56).
 
 ### Minor changes
 

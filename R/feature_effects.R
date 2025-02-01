@@ -169,7 +169,7 @@ feature_effects.default <- function(
     set.seed(seed)
   }
 
-  # Prepare y
+  # Prepare y (NAs are checked after preparing w)
   if (!is.null(y)) {
     if (length(y) == 1L) {
       y <- if (is.matrix(data)) data[, y] else data[[y]]
@@ -178,9 +178,6 @@ feature_effects.default <- function(
     }
     if (!is.numeric(y) && !is.logical(y)) {
       stop("'y' must be numeric or logical.")
-    }
-    if (anyNA(y)) {
-      stop("'y' can't contain NA")
     }
     if (!is.double(y)) {
       y <- as.double(y)
@@ -222,6 +219,11 @@ feature_effects.default <- function(
     if (!is.double(w)) {
       w <- as.double(w)
     }
+  }
+
+  if (!is.null(y) && anyNA(y)) {
+    # We do this check after preparing w. This allows a user to pass weights in {0, NA}
+    stop("'y' can't contain NA")
   }
 
   # Prepare pred (part 2)
