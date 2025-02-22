@@ -427,6 +427,9 @@ one_ggplot <- function(
     df$err_ <- poor_man_stack(x, to_stack = all_err_cols)$value_
   }
 
+  # Remove NA values
+  df <- df[!is.na(df$value_), ]
+
   # Calculate transformation of bars on the right y axis
   if (is.null(ylim)) {
     r <- grDevices::extendrange(df$value_, f = 0.02)
@@ -626,17 +629,18 @@ one_plotly <- function(
     if (has_errors) {
       error_col <- gsub("_mean", "_sd", z)
     }
+    x_complete <- x[!is.na(x[[z]]), ]  # temporarily drop NA value
     fig <- plotly::add_trace(
       fig,
       # ALE values shown at right bin breaks
       x = if (z == "ale") ~bin_mid + bin_width / 2 else ~bin_mean,
-      y = x[[z]],
-      data = x,
+      y = x_complete[[z]],
+      data = x_complete,
       yaxis = "y",
       mode = scatter_mode,
       type = "scatter",
       error_y = if (has_errors && discrete)
-        list(array = x[[error_col]], opacity = alpha * 2 / 3, width = 0),
+        list(array = x_complete[[error_col]], opacity = alpha * 2 / 3, width = 0),
       name = names(z),
       showlegend = show_legend,
       legendgroup = z,
@@ -647,9 +651,9 @@ one_plotly <- function(
       fig <- plotly::add_ribbons(
        fig,
        x = ~bin_mean,
-       ymin = x[[z]] - x[[error_col]],
-       ymax = x[[z]] + x[[error_col]],
-       data = x,
+       ymin = x_complete[[z]] - x_complete[[error_col]],
+       ymax = x_complete[[z]] + x_complete[[error_col]],
+       data = x_complete,
        yaxis = "y",
        name = interval,
        showlegend = FALSE,
