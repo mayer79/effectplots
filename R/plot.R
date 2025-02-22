@@ -464,6 +464,7 @@ one_ggplot <- function(
   if (has_errors) {
     if (!discrete) {
       p <- p + ggplot2::geom_ribbon(
+        data = subset(df, !is.na(err_)),
         ggplot2::aes(
           ymin = value_ - err_, ymax = value_ + err_, fill = varying_, color = varying_
         ),
@@ -647,19 +648,22 @@ one_plotly <- function(
       color = I(colors[i]),
       opacity = alpha
     )
-    if (has_errors && !discrete)
+    if (has_errors && !discrete) {
+      # Bins with N = 1 can have NA values in the SDs. We drop them for the ribbons.
+      x_complete <- x_complete[!is.na(x_complete[[error_col]]), ]
       fig <- plotly::add_ribbons(
-       fig,
-       x = ~bin_mean,
-       ymin = x_complete[[z]] - x_complete[[error_col]],
-       ymax = x_complete[[z]] + x_complete[[error_col]],
-       data = x_complete,
-       yaxis = "y",
-       name = interval,
-       showlegend = FALSE,
-       color = I(colors[i]),
-       opacity = alpha / 2
-    )
+        fig,
+        x = ~bin_mean,
+        ymin = x_complete[[z]] - x_complete[[error_col]],
+        ymax = x_complete[[z]] + x_complete[[error_col]],
+        data = x_complete,
+        yaxis = "y",
+        name = interval,
+        showlegend = FALSE,
+        color = I(colors[i]),
+        opacity = alpha / 2
+      )
+    }
   }
 
   if (!is.null(ylim)) {
