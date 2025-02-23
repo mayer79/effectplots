@@ -10,7 +10,7 @@
   to_factor = FALSE,
   collapse_m = 15L,
   collapse_by = c("weight", "N"),
-  drop_empty = TRUE,
+  drop_empty = FALSE,
   drop_below_n = 0,
   drop_below_weight = 0,
   na.rm = FALSE,
@@ -37,7 +37,7 @@ Set to \code{Inf} for no collapsing.}
 Either "weight" (default) or "N". Only matters in situations with case weights \code{w}.}
 
 \item{drop_empty}{Drop empty bins. Equivalent to \code{drop_below_n = 1}.
-The default is \code{TRUE}.}
+The default is \code{FALSE}.}
 
 \item{drop_below_n}{Drop bins with N below this value. Applied after collapsing.
 The default is 0.}

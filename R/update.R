@@ -27,7 +27,7 @@
 #' @param collapse_by How to determine "rare" levels in `collapse_m`?
 #'   Either "weight" (default) or "N". Only matters in situations with case weights `w`.
 #' @param drop_empty Drop empty bins. Equivalent to `drop_below_n = 1`.
-#'   The default is `TRUE`.
+#'   The default is `FALSE`.
 #' @param drop_below_n Drop bins with N below this value. Applied after collapsing.
 #'   The default is 0.
 #' @param drop_below_weight Drop bins with weight below this value. Applied after
@@ -51,7 +51,7 @@ update.EffectData <- function(
   to_factor = FALSE,
   collapse_m = 15L,
   collapse_by = c("weight", "N"),
-  drop_empty = TRUE,
+  drop_empty = FALSE,
   drop_below_n = 0,
   drop_below_weight = 0,
   na.rm = FALSE,
