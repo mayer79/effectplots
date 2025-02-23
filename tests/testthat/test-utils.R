@@ -8,7 +8,16 @@ test_that("parse_rownames() does what it should", {
   expect_equal(parse_rownames(c("TRUE", NA), "logical"), c(TRUE, NA))
 
   xord <- c("A", "B", NA)
-  expect_equal(parse_rownames(xord, "factor", ord = TRUE, lev = c("A", "B")), ordered(xord))
+  expect_equal(
+    parse_rownames(xord, "factor", ord = TRUE, lev = c("A", "B")), ordered(xord)
+  )
+
+  # What if the original factor contains explicit NA level?
+  lev <- c("3", "1", NA)
+  expect_equal(
+    parse_rownames(x, "factor", lev = lev),
+    factor(x, levels = lev, exclude = NULL)
+  )
 
   expect_error(parse_rownames(x, "date"))
   expect_error(parse_rownames(1:3, "integer"))
