@@ -68,7 +68,9 @@ parse_rownames <- function(x, type, ord = FALSE, lev = NULL) {
   }
   switch(
     type,
-    factor = factor(x, levels = lev, ordered = ord),
+    factor = factor(
+      x, levels = lev, ordered = ord, exclude = if (anyNA(lev)) NULL else NA
+    ),
     double = as.double(x),
     integer = as.integer(x),
     logical = as.logical(x),
