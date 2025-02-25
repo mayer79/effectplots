@@ -16,12 +16,6 @@ factor_or_double <- function(x, m = 5L, ix_sub = NULL) {
     }
     return(collapse::qF(x, sort = FALSE, na.exclude = FALSE))
   }
-  if (is.double(x)) {
-    # {collapse} seems to distinguish positive and negative zeros
-    # https://github.com/SebKrantz/collapse/issues/648
-    # Adding 0 to a double turns negative 0 to positive ones (ISO/IEC 60559)
-    collapse::setop(x, "+", 0.0)
-  }
   if (!is.null(ix_sub)) {  # we have >10k values
     if (m >= length(ix_sub)) {
       stop("Too large value for m")

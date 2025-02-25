@@ -509,6 +509,12 @@ calculate_stats <- function(
     ix_sub,
     ...
 ) {
+  if (is.double(x)) {
+    # {collapse} seems to distinguish positive and negative zeros
+    # https://github.com/SebKrantz/collapse/issues/648
+    # Adding 0 to a double turns negative 0 to positive ones (ISO/IEC 60559)
+    collapse::setop(x, "+", 0.0)
+  }
   # "factor", "double", "integer", "logical", "character"
   orig_type <- if (is.factor(x)) "factor" else typeof(x)
   was_ordered <- is.ordered(x)
