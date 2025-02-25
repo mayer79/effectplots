@@ -48,7 +48,6 @@ bench::mark(
 
 x <- runif(n)
 bench::mark(frange(x))  # 8 ms
-bench::mark(effectplots:::clamp2(x, 0.1, 0.9))  # 16 ms
 
 # Discrete double -> sort = TRUE!   potential: 85% / 200ms
 x <- sample(c(pi, exp(1), exp(-1)), n, TRUE)
@@ -82,3 +81,6 @@ x <- factor(sample(letters[1:10], n, TRUE))
 bench::mark(qF(x))                # 0 ms
 bench::mark(qF(x, sort = FALSE))  # 7 ms
 bench::mark(funique(x))           # 5 ms
+
+
+

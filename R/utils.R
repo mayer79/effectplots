@@ -43,41 +43,6 @@ is_discrete <- function(x) {
   return(intersect(statistics, colnames(x)))
 }
 
-#' Converts Rownames to Original Type
-#'
-#' Internal function used in `calculate_stats()` to turn rownames `x` of a grouped
-#' aggregation data back to the original `type`. For doubles, we can lose precision,
-#' but this should not a problem here.
-#'
-#' @noRd
-#' @keywords internal
-#'
-#' @param x A character vector of row names, may contain `NA`.
-#' @param type One of "factor", "double", "integer", "logical", and "character".
-#' @param ord Is the factor ordered? By default `FALSE`. Only relevant for factors.
-#' @param lev If type = "factor", its original levels.
-#' @returns
-#'   A data.frame with variables not in `to_stack`, a column "varying_" with
-#'   the column name from `to_stack`, and finally a column "value_" with stacked values.
-parse_rownames <- function(x, type, ord = FALSE, lev = NULL) {
-  if (!is.character(x)) {
-    stop("Row names must be strings")
-  }
-  if (type == "factor" && is.null(lev)) {
-    stop("Need 'lev' for type = 'factor'.")
-  }
-  switch(
-    type,
-    factor = factor(
-      x, levels = lev, ordered = ord, exclude = if (anyNA(lev)) NULL else NA
-    ),
-    double = as.double(x),
-    integer = as.integer(x),
-    logical = as.logical(x),
-    character = x,
-    stop("Can only handle features of type factor, double, integer, logical, and character.")
-  )
-}
 
 # -> plot()
 

@@ -1,3 +1,16 @@
+qF2 <- function(x) {
+  if (is.factor(x)) {
+    # Safe way to keep attributes for PDP while ensuring correct order
+    bin_mid <- sort(collapse::funique(x), na.last = TRUE)
+    g <- collapse::qF(
+      x, ordered = is.ordered(x), sort = TRUE, na.exclude = !anyNA(unclass(x))
+    )
+    return(list(g = g, bin_mid = bin_mid))
+  }
+  g <- qG(x, sort = FALSE, na.exclude = FALSE, return.groups = TRUE)
+  return(list(g = as_factor_qG(g), bin_mid = attr(g, "groups")))
+}
+
 #' Turn Input either Double or Factor
 #'
 #' @noRd
@@ -8,13 +21,12 @@
 #' @param ix_sub Subset for pre-check. If not `NULL`, length(x) > 9997.
 #' @returns
 #'   A double vector if x is numeric with > m disjoint values.
-#'   Otherwise, a factor with explicit missings.
+#'   Otherwise, a list with two elements. The first "g" is a factor representing
+#'   `x`, while the second element "bin_mid" represent corresponding evaluation
+#'   points for partial dependence.
 factor_or_double <- function(x, m = 5L, ix_sub = NULL) {
   if (!is.numeric(x)) {
-    if (is.factor(x)) {
-      return(collapse::qF(x, sort = TRUE, na.exclude = !anyNA(unclass(x))))
-    }
-    return(collapse::qF(x, sort = FALSE, na.exclude = FALSE))
+    qF2(x)
   }
   if (!is.null(ix_sub)) {  # we have >10k values
     if (m >= length(ix_sub)) {
@@ -24,8 +36,8 @@ factor_or_double <- function(x, m = 5L, ix_sub = NULL) {
       return(as.double(x))
     }
   }
-  xf <- collapse::qF(x, sort = FALSE, na.exclude = FALSE)
-  if (collapse::fnlevels(xf) > m) as.double(x) else xf
+  xf <- qF2(x)
+  if (length(xf$bin_mid) > m) as.double(x) else xf
 }
 
 

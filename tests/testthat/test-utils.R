@@ -1,30 +1,3 @@
-test_that("parse_rownames() does what it should", {
-  x <- c("3", "1", NA)
-  lev <- c("3", "1")
-  expect_equal(parse_rownames(x, "character"), x)
-  expect_equal(parse_rownames(x, "integer"), c(3L, 1L, NA))
-  expect_equal(parse_rownames(x, "factor", lev = lev), factor(x, levels = lev))
-  expect_equal(parse_rownames(c("3.11111", "2", NA), "double"), c(3.11111, 2, NA))
-  expect_equal(parse_rownames(c("TRUE", NA), "logical"), c(TRUE, NA))
-
-  xord <- c("A", "B", NA)
-  expect_equal(
-    parse_rownames(xord, "factor", ord = TRUE, lev = c("A", "B")), ordered(xord)
-  )
-
-  # What if the original factor contains explicit NA level?
-  lev <- c("3", "1", NA)
-  expect_equal(
-    parse_rownames(x, "factor", lev = lev),
-    factor(x, levels = lev, exclude = NULL)
-  )
-
-  expect_error(parse_rownames(x, "date"))
-  expect_error(parse_rownames(1:3, "integer"))
-  expect_error(parse_rownames(x, "factor"))
-})
-
-
 test_that("poor_man_stack() works (test could be improved)", {
   y <- c("a", "b", "c")
   z <- c("aa", "bb", "cc")

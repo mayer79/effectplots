@@ -515,13 +515,9 @@ calculate_stats <- function(
     # Adding 0 to a double turns negative 0 to positive ones (ISO/IEC 60559)
     collapse::setop(x, "+", 0.0)
   }
-  # "factor", "double", "integer", "logical", "character"
-  orig_type <- if (is.factor(x)) "factor" else typeof(x)
-  was_ordered <- is.ordered(x)
-  lev <- if (is.factor(x)) levels(x)
 
-  x <- factor_or_double(x, m = discrete_m, ix_sub = ix_sub)
-  discrete <- !is.numeric(x)
+  g <- factor_or_double(x, m = discrete_m, ix_sub = ix_sub)
+  discrete <- is.list(g)
 
   if (is.null(PYR) && is.null(pd_data) && (discrete || is.null(ale_data))) {
     return(NULL)
@@ -531,16 +527,12 @@ calculate_stats <- function(
 
   # DISCRETE
   if (discrete) {
-    M <- grouped_stats(PYR, g = x, w = w, sd_cols = sd_cols)
-
-    # We need original unique values of g later for PDP, e.g., TRUE/FALSE.
-    # Doubles might lose digits. This should not be a problem though.
-    g <- parse_rownames(rownames(M), type = orig_type, ord = was_ordered, lev = lev)
-    out <- data.frame(bin_mid = g, bin_width = 0.7, bin_mean = g, M)
-    if (orig_type != "factor") {
-      out <- out[order(g, na.last = TRUE), ]
+    M <- grouped_stats(PYR, g = g$g, w = w, sd_cols = sd_cols)
+    out <- data.frame(bin_mid = g$bin_mid, bin_width = 0.7, bin_mean = g$bin_mid, M)
+    if (!is.factor(x)) {
+      out <- out[order(out$bin_mid, na.last = TRUE), ]
     }
-    if (orig_type %in% c("integer", "double") && length(stats::na.omit(g)) > 1L) {
+    if (is.numeric(x) && length(stats::na.omit(out$bin_mid)) > 1L) {
       out$bin_width <- min(diff(out$bin_mid), na.rm = TRUE) * 0.7
     }
   } else {
