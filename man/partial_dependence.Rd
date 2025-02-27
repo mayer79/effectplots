@@ -6,6 +6,7 @@
 \alias{partial_dependence.ranger}
 \alias{partial_dependence.explainer}
 \alias{partial_dependence.H2OModel}
+\alias{partial_dependence.xgb.Booster}
 \title{Partial Dependence}
 \usage{
 partial_dependence(object, ...)
@@ -69,6 +70,23 @@ partial_dependence(object, ...)
   trafo = NULL,
   which_pred = NULL,
   w = object@parameters$weights_column$column_name,
+  breaks = "Sturges",
+  right = TRUE,
+  discrete_m = 13L,
+  outlier_iqr = 2,
+  pd_n = 500L,
+  seed = NULL,
+  ...
+)
+
+\method{partial_dependence}{xgb.Booster}(
+  object,
+  v,
+  data,
+  pred_fun = stats::predict,
+  trafo = NULL,
+  which_pred = NULL,
+  w = NULL,
   breaks = "Sturges",
   right = TRUE,
   discrete_m = 13L,
@@ -174,6 +192,8 @@ and eventually weighted by \code{w}.
 \item \code{partial_dependence(explainer)}: Method for DALEX explainers.
 
 \item \code{partial_dependence(H2OModel)}: Method for H2O models.
+
+\item \code{partial_dependence(xgb.Booster)}: Method for xgb.Booster models.
 
 }}
 \examples{
