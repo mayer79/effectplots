@@ -3,12 +3,16 @@ qF2 <- function(x) {
     # Safe way to keep attributes for PDP while ensuring correct order
     bin_mid <- sort(collapse::funique(x), na.last = TRUE)
     g <- collapse::qF(
-      x, ordered = is.ordered(x), sort = TRUE, na.exclude = !anyNA(unclass(x))
+      x,
+      ordered = is.ordered(x),
+      sort = TRUE,
+      na.exclude = !anyNA(unclass(x)),
+      drop = TRUE
     )
     return(list(g = g, bin_mid = bin_mid))
   }
-  g <- qG(x, sort = FALSE, na.exclude = FALSE, return.groups = TRUE)
-  return(list(g = as_factor_qG(g), bin_mid = attr(g, "groups")))
+  g <- collapse::qG(x, sort = FALSE, na.exclude = FALSE, return.groups = TRUE)
+  return(list(g = collapse::as_factor_qG(g), bin_mid = attr(g, "groups")))
 }
 
 #' Turn Input either Double or Factor
@@ -28,7 +32,7 @@ factor_or_double <- function(x, m = 5L, ix_sub = NULL) {
   if (!is.numeric(x)) {
     qF2(x)
   }
-  if (!is.null(ix_sub)) {  # we have >10k values
+  if (!is.null(ix_sub)) { # we have >10k values
     if (m >= length(ix_sub)) {
       stop("Too large value for m")
     }
@@ -175,7 +179,7 @@ fcut <- function(x, breaks, labels = NULL, right = TRUE, explicit_na = FALSE) {
   )
   codes_only <- isFALSE(labels)
   if (!is.character(labels)) {
-    labels <- as.character(seq_len(nb))  # need for equi-length case even if codes_only
+    labels <- as.character(seq_len(nb)) # need for equi-length case even if codes_only
   }
 
   # From hist2.default()
@@ -195,7 +199,7 @@ fcut <- function(x, breaks, labels = NULL, right = TRUE, explicit_na = FALSE) {
         out[is.na(x)] <- NA_integer_
       }
     }
-  } else if (diff(range(h)) < 1e-07 * mean(h)) {  # spatstat.utils::fastFindInterval()
+  } else if (diff(range(h)) < 1e-07 * mean(h)) { # spatstat.utils::fastFindInterval()
     return(
       findInterval_equi(
         as.double(x),
@@ -210,7 +214,8 @@ fcut <- function(x, breaks, labels = NULL, right = TRUE, explicit_na = FALSE) {
     )
   } else {
     out <- findInterval(
-      x, vec = breaks, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
+      x,
+      vec = breaks, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
     )
     if (explicit_na && anyNA(x)) {
       out[is.na(x)] <- nb + 1L
@@ -222,4 +227,3 @@ fcut <- function(x, breaks, labels = NULL, right = TRUE, explicit_na = FALSE) {
   }
   structure(out, levels = labels, class = c("factor", if (explicit_na) "na.included"))
 }
-
