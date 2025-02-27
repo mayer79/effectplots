@@ -28,6 +28,7 @@ bench::mark(
 # 0.7s      593 MB  # rnorm
 # 0.4s      504 MB  # sample(c(0, 1))
 # 0.2s      502 MB  # sample(0:1)
+# 0.2s      528 MB  # sample(letters[1:4])
 # 0.2s      139 MB  # factor(letters[1:4])
 
 # Matrix
@@ -47,40 +48,39 @@ bench::mark(
 # 0.9s    1.27GB
 
 x <- runif(n)
-bench::mark(frange(x))  # 8 ms
+bench::mark(frange(x)) # 8 ms
 
 # Discrete double -> sort = TRUE!   potential: 85% / 200ms
 x <- sample(c(pi, exp(1), exp(-1)), n, TRUE)
 x <- sample(c(0, 1, 2), n, TRUE)
-bench::mark(qF(x))                # 417/204 ms
-bench::mark(qF(x, sort=F))        # 21 ms
-bench::mark(funique(x))           # 22 ms
-bench::mark(fnunique(x))          # 19 ms
+bench::mark(qF(x)) # 417/204 ms
+bench::mark(qF(x, sort = F)) # 21 ms
+bench::mark(funique(x)) # 22 ms
+bench::mark(fnunique(x)) # 19 ms
 
 # Int (sort = TRUE)               potential 50% / 19ms
 x <- sample(1:10, n, TRUE)
-bench::mark(qF(x))                # 24 ms
-bench::mark(qF(x, sort = FALSE))  # 11 ms
-bench::mark(funique(x))           # 6 ms
-bench::mark(fnunique(x))          # 8 ms
+bench::mark(qF(x)) # 24 ms
+bench::mark(qF(x, sort = FALSE)) # 11 ms
+bench::mark(funique(x)) # 6 ms
+bench::mark(fnunique(x)) # 8 ms
 
 # Logical (sort does not matter)  potential 30% / 5ms
 x <- sample(c(TRUE, FALSE), n, TRUE)
-bench::mark(qF(x))                # 8 ms
-bench::mark(qF(x, sort = FALSE))  # 8 ms
-bench::mark(funique(x))           # 5 ms
+bench::mark(qF(x)) # 8 ms
+bench::mark(qF(x, sort = FALSE)) # 8 ms
+bench::mark(funique(x)) # 5 ms
 
 # Char -> sort = FALSE  . potential: 65% / 21ms
 x <- sample(letters[1:10], n, TRUE)
-bench::mark(qF(x))                # 26 ms
-bench::mark(qF(x, sort = FALSE))  # 12 ms
-bench::mark(funique(x))           # 7 ms
+bench::mark(qF(x)) # 26 ms
+bench::mark(qF(x, sort = FALSE)) # 12 ms
+bench::mark(funique(x)) # 7 ms
+
+bench::mark(qF(x, sort = FALSE, na.exclude = FALSE))
 
 # Factor -> sort = TRUE : potential: 100% / 5ms
 x <- factor(sample(letters[1:10], n, TRUE))
-bench::mark(qF(x))                # 0 ms
-bench::mark(qF(x, sort = FALSE))  # 7 ms
-bench::mark(funique(x))           # 5 ms
-
-
-
+bench::mark(qF(x)) # 0 ms
+bench::mark(qF(x, sort = FALSE)) # 7 ms
+bench::mark(funique(x)) # 5 ms

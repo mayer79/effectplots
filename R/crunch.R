@@ -30,7 +30,7 @@ qF2 <- function(x) {
 #'   points for partial dependence.
 factor_or_double <- function(x, m = 5L, ix_sub = NULL) {
   if (!is.numeric(x)) {
-    qF2(x)
+    return(qF2(x))
   }
   if (!is.null(ix_sub)) { # we have >10k values
     if (m >= length(ix_sub)) {
