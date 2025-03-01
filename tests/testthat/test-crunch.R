@@ -1,41 +1,66 @@
-test_that("factor_or_double() works", {
-  # Character
-  x <- c("B", NA, "A")
-  expect_equal(factor_or_double(x), collapse::qF(x, sort = FALSE, na.exclude = FALSE))
-
-  # Factor
-  x <- factor(x, levels = c("A", "B", "C"))
-  expect_equal(
-    factor_or_double(x), collapse::qF(x, sort = TRUE, na.exclude = FALSE)
+test_that("qF2() works for non-factors", {
+  data <- list(
+    character = c("B", NA, "A", "B"),
+    logical = c(TRUE, NA, FALSE, FALSE),
+    integer = c(3L, 3L, 1L, NA),
+    double = c(3, 3, 1, NA)
   )
 
-  # Logical
-  x <- c(TRUE, FALSE)
-  expect_equal(factor_or_double(x), collapse::qF(x, sort = FALSE, na.exclude = FALSE))
+  for (drop_na in c(FALSE, TRUE)) {
+    for (x in data) {
+      if (drop_na) {
+        x <- x[!is.na(x)]
+      }
+      g <- qF2(x)
+      expect_equal(g$bin_mid, unique(x))
+      expect_equal(levels(g$g), as.character(g$bin_mid))
+      expect_equal(class(g$bin_mid), class(x))
+    }
+  }
+})
 
-  # Non-discrete numeric vector (short)
+test_that("qF2 works for factors", {
+  for (ordered in c(FALSE, TRUE)) {
+    for (empty_levels in c(FALSE, TRUE)) {
+      for (drop_na in c(FALSE, TRUE)) {
+        z <- c("B", if (!drop_na) NA, "A", "B")
+        lvl <- if (empty_levels) c("A", "B", "C") else c("A", "B")
+        x <- factor(z, ordered = ordered, levels = lvl)
+        g <- qF2(x)
+        expect_equal(g$bin_mid, sort(unique(x), na.last = TRUE))
+        expect_equal(levels(g$g), as.character(g$bin_mid))
+        expect_equal(attributes(g$bin_mid), attributes(x))
+      }
+    }
+  }
+})
+
+test_that("factor_or_double() works in the continuous case", {
   x <- 1:10
   res <- factor_or_double(x, m = 4)
   expect_equal(res, x)
   expect_true(is.double(res))
 
-  # Discrete numeric vector (short)
-  x <- rep(1:4, each = 10)
-  res <- factor_or_double(x, m = 4)
-  expect_equal(res, collapse::qF(x, na.exclude = FALSE, sort = FALSE))
-
-  # Non-discrete numeric vector (long)
-  x <- 1:10
-  res <- factor_or_double(x, m = 4, ix_sub = 1:5)
-  expect_equal(res, x)
-
-  # Discrete numeric vector (long)
-  x <- rep(1:4, each = 10)
-  res <- factor_or_double(x, m = 4, ix_sub = 1:5)
-  expect_equal(res, collapse::qF(x, na.exclude = FALSE, sort = FALSE))
-
   # m needs to be smaller than length(ix_sub)
   expect_error(factor_or_double(x, m = 4, ix_sub = 1:2))
+})
+
+test_that("factor_or_double() works in the discrete case", {
+  data <- list(
+    character = c("B", NA, "A", "B"),
+    logical = c(TRUE, NA, FALSE, FALSE),
+    integer = 1:5,
+    double = c(3, 3, 1, NA)
+  )
+
+  for (x in data) {
+    g <- factor_or_double(x)
+    expect_true(is.list(g))
+  }
+
+  # Compare with the previous test_that() block
+  x <- 1:10
+  expect_true(is.list(factor_or_double(x, m = 12)))
 })
 
 test_that("grouped_stats() works", {
@@ -91,7 +116,7 @@ test_that("fbreaks() without outlier handling gives same breaks like hist()", {
 })
 
 test_that("fbreaks() without outliers gives same breaks like hist()", {
-  x <- rep(0:1, times = c(90, 10))  # IQR is 0
+  x <- rep(0:1, times = c(90, 10)) # IQR is 0
   expect_equal(
     fbreaks(x, breaks = 5, outlier_iqr = 1.5),
     graphics::hist(x, breaks = 5, plot = FALSE)$breaks
@@ -237,5 +262,3 @@ test_that("fcut() works in equal-length mode", {
   class(xp) <- c("factor", "na.included")
   expect_equal(fcut(x, breaks = breaks, explicit_na = TRUE), xp)
 })
-
-

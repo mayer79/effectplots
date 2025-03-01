@@ -238,7 +238,9 @@ fit <- lm(Sepal.Length ~ ., data = iris)
 xvars <- colnames(iris)[2:5]
 M <- feature_effects(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 M
-M |> update(sort = "pd") |> plot(share_y = "all")
+M |>
+  update(sort = "pd") |>
+  plot(share_y = "all")
 }
 \references{
 \enumerate{

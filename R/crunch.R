@@ -1,3 +1,27 @@
+#' Prepares discrete feature for grouped operations of {collapse}
+#'
+#' @description
+#' This function returns two elements:
+#' 1. A factor `g` in the same order as `x` used for grouped calculations and
+#' 2. a vector/factor `bin_mid` of unique values of `x` used for partial dependence.
+#'
+#' Comments on `g`:
+#' - The order of values in `g` correspond to the order in `x`.
+#' - Missing values in `x` are represented as an explicit NA level in `g`. This helps
+#'   to avoid unnecessary copies of `g` in subsequent grouped calculations.
+#' - There are not empty levels.
+#'
+#' Comments on `bin_mid`:
+#' - The order of values in `bin_mid` is the same as the levels of `g`.
+#' - It will retain the original class.
+#' - If `x` is a factor, so will be `bin_mid`. It will keep the original levels.
+#' @noRd
+#' @keywords internal
+#'
+#' @param x A discrete vector or factor.
+#' @returns A list with two elements: "g" is a factor representing `x`, while the
+#'  second element "bin_mid" represent corresponding evaluation points for partial
+#'  dependence.
 qF2 <- function(x) {
   if (is.factor(x)) {
     # Safe way to keep attributes for PDP while ensuring correct order
@@ -12,6 +36,9 @@ qF2 <- function(x) {
     return(list(g = g, bin_mid = bin_mid))
   }
   g <- collapse::qG(x, sort = FALSE, na.exclude = FALSE, return.groups = TRUE)
+  # The following lines could be a solution to keep attributes other than class
+  # bin_mid <- attr(g, "groups")
+  # attributes(bin_mid) <- attributes(x)
   return(list(g = collapse::as_factor_qG(g), bin_mid = attr(g, "groups")))
 }
 
