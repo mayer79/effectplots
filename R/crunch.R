@@ -1,3 +1,70 @@
+#' Collapse factor levels (currently unused)
+#'
+#' Internal function to collapse factor levels.
+#' @noRd
+#' @keywords internal
+#'
+#' @param f A factor.
+#' @param to_combine Levels to combine.
+#' @param other_level Name of the new level, e.g., "Other 3" if three levels are combined.
+#' @returns A factor with combined levels.
+combine_levels <- function(f, to_combine, other_level = "Other") {
+  if (length(to_combine) <= 2L) {
+    return(f)
+  }
+  old_levels <- lvl <- levels(f)
+  to_keep <- setdiff(lvl, to_combine)
+  if (other_level %in% to_keep) {
+    stop("The 'other_level' level is already present in 'f'")
+  }
+  new_levels <- c(to_keep, other_level)
+  old_levels[!(lvl %in% to_keep)] <- other_level
+
+  # like in forcats:::lvls_revalue()
+  out <- match(old_levels, new_levels)[x]
+  attributes(out) <- attributes(f)
+  attr(out, "levels") <- new_levels
+  return(out)
+}
+
+#' Lump rare factor levels (currently unused)
+#'
+#' Internal function to lump rare factor levels into a new level. Note that missing
+#' values (even if explicitly encoded as level NA) are not combined.
+#'
+#' @noRd
+#' @keywords internal
+#'
+#' @param f A factor.
+#' @param combine_m How many rare levels to combine?
+#' @param w Optional case weights.
+#' @returns
+#'   A list with three elements: "f" is a factor with combined levels,
+#'   "combined" is a character vector with the combined levels, and "other_level"
+#'   is the name of the new level.
+flump <- function(f, combine_m, w = NULL) {
+  if (is.null(w)) {
+    N <- collapse::fnobs(f, g = f)
+  } else {
+    N <- collapse::fsum(w, g = f, fill = TRUE)
+  }
+  to_combine <- levels(f)[order(N)][seq_len(combine_m)]
+  to_combine <- setdiff(to_combine, NA) # don't collapse explicit NA levels
+  m_other <- length(to_combine)
+  if (m_other <= 2L) {
+    return(list(f = f, combined = NULL, other_level = NULL))
+  }
+  other_level <- paste("Other", m_other)
+
+  out <- list(
+    f = combine_levels(f, to_combine = to_combine, other_level = other_level),
+    combined = to_combine,
+    other_level = other_level
+  )
+  return(out)
+}
+
+
 #' Prepares discrete feature for grouped operations of {collapse}
 #'
 #' @description
