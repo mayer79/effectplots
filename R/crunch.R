@@ -21,7 +21,7 @@ combine_levels <- function(f, to_combine, other_level = "Other") {
   old_levels[!(lvl %in% to_keep)] <- other_level
 
   # like in forcats:::lvls_revalue()
-  out <- match(old_levels, new_levels)[x]
+  out <- match(old_levels, new_levels)[f]
   attributes(out) <- attributes(f)
   attr(out, "levels") <- new_levels
   return(out)
