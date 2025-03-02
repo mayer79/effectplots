@@ -5,8 +5,9 @@
 - `update(, collapse_m = m)` will now produce a level "other p" for the p least frequent categories [#52](https://github.com/mayer79/effectplots/pull/52).
 - `update()` has received new default: `collapse_m = 15` (was 30) [#54](https://github.com/mayer79/effectplots/pull/54).
 - Missing values in `y` are now checked *after* removing observations without positive weights [#56](https://github.com/mayer79/effectplots/pull/56).
-- Plots now skip missing values on the y-axis, also in the ribbons [#57](https://github.com/mayer79/effectplots/pull/57).
+- Lines now skip missing values on the y-axis, also in the ribbons [#57](https://github.com/mayer79/effectplots/pull/57).
 - Factors with explicit NA level are respected, [#59](https://github.com/mayer79/effectplots/pull/59).
+- Empty factor levels are being dropped, [#60](https://github.com/mayer79/effectplots/pull/60).
 
 ### Minor changes
 

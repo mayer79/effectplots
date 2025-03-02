@@ -1,3 +1,114 @@
+#' Collapse factor levels (currently unused)
+#'
+#' Internal function to collapse factor levels.
+#' @noRd
+#' @keywords internal
+#'
+#' @param f A factor.
+#' @param to_combine Levels to combine.
+#' @param other_level Name of the new level, e.g., "Other 3" if three levels are combined.
+#' @returns A factor with combined levels.
+combine_levels <- function(f, to_combine, other_level = "Other") {
+  if (length(to_combine) <= 2L) {
+    return(f)
+  }
+  old_levels <- lvl <- levels(f)
+  to_keep <- setdiff(lvl, to_combine)
+  if (other_level %in% to_keep) {
+    stop("The 'other_level' level is already present in 'f'")
+  }
+  new_levels <- c(to_keep, other_level)
+  old_levels[!(lvl %in% to_keep)] <- other_level
+
+  # like in forcats:::lvls_revalue()
+  out <- match(old_levels, new_levels)[x]
+  attributes(out) <- attributes(f)
+  attr(out, "levels") <- new_levels
+  return(out)
+}
+
+#' Lump rare factor levels (currently unused)
+#'
+#' Internal function to lump rare factor levels into a new level. Note that missing
+#' values (even if explicitly encoded as level NA) are not combined.
+#'
+#' @noRd
+#' @keywords internal
+#'
+#' @param f A factor.
+#' @param combine_m How many rare levels to combine?
+#' @param w Optional case weights.
+#' @returns
+#'   A list with three elements: "f" is a factor with combined levels,
+#'   "combined" is a character vector with the combined levels, and "other_level"
+#'   is the name of the new level.
+flump <- function(f, combine_m, w = NULL) {
+  if (is.null(w)) {
+    N <- collapse::fnobs(f, g = f)
+  } else {
+    N <- collapse::fsum(w, g = f, fill = TRUE)
+  }
+  to_combine <- levels(f)[order(N)][seq_len(combine_m)]
+  to_combine <- setdiff(to_combine, NA) # don't collapse explicit NA levels
+  m_other <- length(to_combine)
+  if (m_other <= 2L) {
+    return(list(f = f, combined = NULL, other_level = NULL))
+  }
+  other_level <- paste("Other", m_other)
+
+  out <- list(
+    f = combine_levels(f, to_combine = to_combine, other_level = other_level),
+    combined = to_combine,
+    other_level = other_level
+  )
+  return(out)
+}
+
+
+#' Prepares discrete feature for grouped operations of {collapse}
+#'
+#' @description
+#' This function returns two elements:
+#' 1. A factor `g` in the same order as `x` used for grouped calculations and
+#' 2. a vector/factor `bin_mid` of unique values of `x` used for partial dependence.
+#'
+#' Comments on `g`:
+#' - The order of values in `g` correspond to the order in `x`.
+#' - Missing values in `x` are represented as an explicit NA level in `g`. This helps
+#'   to avoid unnecessary copies of `g` in subsequent grouped calculations.
+#' - There are not empty levels.
+#'
+#' Comments on `bin_mid`:
+#' - The order of values in `bin_mid` is the same as the levels of `g`.
+#' - It will retain the original class.
+#' - If `x` is a factor, so will be `bin_mid`. It will keep the original levels.
+#' @noRd
+#' @keywords internal
+#'
+#' @param x A discrete vector or factor.
+#' @returns A list with two elements: "g" is a factor representing `x`, while the
+#'  second element "bin_mid" represent corresponding evaluation points for partial
+#'  dependence.
+qF2 <- function(x) {
+  if (is.factor(x)) {
+    # Safe way to keep attributes for PDP while ensuring correct order
+    bin_mid <- sort(collapse::funique(x), na.last = TRUE)
+    g <- collapse::qF(
+      x,
+      ordered = is.ordered(x),
+      sort = TRUE,
+      na.exclude = !anyNA(unclass(x)),
+      drop = TRUE
+    )
+    return(list(g = g, bin_mid = bin_mid))
+  }
+  g <- collapse::qG(x, sort = FALSE, na.exclude = FALSE, return.groups = TRUE)
+  # The following lines could be a solution to keep attributes other than class
+  # bin_mid <- attr(g, "groups")
+  # attributes(bin_mid) <- attributes(x)
+  return(list(g = collapse::as_factor_qG(g), bin_mid = attr(g, "groups")))
+}
+
 #' Turn Input either Double or Factor
 #'
 #' @noRd
@@ -8,21 +119,14 @@
 #' @param ix_sub Subset for pre-check. If not `NULL`, length(x) > 9997.
 #' @returns
 #'   A double vector if x is numeric with > m disjoint values.
-#'   Otherwise, a factor with explicit missings.
+#'   Otherwise, a list with two elements. The first "g" is a factor representing
+#'   `x`, while the second element "bin_mid" represent corresponding evaluation
+#'   points for partial dependence.
 factor_or_double <- function(x, m = 5L, ix_sub = NULL) {
   if (!is.numeric(x)) {
-    if (is.factor(x)) {
-      return(collapse::qF(x, sort = TRUE, na.exclude = !anyNA(unclass(x))))
-    }
-    return(collapse::qF(x, sort = FALSE, na.exclude = FALSE))
+    return(qF2(x))
   }
-  if (is.double(x)) {
-    # {collapse} seems to distinguish positive and negative zeros
-    # https://github.com/SebKrantz/collapse/issues/648
-    # Adding 0 to a double turns negative 0 to positive ones (ISO/IEC 60559)
-    collapse::setop(x, "+", 0.0)
-  }
-  if (!is.null(ix_sub)) {  # we have >10k values
+  if (!is.null(ix_sub)) { # we have >10k values
     if (m >= length(ix_sub)) {
       stop("Too large value for m")
     }
@@ -30,8 +134,8 @@ factor_or_double <- function(x, m = 5L, ix_sub = NULL) {
       return(as.double(x))
     }
   }
-  xf <- collapse::qF(x, sort = FALSE, na.exclude = FALSE)
-  if (collapse::fnlevels(xf) > m) as.double(x) else xf
+  xf <- qF2(x)
+  if (length(xf$bin_mid) > m) as.double(x) else xf
 }
 
 
@@ -169,7 +273,7 @@ fcut <- function(x, breaks, labels = NULL, right = TRUE, explicit_na = FALSE) {
   )
   codes_only <- isFALSE(labels)
   if (!is.character(labels)) {
-    labels <- as.character(seq_len(nb))  # need for equi-length case even if codes_only
+    labels <- as.character(seq_len(nb)) # need for equi-length case even if codes_only
   }
 
   # From hist2.default()
@@ -189,7 +293,7 @@ fcut <- function(x, breaks, labels = NULL, right = TRUE, explicit_na = FALSE) {
         out[is.na(x)] <- NA_integer_
       }
     }
-  } else if (diff(range(h)) < 1e-07 * mean(h)) {  # spatstat.utils::fastFindInterval()
+  } else if (diff(range(h)) < 1e-07 * mean(h)) { # spatstat.utils::fastFindInterval()
     return(
       findInterval_equi(
         as.double(x),
@@ -204,7 +308,8 @@ fcut <- function(x, breaks, labels = NULL, right = TRUE, explicit_na = FALSE) {
     )
   } else {
     out <- findInterval(
-      x, vec = breaks, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
+      x,
+      vec = breaks, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
     )
     if (explicit_na && anyNA(x)) {
       out[is.na(x)] <- nb + 1L
@@ -216,4 +321,3 @@ fcut <- function(x, breaks, labels = NULL, right = TRUE, explicit_na = FALSE) {
   }
   structure(out, levels = labels, class = c("factor", if (explicit_na) "na.included"))
 }
-

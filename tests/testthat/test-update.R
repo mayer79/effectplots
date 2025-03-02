@@ -99,21 +99,16 @@ test_that("update() can sort according to importance", {
   expect_error(effect_importance(M, by = "something"))
 })
 
-test_that("update() can drop empty levels", {
+test_that("update() can drop empty levels of continuous features", {
   M2 <- feature_effects(
     fit,
-    v = c("Petal.Length", "Petal.Width", "Species"),
-    data = iris[51:150, ],
+    v = c("Petal.Length"),
+    data = iris,
     y = "Sepal.Length",
     w = "Sepal.Width",
-    breaks = 5
+    breaks = 10
   )
 
-  # setosa is here and stays with a normal update
-  expect_equal(M2$Species[1L, "N"], 0)
-  expect_equal(update(M2, drop_empty = FALSE)$Species[1L, "N"], 0)
-
-  # Not anymore
-  expect_false("setosa" %in% levels(update(M2, drop_empty = TRUE)$Species$bin_mid))
+  expect_true(any(M2$Petal.Length$N == 0))
+  expect_true(!any(update(M2, drop_empty = TRUE)$Petal.Length$N == 0))
 })
-

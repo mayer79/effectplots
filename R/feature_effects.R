@@ -116,7 +116,9 @@
 #' xvars <- colnames(iris)[2:5]
 #' M <- feature_effects(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 #' M
-#' M |> update(sort = "pd") |> plot(share_y = "all")
+#' M |>
+#'   update(sort = "pd") |>
+#'   plot(share_y = "all")
 feature_effects <- function(object, ...) {
   UseMethod("feature_effects")
 }
@@ -142,8 +144,7 @@ feature_effects.default <- function(
     ale_n = 50000L,
     ale_bin_size = 200L,
     seed = NULL,
-    ...
-) {
+    ...) {
   # Input checks
   stopifnot(
     is.data.frame(data) || is.matrix(data),
@@ -229,7 +230,8 @@ feature_effects.default <- function(
   # Prepare pred (part 2)
   if (is.null(pred) && isTRUE(calc_pred)) {
     pred <- prep_pred(
-      pred_fun(object, data, ...), trafo = trafo, which_pred = which_pred
+      pred_fun(object, data, ...),
+      trafo = trafo, which_pred = which_pred
     )
   }
 
@@ -303,7 +305,7 @@ feature_effects.default <- function(
   )
 
   # Remove empty results (happens if feature is discrete and only ALE was calculated)
-  ok <- lengths(out) > 0L  # non-null (has some columns)
+  ok <- lengths(out) > 0L # non-null (has some columns)
   if (!all(ok)) {
     if (!any(ok)) {
       stop("Nothing has been calculated!")
@@ -336,8 +338,7 @@ feature_effects.ranger <- function(
     pd_n = 500L,
     ale_n = 50000L,
     ale_bin_size = 200L,
-    ...
-) {
+    ...) {
   if (is.null(pred_fun)) {
     pred_fun <- function(model, newdata, ...) {
       stats::predict(model, newdata, ...)$predictions
@@ -368,25 +369,24 @@ feature_effects.ranger <- function(
 #' @describeIn feature_effects Method for DALEX explainer.
 #' @export
 feature_effects.explainer <- function(
-  object,
-  v = colnames(data),
-  data = object$data,
-  y = object$y,
-  pred = NULL,
-  pred_fun = object$predict_function,
-  trafo = NULL,
-  which_pred = NULL,
-  w = object$weights,
-  breaks = "Sturges",
-  right = TRUE,
-  discrete_m = 13L,
-  outlier_iqr = 2,
-  calc_pred = TRUE,
-  pd_n = 500L,
-  ale_n = 50000L,
-  ale_bin_size = 200L,
-  ...
-) {
+    object,
+    v = colnames(data),
+    data = object$data,
+    y = object$y,
+    pred = NULL,
+    pred_fun = object$predict_function,
+    trafo = NULL,
+    which_pred = NULL,
+    w = object$weights,
+    breaks = "Sturges",
+    right = TRUE,
+    discrete_m = 13L,
+    outlier_iqr = 2,
+    calc_pred = TRUE,
+    pd_n = 500L,
+    ale_n = 50000L,
+    ale_bin_size = 200L,
+    ...) {
   feature_effects.default(
     object,
     v = v,
@@ -415,7 +415,7 @@ feature_effects.H2OModel <- function(
     object,
     data,
     v = object@parameters$x,
-    y = NULL,                   #  object@parameters$y does not work for multi-outputs
+    y = NULL, #  object@parameters$y does not work for multi-outputs
     pred = NULL,
     pred_fun = NULL,
     trafo = NULL,
@@ -429,8 +429,7 @@ feature_effects.H2OModel <- function(
     pd_n = 500L,
     ale_n = 50000L,
     ale_bin_size = 200L,
-    ...
-) {
+    ...) {
   if (!requireNamespace("h2o", quietly = TRUE)) {
     stop("Package 'h2o' not installed")
   }
@@ -438,7 +437,8 @@ feature_effects.H2OModel <- function(
   if (inherits(data, "H2OFrame")) {
     if (is.null(pred) && calc_pred) {
       pred <- prep_pred(
-        stats::predict(object, data, ...), trafo = trafo, which_pred = which_pred
+        stats::predict(object, data, ...),
+        trafo = trafo, which_pred = which_pred
       )
     }
     data <- as.data.frame(data)
@@ -507,34 +507,32 @@ calculate_stats <- function(
     ale_data,
     ale_bin_size,
     ix_sub,
-    ...
-) {
-  # "factor", "double", "integer", "logical", "character"
-  orig_type <- if (is.factor(x)) "factor" else typeof(x)
-  was_ordered <- is.ordered(x)
-  lev <- if (is.factor(x)) levels(x)
+    ...) {
+  if (is.double(x)) {
+    # {collapse} seems to distinguish positive and negative zeros
+    # https://github.com/SebKrantz/collapse/issues/648
+    # Adding 0 to a double turns negative 0 to positive ones (ISO/IEC 60559)
+    collapse::setop(x, "+", 0.0)
+  }
 
-  x <- factor_or_double(x, m = discrete_m, ix_sub = ix_sub)
-  discrete <- !is.numeric(x)
+  # For continuous x, we get x. Otherwise, a list including bin_mid as grid
+  g <- factor_or_double(x, m = discrete_m, ix_sub = ix_sub)
+  discrete <- is.list(g)
 
   if (is.null(PYR) && is.null(pd_data) && (discrete || is.null(ale_data))) {
     return(NULL)
   }
 
-  sd_cols <- setdiff(colnames(PYR), "pred")  # Can be NULL
+  sd_cols <- setdiff(colnames(PYR), "pred") # Can be NULL
 
   # DISCRETE
   if (discrete) {
-    M <- grouped_stats(PYR, g = x, w = w, sd_cols = sd_cols)
-
-    # We need original unique values of g later for PDP, e.g., TRUE/FALSE.
-    # Doubles might lose digits. This should not be a problem though.
-    g <- parse_rownames(rownames(M), type = orig_type, ord = was_ordered, lev = lev)
-    out <- data.frame(bin_mid = g, bin_width = 0.7, bin_mean = g, M)
-    if (orig_type != "factor") {
-      out <- out[order(g, na.last = TRUE), ]
+    M <- grouped_stats(PYR, g = g$g, w = w, sd_cols = sd_cols)
+    out <- data.frame(bin_mid = g$bin_mid, bin_width = 0.7, bin_mean = g$bin_mid, M)
+    if (!is.factor(x)) {
+      out <- out[order(out$bin_mid, na.last = TRUE), ]
     }
-    if (orig_type %in% c("integer", "double") && length(stats::na.omit(g)) > 1L) {
+    if (is.numeric(x) && length(stats::na.omit(out$bin_mid)) > 1L) {
       out$bin_width <- min(diff(out$bin_mid), na.rm = TRUE) * 0.7
     }
   } else {
@@ -556,7 +554,7 @@ calculate_stats <- function(
     # Calculate bin_means, clip outliers, and replace missings (where possible)
     bin_means <- collapse::fmean(x, g = ix, w = w, use.g.names = FALSE)
     bad <- is.na(bin_means)
-    bin_means[bad] = mids[bad]
+    bin_means[bad] <- mids[bad]
     bin_means <- pmax(pmin(bin_means, breaks[length(breaks)]), breaks[1L])
 
     out <- data.frame(bin_mid = mids, bin_width = bin_width, bin_mean = bin_means, M)
@@ -588,7 +586,7 @@ calculate_stats <- function(
         v = v,
         data = ale_data$X,
         breaks = breaks,
-        right = right,  # does not matter because we pass g
+        right = right, # does not matter because we pass g
         pred_fun = pred_fun,
         trafo = trafo,
         which_pred = which_pred,
@@ -603,7 +601,7 @@ calculate_stats <- function(
       cvars <- intersect(c("pd", "pred_mean", "y_mean"), colnames(out))
       if (length(cvars)) {
         w_ok <- out$weight[ok]
-        ale_mids <- 0.5 * (ale + c(0, ale[-length(ale)]))  # average ALE per bin
+        ale_mids <- 0.5 * (ale + c(0, ale[-length(ale)])) # average ALE per bin
         ale <- ale + collapse::fmean(out[[cvars[1L]]][ok], na.rm = TRUE, w = w_ok) -
           collapse::fmean(ale_mids, w = w_ok)
       }
