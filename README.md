@@ -28,6 +28,9 @@ We highly recommend Christoph Molnar's book [3] for more info on feature effects
 2. **Update** the results with `update()`: Combine rare levels of categorical features, sort results by importance, turn values of discrete features to factor etc.
 3. **Plot** the results with `plot()`: Choose between ggplot2/patchwork and plotly.
 
+**Outlier capping**: Extreme outliers in numeric features are capped by default (but not deleted).
+To avoid capping, set `outlier_iqr = Inf`.
+
 ## Installation
 
 You can install the development version of {effectplots} from [GitHub](https://github.com/) with:
