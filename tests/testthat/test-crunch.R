@@ -152,113 +152,78 @@ test_that("fcut() catches problematic input", {
 
 test_that("fcut() works in single-bin mode", {
   breaks <- 1:2
-  x <- c(NA, 1:10)
+  n <- 10
 
-  # Codes only
-  out <- fcut(x, breaks = breaks, labels = FALSE)
-  expect_type(out, "integer")
-  expect_equal(out, c(NA, rep(1, times = 10)))
-  expect_equal(
-    fcut(x, breaks = breaks, labels = FALSE, explicit_na = TRUE),
-    c(2L, rep(1, times = 10))
-  )
+  for (has_na in c(FALSE, TRUE)) {
+    x <- c(if (has_na) NA, 1:n)
+    z <- c(if (has_na) NA, rep("A", n))
 
-  # Factor output (without and with explicit missings)
-  expect_equal(
-    fcut(x, breaks = breaks, labels = "A"),
-    as.factor(c(NA, rep("A", times = 10)))
-  )
-  xp <- factor(c(NA, rep("A", times = 10)), levels = c("A", NA), exclude = NULL)
-  class(xp) <- c("factor", "na.included")
-  expect_equal(fcut(x, breaks = breaks, labels = "A", explicit_na = TRUE), xp)
-
-  # No missings, but explicit_na = TRUE; no labels
-  x <- 1:10
-  xp <- factor(rep("1", times = 10))
-  class(xp) <- c("factor", "na.included")
-  expect_equal(fcut(x, breaks = breaks, explicit_na = TRUE), xp)
+    for (explicit_na in c(FALSE, TRUE)) {
+      for (labels in list(FALSE, "A")) {
+        out <- fcut(x, breaks = breaks, labels = labels, explicit_na = explicit_na)
+        if (!isFALSE(labels)) {
+          if (!explicit_na) {
+            xp <- factor(z)
+          } else {
+            xp <- factor(z, levels = c("A", if (has_na) NA), exclude = NULL)
+            class(xp) <- c("factor", "na.included")
+          }
+        } else {
+          xp <- rep(1L, n)
+          if (has_na) {
+            xp <- c(if (explicit_na) 2L else NA, xp)
+          }
+        }
+        expect_equal(out, xp)
+      }
+    }
+  }
 })
 
-test_that("fcut() works in unequal-length mode", {
-  breaks <- c(1, 2, 5)
-  x <- c(NA, 1:10)
-
-  # Codes only: right = TRUE/FALSE/explicit.na = TRUE
-  out <- fcut(x, breaks = breaks, labels = FALSE)
-  expect_type(out, "integer")
-  expect_equal(out, rep(c(NA, 1:2), times = c(1, 2, 8)))
-
-  expect_equal(
-    fcut(x, breaks = breaks, labels = FALSE, right = FALSE),
-    rep(c(NA, 1:2), times = c(1, 1, 9))
-  )
-
-  expect_equal(
-    fcut(x, breaks = breaks, labels = FALSE, explicit_na = TRUE),
-    rep(c(3, 1:2), times = c(1, 2, 8))
-  )
-
-  # Factor output (without and with explicit missings)
-  expect_equal(
-    fcut(x, breaks = breaks, labels = c("A", "B")),
-    as.factor(rep(c(NA, "A", "B"), times = c(1, 2, 8)))
-  )
-  xp <- factor(
-    rep(c(NA, "A", "B"), times = c(1, 1, 9)),
-    levels = c("A", "B", NA),
-    exclude = NULL
-  )
-  class(xp) <- c("factor", "na.included")
-  expect_equal(
-    fcut(x, breaks = breaks, labels = c("A", "B"), explicit_na = TRUE, right = FALSE),
-    xp
-  )
-
-  # No missings, but explicit_na = TRUE; no labels
-  x <- 1:10
-  xp <- factor(rep(c("1", "2"), times = c(2, 8)))
-  class(xp) <- c("factor", "na.included")
-  expect_equal(fcut(x, breaks = breaks, explicit_na = TRUE), xp)
-})
-
-test_that("fcut() works in equal-length mode", {
-  breaks <- c(1, 4, 7)
-  x <- c(NA, 1:10)
-
-  # Codes only: right = TRUE/FALSE/explicit.na = TRUE
-  out <- fcut(x, breaks = breaks, labels = FALSE)
-  expect_type(out, "integer")
-  expect_equal(out, rep(c(NA, 1:2), times = c(1, 4, 6)))
-
-  expect_equal(
-    fcut(x, breaks = breaks, labels = FALSE, right = FALSE),
-    rep(c(NA, 1:2), times = c(1, 3, 7))
-  )
-
-  expect_equal(
-    fcut(x, breaks = breaks, labels = FALSE, explicit_na = TRUE),
-    rep(c(3, 1:2), times = c(1, 4, 6))
-  )
-
-  # Factor output (without and with explicit missings)
-  expect_equal(
-    fcut(x, breaks = breaks, labels = c("A", "B")),
-    as.factor(rep(c(NA, "A", "B"), times = c(1, 4, 6)))
-  )
-  xp <- factor(
-    rep(c(NA, "A", "B"), times = c(1, 3, 7)),
-    levels = c("A", "B", NA),
-    exclude = NULL
-  )
-  class(xp) <- c("factor", "na.included")
-  expect_equal(
-    fcut(x, breaks = breaks, labels = c("A", "B"), explicit_na = TRUE, right = FALSE),
-    xp
-  )
-
-  # No missings, but explicit_na = TRUE; no labels
-  x <- 1:10
-  xp <- factor(rep(c("1", "2"), times = c(4, 6)))
-  class(xp) <- c("factor", "na.included")
-  expect_equal(fcut(x, breaks = breaks, explicit_na = TRUE), xp)
+test_that("fcut() works in unequal- and equal-length mode", {
+  n <- 10
+  lev <- c("A", "B")
+  for (equal in c(FALSE, TRUE)) {
+    breaks <- c(1, 2 + equal, 5)
+    for (has_na in c(TRUE, FALSE)) {
+      x <- c(if (has_na) NA, 1:n)
+      for (right in c(TRUE, FALSE)) {
+        # "pre-expected"
+        z <- rep(1:2, times = c(1L + right + equal, n - 1L - right - equal))
+        if (has_na) {
+          z <- c(NA, z)
+        }
+        for (explicit_na in c(TRUE, FALSE)) {
+          for (labels in list(FALSE, lev)) {
+            out <- fcut(
+              x,
+              breaks = breaks,
+              labels = labels,
+              explicit_na = explicit_na,
+              right = right
+            )
+            if (!isFALSE(labels)) {
+              if (!explicit_na) {
+                xp <- factor(z, levels = 1:2, labels = lev)
+              } else {
+                xp <- factor(
+                  z,
+                  levels = c(1:2, if (has_na) NA),
+                  labels = c(lev, if (has_na) NA),
+                  exclude = NULL
+                )
+                class(xp) <- c("factor", "na.included")
+              }
+            } else { # no labels, just integers
+              xp <- z
+              if (has_na && explicit_na) {
+                xp[is.na(xp)] <- 3L
+              }
+            }
+            expect_equal(out, xp)
+          }
+        }
+      }
+    }
+  }
 })
