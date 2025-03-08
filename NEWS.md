@@ -8,6 +8,8 @@
 - Lines now skip missing values on the y-axis, also in the ribbons [#57](https://github.com/mayer79/effectplots/pull/57).
 - Factors with explicit NA level are respected, [#59](https://github.com/mayer79/effectplots/pull/59).
 - Empty factor levels are being dropped, [#60](https://github.com/mayer79/effectplots/pull/60).
+- Improved logic to find discrete grid for PDPs, [#61](https://github.com/mayer79/effectplots/pull/61).
+- Better test coverage for `fcut()`, [#63](https://github.com/mayer79/effectplots/pull/63).
 
 ### Minor changes
 
