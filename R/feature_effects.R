@@ -199,7 +199,7 @@ feature_effects.default <- function(
       w <- if (is.matrix(data)) data[, w] else data[[w]]
     }
     if (!is.numeric(w) && !is.logical(w)) {
-      stop("'w' must be numeric, or logical.")
+      stop("'w' must be numeric or logical.")
     }
     wpos <- !is.na(w) & w > 0
     if (!any(wpos)) {

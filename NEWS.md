@@ -1,3 +1,5 @@
+# effectplots 0.2.3
+
 # effectplots 0.2.2
 
 ### Minor improvement
@@ -13,8 +15,6 @@
 
 - Improved logic to find discrete grids for PDPs, [#61](https://github.com/mayer79/effectplots/pull/61).
 - Better test coverage for `fcut()`, [#63](https://github.com/mayer79/effectplots/pull/63).
-
-### Minor changes
 
 # effectplots 0.2.1
 

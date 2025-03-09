@@ -1,6 +1,6 @@
-#=============================================================================
+# =============================================================================
 # Put together the package
-#=============================================================================
+# =============================================================================
 
 # WORKFLOW: UPDATE EXISTING PACKAGE
 # 1) Modify package content and documentation.
@@ -15,7 +15,7 @@ library(usethis)
 use_description(
   fields = list(
     Title = "Effect Plots",
-    Version = "0.2.2",
+    Version = "0.2.3",
     Description = "High-performance implementation of various effect plots
     useful for regression and probabilistic classification tasks.
     The package includes partial dependence plots
@@ -47,7 +47,8 @@ use_gpl_license()
 
 # Your files that do not belong to the package itself (others are added by "use_* function")
 use_build_ignore(
-  c("^packaging.R$", "[.]Rproj$", "^logo.png$", "^claims.parquet$"), escape = FALSE
+  c("^packaging.R$", "[.]Rproj$", "^logo.png$", "^claims.parquet$"),
+  escape = FALSE
 )
 
 # Add short docu in Markdown (without running R code)
@@ -74,9 +75,9 @@ use_rcpp()
 # use_github_action("test-coverage")
 # use_github_action("pkgdown")
 
-#=============================================================================
+# =============================================================================
 # Finish package building (can use fresh session)
-#=============================================================================
+# =============================================================================
 
 library(devtools)
 

@@ -1,6 +1,6 @@
 #' Collapse factor levels (currently unused)
 #'
-#' Internal function to collapse factor levels.
+#' Internal function to collapse factor levels. Only used in `flump()`.
 #' @noRd
 #' @keywords internal
 #'
@@ -9,7 +9,7 @@
 #' @param other_level Name of the new level, e.g., "Other 3" if three levels are combined.
 #' @returns A factor with combined levels.
 combine_levels <- function(f, to_combine, other_level = "Other") {
-  if (length(to_combine) <= 2L) {
+  if (length(to_combine) <= 1L) {
     return(f)
   }
   old_levels <- lvl <- levels(f)
@@ -25,6 +25,32 @@ combine_levels <- function(f, to_combine, other_level = "Other") {
   attributes(out) <- attributes(f)
   attr(out, "levels") <- new_levels
   return(out)
+}
+
+#' Find rare factor levels (currently unused)
+#'
+#' Internal function to find rare factor levels. NA levels are never
+#' considered as being rare. Only used by `flump()`.
+#'
+#' @noRd
+#' @keywords internal
+#'
+#' @param f A factor.
+#' @param m How many rare levels to find?
+#' @param w Optional case weights.
+#' @returns A character vector with m rare levels, or `NULL`.
+rare_levels <- function(f, m, w = NULL) {
+  if (m <= 1L) {
+    return(NULL)
+  }
+  if (is.null(w)) {
+    N <- collapse::fnobs(f, g = f)
+  } else {
+    N <- collapse::fsum(w, g = f, fill = TRUE)
+  }
+  N <- sort(N[!is.na(names(N))]) # Never consider NA
+  m <- min(m, length(N))
+  return(names(N)[seq_len(m)])
 }
 
 #' Lump rare factor levels (currently unused)
@@ -43,18 +69,16 @@ combine_levels <- function(f, to_combine, other_level = "Other") {
 #'   "combined" is a character vector with the combined levels, and "other_level"
 #'   is the name of the new level.
 flump <- function(f, combine_m, w = NULL) {
-  if (is.null(w)) {
-    N <- collapse::fnobs(f, g = f)
-  } else {
-    N <- collapse::fsum(w, g = f, fill = TRUE)
+  stopifnot(
+    is.factor(f),
+    combine_m > 1,
+    is.null(w) || length(f) == length(w)
+  )
+  to_combine <- rare_levels(f, m = combine_m, w = w)
+  if (length(to_combine) <= 1L) {
+    return(f = f, combined = NULL, other_level = NULL)
   }
-  to_combine <- levels(f)[order(N)][seq_len(combine_m)]
-  to_combine <- setdiff(to_combine, NA) # don't collapse explicit NA levels
-  m_other <- length(to_combine)
-  if (m_other <= 2L) {
-    return(list(f = f, combined = NULL, other_level = NULL))
-  }
-  other_level <- paste("Other", m_other)
+  other_level <- paste("Other", length(to_combine))
 
   out <- list(
     f = combine_levels(f, to_combine = to_combine, other_level = other_level),
@@ -63,7 +87,6 @@ flump <- function(f, combine_m, w = NULL) {
   )
   return(out)
 }
-
 
 #' Prepares discrete feature for grouped operations of {collapse}
 #'
