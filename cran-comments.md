@@ -1,8 +1,8 @@
-## effectplots 0.2.1
+## effectplots 0.2.2
 
 Dear CRAN team
 
-This is a small update which mainly brings the plotting of NA values on the x axis.
+This is a small update with some internal improvements and code simplifications.
 
 ## R CMD check results
 
@@ -15,5 +15,3 @@ OK
 ## Win devel
 
 OK
-
-

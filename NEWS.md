@@ -5,10 +5,13 @@
 - `update(, collapse_m = m)` will now produce a level "other p" for the p least frequent categories [#52](https://github.com/mayer79/effectplots/pull/52).
 - `update()` has received new default: `collapse_m = 15` (was 30) [#54](https://github.com/mayer79/effectplots/pull/54).
 - Missing values in `y` are now checked *after* removing observations without positive weights [#56](https://github.com/mayer79/effectplots/pull/56).
-- Lines now skip missing values on the y-axis, also in the ribbons [#57](https://github.com/mayer79/effectplots/pull/57).
+- Plotted lines now skip missing values on the y-axis, also in the ribbons [#57](https://github.com/mayer79/effectplots/pull/57).
 - Factors with explicit NA level are respected, [#59](https://github.com/mayer79/effectplots/pull/59).
 - Empty factor levels are being dropped, [#60](https://github.com/mayer79/effectplots/pull/60).
-- Improved logic to find discrete grid for PDPs, [#61](https://github.com/mayer79/effectplots/pull/61).
+
+### Maintenance
+
+- Improved logic to find discrete grids for PDPs, [#61](https://github.com/mayer79/effectplots/pull/61).
 - Better test coverage for `fcut()`, [#63](https://github.com/mayer79/effectplots/pull/63).
 
 ### Minor changes
