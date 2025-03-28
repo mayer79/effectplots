@@ -1,32 +1,3 @@
-#' Collapse factor levels (currently unused)
-#'
-#' Internal function to collapse factor levels. Only used in `flump()`.
-#' @noRd
-#' @keywords internal
-#'
-#' @param f A factor.
-#' @param to_combine Levels to combine.
-#' @param other_level Name of the new level, e.g., "Other 3" if three levels are combined.
-#' @returns A factor with combined levels.
-combine_levels <- function(f, to_combine, other_level = "Other") {
-  if (length(to_combine) <= 1L) {
-    return(f)
-  }
-  old_levels <- lvl <- levels(f)
-  to_keep <- setdiff(lvl, to_combine)
-  if (other_level %in% to_keep) {
-    stop("The 'other_level' level is already present in 'f'")
-  }
-  new_levels <- c(to_keep, other_level)
-  old_levels[!(lvl %in% to_keep)] <- other_level
-
-  # like in forcats:::lvls_revalue()
-  out <- match(old_levels, new_levels)[f]
-  attributes(out) <- attributes(f)
-  attr(out, "levels") <- new_levels
-  return(out)
-}
-
 #' Find rare factor levels (currently unused)
 #'
 #' Internal function to find rare factor levels. NA levels are never
@@ -40,7 +11,7 @@ combine_levels <- function(f, to_combine, other_level = "Other") {
 #' @param w Optional case weights.
 #' @returns A character vector with m rare levels, or `NULL`.
 rare_levels <- function(f, m, w = NULL) {
-  if (m <= 1L) {
+  if (m < 2L) {
     return(NULL)
   }
   if (is.null(w)) {
@@ -51,6 +22,37 @@ rare_levels <- function(f, m, w = NULL) {
   N <- sort(N[!is.na(names(N))]) # Never consider NA
   m <- min(m, length(N))
   return(names(N)[seq_len(m)])
+}
+
+#' Collapse factor levels (currently unused)
+#'
+#' Internal function to collapse factor levels. Only used in `flump()`.
+#' @noRd
+#' @keywords internal
+#'
+#' @param f A factor.
+#' @param to_combine Levels to combine.
+#' @param other_level Name of the new level, e.g., "Other 3" if three levels are combined.
+#' @returns A factor with combined levels.
+combine_levels <- function(f, to_combine, other_level = "Other") {
+  if (length(to_combine) < 2L) {
+    return(f)
+  }
+  lvl <- levels(f)
+  to_keep <- setdiff(lvl, to_combine)
+  if (other_level %in% to_keep) {
+    stop("'other_level' already exists")
+  }
+  new_levels <- c(to_keep, other_level)
+  lvl[!(lvl %in% to_keep)] <- other_level
+
+  # Like in forcats:::lvls_revalue()
+  # Note that (implicit) NA values in f remain NA in out
+  map_to_new_codes <- match(lvl, new_levels)
+  out <- map_to_new_codes[f]
+  attributes(out) <- attributes(f)
+  attr(out, "levels") <- new_levels
+  return(out)
 }
 
 #' Lump rare factor levels (currently unused)
@@ -71,7 +73,7 @@ rare_levels <- function(f, m, w = NULL) {
 flump <- function(f, combine_m, w = NULL) {
   stopifnot(
     is.factor(f),
-    combine_m > 1,
+    combine_m > 1L,
     is.null(w) || length(f) == length(w)
   )
   to_combine <- rare_levels(f, m = combine_m, w = w)
