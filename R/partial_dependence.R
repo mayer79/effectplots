@@ -204,6 +204,46 @@ partial_dependence.H2OModel <- function(
   )
 }
 
+#' @describeIn partial_dependence Method for xgb.Booster models.
+#' @export
+partial_dependence.xgb.Booster <- function(
+    object,
+    v,
+    data,
+    pred_fun = stats::predict,
+    trafo = NULL,
+    which_pred = NULL,
+    w = NULL,
+    breaks = "Sturges",
+    right = TRUE,
+    discrete_m = 13L,
+    outlier_iqr = 2,
+    pd_n = 500L,
+    seed = NULL,
+    ...
+) {
+
+  if (!inherits(data, "matrix")) {
+    data = as.matrix(data)
+  }
+  partial_dependence.default(
+    object = object,
+    v = v,
+    data = data,
+    pred_fun = pred_fun,
+    trafo = trafo,
+    which_pred = which_pred,
+    w = w,
+    breaks = breaks,
+    right = right,
+    discrete_m = discrete_m,
+    outlier_iqr = outlier_iqr,
+    pd_n = pd_n,
+    seed = seed,
+    ...
+  )
+}
+
 #' Barebone Partial Dependence
 #'
 #' This is a barebone implementation of Friedman's partial dependence
