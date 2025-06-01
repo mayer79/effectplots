@@ -3,7 +3,8 @@ test_that("partial_dependence() is consistent with feature_effects()", {
   v <- c("Sepal.Width", "Species")
   pd <- partial_dependence(fit, v = v, data = iris, w = 1:150)
   marg <- feature_effects(
-    fit, v = v, data = iris, calc_pred = FALSE, ale_n = 0, w = 1:150
+    fit,
+    v = v, data = iris, calc_pred = FALSE, ale_n = 0, w = 1:150
   )
   expect_equal(pd, marg)
 })
@@ -43,7 +44,34 @@ test_that(".pd() respects ... argument for predictions", {
 
   pd1 <- .pd(fit2, v = "Species", data = iris, grid = unique(iris$Species))
   pd2 <- .pd(
-    fit2, v = "Species", data = iris, grid = unique(iris$Species), type = "response"
+    fit2,
+    v = "Species", data = iris, grid = unique(iris$Species), type = "response"
   )
   expect_false(identical(pd1, pd2))
+})
+
+test_that(".pd() respects case weights", {
+  fit <- lm(Sepal.Length ~ Species * Sepal.Width, data = iris)
+  v <- "Sepal.Width"
+  br <- c(2, 2.5, 3, 3.5, 4.5)
+  w <- c(rep(1L, times = 100L), rep(2L, times = 50L))
+  ix <- rep(1:nrow(iris), times = w)
+
+  res_w <- .pd(fit, v = v, data = iris, grid = br, w = w)
+  res_uw <- .pd(fit, v = v, data = iris[ix, ], grid = br)
+
+  expect_equal(res_w, res_uw)
+})
+
+test_that("partial_dependence() respects case weights", {
+  fit <- lm(Sepal.Length ~ Species * Sepal.Width, data = iris)
+  v <- "Sepal.Width"
+  br <- c(2, 2.5, 3, 3.5, 4.5)
+  w <- c(rep(1L, times = 100L), rep(2L, times = 50L))
+  ix <- rep(1:nrow(iris), times = w)
+
+  res_w <- partial_dependence(fit, v = v, data = iris, breaks = br, w = w)[[1L]]
+  res_uw <- partial_dependence(fit, v = v, data = iris[ix, ], breaks = br)[[1L]]
+
+  expect_equal(res_w[-4L], res_uw[-4L])
 })

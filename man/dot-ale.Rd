@@ -55,16 +55,15 @@ By default \code{NULL}.}
 a \code{glm()} or (typically) \code{prob = TRUE} in classification models.}
 }
 \value{
-Vector representing one ALE per bin.
+Vector representing one value per break.
 }
 \description{
 This is a barebone implementation of Apley's ALE.
 Per bin, the local effect \eqn{D_j} is calculated, and then accumulated over bins.
 \eqn{D_j} equals the difference between the partial dependence at the
 lower and upper bin breaks using only observations within bin.
-To plot the values, we can make a line plot of the resulting vector against
-upper bin breaks. Alternatively, the vector can be extended
-from the left by the value 0, and then plotted against \emph{all} breaks.
+The values are to be plotted against bin breaks.
+Note that no centering is applied, i.e., the first value starts at 0.
 }
 \examples{
 fit <- lm(Sepal.Length ~ ., data = iris)

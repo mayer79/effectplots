@@ -16,3 +16,25 @@ test_that("single vector input works", {
   expect_equal(out1, out2)
   expect_equal(out1, out3)
 })
+
+test_that("case weights are respected", {
+  fit <- lm(Sepal.Length ~ Species * Sepal.Width, data = iris)
+  v <- "Sepal.Width"
+  br <- c(2, 2.5, 3, 3.5, 4.5)
+  w <- c(rep(1L, times = 100L), rep(2L, times = 50L))
+  ix <- rep(1:nrow(iris), times = w)
+
+  res_w <- average_predicted(
+    iris[v],
+    pred = predict(fit, iris),
+    breaks = br,
+    w = w
+  )[[1L]]
+  res_uw <- average_predicted(
+    iris[ix, v],
+    pred = predict(fit, iris[ix, ]),
+    breaks = br
+  )[[1L]]
+
+  expect_equal(res_w[-4L], res_uw[-4L])
+})
