@@ -30,7 +30,7 @@ rare_levels <- function(f, m, w = NULL) {
 #' @noRd
 #' @keywords internal
 #'
-#' @param f A factor.
+#' @param f A factor produces with `collapse::qF(, na.exclude=False)`.
 #' @param to_combine Levels to combine.
 #' @param other_level Name of the new level, e.g., "Other 3" if three levels are combined.
 #' @returns A factor with combined levels.
