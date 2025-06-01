@@ -1,3 +1,8 @@
+# effectplots 0.2.3
+
+- More unit tests.
+- Better code explanations for .ale().
+
 # effectplots 0.2.2
 
 ### Minor improvement

@@ -159,7 +159,7 @@ feature is discrete or continuous. This attribute might be lost when you manuall
 modify the data.frames.
 }
 \description{
-Calculates ALE for one or multiple continuous features specified by \code{X}.
+Calculates uncentered ALE for one or multiple continuous features specified by \code{X}.
 
 The concept of ALE was introduced in Apley et al. (2020) as an alternative to
 partial dependence (PD). The Ceteris Paribus clause behind PD is a blessing and
@@ -176,7 +176,11 @@ partial dependence difference between lower and upper bin break, using only
 observations falling into this bin. This is repeated for all bins,
 and the values are \emph{accumulated}.
 
-ALE values are plotted against right bin breaks.
+This implementation closely follows the implementation of Apley et al. (2020).
+Notably, we also plot the values at the bin breaks, not at the bin means.
+The main difference to Apley is that we use uniform binning, not quantile binning.
+For large bins, we sample \code{ale_bin_size} observations, a step that is not necessary
+with quantile binning. Furthermore, we don't center the values to mean 0.
 }
 \details{
 The function is a convenience wrapper around \code{\link[=feature_effects]{feature_effects()}}, which calls
@@ -199,7 +203,7 @@ M <- ale(fit, v = "Petal.Length", data = iris)
 M |> plot()
 
 M2 <- ale(fit, v = colnames(iris)[-1], data = iris, breaks = 5)
-plot(M2, share_y = "all")  # Only continuous variables shown
+plot(M2, share_y = "all") # Only continuous variables shown
 }
 \references{
 Apley, Daniel W., and Jingyu Zhu. 2020. \emph{Visualizing the Effects of Predictor Variables in Black Box Supervised Learning Models.}

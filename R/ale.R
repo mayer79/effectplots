@@ -1,7 +1,7 @@
 #' Accumulated Local Effects (ALE)
 #'
 #' @description
-#' Calculates ALE for one or multiple continuous features specified by `X`.
+#' Calculates uncentered ALE for one or multiple continuous features specified by `X`.
 #'
 #' The concept of ALE was introduced in Apley et al. (2020) as an alternative to
 #' partial dependence (PD). The Ceteris Paribus clause behind PD is a blessing and
@@ -17,7 +17,11 @@
 #' observations falling into this bin. This is repeated for all bins,
 #' and the values are *accumulated*.
 #'
-#' ALE values are plotted against right bin breaks.
+#' This implementation closely follows the implementation of Apley et al. (2020).
+#'  Notably, we also plot the values at the bin breaks, not at the bin means.
+#'  The main difference to Apley is that we use uniform binning, not quantile binning.
+#'  For large bins, we sample `ale_bin_size` observations, a step that is not necessary
+#'  with quantile binning. Furthermore, we don't center the values to mean 0.
 #'
 #' @details
 #' The function is a convenience wrapper around [feature_effects()], which calls
@@ -43,7 +47,7 @@
 #' M |> plot()
 #'
 #' M2 <- ale(fit, v = colnames(iris)[-1], data = iris, breaks = 5)
-#' plot(M2, share_y = "all")  # Only continuous variables shown
+#' plot(M2, share_y = "all") # Only continuous variables shown
 ale <- function(object, ...) {
   UseMethod("ale")
 }
@@ -65,8 +69,7 @@ ale.default <- function(
     ale_n = 50000L,
     ale_bin_size = 200L,
     seed = NULL,
-    ...
-) {
+    ...) {
   feature_effects.default(
     object = object,
     v = v,
@@ -106,8 +109,7 @@ ale.ranger <- function(
     ale_n = 50000L,
     ale_bin_size = 200L,
     seed = NULL,
-    ...
-) {
+    ...) {
   if (is.null(pred_fun)) {
     pred_fun <- function(model, newdata, ...) {
       stats::predict(model, newdata, ...)$predictions
@@ -149,8 +151,7 @@ ale.explainer <- function(
     ale_n = 50000L,
     ale_bin_size = 200L,
     seed = NULL,
-    ...
-) {
+    ...) {
   ale.default(
     object = object[["model"]],
     v = v,
@@ -187,8 +188,7 @@ ale.H2OModel <- function(
     ale_n = 50000L,
     ale_bin_size = 200L,
     seed = NULL,
-    ...
-) {
+    ...) {
   if (!requireNamespace("h2o", quietly = TRUE)) {
     stop("Package 'h2o' not installed")
   }
@@ -227,9 +227,8 @@ ale.H2OModel <- function(
 #' Per bin, the local effect \eqn{D_j} is calculated, and then accumulated over bins.
 #' \eqn{D_j} equals the difference between the partial dependence at the
 #' lower and upper bin breaks using only observations within bin.
-#' To plot the values, we can make a line plot of the resulting vector against
-#' upper bin breaks. Alternatively, the vector can be extended
-#' from the left by the value 0, and then plotted against *all* breaks.
+#' The values are to be plotted against bin breaks.
+#' Note that no centering is applied, i.e., the first value starts at 0.
 #'
 #' @param v Variable name in `data` to calculate ALE.
 #' @param data Matrix or data.frame.
@@ -242,7 +241,7 @@ ale.H2OModel <- function(
 #' @param g For internal use. The result of `as.factor(findInterval(...))`.
 #'   By default `NULL`.
 #' @inheritParams feature_effects
-#' @returns Vector representing one ALE per bin.
+#' @returns Vector representing one value per break.
 #' @export
 #' @seealso [partial_dependence()]
 #' @inherit ale references
@@ -262,47 +261,52 @@ ale.H2OModel <- function(
     bin_size = 200L,
     w = NULL,
     g = NULL,
-    ...
-) {
+    ...) {
   if (is.null(g)) {
     x <- if (is.data.frame(data)) data[[v]] else data[, v]
     g <- findInterval(
-      x, vec = breaks, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
+      x = x, vec = breaks, rightmost.closed = TRUE, left.open = right, all.inside = TRUE
     )
     g <- collapse::qF(g, sort = FALSE)
   }
 
-  # List of bin indices. We remove empty or NA bins.
+  # List containing selected row indices per unsorted(!) bin ID
   J <- lapply(
     collapse::gsplit(g = g, use.g.names = TRUE),
     function(z) if (length(z) <= bin_size) z else sample(z, size = bin_size)
   )
+  # Remove empty or NA bins
   ok <- !is.na(names(J)) & lengths(J, use.names = FALSE) > 0L
   if (!all(ok)) {
     J <- J[ok]
   }
 
   # Before flattening the list J, we store bin counts
-  bin_n <- lengths(J, use.names = FALSE)
-  ix <- as.integer(names(J))
+  bin_sizes <- lengths(J, use.names = FALSE)
+  ix <- as.integer(names(J)) # Unsorted bin IDs
   J <- unlist(J, recursive = FALSE, use.names = FALSE)
 
-  # Empty bins will get an incremental effect of 0
-  out <- numeric(length(breaks) - 1L)
+  # Initialize local effects with 0
+  out <- numeric(length(breaks)) # first value corresponds to first left break
 
-  # Now we create a single prediction dataset. Lower bin edges first, then upper ones.
+  # Create single prediction data set. Lower bin edges first, then upper ones
+  # This makes the code harder to read, but is more efficient
   data_long <- collapse::ss(data, rep.int(J, 2L))
-  grid_long <- rep.int(c(breaks[ix], breaks[ix + 1L]), times = c(bin_n, bin_n))
+  grid_long <- rep.int(c(breaks[ix], breaks[ix + 1L]), times = c(bin_sizes, bin_sizes))
   if (is.data.frame(data_long)) {
     data_long[[v]] <- grid_long
   } else {
     data_long[, v] <- grid_long
   }
+
   pred <- prep_pred(
-    pred_fun(object, data_long, ...), trafo = trafo, which_pred = which_pred
+    pred_fun(object, data_long, ...),
+    trafo = trafo, which_pred = which_pred
   )
+
+  # Aggregate individual local effects
   n <- length(J)
-  out[ix] <- collapse::fmean(
+  out[ix + 1L] <- collapse::fmean(
     pred[(n + 1L):(2L * n)] - pred[1L:n],
     g = collapse::fdroplevels(g[J]),
     w = if (!is.null(w)) w[J],

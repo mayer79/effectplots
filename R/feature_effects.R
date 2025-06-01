@@ -594,7 +594,7 @@ calculate_stats <- function(
         w = ale_data$w,
         g = if (is.null(ale_data$ix)) ix else ix[ale_data$ix],
         ...
-      )
+      )[-1L] # drop value at first break as we have one value too much
       ok <- !is.na(out$bin_mid)
 
       # Centering possible?
