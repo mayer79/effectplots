@@ -3,18 +3,44 @@ xvars <- colnames(iris)[-1]
 M <- feature_effects(fit, v = xvars, data = iris, y = "Sepal.Length", breaks = 5)
 
 test_that("plot() returns correct class", {
-  expect_s3_class(plot(M), "patchwork")
-  expect_s3_class(plot(M[1L]), "ggplot")
+  expect_s3_class(plot(M, rotate_x = 45, title = "multiple plots"), "patchwork")
+  expect_s3_class(plot(M, stats = "resid_mean", interval = "ci"), "patchwork")
+
+  expect_s3_class(plot(M[1L], rotate_x = 45), "ggplot")
+  expect_s3_class(plot(M[1L], stats = "resid_mean", interval = "ci"), "ggplot")
 
   # Plotly
-  p <- plot(M, plotly = TRUE)
+  p <- plot(M, plotly = TRUE, title = "multiple plots")
   expect_s3_class(p, "plotly")
   expect_true("subplot" %in% names(p$x))
 
   p <- plot(M[1L], plotly = TRUE)
   expect_s3_class(p, "plotly")
   expect_false("subplot" %in% names(p$x))
+
+  p <- plot(M, stats = "resid_mean", interval = "ci", plotly = TRUE)
+  expect_s3_class(p, "plotly")
+  expect_true("subplot" %in% names(p$x))
+
+  p <- plot(M[1L], stats = "resid_mean", interval = "ci", plotly = TRUE)
+  expect_s3_class(p, "plotly")
+  expect_false("subplot" %in% names(p$x))
 })
+
+test_that("plot() returns correct class with single ALE line", {
+  expect_s3_class(plot(M[1:2], stats = "ale"), "patchwork")
+  expect_s3_class(plot(M[1L], stats = "ale"), "ggplot")
+
+  # Plotly
+  p <- plot(M[1:2], plotly = TRUE, stats = "ale")
+  expect_s3_class(p, "plotly")
+  expect_true("subplot" %in% names(p$x))
+
+  p <- plot(M[1L], plotly = TRUE, stats = "ale")
+  expect_s3_class(p, "plotly")
+  expect_false("subplot" %in% names(p$x))
+})
+
 
 test_that("ncols has an effect", {
   # How to do with patchwork??
@@ -59,4 +85,3 @@ test_that("y axis can be shared", {
   expect_null(p1$x$layout$yaxis$range)
   expect_equal(p2$x$layout$yaxis$range, p2$x$layout$yaxis3$range)
 })
-
