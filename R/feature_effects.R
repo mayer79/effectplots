@@ -473,6 +473,53 @@ feature_effects.H2OModel <- function(
   )
 }
 
+#' @describeIn feature_effects Method for xgb.Booster models.
+#' @export
+feature_effects.xgb.Booster <- function(
+    object,
+    v,
+    data,
+    y = NULL,
+    pred = NULL,
+    pred_fun = stats::predict,
+    trafo = NULL,
+    which_pred = NULL,
+    w = NULL,
+    breaks = "Sturges",
+    right = TRUE,
+    discrete_m = 13L,
+    outlier_iqr = 2,
+    calc_pred = TRUE,
+    pd_n = 500L,
+    ale_n = 50000L,
+    ale_bin_size = 200L,
+    ...
+) {
+  if (!inherits(data, "matrix")) {
+    data = as.matrix(data)
+  }
+  feature_effects.default(
+    object,
+    v = v,
+    data = data,
+    y = y,
+    pred = pred,
+    pred_fun = pred_fun,
+    trafo = trafo,
+    which_pred = which_pred,
+    w = w,
+    breaks = breaks,
+    right = right,
+    discrete_m = discrete_m,
+    outlier_iqr = outlier_iqr,
+    calc_pred = calc_pred,
+    pd_n = pd_n,
+    ale_n = ale_n,
+    ale_bin_size = ale_bin_size,
+    ...
+  )
+}
+
 #' Workhorse of feature_effects()
 #'
 #' Internal function used to calculate the output of `feature_effects()` for one

@@ -6,6 +6,7 @@
 \alias{feature_effects.ranger}
 \alias{feature_effects.explainer}
 \alias{feature_effects.H2OModel}
+\alias{feature_effects.xgb.Booster}
 \title{Feature Effects}
 \usage{
 feature_effects(object, ...)
@@ -84,6 +85,27 @@ feature_effects(object, ...)
   trafo = NULL,
   which_pred = NULL,
   w = object@parameters$weights_column$column_name,
+  breaks = "Sturges",
+  right = TRUE,
+  discrete_m = 13L,
+  outlier_iqr = 2,
+  calc_pred = TRUE,
+  pd_n = 500L,
+  ale_n = 50000L,
+  ale_bin_size = 200L,
+  ...
+)
+
+\method{feature_effects}{xgb.Booster}(
+  object,
+  v,
+  data,
+  y = NULL,
+  pred = NULL,
+  pred_fun = stats::predict,
+  trafo = NULL,
+  which_pred = NULL,
+  w = NULL,
   breaks = "Sturges",
   right = TRUE,
   discrete_m = 13L,
@@ -231,6 +253,8 @@ If you need only one specific statistic, you can use the simplified APIs of
 \item \code{feature_effects(explainer)}: Method for DALEX explainer.
 
 \item \code{feature_effects(H2OModel)}: Method for H2O models.
+
+\item \code{feature_effects(xgb.Booster)}: Method for xgb.Booster models.
 
 }}
 \examples{
