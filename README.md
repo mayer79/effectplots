@@ -6,6 +6,9 @@
 [![Codecov test coverage](https://codecov.io/gh/mayer79/effectplots/graph/badge.svg)](https://app.codecov.io/gh/mayer79/effectplots)
 [![CRAN_Status_Badge](https://www.r-pkg.org/badges/version/effectplots)](https://cran.r-project.org/package=effectplots)
 
+[![](https://cranlogs.r-pkg.org/badges/effectplots)](https://cran.r-project.org/package=effectplots) 
+[![](https://cranlogs.r-pkg.org/badges/grand-total/effectplots?color=orange)](https://cran.r-project.org/package=effectplots)
+
 <!-- badges: end -->
 
 **{effectplots}** is an R package for calculating and plotting feature effects of any model. It is very fast thanks to [{collapse}](https://CRAN.R-project.org/package=collapse).
